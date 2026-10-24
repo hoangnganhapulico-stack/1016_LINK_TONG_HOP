@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Giá Sữa Tắm On:The Body — Push Sale Tháng 9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f1f5f9;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+
+  .card {
+    background: #fff;
+    width: 640px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #e11d48 0%, #ec4899 55%, #f59e0b 100%);
+    padding: 28px 32px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 40px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .store-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 8px;
+  }
+  .product-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    position: relative;
+  }
+  .product-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 6px;
+    font-weight: 500;
+    position: relative;
+  }
+  .period-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  /* ── TABLE SECTION ── */
+  .table-wrap {
+    padding: 24px 28px 28px;
+  }
+
+  /* Column headers */
+  .col-labels {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+  .col-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #94a3b8;
+  }
+  .col-label.highlight {
+    color: #e11d48;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .disc-tag {
+    display: inline-block;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 100px;
+    padding: 2px 7px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #e11d48;
+  }
+
+  /* Each row */
+  .price-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .qty-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+  }
+  .qty-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+  }
+  .qty-unit {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-top: 1px;
+    text-align: center;
+  }
+
+  .price-cell {
+    border-radius: 14px;
+    padding: 12px 14px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .price-cell.regular {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+  }
+  .price-cell.kohnan {
+    background: linear-gradient(135deg, #fff1f2 0%, #fff7ed 100%);
+    border: 1.5px solid #fecaca;
+  }
+  .price-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .price-cell.regular .price-amount {
+    font-size: 18px;
+    color: #475569;
+  }
+  .price-cell.kohnan .price-amount {
+    font-size: 20px;
+    color: #e11d48;
+  }
+  .price-saved {
+    font-size: 10px;
+    font-weight: 700;
+    color: #16a34a;
+    margin-top: 2px;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0 20%, #e2e8f0 80%, transparent);
+    margin: 6px 0 14px;
+  }
+
+  /* ── KOHNAN DAY CALLOUT ── */
+  .kohnan-callout {
+    margin: 4px 28px 24px;
+    background: linear-gradient(120deg, #fff1f2, #fff7ed);
+    border: 1.5px solid #fca5a5;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .kohnan-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .kohnan-text-wrap {}
+  .kohnan-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: #e11d48;
+  }
+  .kohnan-dates {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .kohnan-note {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-left {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .footer-right {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .print-btn {
+    display: block;
+    text-align: center;
+    margin: 20px auto 0;
+    background: #1e293b;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    width: 640px;
+  }
+  .print-btn:hover { background: #0f172a; }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .card {
+      box-shadow: none;
+      border-radius: 0;
+      width: 100%;
+    }
+    .print-btn { display: none; }
+    @page { margin: 10mm; size: A5 portrait; }
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <div class="card">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="store-tag">Kohnan Parc Mall · Store 1016 · Push Sale Tháng 9</div>
+      <div class="product-name">🧴 Sữa Tắm On: The Body</div>
+      <div class="product-sub">Nước Hoa OTB · 3 mùi hương · Chai 1000G</div>
+      <div class="period-badge">Chiến dịch: 24/08 – 23/09/2026</div>
+    </div>
+
+    <!-- PRICE TABLE -->
+    <div class="table-wrap">
+
+      <!-- Column headers -->
+      <div class="col-labels">
+        <div class="col-label"></div>
+        <div class="col-label">Giá thường</div>
+        <div class="col-label highlight">
+          Giá Kohnan Day
+          <span class="disc-tag">−5%</span>
+        </div>
+      </div>
+
+      <!-- 1 Chai -->
+      <div class="price-row">
+        <div>
+          <div class="qty-cell"><div>
+            <div class="qty-num">1</div>
+            <div class="qty-unit">chai</div>
+          </div></div>
+        </div>
+        <div class="price-cell regular">
+          <div class="price-amount">99.000đ</div>
+        </div>
+        <div class="price-cell kohnan">
+          <div class="price-amount">94.050đ</div>
+          <div class="price-saved">↓ tiết kiệm 4.950đ</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 2 Chai -->
+      <div class="price-row">
+        <div>
+          <div class="qty-cell"><div>
+            <div class="qty-num">2</div>
+            <div class="qty-unit">chai</div>
+          </div></div>
+        </div>
+        <div class="price-cell regular">
+          <div class="price-amount">198.000đ</div>
+        </div>
+        <div class="price-cell kohnan">
+          <div class="price-amount">188.100đ</div>
+          <div class="price-saved">↓ tiết kiệm 9.900đ</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 3 Chai -->
+      <div class="price-row">
+        <div>
+          <div class="qty-cell"><div>
+            <div class="qty-num">3</div>
+            <div class="qty-unit">chai</div>
+          </div></div>
+        </div>
+        <div class="price-cell regular">
+          <div class="price-amount">297.000đ</div>
+        </div>
+        <div class="price-cell kohnan">
+          <div class="price-amount">282.150đ</div>
+          <div class="price-saved">↓ tiết kiệm 14.850đ</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 4 Chai -->
+      <div class="price-row">
+        <div>
+          <div class="qty-cell"><div>
+            <div class="qty-num">4</div>
+            <div class="qty-unit">chai</div>
+          </div></div>
+        </div>
+        <div class="price-cell regular">
+          <div class="price-amount">396.000đ</div>
+        </div>
+        <div class="price-cell kohnan">
+          <div class="price-amount">376.200đ</div>
+          <div class="price-saved">↓ tiết kiệm 19.800đ</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KOHNAN DAY CALLOUT -->
+    <div class="kohnan-callout">
+      <div class="kohnan-icon">🔥</div>
+      <div class="kohnan-text-wrap">
+        <div class="kohnan-title">Giá Kohnan Day áp dụng ngày 05/09 và 20/09</div>
+        <div class="kohnan-dates">Thứ Bảy 05/09/2026 · Thứ Bảy 20/09/2026</div>
+        <div class="kohnan-note">Các ngày còn lại trong tháng áp dụng cột "Giá thường"</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-left">Team Admin · Kohnan Store 1016</div>
+      <div class="footer-right">Giá chưa bao gồm VAT • Tháng 9/2026</div>
+    </div>
+
+  </div>
+
+  <button class="print-btn" onclick="window.print()">🖨️ In Bảng Giá</button>
+</div>
+
+</body>
+</html>

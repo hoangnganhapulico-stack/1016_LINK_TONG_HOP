@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cẩm Nang Hướng Dẫn Đo Huyết Áp Tại Nhà - Bản In A4 (2 Trang)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Fixed A4 Page container for preview and print */
+        .page {
+            width: 210mm;
+            height: 296mm; /* Exactly 1mm less than A4 height to guarantee zero unexpected page-overflows */
+            padding: 12mm 14mm;
+            margin: 15px auto;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* Prevents overflow pushing to extra page */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Printable Standard Overrides */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .page {
+                width: 210mm !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
+                margin: 0 !important;
+                padding: 10mm 12mm !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 5px 8px;
+            text-align: left;
+            font-size: 11px;
+            line-height: 1.35;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="py-4">
+
+    <!-- Print action bar for screen view -->
+    <div class="no-print max-w-4xl mx-auto mb-4 bg-blue-900 text-white p-4 rounded-xl shadow-lg flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="font-bold text-base flex items-center gap-2">
+                🖨️ <span>Trang In Cẩm Nang Chuẩn A4 (Đúng 2 Trang)</span>
+            </h2>
+            <p class="text-xs text-blue-200 mt-0.5">Nội dung đã được căn chỉnh vừa khít 2 trang A4. Bấm nút bên cạnh để In hoặc Chọn "Lưu dưới dạng PDF" (Save as PDF).</p>
+        </div>
+        <button onclick="window.print()" class="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition shadow-md flex items-center gap-2 text-sm">
+            <span>🖨️ In Ngay / Xuất PDF</span>
+        </button>
+    </div>
+
+    <!-- ==================== PAGE 1: HƯỚNG DẪN & TRA CỨU ==================== -->
+    <div class="page">
+        <div>
+            <!-- Header Section -->
+            <div class="border-b-2 border-blue-600 pb-2 mb-3 flex justify-between items-start">
+                <div>
+                    <span class="inline-block px-2.5 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded-full mb-1">TÀI LIỆU Y KHOA KHÁCH HÀNG</span>
+                    <h1 class="text-xl font-extrabold text-blue-900 leading-tight">🩸 CẨM NANG HƯỚNG DẪN ĐO & THEO DÕI HUYẾT ÁP</h1>
+                    <p class="text-[10px] text-slate-500 mt-0.5">Đồng hành cùng sức khỏe gia đình bạn | Hướng dẫn chuẩn Bộ Y Tế & WHO</p>
+                </div>
+                <div class="text-right text-[11px] text-slate-600">
+                    <p class="font-bold text-blue-900 text-xs">🏪 KOHNAN PARC MALL</p>
+                    <p class="text-[10px] text-slate-500">L2-01 Tầng 2 TTTM Parc Mall</p>
+                    <p class="mt-0.5 text-blue-800 font-bold">📞 Hotline/Zalo: 0911490044</p>
+                </div>
+            </div>
+
+            <!-- Section 1: 5 Không 3 Đúng -->
+            <div class="mb-3">
+                <h2 class="text-xs font-bold text-blue-900 bg-blue-100/70 px-2.5 py-1 rounded border-l-4 border-blue-600 mb-2">
+                    PHẦN 1: QUY TẮC "5 KHÔNG - 3 ĐÚNG" KHI ĐO HUYẾT ÁP
+                </h2>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="border border-red-200 bg-red-50/40 p-2 rounded-lg">
+                        <h3 class="font-bold text-red-700 mb-1 border-b border-red-200 pb-0.5 text-xs">🚫 5 KHÔNG (Tránh 30 phút trước khi đo)</h3>
+                        <ul class="space-y-1 text-slate-700 text-[10.5px]">
+                            <li><b>1. KHÔNG chất kích thích:</b> Trà đậm, cà phê, rượu bia, thuốc lá.</li>
+                            <li><b>2. KHÔNG vận động mạnh:</b> Đi bộ nhanh, leo cầu thang, tập gym.</li>
+                            <li><b>3. KHÔNG ăn quá no:</b> Ăn no làm dồn máu về hệ tiêu hóa.</li>
+                            <li><b>4. KHÔNG nhịn tiểu:</b> Bàng quang đầy làm tăng 10-15 mmHg.</li>
+                            <li><b>5. KHÔNG mặc áo chật:</b> Xắn tay áo bó sát cản trở dòng máu.</li>
+                        </ul>
+                    </div>
+
+                    <div class="border border-emerald-200 bg-emerald-50/40 p-2 rounded-lg">
+                        <h3 class="font-bold text-emerald-700 mb-1 border-b border-emerald-200 pb-0.5 text-xs">🎯 3 ĐÚNG (Thực hiện khi bắt đầu đo)</h3>
+                        <ul class="space-y-1 text-slate-700 text-[10.5px]">
+                            <li><b>1. TƯ THẾ ĐÚNG:</b> Ngồi tựa lưng vào ghế, hai chân chạm bằng phẳng trên sàn (không bắt chéo chân).</li>
+                            <li><b>2. VỊ TRÍ ĐÚNG:</b> Đặt cánh tay/cổ tay lên bàn, vòng bít nằm ngang mức với tim.</li>
+                            <li><b>3. TRẠNG THÁI ĐÚNG:</b> Thả lỏng toàn thân, giữ im lặng tuyệt đối, không di chuyển khi máy đang đo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Cách đọc chỉ số & Bảng phân loại -->
+            <div class="mb-3">
+                <h2 class="text-xs font-bold text-blue-900 bg-blue-100/70 px-2.5 py-1 rounded border-l-4 border-blue-600 mb-2">
+                    PHẦN 2: CÁCH ĐỌC & HIỂU CHỈ SỐ HUYẾT ÁP
+                </h2>
+                
+                <table class="w-full mb-2">
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Ký hiệu</th>
+                            <th class="w-1/4">Tên chỉ số</th>
+                            <th>Ý nghĩa y khoa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[10.5px]">
+                        <tr>
+                            <td class="font-bold text-blue-700">SYS (Số trên)</td>
+                            <td>Huyết áp Tâm thu</td>
+                            <td>Áp lực máu khi tim bóp đẩy máu đi nuôi cơ thể (Dự phòng đột quỵ).</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-emerald-700">DIA (Số dưới)</td>
+                            <td>Huyết áp Tâm trương</td>
+                            <td>Áp lực máu khi tim nghỉ giữa hai nhịp đập.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-orange-600">PULSE</td>
+                            <td>Nhịp tim</td>
+                            <td>Số nhịp tim đập trong 1 phút (Bình thường: 60 - 90 nhịp/phút).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-[10.5px] font-bold text-slate-700 mb-1">📊 Bảng Phân Loại Huyết Áp Chuẩn (Theo ESC/WHO):</p>
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Phân loại</th>
+                            <th>Tâm thu (SYS)</th>
+                            <th>Tâm trương (DIA)</th>
+                            <th>Khuyên dùng</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[10.5px]">
+                        <tr class="bg-emerald-50">
+                            <td class="font-bold text-emerald-800">Tối ưu</td>
+                            <td>&lt; 120 mmHg</td>
+                            <td>&lt; 80 mmHg</td>
+                            <td>Rất tốt! Duy trì lối sống lành mạnh.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-emerald-600">Bình thường</td>
+                            <td>120 - 129 mmHg</td>
+                            <td>80 - 84 mmHg</td>
+                            <td>An toàn, duy trì đo định kỳ.</td>
+                        </tr>
+                        <tr class="bg-yellow-50">
+                            <td class="font-bold text-yellow-700">Tiền tăng huyết áp</td>
+                            <td>130 - 139 mmHg</td>
+                            <td>85 - 89 mmHg</td>
+                            <td>Giảm ăn mặn, tập thể dục, theo dõi sát.</td>
+                        </tr>
+                        <tr class="bg-orange-50">
+                            <td class="font-bold text-orange-700">Tăng huyết áp Cấp 1</td>
+                            <td>140 - 159 mmHg</td>
+                            <td>90 - 99 mmHg</td>
+                            <td>Nên tham khảo ý kiến bác sĩ.</td>
+                        </tr>
+                        <tr class="bg-red-50">
+                            <td class="font-bold text-red-700">Tăng huyết áp Cấp 2</td>
+                            <td>&ge; 160 mmHg</td>
+                            <td>&ge; 100 mmHg</td>
+                            <td>Cần thăm khám và dùng thuốc theo đơn.</td>
+                        </tr>
+                        <tr class="bg-red-200 font-bold">
+                            <td class="text-red-900">🚨 NGUY CẤP</td>
+                            <td class="text-red-900">&gt; 180 mmHg</td>
+                            <td class="text-red-900">&gt; 120 mmHg</td>
+                            <td class="text-red-900">Nghỉ 5 phút đo lại. Vẫn cao $\rightarrow$ CẤP CỨU!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 3: Máy đo bắp tay & cổ tay -->
+            <div>
+                <h2 class="text-xs font-bold text-blue-900 bg-blue-100/70 px-2.5 py-1 rounded border-l-4 border-blue-600 mb-2">
+                    PHẦN 3: SO SÁNH MÁY ĐO BẮP TAY & CỔ TAY
+                </h2>
+                <table class="w-full text-[10.5px]">
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Tiêu chí</th>
+                            <th class="w-3/8">Máy Đo Bắp Tay</th>
+                            <th class="w-3/8">Máy Đo Cổ Tay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold">Độ chính xác</td>
+                            <td><b>Cao nhất & rất ổn định</b> (Mạch bắp tay to, gần tim).</td>
+                            <td><b>Khá tốt</b> (Nhạy cảm hơn với vị trí đặt tay).</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Đối tượng phù hợp</td>
+                            <td>• Người cao tuổi (&gt;50 tuổi)<br>• Người có bệnh tim mạch, tiểu đường</td>
+                            <td>• Người trẻ, trung niên (&lt;50 tuổi)<br>• Người hay di chuyển, du lịch</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Lưu ý khi dùng</td>
+                            <td>Quấn vòng bít cách khuỷu tay 1 - 2 cm.</td>
+                            <td>Bắt buộc phải <b>áp sát cổ tay lên ngực (ngang tim)</b>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center text-[10px] text-slate-400 pt-2 border-t border-slate-200">
+            Trang 1 / 2 — Cẩm nang hướng dẫn đo huyết áp tại nhà (Kohnan Parc Mall)
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 2: NHẬT KÝ THEO DÕI ==================== -->
+    <div class="page">
+        <div class="h-full flex flex-col justify-between">
+            <div>
+                <!-- Page 2 Header -->
+                <div class="border-b-2 border-blue-600 pb-2 mb-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base font-bold text-blue-900">PHẦN 4: BẢNG NHẬT KÝ THEO DÕI HUYẾT ÁP HÀNG NGÀY</h2>
+                        <p class="text-[11px] text-slate-500">Nên đo 2 lần/ngày: <b>Buổi sáng</b> (mới ngủ dậy, đã đi vệ sinh) và <b>Buổi tối</b> (trước khi đi ngủ).</p>
+                    </div>
+                    <div class="text-right text-[11px] bg-blue-50 px-3 py-1.5 rounded border border-blue-200">
+                        <p class="text-blue-900"><b>Mục tiêu bác sĩ dặn:</b></p>
+                        <p class="font-bold text-blue-800 text-xs mt-0.5">&lt; ....... / ....... mmHg</p>
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="mb-3 grid grid-cols-3 gap-2 text-xs bg-slate-50 p-2 rounded border border-slate-200">
+                    <p><b>Họ và tên:</b> .....................................................</p>
+                    <p><b>Tuổi:</b> .....................</p>
+                    <p><b>SĐT:</b> .....................................</p>
+                </div>
+
+                <!-- Tracking Log Table -->
+                <table class="w-full mb-3">
+                    <thead>
+                        <tr class="bg-blue-100 text-blue-900">
+                            <th class="w-1/6">Ngày</th>
+                            <th class="w-1/12 text-center">Buổi</th>
+                            <th class="w-1/5 text-center">Huyết áp (SYS / DIA)</th>
+                            <th class="w-1/6 text-center">Nhịp tim (PULSE)</th>
+                            <th>Ghi chú (Triệu chứng, vừa uống thuốc, mệt...)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[11px]">
+                        <tr class="italic text-slate-500 bg-slate-50">
+                            <td>Ví dụ: 20/10</td>
+                            <td class="text-center">Sáng</td>
+                            <td class="text-center font-bold text-slate-700">125 / 82</td>
+                            <td class="text-center">72</td>
+                            <td>Thấy khỏe, vừa ngủ dậy</td>
+                        </tr>
+                        <tr class="italic text-slate-500 bg-slate-50">
+                            <td>Ví dụ: 20/10</td>
+                            <td class="text-center">Tối</td>
+                            <td class="text-center font-bold text-orange-600">138 / 88</td>
+                            <td class="text-center">78</td>
+                            <td>Hơi mệt sau giờ làm</td>
+                        </tr>
+                        <!-- 12 empty log rows -->
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Sáng</td><td></td><td></td><td></td></tr>
+                        <tr><td class="h-7"></td><td class="text-center font-semibold text-slate-600">Tối</td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Advice & Store Contact -->
+            <div class="border-t-2 border-blue-600 pt-3 mt-auto">
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-100 flex flex-col justify-center">
+                        <h4 class="font-bold text-blue-900 mb-1 text-xs">💡 LỜI KHUYÊN DÀNH CHO KHÁCH HÀNG:</h4>
+                        <ul class="space-y-1 text-slate-700 text-[10.5px]">
+                            <li>• <b>Khi tái khám bác sĩ:</b> Hãy mang theo nhật ký này để bác sĩ có dữ liệu chẩn đoán và điều chỉnh thuốc chính xác nhất.</li>
+                            <li>• <b>Hỗ trợ kỹ thuật:</b> Mang máy đến cửa hàng để được hỗ trợ kiểm tra và hướng dẫn kỹ thuật đo đúng cách.</li>
+                        </ul>
+                    </div>
+                    <div class="text-right flex flex-col justify-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                        <p class="font-extrabold text-blue-900 text-xs">🏪 CỬA HÀNG KOHNAN PARC MALL</p>
+                        <p class="text-slate-600 text-[10.5px] mt-0.5">📍 L2-01 Tầng 2 TTTM Parc Mall (547-549 Tạ Quang Bửu, Phường Chánh Hưng, TP.HCM)</p>
+                        <p class="text-slate-700 text-[11px] font-bold mt-0.5">📞 Hotline / Zalo hỗ trợ: <span class="text-blue-800">0911490044</span></p>
+                    </div>
+                </div>
+                <div class="text-center text-[10px] text-slate-400 mt-2">
+                    Trang 2 / 2 — Cẩm nang hướng dẫn đo huyết áp tại nhà (Kohnan Parc Mall)
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

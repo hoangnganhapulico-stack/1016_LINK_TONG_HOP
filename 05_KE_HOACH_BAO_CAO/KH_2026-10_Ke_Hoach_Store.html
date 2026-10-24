@@ -1,0 +1,694 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kế Hoạch Tháng 10 - Store 1016</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #eef1f6; --surface: #ffffff; --surface-2: #f4f6f9;
+    --ink: #10161f; --ink-soft: #4b5768; --ink-faint: #6f7a8c;
+    --primary: #123a6b; --primary-soft: #e6ecf6; --primary-line: #c7d4e8;
+    --accent-red: #b8291f; --accent-red-soft: #fbe9e7;
+    --accent-amber: #c9781a; --accent-amber-soft: #fbf0dd;
+    --pink: #b0306a; --pink-soft: #fbe8f1;
+    --good: #276b4d; --good-soft: #e3f2e9;
+    --border: #dde2ea;
+    --shadow: 0 1px 2px rgba(16,22,31,0.04), 0 8px 24px rgba(16,22,31,0.06);
+    --radius: 10px;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+    --display: 'Archivo', 'IBM Plex Sans', -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #11151c; --surface: #1a2029; --surface-2: #1f2631;
+      --ink: #edf0f4; --ink-soft: #aab4c4; --ink-faint: #8a95a6;
+      --primary: #8fb3e6; --primary-soft: #1e2c42; --primary-line: #2d3f5c;
+      --accent-red: #ff8a7d; --accent-red-soft: #3a2220;
+      --accent-amber: #f2b25c; --accent-amber-soft: #372a16;
+      --pink: #f38bbb; --pink-soft: #3a1f2c;
+      --good: #7fd1a8; --good-soft: #1c3529;
+      --border: #2b3340;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #11151c; --surface: #1a2029; --surface-2: #1f2631;
+    --ink: #edf0f4; --ink-soft: #aab4c4; --ink-faint: #8a95a6;
+    --primary: #8fb3e6; --primary-soft: #1e2c42; --primary-line: #2d3f5c;
+    --accent-red: #ff8a7d; --accent-red-soft: #3a2220;
+    --accent-amber: #f2b25c; --accent-amber-soft: #372a16;
+    --pink: #f38bbb; --pink-soft: #3a1f2c;
+    --good: #7fd1a8; --good-soft: #1c3529;
+    --border: #2b3340;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15.5px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: var(--primary); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px 80px; }
+
+  .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: #123a6b; color: #fff; }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 12px; overflow-x: auto; }
+  .topbar .mark { font-family: var(--display); font-weight: 800; letter-spacing: 0.02em; font-size: 13px; white-space: nowrap; padding-right: 10px; border-right: 1px solid rgba(255,255,255,0.25); }
+  .topbar nav { display: flex; gap: 4px; white-space: nowrap; }
+  .topbar nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 12.5px; padding: 6px 9px; border-radius: 6px; }
+  .topbar nav a:hover, .topbar nav a:focus-visible { background: rgba(255,255,255,0.14); color: #fff; outline: none; }
+
+  .hero { padding: 40px 0 28px; }
+  .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 10px; }
+  h1.title { font-family: var(--display); font-weight: 800; letter-spacing: -0.01em; font-size: clamp(28px, 4.4vw, 40px); line-height: 1.08; margin: 0 0 10px; text-wrap: balance; }
+  h1.title .store { display: block; font-size: 0.42em; font-weight: 700; color: var(--primary); margin-top: 10px; letter-spacing: 0.01em; }
+  .hero p.lede { max-width: 62ch; color: var(--ink-soft); font-size: 16px; margin: 14px 0 0; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .tag { font-family: var(--mono); font-size: 11.5px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-soft); background: var(--surface); }
+
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+  .section-num { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+  h2 { font-family: var(--display); font-weight: 800; font-size: 21px; margin: 0; text-wrap: balance; }
+  .section-note { color: var(--ink-soft); font-size: 14px; margin: -6px 0 18px; max-width: 70ch; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .stat { background: var(--surface); padding: 16px 18px; }
+  .stat .k { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); }
+  .stat .v { font-family: var(--display); font-weight: 800; font-size: 22px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .stat .v.small { font-size: 15.5px; font-weight: 700; line-height: 1.3; }
+
+  .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; }
+  .pillar { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; color: var(--ink-soft); }
+  .pillar b { display: block; color: var(--ink); font-family: var(--display); font-size: 14px; margin-bottom: 2px; }
+
+  .callout { border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); padding: 20px 22px; }
+  .callout.priority { border-color: var(--accent-red); background: var(--accent-red-soft); }
+  .callout.women { border-color: var(--pink); background: var(--pink-soft); }
+  .callout + .callout { margin-top: 14px; }
+  .callout-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .chip { font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
+  .chip.store { background: var(--accent-red); color: var(--surface); }
+  .chip.pink { background: var(--pink); color: var(--surface); }
+  .chip.due { background: var(--accent-amber); color: #221607; }
+  .chip.all { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-line); }
+  .callout h4 { margin: 0; font-family: var(--display); font-size: 15.5px; font-weight: 800; }
+  .callout p { margin: 6px 0 0; color: var(--ink-soft); font-size: 14px; }
+  .callout dl { margin: 12px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13.5px; }
+  .callout dt { font-family: var(--mono); color: var(--ink-faint); white-space: nowrap; }
+  .callout dd { margin: 0; }
+
+  .timeline { border-left: 2px solid var(--border); margin-left: 6px; padding-left: 22px; }
+  .tl-group-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin: 26px 0 10px; }
+  .tl-group-label:first-child { margin-top: 4px; }
+  .tl-item { position: relative; padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-item::before { content: ""; position: absolute; left: -28px; top: 16px; width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink-faint); }
+  .tl-item.due::before { border-color: var(--accent-amber); background: var(--accent-amber); }
+  .tl-item.store1016::before { border-color: var(--accent-red); background: var(--accent-red); }
+  .tl-item.women::before { border-color: var(--pink); background: var(--pink); }
+  .tl-date { font-family: var(--mono); font-size: 12.5px; font-weight: 600; min-width: 128px; font-variant-numeric: tabular-nums; }
+  .tl-body { flex: 1; min-width: 200px; font-size: 14px; }
+  .tl-cat { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+
+  .cat-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 14px; }
+  .cat-card.p1 { border-left: 4px solid var(--accent-red); }
+  .cat-card.pw { border-left: 4px solid var(--pink); }
+  .cat-card.p2 { border-left: 4px solid var(--primary); box-shadow: none; }
+  .cat-head { padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cat-id { font-family: var(--mono); font-weight: 700; font-size: 12px; color: var(--surface); background: var(--ink); padding: 3px 8px; border-radius: 5px; letter-spacing: 0.03em; white-space: nowrap; }
+  .cat-card.p1 .cat-id { background: var(--accent-red); }
+  .cat-card.pw .cat-id { background: var(--pink); }
+  .cat-title { font-family: var(--display); font-weight: 800; font-size: 16px; flex: 1; min-width: 140px; }
+  .cat-target { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .cat-body { padding: 0 20px 18px; }
+  .cat-body p { margin: 6px 0; font-size: 14px; color: var(--ink-soft); }
+  .cat-body p b { color: var(--ink); font-weight: 600; }
+  .price { font-family: var(--mono); color: var(--accent-red); font-weight: 600; white-space: nowrap; }
+  .note { font-size: 12.5px; }
+
+  details.cat-card summary { cursor: pointer; list-style: none; }
+  details.cat-card summary::-webkit-details-marker { display: none; }
+  details.cat-card summary:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+  details.cat-card summary .arrow { margin-left: auto; color: var(--ink-faint); font-family: var(--mono); font-size: 13px; transition: transform 0.15s; }
+  details[open].cat-card summary .arrow { transform: rotate(90deg); }
+
+  .checklist { list-style: none; margin: 12px 0 4px; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .checklist li { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; }
+  .checklist input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; flex: none; border: 1.5px solid var(--ink-faint); border-radius: 4px; margin-top: 1.5px; cursor: pointer; background: var(--surface); position: relative; }
+  .checklist input[type="checkbox"]:checked { background: var(--good); border-color: var(--good); }
+  .checklist input[type="checkbox"]:checked::after { content: "✓"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--surface); font-size: 12px; font-weight: 700; }
+  .checklist input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .checklist label { cursor: pointer; }
+  .checklist input:checked + label { color: var(--ink-faint); text-decoration: line-through; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+  table.data th, table.data td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.data th { font-family: var(--mono); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); }
+  table.data td.num { font-variant-numeric: tabular-nums; text-align: right; font-family: var(--mono); }
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; }
+
+  .rank-flag { display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: var(--accent-amber-soft); border: 1px solid var(--accent-amber); border-radius: 8px; margin-top: 10px; }
+  .rank-flag.good { background: var(--good-soft); border-color: var(--good); }
+  .rank-flag .num { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--accent-amber); min-width: 72px; font-variant-numeric: tabular-nums; }
+  .rank-flag.good .num { color: var(--good); }
+  .rank-flag p { margin: 0; font-size: 13.5px; }
+
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--ink-faint); font-size: 12.5px; }
+  @media (max-width: 520px) { .wrap { padding: 0 16px 60px; } .cat-head { padding: 14px 16px; } .cat-body { padding: 0 16px 16px; } .callout { padding: 16px; } .tl-date { min-width: 0; width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600&display=swap">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="mark">KOHNAN · OCT PLAN</span>
+    <nav>
+      <a href="#budget">Budget 1016</a>
+      <a href="#uu-tien">Riêng 1016</a>
+      <a href="#phu-nu">20/10</a>
+      <a href="#canh-bao">Số liệu 1016</a>
+      <a href="#lich-trinh">Lịch trình</a>
+      <a href="#nganh-uu-tien">Ngành ưu tiên</a>
+      <a href="#nganh-khac">Ngành khác</a>
+      <a href="#bat-buoc">Bắt buộc</a>
+      <a href="#khong-ap-dung">Không áp dụng</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow">Nguồn: MD Plan Oct - Kohnan Việt Nam · Phòng Merchandiser · Trình bày 18/09/2026</p>
+    <h1 class="title">Kế hoạch bán hàng tháng 10/2026
+      <span class="store">Việc cần làm - Kohnan Parc Mall, Store 1016</span>
+    </h1>
+    <p class="lede">Tổng hợp từ bộ kế hoạch 124 trang của phòng Merchandiser, giữ lại phần áp dụng cho Store 1016 (miền Nam) và việc triển khai tại quầy, kệ, kho.</p>
+    <div class="meta-row">
+      <span class="tag">Cập nhật: 26/09/2026</span>
+      <span class="tag">Chủ đề: "Prepare Your Home" - Rain · Prepare · Clean · Organize</span>
+      <span class="tag">Cao điểm: 20/10 Ngày Phụ nữ VN</span>
+      <span class="tag">Khu vực: Miền Nam (HCMC)</span>
+    </div>
+  </div>
+
+  <section id="tong-quan">
+    <div class="section-head"><span class="section-num">01</span><h2>Bối cảnh chung tháng 10</h2></div>
+    <p class="section-note">Trung Thu kết thúc, trọng tâm chuyển sang mùa mưa cao điểm và chuẩn bị nhà cửa cuối năm. Miền Nam: <b>chống mưa ngập - dọn dẹp sau mưa</b> (gạt nước, gáo múc nước, cây lau nhà, xô). Toàn quốc: sửa chữa DIY, vệ sinh, bếp và lưu trữ (keo, băng keo sửa chữa, chảo). Song song: <b>20/10 Ngày Phụ nữ</b> theo chiến lược Beauty × Health × Flower.</p>
+    <div class="stats">
+      <div class="stat"><div class="k">Budget Store 1016 T10</div><div class="v">3,462 tỷ</div></div>
+      <div class="stat"><div class="k">So với T10/2025</div><div class="v small">+6,4%<br>LY 3,254 tỷ · +208 triệu</div></div>
+      <div class="stat"><div class="k">Ngành lớn nhất</div><div class="v small">Cat 15 · Hóa mỹ phẩm<br>17,47 tỷ</div></div>
+      <div class="stat"><div class="k">Tăng trưởng mạnh nhất</div><div class="v small">Cat 12 · Thú cưng<br>1,65 tỷ · 209% LY</div></div>
+    </div>
+    <div class="pillars">
+      <div class="pillar"><b>1. Giá trị & giá phù hợp</b>Không chạy theo giảm sâu - tập trung lợi nhuận từng giao dịch.</div>
+      <div class="pillar"><b>2. Hàng GP cao mỗi ngày</b>Ít mặt hàng khuyến mãi, tập trung item GP cao, trưng bày khối lượng lớn.</div>
+      <div class="pillar"><b>3. Tăng giá trị giỏ hàng</b>Bán kèm, mua số lượng các mặt hàng liên quan.</div>
+    </div>
+    <div class="pillars">
+      <div class="pillar"><b>① Phòng chống mưa ngập</b>Chủ đề quan trọng nhất - mưa, ngập, cúp điện.</div>
+      <div class="pillar"><b>② Vệ sinh</b>Thoát nước sau mưa, lau chùi bùn đất.</div>
+      <div class="pillar"><b>③ Sửa chữa nhà</b>Chống dột, cửa sổ, băng keo chống thấm.</div>
+      <div class="pillar"><b>④ Lưu trữ</b>Đổi mùa quần áo, hộp nhựa, móc treo.</div>
+      <div class="pillar"><b>⑤ Bếp</b>Nồi, chảo, hộp đựng thực phẩm.</div>
+    </div>
+  </section>
+
+  <section id="budget">
+    <div class="section-head"><span class="section-num">02</span><h2>Budget Store 1016 tháng 10</h2></div>
+    <p class="section-note">Nguồn: file 1016.BUDGET2026 - sheet tháng 10 (01/10-31/10/2026). Cuối tuần gánh hơn nửa doanh số tháng.</p>
+    <div class="stats">
+      <div class="stat"><div class="k">Bình quân / ngày</div><div class="v">111,7 tr</div></div>
+      <div class="stat"><div class="k">Thứ 7 / Chủ nhật</div><div class="v small">174,5 tr / 230,9 tr</div></div>
+      <div class="stat"><div class="k">Thứ 2 - Thứ 6</div><div class="v small">62,3 - 83,8 tr</div></div>
+      <div class="stat"><div class="k">9 ngày cuối tuần</div><div class="v small">1,796 tỷ<br>52% budget tháng</div></div>
+    </div>
+
+    <h3 style="font-family:var(--display);font-size:15px;margin:22px 0 8px">Budget theo tuần & ngày trọng điểm</h3>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Tuần</th><th>Budget</th><th>Ngày cần chú ý</th></tr></thead>
+        <tbody>
+          <tr><td>01 - 04/10</td><td class="num">570,5 tr</td><td><b>03-04/10 Pet Festival tại Parc Mall</b>: T7 174,5tr + CN 230,9tr = 405,4tr</td></tr>
+          <tr><td>05 - 11/10</td><td class="num">781,0 tr</td><td>Hàng mới về 05/10; NIN HOUSE bắt đầu 09/10; cuối tuần 10-11/10: 405,4tr</td></tr>
+          <tr><td>12 - 18/10</td><td class="num">778,3 tr</td><td>Cuối tuần 17-18/10 trước 20/10: 405,4tr - dồn lực khu quà</td></tr>
+          <tr><td>19 - 25/10</td><td class="num">784,9 tr</td><td><b>20/10 (Thứ 3): 72,36tr</b> - cao hơn Thứ 3 thường 10%</td></tr>
+          <tr><td>26 - 31/10</td><td class="num">547,4 tr</td><td>31/10 Halloween (Thứ 7): 174,5tr</td></tr>
+          <tr><td><b>Tổng</b></td><td class="num"><b>3.462 tr</b></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:var(--display);font-size:15px;margin:22px 0 8px">Budget theo ngành hàng (triệu đồng)</h3>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Cat</th><th>Ngành</th><th style="text-align:right">Budget T10</th><th style="text-align:right">T10/2025</th><th style="text-align:right">% LY</th><th style="text-align:right">Cần tăng</th><th style="text-align:right">Tỷ trọng</th></tr></thead>
+        <tbody>
+          <tr><td>06</td><td>Chăn ga gối / trang trí</td><td class="num">772,0</td><td class="num">783,4</td><td class="num">98,5%</td><td class="num">-11,4</td><td class="num">22,3%</td></tr>
+          <tr><td>15</td><td>Hóa mỹ phẩm</td><td class="num">771,7</td><td class="num">692,4</td><td class="num">111,5%</td><td class="num">+79,3</td><td class="num">22,3%</td></tr>
+          <tr><td>05</td><td>Đồ bếp</td><td class="num">481,9</td><td class="num">438,3</td><td class="num">109,9%</td><td class="num">+43,6</td><td class="num">13,9%</td></tr>
+          <tr><td>21</td><td>Dụng cụ vệ sinh</td><td class="num">216,4</td><td class="num">199,3</td><td class="num">108,6%</td><td class="num">+17,1</td><td class="num">6,2%</td></tr>
+          <tr><td>20</td><td>Đồ mưa / giày dép</td><td class="num">194,2</td><td class="num">170,3</td><td class="num">114,0%</td><td class="num">+23,9</td><td class="num">5,6%</td></tr>
+          <tr><td>25</td><td>Bánh kẹo / nước</td><td class="num">190,4</td><td class="num">157,4</td><td class="num">121,0%</td><td class="num">+33,0</td><td class="num">5,5%</td></tr>
+          <tr><td>23</td><td>Xe đạp / du lịch</td><td class="num">167,2</td><td class="num">193,5</td><td class="num">86,4%</td><td class="num">-26,3</td><td class="num">4,8%</td></tr>
+          <tr><td>19</td><td>Sức khỏe / massage</td><td class="num">149,6</td><td class="num">130,6</td><td class="num">114,5%</td><td class="num">+19,0</td><td class="num">4,3%</td></tr>
+          <tr><td>02</td><td>Dụng cụ điện / đồ nghề</td><td class="num">111,1</td><td class="num">95,6</td><td class="num">116,2%</td><td class="num">+15,5</td><td class="num">3,2%</td></tr>
+          <tr><td>14</td><td>VPP / đồ chơi</td><td class="num">109,1</td><td class="num">99,7</td><td class="num">109,4%</td><td class="num">+9,4</td><td class="num">3,1%</td></tr>
+          <tr><td>08</td><td>Pin / đèn / chống muỗi</td><td class="num">70,3</td><td class="num">72,5</td><td class="num">96,9%</td><td class="num">-2,3</td><td class="num">2,0%</td></tr>
+          <tr><td>07</td><td>Chăm sóc xe</td><td class="num">54,4</td><td class="num">52,7</td><td class="num">103,0%</td><td class="num">+1,6</td><td class="num">1,6%</td></tr>
+          <tr><td>18</td><td>Nội thất / lưu trữ</td><td class="num">45,4</td><td class="num">41,2</td><td class="num">110,1%</td><td class="num">+4,2</td><td class="num">1,3%</td></tr>
+          <tr><td>09</td><td>Làm vườn</td><td class="num">23,9</td><td class="num">19,7</td><td class="num">121,3%</td><td class="num">+4,2</td><td class="num">0,7%</td></tr>
+          <tr><td>04</td><td>Cat 04</td><td class="num">22,8</td><td class="num">22,5</td><td class="num">101,5%</td><td class="num">+0,3</td><td class="num">0,7%</td></tr>
+          <tr><td>03</td><td>Đồ nghề khác</td><td class="num">22,2</td><td class="num">24,6</td><td class="num">90,1%</td><td class="num">-2,4</td><td class="num">0,6%</td></tr>
+          <tr><td>01</td><td>Dụng cụ cầm tay</td><td class="num">20,1</td><td class="num">17,0</td><td class="num">118,3%</td><td class="num">+3,1</td><td class="num">0,6%</td></tr>
+          <tr><td>11</td><td>Cây xanh / hạt giống</td><td class="num">18,7</td><td class="num">17,0</td><td class="num">109,9%</td><td class="num">+1,7</td><td class="num">0,5%</td></tr>
+          <tr><td>12</td><td>Thú cưng</td><td class="num">12,1</td><td class="num">12,9</td><td class="num">94,1%</td><td class="num">-0,8</td><td class="num">0,4%</td></tr>
+          <tr><td>10</td><td>Thang / xe đẩy</td><td class="num">8,7</td><td class="num">13,2</td><td class="num">65,8%</td><td class="num">-4,5</td><td class="num">0,2%</td></tr>
+          <tr><td colspan="2"><b>Tổng Store 1016</b></td><td class="num"><b>3.462,0</b></td><td class="num"><b>3.253,7</b></td><td class="num"><b>106,4%</b></td><td class="num"><b>+208,3</b></td><td class="num">100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rank-flag">
+      <div class="num">44,6%</div>
+      <p><b>Cat 06 + Cat 15 = 1,544 tỷ</b>, gần nửa budget tháng. Hai ngành này cũng là trục Ngày Phụ nữ (nến thơm, workshop, mặt nạ, quà tặng) - ưu tiên nhân sự và mặt trưng bày tốt nhất.</p>
+    </div>
+    <div class="rank-flag">
+      <div class="num">+128 tr</div>
+      <p><b>Cat 15:</b> budget cửa hàng 771,7tr, MD Cat 15 kỳ vọng 1016 đạt 900tr. Lấy 900tr làm mục tiêu phấn đấu, tương đương ~29tr/ngày.</p>
+    </div>
+    <div class="rank-flag">
+      <div class="num">+33 tr</div>
+      <p><b>Cần tăng mạnh nhất về số tiền:</b> Cat 15 (+79tr), Cat 05 (+44tr), Cat 25 (+33tr, 121% LY), Cat 20 (+24tr), Cat 19 (+19tr), Cat 21 (+17tr), Cat 02 (+16tr).</p>
+    </div>
+    <div class="rank-flag good">
+      <div class="num">&lt; LY</div>
+      <p><b>Budget thấp hơn cùng kỳ:</b> Cat 23 (-26tr), Cat 06 (-11tr), Cat 10, Cat 03, Cat 08, Cat 12 - bán vượt các ngành này là phần dư bù cho các ngành tăng trưởng.</p>
+    </div>
+  </section>
+
+  <section id="uu-tien">
+    <div class="section-head"><span class="section-num">03</span><h2>Riêng cho Store 1016 - cần chủ động chuẩn bị</h2></div>
+    <p class="section-note">Các hoạt động tài liệu MD chỉ định đích danh Parc Mall / Store 1016.</p>
+
+    <div class="callout priority">
+      <div class="callout-head"><span class="chip store">Parc Mall</span><span class="chip due">03-04/10</span><span class="chip all">Cat 12</span></div>
+      <h4>Vietnam Pet Festival 2026 "Pet Metropolis" tại Parc Mall</h4>
+      <p>Sự kiện thú cưng diễn ra ngay tại Parc Mall: Grooming Show, Pet Technology Expo, Pet Competition. Kohnan tham gia cùng 3 nhà cung cấp - mỗi NCC tài trợ 1 booth để Kohnan vận hành và bán hàng (khu A6, A7, A8).</p>
+      <dl>
+        <dt>Budget</dt><dd>Cửa hàng T7 03/10: 174,5tr · CN 04/10: 230,9tr. Budget Cat 12 cả tháng của 1016 chỉ 12,1tr - doanh số booth giúp Cat 12 vượt budget</dd>
+        <dt>Hàng đẩy</dt><dd>Silver Spoon (thức ăn mèo), Zenith (thức ăn chó), Vemedim (thực phẩm bổ sung), rọ mõm, đồ dùng thú cưng</dd>
+        <dt>Cần làm</dt><dd>Chốt nhân sự đứng booth, hàng mang ra booth, POP giá; đón khách từ sự kiện vào khu thú cưng trong cửa hàng</dd>
+      </dl>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1016-1"><label for="c1016-1">Xác nhận với MD Cat 12 / NCC: đầu mối, giờ dựng booth, hàng và phương thức thu tiền tại booth</label></li>
+        <li><input type="checkbox" id="c1016-2"><label for="c1016-2">Xếp lịch nhân sự đứng booth 03-04/10</label></li>
+        <li><input type="checkbox" id="c1016-3"><label for="c1016-3">Tăng tồn & làm đầy khu thú cưng trong cửa hàng trước 03/10</label></li>
+      </ul>
+    </div>
+
+    <div class="callout women">
+      <div class="callout-head"><span class="chip pink">Store 1016</span><span class="chip due">01-30/10</span><span class="chip all">Cat 06</span></div>
+      <h4>Workshop quà handmade Ngày Phụ nữ - Dreamtex</h4>
+      <p>Hai workshop do NCC Dreamtex hỗ trợ, chạy cả tháng tại 1001, 1002, 1003, 1016: khách tự làm thiệp/phụ kiện nhỏ làm quà; khách chọn vải, họa tiết, trang trí để cá nhân hóa món quà.</p>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1016-4"><label for="c1016-4">Liên hệ Dreamtex chốt vị trí, bàn ghế, lịch workshop theo ngày trong tháng 10</label></li>
+        <li><input type="checkbox" id="c1016-5"><label for="c1016-5">Đăng ký sự kiện với mall, treo POP thông báo workshop tại lối vào</label></li>
+      </ul>
+    </div>
+
+    <div class="callout women">
+      <div class="callout-head"><span class="chip pink">Store 1016</span><span class="chip due">09-21/10</span><span class="chip all">Cat 06</span></div>
+      <h4>Workshop hoa kẽm nhung NIN HOUSE - "Velvet Wire Flower"</h4>
+      <p>Khách tự làm hoa kẽm nhung, thiết kế bó hoa riêng và mang về làm quà 20/10. Áp dụng 1001, 1002, 1003, 1004, 1014, 1016.</p>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1016-6"><label for="c1016-6">Chốt vị trí và nhân sự hỗ trợ workshop NIN HOUSE trước 07/10</label></li>
+        <li><input type="checkbox" id="c1016-7"><label for="c1016-7">Đặt khu workshop gần khu quà 20/10 để kéo khách sang mua hoa + mỹ phẩm</label></li>
+      </ul>
+    </div>
+
+    <div class="callout priority">
+      <div class="callout-head"><span class="chip store">Store 1016</span><span class="chip due">Từ 15/10</span><span class="chip all">Cat 11</span></div>
+      <h4>Chạy thử giỏ sen đá (NCC 100867) - trưng bày tại lối vào</h4>
+      <p>1016 là 1 trong 6 cửa hàng thử (1001, 1002, 1003, 1005, 1016, 1017). Hàng về dự kiến 15/10.</p>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1016-8"><label for="c1016-8">Chuẩn bị vị trí trưng bày giỏ sen đá tại lối vào trước 15/10</label></li>
+      </ul>
+    </div>
+
+    <div class="callout priority">
+      <div class="callout-head"><span class="chip store">Store 1016</span><span class="chip due">Tháng 10</span><span class="chip all">Cat 15</span></div>
+      <h4>Cat 15 riêng 1016: budget 771,7tr - MD kỳ vọng 900tr, GP 31%</h4>
+      <p>T10/2025 đạt 692,4 triệu (GP 31,8%) - cần tăng 30%. MD yêu cầu 1016 kiểm tra lại trưng bày mặt nạ Ngày Phụ nữ (nhóm double check display: 1001, 1004, 1009, 1014, 1016, 1017, 1018). Tuần 37, 1016 bán 185 miếng mặt nạ.</p>
+      <dl>
+        <dt>Hàng phân bổ</dt><dd>Mondahmin 800ml: 180 · 300ml: 120 (trưng bày lớn) · Hút ẩm Lifelex ngừa mạt: 24</dd>
+      </dl>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1016-9"><label for="c1016-9">Mở rộng khu trưng bày mặt nạ (5 dòng: Sáng Da, Đàn Hồi, Dịu Da, Cấp Ẩm, Phục Hồi)</label></li>
+        <li><input type="checkbox" id="c1016-10"><label for="c1016-10">Dựng khu trưng bày lớn Mondahmin theo số lượng phân bổ</label></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="phu-nu">
+    <div class="section-head"><span class="section-num">04</span><h2>20/10 Ngày Phụ nữ - Beauty × Health × Flower</h2></div>
+    <p class="section-note">"Celebrate Her. Celebrate You." Hai nhóm khách: nam mua quà (cần quyết định trong 3 phút nhờ trưng bày và POP rõ ràng) và nữ tự thưởng ("FOR ME" - hàng chăm sóc, cao cấp).</p>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Bước</th><th>Khu</th><th>Hàng gợi ý tại 1016</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>FLOWER - Quà tặng</td><td>Bình hoa gốm Bát Tràng (Cat 09), dưỡng hoa Longlife, hoa kẽm nhung (workshop NIN)</td></tr>
+          <tr><td>2</td><td>BEAUTY - Làm đẹp</td><td>Mặt nạ, gel tắm hộp quà, gội xả 99k, kem tay, son dưỡng (Cat 15)</td></tr>
+          <tr><td>3</td><td>HEALTH - Thư giãn</td><td>Collagen, hồng sâm, súng massage MK466, búa ngải cứu (Cat 19)</td></tr>
+          <tr><td>4</td><td>FOR ME - Tự thưởng</td><td>Nến thơm 299k, tinh dầu 99k-399k (Cat 06), skincare cao cấp</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap" style="margin-top:12px">
+      <table class="data">
+        <thead><tr><th>Mức giá gói quà</th><th>Gợi ý kết hợp</th></tr></thead>
+        <tbody>
+          <tr><td class="num" style="text-align:left">Dưới 100k</td><td>1 bông hoa + kem tay / mặt nạ</td></tr>
+          <tr><td class="num" style="text-align:left">Dưới 300k</td><td>Bó hoa mini + chăm sóc tóc</td></tr>
+          <tr><td class="num" style="text-align:left">Dưới 500k</td><td>Hoa + skincare cao cấp + massage</td></tr>
+          <tr><td class="num" style="text-align:left">Trên 500k</td><td>Bình hoa cắm sẵn + làm đẹp cao cấp + hương thơm</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="checklist">
+      <li><input type="checkbox" id="cw-1"><label for="cw-1">Dựng khu "Destination Zone" 4 bước Hoa → Làm đẹp → Sức khỏe → For Me trước 01/10</label></li>
+      <li><input type="checkbox" id="cw-2"><label for="cw-2">Làm POP gói quà theo 4 mức giá, đặt tại đầu khu</label></li>
+      <li><input type="checkbox" id="cw-3"><label for="cw-3">Rà tồn toàn bộ hàng quà 20/10 lần cuối vào 18/10</label></li>
+    </ul>
+  </section>
+
+  <section id="canh-bao">
+    <div class="section-head"><span class="section-num">05</span><h2>Số liệu Store 1016 - cần chú ý</h2></div>
+    <p class="section-note">Trích từ các bảng bán hàng 01-15/09 và tồn kho 16/09 trong tài liệu MD.</p>
+    <div class="rank-flag">
+      <div class="num">1 / 100</div>
+      <p><b>Son dưỡng môi Omi Menturm (39k, GP 51%):</b> tồn 1, target tháng 100. <b>Kem tay (49k):</b> tồn 10, target 100. Đây là hàng thu ngân giới thiệu mùa thu đông - cần đặt hàng ngay.</p>
+    </div>
+    <div class="rank-flag">
+      <div class="num">491</div>
+      <p><b>On The Body 1kg (99k):</b> tồn 491 - cao nhất chuỗi, bán 35 trong nửa tháng. Đưa lên đầu kệ/gần quầy thu ngân để xả tồn.</p>
+    </div>
+    <div class="rank-flag">
+      <div class="num">408</div>
+      <p><b>Cạo lưỡi tam giác CL02 (29k):</b> tồn 408, bán 87. Treo side net cạnh bàn chải. Dao cạo Kai (39k, GP 51%): tồn 52, MD add PO 100.</p>
+    </div>
+    <div class="rank-flag good">
+      <div class="num">Top 1</div>
+      <p><b>Sữa tắm 99k (Cat 15):</b> 1016 bán 200 / 102 / 231 (3 mã) - dẫn đầu chuỗi. Gel tắm hộp quà 79k bán 61 / 56 - cũng dẫn đầu. Giữ đủ tồn và mặt trưng bày.</p>
+    </div>
+    <div class="rank-flag">
+      <div class="num">86,3%</div>
+      <p><b>Cat 14 - Văn phòng phẩm/đồ chơi:</b> 1016 tháng 9 (MTD) đạt 33,9 triệu, 86,3% so với cùng kỳ. Đẩy bút gel Campus 49k/5 và balo Campus 329k.</p>
+    </div>
+    <div class="rank-flag good">
+      <div class="num">105,7%</div>
+      <p><b>Cat 19 - Sức khỏe:</b> 1016 tháng 9 (MTD) đạt 76,5 triệu, 105,7% so với cùng kỳ.</p>
+    </div>
+  </section>
+
+  <section id="lich-trinh">
+    <div class="section-head"><span class="section-num">06</span><h2>Lịch trình mốc thời gian (lịch hàng miền Nam)</h2></div>
+    <p class="section-note">Các mốc đã được đưa vào lịch Google "CÔNG VIỆC".</p>
+
+    <div class="timeline">
+      <div class="tl-group-label">Đã đến hạn - kiểm tra ngay</div>
+      <div class="tl-item due"><div class="tl-date">Tuần 18/09</div><div class="tl-body">Thùng nhựa MSL 30L (4 màu) - 209k <div class="tl-cat">Cat 18</div></div></div>
+      <div class="tl-item due"><div class="tl-date">24/09</div><div class="tl-body">Máy rửa xe Karcher mới (thay dòng Horizontal) và máy hút bụi Karcher KVA2 (thay VCS3) <div class="tl-cat">Cat 02</div></div></div>
+
+      <div class="tl-group-label">Trước 01/10 - chuẩn bị</div>
+      <div class="tl-item women"><div class="tl-date">27-30/09</div><div class="tl-body">Dựng khu 20/10, mở rộng mặt nạ, POP giá đỏ SB/PB, đặt hàng son dưỡng/kem tay <div class="tl-cat">Cat 15 · Cat 19 · Cat 06</div></div></div>
+
+      <div class="tl-group-label">Tháng 10</div>
+      <div class="tl-item"><div class="tl-date">01/10 - 01/11</div><div class="tl-body"><b>Khung khuyến mãi tháng 10</b> (Cat 19, Cat 14, Cat 08 và các ngành) <div class="tl-cat">Toàn hệ thống</div></div></div>
+      <div class="tl-item women"><div class="tl-date">01 - 30/10</div><div class="tl-body"><b>Workshop Dreamtex tại 1016</b> - quà handmade <div class="tl-cat">Cat 06</div></div></div>
+      <div class="tl-item"><div class="tl-date">01 - 07/10</div><div class="tl-body">Đệm tựa lưng gấp gọn 249k / gel 379k về <div class="tl-cat">Cat 18</div></div></div>
+      <div class="tl-item"><div class="tl-date">Đầu tháng 10</div><div class="tl-body">Phụ kiện điện thoại Baseus có hàng lại; ra mắt tai nghe/cáp EDIF <div class="tl-cat">Cat 08</div></div></div>
+      <div class="tl-item store1016"><div class="tl-date">03 - 04/10</div><div class="tl-body"><b>Vietnam Pet Festival tại Parc Mall</b> - budget 2 ngày 405,4tr <div class="tl-cat">Cat 12</div></div></div>
+      <div class="tl-item"><div class="tl-date">05/10</div><div class="tl-body">Bàn chải tắm silicon 99k (miền Nam); dưỡng hoa Longlife 99k; balo gấp Stargo 249k <div class="tl-cat">Cat 21 · Cat 09 · Cat 23</div></div></div>
+      <div class="tl-item"><div class="tl-date">05 - 10/10</div><div class="tl-body">Súng massage MK466 399k về (1016: 10 hồng, 5 xanh, 5 tím) <div class="tl-cat">Cat 19</div></div></div>
+      <div class="tl-item women"><div class="tl-date">09 - 21/10</div><div class="tl-body"><b>Workshop hoa kẽm nhung NIN HOUSE tại 1016</b> <div class="tl-cat">Cat 06</div></div></div>
+      <div class="tl-item store1016"><div class="tl-date">15/10</div><div class="tl-body">Giỏ sen đá về - trưng bày lối vào (1016 chạy thử); bắt đầu tất thể thao <div class="tl-cat">Cat 11 · Cat 23</div></div></div>
+      <div class="tl-item women"><div class="tl-date">18/10</div><div class="tl-body">Rà tồn và làm đầy khu quà trước cao điểm - Chủ nhật, budget 230,9tr <div class="tl-cat">Cat 15 · Cat 19 · Cat 06</div></div></div>
+      <div class="tl-item women"><div class="tl-date">20/10</div><div class="tl-body"><b>Ngày Phụ nữ Việt Nam - cao điểm bán hàng</b> - budget 72,36tr (Thứ 3)</div></div>
+      <div class="tl-item"><div class="tl-date">31/10</div><div class="tl-body">Halloween (Thứ 7, budget 174,5tr) - thú nhồi bông Halloween 149k <div class="tl-cat">Cat 06</div></div></div>
+    </div>
+  </section>
+
+  <section id="nganh-uu-tien">
+    <div class="section-head"><span class="section-num">07</span><h2>8 ngành hàng ưu tiên tháng 10</h2></div>
+    <p class="section-note">Nhóm Ngày Phụ nữ (viền hồng) và nhóm mùa mưa - chuẩn bị nhà cửa (viền đỏ).</p>
+
+    <div class="cat-card pw">
+      <div class="cat-head"><span class="cat-id">CAT 15</span><span class="cat-title">Hóa mỹ phẩm / chăm sóc cá nhân</span><span class="cat-target">Chuỗi 17,47 tỷ · 1016: budget 771,7tr (111,5% LY) · MD kỳ vọng 900tr</span></div>
+      <div class="cat-body">
+        <p><b>SB/PB tác động giá:</b> trưng bày gần cửa ra vào/lối đi/quầy thu ngân, POP giá đỏ có số neo - mức giá <span class="price">29k-149k</span> (vd 39k→29k, 59k→49k, 99k/3, 75k/10, 45k/2).</p>
+        <p><b>20/10:</b> mặt nạ mở rộng trưng bày (target 15.000 miếng toàn chuỗi, GP 36%); gel tắm hộp quà <span class="price">79k</span> GP45% - thêm mặt trưng bày; Enchanteur <span class="price">159k / 229k</span> kèm sữa tắm.</p>
+        <p><b>Tóc & body 99k:</b> gội xả Olive/Hoa trà <span class="price">99k</span> (từ 159k/179k); On The Body 1kg <span class="price">99k</span> (từ 169k).</p>
+        <p><b>Thu đông - thu ngân giới thiệu:</b> son dưỡng Omi <span class="price">39k</span> GP51%; kem tay <span class="price">49k</span> (từ 89k).</p>
+        <p><b>Răng miệng:</b> Mondahmin 800ml <span class="price">139k</span> / 300ml <span class="price">60k</span> mua 1 tặng 1; bàn chải <span class="price">79k/2</span>, kem đánh răng <span class="price">109k/2</span>. Side net: dao cạo Kai <span class="price">39k</span>, cạo lưỡi <span class="price">29k</span>.</p>
+        <p><b>Mùa mưa:</b> hút ẩm Lifelex ngừa mạt bụi 500ml×3 <span class="price">69k</span> GP44%.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c15-1"><label for="c15-1">POP giá đỏ SB/PB gần cửa ra vào / quầy thu ngân</label></li>
+          <li><input type="checkbox" id="c15-2"><label for="c15-2">Training thu ngân giới thiệu son dưỡng + kem tay</label></li>
+          <li><input type="checkbox" id="c15-3"><label for="c15-3">Đặt hàng son dưỡng, kem tay đủ target 100/mã</label></li>
+          <li><input type="checkbox" id="c15-4"><label for="c15-4">Đẩy On The Body 1kg lên vị trí nổi bật (tồn 491)</label></li>
+          <li><input type="checkbox" id="c15-5"><label for="c15-5">Treo side net dao cạo Kai & cạo lưỡi cạnh khu răng miệng</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card pw">
+      <div class="cat-head"><span class="cat-id">CAT 19</span><span class="cat-title">Thực phẩm chức năng / massage / vệ sinh</span><span class="cat-target">Chuỗi 3,54 tỷ · 1016: 149,6tr (114,5% LY)</span></div>
+      <div class="cat-body">
+        <p>Chủ đề: <b>Ngày Phụ nữ</b> + <b>chăm sóc mùa lạnh</b>. Khung KM 01/10-01/11.</p>
+        <p><b>Collagen:</b> Cola Rich 5000mg 3 chai <span class="price">149k</span> (từ 199k), 10 chai <span class="price">449k</span>; ALFE <span class="price">439k</span> (từ 589k); BIOK, Top mua 1 tặng 1; Nucos 10.000mg <span class="price">949k</span> (từ 1.790k).</p>
+        <p><b>Sức khỏe:</b> Nutine hồng sâm mua 1 tặng 1; Kolmar hồng sâm Gold mua 2 tặng 1; Welson <span class="price">479k</span>; Costar Omega 3 <span class="price">329k</span>, Glucosamine <span class="price">219k</span>, sụn cá mập <span class="price">499k</span>.</p>
+        <p><b>Massage:</b> súng MK466 <span class="price">399k</span> (từ 499k, GP41%, về 5-10/10); massage đầu MK399, gậy MK405 <span class="price">399k</span>; búa ngải cứu <span class="price">89k</span> GP47%.</p>
+        <p><b>Mùa lạnh:</b> DHC Vitamin D <span class="price">79k</span>, Vitamin C <span class="price">99k</span>; xịt mũi Humer mua 1 tặng 1; Eugica <span class="price">59k</span>; miếng dán hạ sốt <span class="price">75k</span>; khẩu trang KF94 <span class="price">29k</span>.</p>
+        <p><b>Trưng bày khối lượng lớn:</b> Biok nước ĐTHT/hồng sâm <span class="price">129k</span>; Gold nước hồng sâm <span class="price">49k</span>; Kolmar ĐTHT <span class="price">29k</span> mua 2 tặng 1; kẹo hồng sâm 500g <span class="price">99k</span>; trà Orihiro <span class="price">199k</span>.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c19-1"><label for="c19-1">Set gian collagen / hồng sâm vào khu quà 20/10</label></li>
+          <li><input type="checkbox" id="c19-2"><label for="c19-2">Nhận và trưng bày súng massage MK466 (10/5/5) khi về</label></li>
+          <li><input type="checkbox" id="c19-3"><label for="c19-3">Góc "chăm sóc mùa lạnh": vitamin, xịt mũi, khẩu trang KF94</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card pw">
+      <div class="cat-head"><span class="cat-id">CAT 06</span><span class="cat-title">Chăn ga gối / trang trí / nến thơm</span><span class="cat-target">Chuỗi 10,2 tỷ · 1016: 772,0tr (98,5% LY) - ngành lớn nhất 1016</span></div>
+      <div class="cat-body">
+        <p>Chăn ga mát vẫn là nhóm lớn nhất (3,92 tỷ). Gối ôm Nin <span class="price">399k</span> (từ 499k), vỏ gối Nin <span class="price">119k</span> GP55%.</p>
+        <p><b>Nến thơm & tinh dầu</b> theo planogram: nến <span class="price">299k</span>, tinh dầu Classic <span class="price">99k</span>, Yurari <span class="price">299k</span>, Espprit <span class="price">399k</span> - dùng cho gói quà 20/10 trên 500k.</p>
+        <p>Thú nhồi bông Halloween <span class="price">149k</span> (từ 199k), GP45%.</p>
+        <p><b>1016 có 2 workshop riêng - xem mục 02 (Dreamtex, NIN HOUSE).</b></p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c6-1"><label for="c6-1">Setup planogram nến thơm & tinh dầu đúng mã</label></li>
+          <li><input type="checkbox" id="c6-2"><label for="c6-2">Đưa nến/tinh dầu vào khu "For Me" 20/10</label></li>
+          <li><input type="checkbox" id="c6-3"><label for="c6-3">Trưng bày thú nhồi bông Halloween trước 31/10</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card p1">
+      <div class="cat-head"><span class="cat-id">CAT 21</span><span class="cat-title">Dụng cụ vệ sinh / giặt ủi / phòng tắm</span><span class="cat-target">Chuỗi 3,8 tỷ · 1016: 216,4tr (108,6% LY)</span></div>
+      <div class="cat-body">
+        <p>MD: <b>"trưng bày đủ khối lượng để phủ doanh số"</b>.</p>
+        <p>Lăn bụi thảm PB trên xe wagon: <span class="price">39k-69k</span> (từ 49k-79k). Dụng cụ vệ sinh <span class="price">399k</span> (từ 499k), hàng hot trend <span class="price">249k</span>.</p>
+        <p>Giá phơi đồ PB mùa mưa: <span class="price">599k</span> (từ 799k), <span class="price">499k</span>, <span class="price">699k</span>. Móc Towa <span class="price">29k</span>, móc inox <span class="price">79k</span> (từ 99k) - trưng bày khối lượng.</p>
+        <p>Mới: bàn chải tắm silicon <span class="price">99k</span> GP47%, về miền Nam 05/10.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c21-1"><label for="c21-1">Xe wagon lăn bụi thảm PB tại lối đi chính</label></li>
+          <li><input type="checkbox" id="c21-2"><label for="c21-2">Tăng khối lượng giá phơi đồ PB, móc Towa/inox</label></li>
+          <li><input type="checkbox" id="c21-3"><label for="c21-3">Kiểm tra độ đầy cây lau, xô, gạt nước, gáo (mùa mưa miền Nam)</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card p1">
+      <div class="cat-head"><span class="cat-id">CAT 20</span><span class="cat-title">Đồ mưa, dép, chăm sóc giày</span><span class="cat-target">GP 46% · 1016: 194,2tr (114,0% LY)</span></div>
+      <div class="cat-body">
+        <p>Trọng tâm: áo mưa + ô. Set áo mưa <span class="price">249k</span> (từ 299k) GP47%; áo mưa <span class="price">169k</span> (từ 199k); áo mưa <span class="price">129k</span>, KM <span class="price">119k</span>.</p>
+        <p>Áo mưa mini móc khóa <span class="price">29k</span> MGN 55% - rổ tại quầy thu ngân, mở 1 mẫu. Chăm sóc giày <span class="price">39k</span> (từ 49k) - rổ tại quầy thu ngân.</p>
+        <p>Concept pastel: ô (GP47%), nón (50%), dép (45%).</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c20-1"><label for="c20-1">Rổ áo mưa mini + chăm sóc giày tại quầy thu ngân, mở 1 mẫu</label></li>
+          <li><input type="checkbox" id="c20-2"><label for="c20-2">Cập nhật giá set áo mưa 249k / 169k / 119k</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card p1">
+      <div class="cat-head"><span class="cat-id">CAT 02</span><span class="cat-title">Dụng cụ điện / đồ nghề / lưu trữ</span><span class="cat-target">Chuỗi 1,9 tỷ · 1016: 111,1tr (116,2% LY)</span></div>
+      <div class="cat-body">
+        <p><b>Hàng mới 24/09:</b> máy rửa xe Karcher (thay Horizontal) <span class="price">2.690k / 2.290k</span>; máy hút bụi Karcher KVA2 <span class="price">5.490k</span> (từ 5.990k).</p>
+        <p><b>Mùa mưa:</b> PWX1A <span class="price">1.590k</span>, Tolsen 1800W <span class="price">2.490k</span>, K2 Power <span class="price">2.790k</span>, K3 Plus <span class="price">3.790k</span>; hút bụi Fujihome 12L <span class="price">990k</span>, WD3 <span class="price">3.290k</span>. Clearance máy hơi nước SC2 <span class="price">3.290k</span>, SC3 <span class="price">4.290k</span>.</p>
+        <p><b>Lọc không khí (ký gửi):</b> Fujihome AP5 <span class="price">1.490k</span>, Milux X5 <span class="price">2.990k</span>, X6 <span class="price">5.990k</span>.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c2-1"><label for="c2-1">Xác nhận Karcher mới đã lên kệ, thay giá/POP dòng cũ</label></li>
+          <li><input type="checkbox" id="c2-2"><label for="c2-2">Góc mùa mưa: máy rửa xe - hút bụi khô ướt - máy hơi nước (clearance)</label></li>
+          <li><input type="checkbox" id="c2-3"><label for="c2-3">Góc máy lọc không khí, POP "ô nhiễm không khí"</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card p1">
+      <div class="cat-head"><span class="cat-id">CAT 05</span><span class="cat-title">Đồ bếp / bàn ăn</span><span class="cat-target">Chuỗi 8,18 tỷ · 1016: 481,9tr (109,9% LY)</span></div>
+      <div class="cat-body">
+        <p><b>Chảo SB inox</b> giảm ~30% so cùng kỳ → trưng bày wagon/bàn và đầu kệ, demo, gắn POP.</p>
+        <p>Bình nhựa <span class="price">59k</span>, ly sứ <span class="price">99k</span> GP49%. Dụng cụ xay/thớt gỗ teak/hộp inox/bộ đũa: <span class="price">49k-149k</span>, GP 41-62%. Bình giữ nhiệt <span class="price">279k / 349k</span>.</p>
+        <p>Hàng mới: bình Tumbler 380ml <span class="price">199k</span>, hộp thủy tinh 3 ngăn 1000ml <span class="price">199k</span> (thay Inochi), bình nhựa 2L <span class="price">69k</span>, bình Kita Glee/Base/Sport/Whim <span class="price">149k-229k</span>. Một số mã Kita cũ ngừng kinh doanh.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c5-1"><label for="c5-1">Wagon + đầu kệ chảo SB, có mẫu demo và POP</label></li>
+          <li><input type="checkbox" id="c5-2"><label for="c5-2">Rà các mã Kita ngừng kinh doanh, thay bằng mã mới</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cat-card p1">
+      <div class="cat-head"><span class="cat-id">CAT 12</span><span class="cat-title">Thú cưng</span><span class="cat-target">Chuỗi 1,65 tỷ · 1016: 12,1tr (94,1% LY)</span></div>
+      <div class="cat-body">
+        <p><b>Pet Festival tại Parc Mall 03-04/10 - xem mục 02.</b></p>
+        <p>Thức ăn mèo Silver Spoon: hạt Gà Cừu 450g <span class="price">60k</span> mua 3 tặng 1; pate 60g <span class="price">26k</span> mua 2 tặng 1; súp thưởng mua 1 tặng 1. Thức ăn chó Zenith <span class="price">199k-353k</span>. Thực phẩm bổ sung Vemedim <span class="price">49k-350k</span>.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c12-1"><label for="c12-1">Nhận hàng mới Vemedim, Zenith; trưng bày KM Silver Spoon</label></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="nganh-khac">
+    <div class="section-head"><span class="section-num">08</span><h2>Ngành hàng khác</h2></div>
+    <p class="section-note">Bấm để mở chi tiết.</p>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 1·3·4·22</span><span class="cat-title">Dụng cụ cầm tay, đồ nghề, điện lạnh & thiết bị bếp</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016:</b> Cat 01 20,1tr (118% LY) · Cat 03 22,2tr (90%) · Cat 04 22,8tr (102%).</p>
+        <p>Chuỗi T10: Cat 1 300tr (+10%, GP48%); Cat 3 720tr (+11%); Cat 4 400tr (+13%); Cat 22 1,5 tỷ (+7%, GP35%) - Heating/Cooling 47%, Cooking Appliance 43%.</p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 07</span><span class="cat-title">Chăm sóc xe / kính mát</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 54,4tr (103% LY).</b> Chuỗi 1,109 tỷ, +12%, GP45%. Mũ bảo hiểm <span class="price">179k</span> (từ 249k) GP57%. Mùa mưa: vệ sinh / phủ nano chống bám nước kính ô tô <span class="price">229k-339k</span>. Nước rửa xe Lifelex chống thấm <span class="price">79k</span>, 500ml <span class="price">69k</span>; nước vệ sinh kính 2L <span class="price">59k</span>. Kính mát trẻ em.</p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 08</span><span class="cat-title">Pin / điện / đèn / chống muỗi / phụ kiện ĐT</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 70,3tr (96,9% LY).</b> Chuỗi 1,208 tỷ, GP 52,6%. Pin chiếm 44% - giữ tồn ổn định các mã bán chạy.</p>
+        <p>Đèn bắt muỗi Daewoo DWIK-780 <span class="price">399k</span> (1016 tồn 11); DWIK-680 <span class="price">409k</span> (1016 tồn 9, phân bổ thêm 5). Kachi: vợt MK412 <span class="price">109k</span>, MK413 <span class="price">139k</span>, vợt tự động MK386 <span class="price">399k</span>, đèn MK409 <span class="price">319k</span>, MK457 <span class="price">559k</span>, vợt MK462 <span class="price">409k</span>; Điện Quang EMR09 <span class="price">159k</span>, EMR07L <span class="price">189k</span>.</p>
+        <p>Baseus có hàng lại đầu tháng 10; mã mới EDIF (tai nghe TWS X2 Pro, tai nghe dây P230, cáp USB-C).</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c8-1"><label for="c8-1">Cập nhật giá KM đồ chống muỗi Daewoo/Kachi/Điện Quang</label></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 09</span><span class="cat-title">Làm vườn</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 23,9tr (121,3% LY).</b> Chuỗi 606tr, +10%, GP47%. Tiếp tục bình hoa Bát Tràng (đổi KM sang mã khác, <span class="price">79k-349k</span>). <b>Dời kệ đứng chậu cây ra vị trí khách dễ thấy</b>: khay đứng M <span class="price">159k</span>, L <span class="price">179k</span>, đá núi lửa <span class="price">89k</span>.</p>
+        <p>Mới 05/10: dưỡng hoa Longlife 200ml <span class="price">99k</span> (1016: 3); phân Rynan 230/240/HH/220 <span class="price">39k-59k</span> (1016: 3 mỗi mã).</p>
+        <ul class="checklist">
+          <li><input type="checkbox" id="c9-1"><label for="c9-1">Dời kệ đứng chậu cây ra khu dễ thấy</label></li>
+          <li><input type="checkbox" id="c9-2"><label for="c9-2">Đặt dưỡng hoa Longlife cạnh bình hoa - bán kèm quà 20/10</label></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 11</span><span class="cat-title">Cây xanh / hạt giống</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 18,7tr (109,9% LY).</b> Chuỗi 242,6tr, +10%, GP36%. Tập trung cây mini (xương rồng, sen đá) NCC 100789. Giá bán tốt: cây lá 129k-199k, terrarium 149k-299k. <b>1016 chạy thử giỏ sen đá - xem mục 02.</b></p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 14</span><span class="cat-title">Văn phòng phẩm / đồ chơi / balo</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 109,1tr (109,4% LY).</b> Chuỗi 1,23 tỷ, +17%, GP43%. KM: bút gel Campus <span class="price">49k/5</span>; balo Campus <span class="price">329k</span> (từ 399k). Thiên Long bổ sung mã cơ bản. Không có hàng mùa vụ tháng 10.</p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 18</span><span class="cat-title">Nội thất / hộp lưu trữ</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 45,4tr (110,1% LY).</b> Chuỗi 1,232 tỷ, GP40%. Đệm tựa lưng gấp gọn <span class="price">249k</span> (từ 279k), bản gel <span class="price">379k</span> - về miền Nam 01-07/10. Ghế tựa lưng G2016 <span class="price">299k</span>, KSOS-005 <span class="price">659k</span>, KSOS-006 <span class="price">759k</span>. Thùng MSL 30L <span class="price">209k</span> - lưu trữ đổi mùa.</p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 23</span><span class="cat-title">Xe đạp / cắm trại / thể thao / du lịch</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 167,2tr (86,4% LY).</b> Chuỗi 1,886 tỷ, +18%, GP36%. Vali ABS+PC size 20 <span class="price">599k</span>, size 24 <span class="price">729k</span>. Balo gấp Stargo Compax <span class="price">249k</span> về 05/10 (1016: 5 đỏ + 5 nâu). Phát triển phụ kiện thể thao mua lặp lại: tất thể thao từ 15/10, quấn cán vợt, bóng pickleball.</p>
+      </div>
+    </details>
+
+    <details class="cat-card p2">
+      <summary><div class="cat-head"><span class="cat-id">CAT 25</span><span class="cat-title">Bánh kẹo / nước giải khát / cà phê</span><span class="arrow">▸</span></div></summary>
+      <div class="cat-body">
+        <p><b>1016: 190,4tr (121,0% LY)</b> - ngành cần tăng mạnh nhất theo %. Chuỗi 5,7 tỷ, +23%, GP35%. Mới: Cộng Cà Phê (5P <span class="price">29k-39k</span>, 12P <span class="price">65k-79k</span>, 30P <span class="price">150k-189k</span>). KM: bánh Hongjee <span class="price">78k/3</span>, Calbee 400-450g <span class="price">179k</span>, bắp rang Popster <span class="price">10k</span>, thạch túi Tarami <span class="price">39k/2</span>, Teago/Sunday <span class="price">20k/4</span>, Pori Pori <span class="price">49k/12</span>, mochi <span class="price">99k</span>, Jagabee <span class="price">29k</span>.</p>
+      </div>
+    </details>
+  </section>
+
+  <section id="bat-buoc">
+    <div class="section-head"><span class="section-num">09</span><h2>Yêu cầu bắt buộc toàn hệ thống</h2></div>
+    <div class="callout">
+      <ul class="checklist">
+        <li><input type="checkbox" id="cm-1"><label for="cm-1">SB/PB trưng bày gần cửa ra vào/lối đi/quầy thu ngân, POP giá đỏ có số neo (Cat 15)</label></li>
+        <li><input type="checkbox" id="cm-2"><label for="cm-2">Khu 20/10 theo 4 bước Hoa - Làm đẹp - Sức khỏe - For Me, POP gói quà theo mức giá</label></li>
+        <li><input type="checkbox" id="cm-3"><label for="cm-3">Mở rộng trưng bày mặt nạ Ngày Phụ nữ (Cat 15)</label></li>
+        <li><input type="checkbox" id="cm-4"><label for="cm-4">Ít mặt hàng KM, tập trung hàng GP cao, trưng bày khối lượng lớn; bán kèm để tăng giá trị giỏ hàng</label></li>
+        <li><input type="checkbox" id="cm-5"><label for="cm-5">Cat 21 trưng bày đủ khối lượng; lăn bụi thảm PB trên wagon</label></li>
+        <li><input type="checkbox" id="cm-6"><label for="cm-6">Chảo SB: wagon + đầu kệ + demo + POP (Cat 05)</label></li>
+        <li><input type="checkbox" id="cm-7"><label for="cm-7">Thu ngân giới thiệu: son dưỡng/kem tay, áo mưa mini, chăm sóc giày</label></li>
+        <li><input type="checkbox" id="cm-8"><label for="cm-8">Dời kệ đứng chậu cây ra vị trí khách dễ thấy (Cat 09)</label></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="khong-ap-dung">
+    <div class="section-head"><span class="section-num">10</span><h2>Không áp dụng cho Store 1016</h2></div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Nội dung</th><th>Ngành</th><th>Phạm vi</th></tr></thead>
+        <tbody>
+          <tr><td>Tolsen Event / Magic Event</td><td>Cat 02</td><td>1001, 1003, 1005, 1009</td></tr>
+          <tr><td>Máy rửa xe Karcher Handheld Compact</td><td>Cat 02</td><td>1001, 1003, 1005, 1008</td></tr>
+          <tr><td>Dự trữ bếp gas mini, đèn khò mùa bão</td><td>Cat 05</td><td>Store miền Bắc</td></tr>
+          <tr><td>Miếng dán giữ nhiệt</td><td>Cat 19</td><td>Store miền Bắc + 1006</td></tr>
+          <tr><td>KM đèn sạc Tuyết Mai</td><td>Cat 08</td><td>1005, 1008, 1010, 1018</td></tr>
+          <tr><td>Booth COW / Sweet Rabbit / Coclear</td><td>Cat 15</td><td>1005 / 1001 / 1003</td></tr>
+          <tr><td>PG booth Hankol / Hoa Phúc</td><td>Cat 19</td><td>1004, 1002 / 1001, 1003</td></tr>
+          <tr><td>Workshop móc khóa "I love Mom"</td><td>Cat 14</td><td>1014, 1015, 1005, 1019</td></tr>
+          <tr><td>Workshop JEANPERRY (mặt nạ ngủ, Halloween)</td><td>Cat 06</td><td>1001, 1002, 1003, 1004, 1007, 1010</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Biên soạn từ "ALL CAT - Sale Plan Oct" (124 trang, Kohnan Việt Nam, phòng Merchandiser, 18/09/2026). Budget từ file 1016.BUDGET2026 (đơn vị gốc: nghìn đồng). Ô tick lưu trên trình duyệt đang xem.
+  </footer>
+</div>
+
+<script>
+(function(){
+  try {
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach(function(b){
+      var key = 'kohnan-oct-1016-' + b.id;
+      try { if (localStorage.getItem(key) === '1') b.checked = true; } catch(e){}
+      b.addEventListener('change', function(){ try { localStorage.setItem(key, b.checked ? '1' : '0'); } catch(e){} });
+    });
+  } catch(e) {}
+})();
+</script>
+
+</body></html>

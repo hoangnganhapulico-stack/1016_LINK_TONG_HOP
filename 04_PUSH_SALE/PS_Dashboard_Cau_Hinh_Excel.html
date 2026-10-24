@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title id="pageTitle">Push Sale Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{inter:['Inter','sans-serif']}}}}</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*{font-family:'Inter',sans-serif}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.progress-bar-inner{transition:width .6s cubic-bezier(.4,0,.2,1)}
+.milestone-line{position:absolute;top:0;bottom:0;width:2px;background:#1e293b;opacity:.2;pointer-events:none}
+.milestone-txt{position:absolute;top:-18px;transform:translateX(-50%);font-size:9px;color:#64748b;white-space:nowrap;font-weight:600}
+.stat-row td{padding:6px 8px;font-size:13px}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sticky-col{position:sticky;left:0;background:white;z-index:2}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:white;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:24px}
+.tab-btn{padding:6px 16px;border-radius:9999px;font-size:13px;font-weight:600;transition:all .2s;cursor:pointer}
+.tab-btn.active{background:#f97316;color:white}
+.tab-btn:not(.active){background:rgba(255,255,255,.1);color:#cbd5e1}
+.tab-btn:not(.active):hover{background:rgba(255,255,255,.2)}
+.kpi-card{border-radius:16px;padding:20px;color:white;position:relative;overflow:hidden}
+.kpi-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1)}
+.avatar-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+.podium-bar{border-radius:8px 8px 0 0;display:flex;align-items:flex-end;justify-content:center}
+#toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.15);transition:all .3s;pointer-events:none}
+.section-wrap{background:white;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #f1f5f9;padding:20px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.input-field{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13px;width:100%;outline:none;transition:border-color .2s}
+.input-field:focus{border-color:#f97316}
+.btn-orange{background:#f97316;color:white;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-orange:hover{background:#ea580c}
+.btn-slate{background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-slate:hover{background:#e2e8f0}
+.badge-above{background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.badge-below{background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.badge-near{background:#fef9c3;color:#ca8a04;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.th{background:#f8fafc;padding:8px 10px;font-size:12px;font-weight:700;color:#64748b;text-align:center;white-space:nowrap;border-bottom:1px solid #e2e8f0}
+.td{padding:7px 10px;font-size:13px;text-align:center;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+.rank-1{color:#f59e0b;font-weight:900}
+.rank-2{color:#94a3b8;font-weight:800}
+.rank-3{color:#b45309;font-weight:800}
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- ===== IMPORT SCREEN ===== -->
+<div id="importScreen" class="min-h-screen flex items-center justify-center p-4" style="background:linear-gradient(135deg,#fff7ed 0%,#f1f5f9 100%)">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-4">🛒</div>
+      <h1 class="text-2xl font-black text-slate-800">Push Sale Dashboard</h1>
+      <p class="text-slate-500 text-sm mt-2">Nhập file cấu hình Excel để bắt đầu</p>
+    </div>
+    <div id="dropZone" class="border-2 border-dashed border-orange-300 rounded-xl p-8 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all" onclick="document.getElementById('configFileInput').click()">
+      <div class="text-3xl mb-3">📂</div>
+      <p class="font-semibold text-slate-700">Nhấn để chọn file Excel</p>
+      <p class="text-xs text-slate-400 mt-1">KohnanPushSale_CauHinh_Template.xlsx</p>
+    </div>
+    <input type="file" id="configFileInput" accept=".xlsx,.xls" class="hidden" onchange="handleConfigUpload(this)">
+    <div id="importError" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+    <div id="importProgress" class="hidden mt-4">
+      <div class="flex items-center gap-2 text-orange-600 font-medium text-sm">
+        <div class="animate-spin w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full"></div>
+        Đang đọc cấu hình...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD SCREEN ===== -->
+<div id="dashboardScreen" class="hidden">
+
+<!-- NAV -->
+<nav class="bg-slate-900 sticky top-0 z-40 shadow-lg">
+  <div class="px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-2 flex-wrap">
+      <button class="tab-btn active" id="tabALL" onclick="setGroupFilter('ALL')">Tất cả</button>
+      <div id="groupTabs" class="flex gap-2 flex-wrap"></div>
+    </div>
+    <div class="text-center flex-1 min-w-0">
+      <h1 id="navTitle" class="text-white font-black text-sm sm:text-base truncate"></h1>
+      <p id="navSubtitle" class="text-slate-400 text-xs truncate"></p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <button onclick="openModal('csvModal')" class="btn-orange text-xs sm:text-sm">📂 Nhập CSV</button>
+      <button onclick="openModal('quickAddModal')" class="btn-slate text-xs sm:text-sm">➕ Nhập nhanh</button>
+      <button onclick="openModal('reportTypeModal')" class="btn-slate text-xs sm:text-sm">📊 Xuất báo cáo</button>
+      <button onclick="openModal('barcodeModal')" class="btn-slate text-xs sm:text-sm">🔍 Barcode</button>
+      <button onclick="openModal('aliasModal')" class="btn-slate text-xs sm:text-sm">👤 Nhân viên</button>
+      <button onclick="confirmReset()" class="btn-slate text-xs sm:text-sm text-red-500">🗑 Đặt lại</button>
+    </div>
+  </div>
+  <!-- Table filter for daily table -->
+  <div class="bg-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto">
+    <span class="text-slate-400 text-xs font-semibold whitespace-nowrap">Xem:</span>
+    <button class="tab-btn active text-xs" id="filterALL" onclick="setTableFilter('ALL')">Tất cả ngày</button>
+    <button class="tab-btn text-xs" id="filterDONE" onclick="setTableFilter('DONE')">Ngày đã qua</button>
+    <button class="tab-btn text-xs" id="filterTODAY" onclick="setTableFilter('TODAY')">Hôm nay</button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="max-w-screen-xl mx-auto px-4 py-5 space-y-5">
+
+<!-- KPI CARDS -->
+<div id="kpiSection"></div>
+
+<!-- INVENTORY GRID -->
+<div id="inventorySection"></div>
+
+<!-- DAILY TEAM TABLE -->
+<div class="section-wrap fade-in">
+  <div class="section-title">📅 Bảng theo dõi hàng ngày – Toàn team</div>
+  <div class="table-scroll" id="dailyTableWrap"></div>
+</div>
+
+<!-- INDIVIDUAL ROADMAP -->
+<div class="section-wrap fade-in">
+  <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+    <div class="section-title mb-0">🧭 Lộ trình cá nhân</div>
+    <select id="staffSelector" onchange="renderIndividual()" class="input-field" style="width:auto;min-width:160px"></select>
+  </div>
+  <div id="individualSection"></div>
+</div>
+
+<!-- CHARTS + LEADERBOARD -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+  <div class="section-wrap fade-in">
+    <div class="section-title">📊 Biểu đồ doanh thu</div>
+    <canvas id="revenueChart" height="280"></canvas>
+  </div>
+  <div class="section-wrap fade-in">
+    <div class="section-title">🥧 Tỷ trọng bán hàng</div>
+    <canvas id="shareChart" height="280"></canvas>
+  </div>
+</div>
+
+<!-- REVENUE COMPARISON -->
+<div class="section-wrap fade-in">
+  <div class="section-title">💰 Đối chiếu doanh thu cửa hàng</div>
+  <div class="flex flex-wrap gap-4 items-end">
+    <div>
+      <label class="text-xs font-semibold text-slate-500 block mb-1">Doanh thu cửa hàng (₫)</label>
+      <input type="number" id="storeRevenueInput" class="input-field" style="width:200px" placeholder="0" oninput="updateStoreRevenue(this.value)">
+    </div>
+    <div id="revenueCompareCards" class="flex flex-wrap gap-3"></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="section-wrap fade-in">
+  <div class="section-title">🏆 Bảng xếp hạng</div>
+  <div id="podiumSection" class="mb-6"></div>
+  <div class="table-scroll" id="leaderboardTable"></div>
+</div>
+
+
+</main>
+</div><!-- end dashboardScreen -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- CSV Import Modal -->
+<div id="csvModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('csvModal')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">📂 Nhập dữ liệu CSV</h3>
+      <button onclick="closeModal('csvModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">File BILL.csv (danh sách hóa đơn)</label>
+        <input type="file" id="billFileInput" accept=".csv,.xlsx,.xls" class="input-field text-xs">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">File DETAIL.csv (chi tiết sản phẩm)</label>
+        <input type="file" id="detailFileInput" accept=".csv,.xlsx,.xls" class="input-field text-xs">
+      </div>
+      <div class="bg-slate-50 rounded-lg p-3">
+        <p class="text-xs font-semibold text-slate-600 mb-2">Chế độ nhập:</p>
+        <label class="flex items-center gap-2 text-sm cursor-pointer mb-1">
+          <input type="radio" name="csvMode" value="add" checked> Cộng dồn (thêm vào dữ liệu hiện tại)
+        </label>
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input type="radio" name="csvMode" value="overwrite"> Ghi đè (xóa và nhập lại)
+        </label>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-700">
+        <strong>Lưu ý:</strong> Chỉ tính hàng có <strong>Slip Div = Sales</strong>. Hai file được ghép qua <strong>Slip No.</strong>
+      </div>
+      <button onclick="handleCSVImport()" class="btn-orange w-full py-2.5">Nhập dữ liệu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Add Modal -->
+<div id="quickAddModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('quickAddModal')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">➕ Nhập nhanh</h3>
+      <button onclick="closeModal('quickAddModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div class="space-y-3" id="quickAddForm"></div>
+    <button onclick="handleQuickAdd()" class="btn-orange w-full py-2.5 mt-4">Lưu</button>
+  </div>
+</div>
+
+<!-- Barcode Info Modal -->
+<div id="barcodeModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('barcodeModal')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">🔍 Danh sách Barcode</h3>
+      <button onclick="closeModal('barcodeModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div id="barcodeModalContent"></div>
+  </div>
+</div>
+
+<!-- Alias Info Modal -->
+<div id="aliasModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('aliasModal')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">👤 Nhân viên & Từ khoá nhận diện</h3>
+      <button onclick="closeModal('aliasModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div id="aliasModalContent"></div>
+  </div>
+</div>
+
+<!-- Report Type Modal -->
+<div id="reportTypeModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('reportTypeModal')">
+  <div class="modal-box" style="max-width:400px">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">📊 Xuất báo cáo</h3>
+      <button onclick="closeModal('reportTypeModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div class="space-y-3">
+      <button onclick="exportReport('summary');closeModal('reportTypeModal')" class="w-full p-4 bg-orange-50 border-2 border-orange-200 rounded-xl text-left hover:bg-orange-100 transition-colors">
+        <div class="font-bold text-orange-700">📋 Báo cáo tóm tắt</div>
+        <div class="text-xs text-orange-600 mt-1">KPI tổng, top 3, bảng xếp hạng</div>
+      </button>
+      <button onclick="exportReport('detailed');closeModal('reportTypeModal')" class="w-full p-4 bg-indigo-50 border-2 border-indigo-200 rounded-xl text-left hover:bg-indigo-100 transition-colors">
+        <div class="font-bold text-indigo-700">📊 Báo cáo chi tiết</div>
+        <div class="text-xs text-indigo-600 mt-1">Đầy đủ + nhận xét từng nhân viên</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory PLU Import Modal -->
+<div id="pluModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('pluModal')">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-800">📦 Nhập tồn kho từ PLU</h3>
+      <button onclick="closeModal('pluModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">File PLU Excel/CSV</label>
+        <input type="file" id="pluFileInput" accept=".csv,.xlsx,.xls" class="input-field text-xs">
+      </div>
+      <div class="bg-slate-50 rounded-lg p-3 text-xs text-slate-600">
+        File PLU cần có cột Barcode và cột số lượng tồn kho.
+      </div>
+      <button onclick="handlePLUImport()" class="btn-orange w-full py-2.5">Nhập tồn kho</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden"></div>
+
+<script>
+// ================================================================
+// ADAPTIVE STORAGE
+// ================================================================
+const STORAGE_VERSION = 'V8';
+const META_KEY = 'PUSH_SALE_META_KEY_V8';
+let STORAGE_KEY = 'PUSH_SALE_V8_DEFAULT';
+let storageBackend = 'memory';
+let _mem = {};
+
+async function detectStorageBackend() {
+  try {
+    if (typeof window !== 'undefined' && window.storage && typeof window.storage.setItem === 'function') {
+      await window.storage.setItem('__test__', '1');
+      await window.storage.removeItem('__test__');
+      storageBackend = 'window'; return;
+    }
+  } catch(e){}
+  try {
+    localStorage.setItem('__test__', '1');
+    localStorage.removeItem('__test__');
+    storageBackend = 'local'; return;
+  } catch(e){}
+  storageBackend = 'memory';
+}
+
+async function sGet(key) {
+  try {
+    if (storageBackend==='window') return JSON.parse(await window.storage.getItem(key)||'null');
+    if (storageBackend==='local') return JSON.parse(localStorage.getItem(key));
+    return _mem[key]||null;
+  } catch(e){ return null; }
+}
+
+async function sSet(key, val) {
+  try {
+    const s = JSON.stringify(val);
+    if (storageBackend==='window') await window.storage.setItem(key, s);
+    else if (storageBackend==='local') localStorage.setItem(key, s);
+    else _mem[key] = val;
+  } catch(e){ try{ _mem[key]=val; }catch(_){} }
+}
+
+// ================================================================
+// GLOBALS
+// ================================================================
+let config = null;
+let appState = null;
+let charts = {};
+const AVATAR_COLORS = ['#f97316','#6366f1','#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#ec4899','#84cc16'];
+
+// ================================================================
+// EMBEDDED SEPTEMBER 2026 CONFIG (no Excel template required)
+// ================================================================
+// ================================================================
+// UTILS
+// ================================================================
+function removeVietnameseTones(s) {
+  if (!s) return '';
+  // NFD Unicode normalization — handles NFC/NFD differences from Excel/POS encodings
+  return s.toString()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function fmt(n, d=0) {
+  if (n==null||isNaN(n)) return '0';
+  return Number(n).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+
+function fmtVND(n) {
+  if (!n||isNaN(n)) return '0 ₫';
+  if (Math.abs(n)>=1e9) return fmt(n/1e9,1)+' tỷ ₫';
+  if (Math.abs(n)>=1e6) return fmt(n/1e6,1)+' tr ₫';
+  return fmt(n)+' ₫';
+}
+
+function pct(a,b) { return b?Math.round(a/b*100):0; }
+
+// Timezone-safe day difference: always compare local midnight→local midnight
+function dayDiff(dt, startDate) {
+  const a = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  const b = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  return Math.round((a - b) / 86400000);
+}
+
+function statusBadge(act, tgt) {
+  const p = pct(act,tgt);
+  if (p>=100) return `<span class="badge-above">✅ ${p}%</span>`;
+  if (p>=80) return `<span class="badge-near">⚡ ${p}%</span>`;
+  return `<span class="badge-below">📉 ${p}%</span>`;
+}
+
+function initials(name) {
+  return (name||'?').split(' ').filter(Boolean).map(w=>w[0]).join('').substring(0,2).toUpperCase();
+}
+
+function getToday() {
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+
+function dateToKey(d) { return d instanceof Date ? `${d.getDate()}_${d.getMonth()+1}_${d.getFullYear()}` : ''; }
+
+// ================================================================
+// EXCEL CONFIG PARSER
+// ================================================================
+function normDateStr(val) {
+  if (val == null || val === '') return null;
+  // JS Date object (from cellDates:true)
+  if (val instanceof Date) { return isNaN(val.getTime()) ? null : val; }
+  // Excel serial number (days since 1899-12-30)
+  if (typeof val === 'number') {
+    const serial = Math.round(val);
+    if (serial < 1) return null;
+    // Excel serial to JS date (UTC)
+    const msPerDay = 86400000;
+    const excelEpoch = new Date(1899, 11, 30); // Dec 30 1899 local
+    const d = new Date(excelEpoch.getTime() + serial * msPerDay);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof val === 'string') {
+    const s = val.trim();
+    if (!s) return null;
+    // Try DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY (with optional time, e.g. Trading Datetime)
+    const m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+    if (m) {
+      const [,dd,mm,yy] = m.map(Number);
+      const yyyy = yy < 100 ? yy + 2000 : yy;
+      if (dd<=31 && mm<=12) return new Date(yyyy, mm-1, dd);
+    }
+    // Try YYYY-MM-DD
+    const m2 = s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+    if (m2) { const [,y,mo,d2]=m2.map(Number); return new Date(y,mo-1,d2); }
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return null;
+}
+
+// Fuzzy lookup in info map — returns first value whose key includes any of the search terms
+// Uses removeVietnameseTones to handle Unicode NFC/NFD differences from Excel encoding
+function infoLookup(map, ...terms) {
+  for (const term of terms) {
+    const tNorm = removeVietnameseTones(term);
+    for (const [k,v] of Object.entries(map)) {
+      if (removeVietnameseTones(k).includes(tNorm)) return v;
+    }
+  }
+  return undefined;
+}
+
+async function parseConfigExcel(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true});
+        const cfg = {};
+
+        // ---- SHEET 2: THÔNG TIN CHUNG ----
+        const sh2 = wb.Sheets[wb.SheetNames[1]];
+        const rows2 = XLSX.utils.sheet_to_json(sh2, {header:1, raw:true, defval:null});
+        const infoMap = {};
+        rows2.forEach(r => {
+          // Layout A: col A = nhãn, col B = giá trị (template thực tế)
+          if (r[0] != null && r[0] !== '' && r[1] != null && r[1] !== '') {
+            infoMap[String(r[0]).trim()] = r[1];
+          }
+          // Layout B: col B = nhãn, col C = giá trị (fallback)
+          if (r[1] != null && r[1] !== '' && r[2] != null && r[2] !== '') {
+            const k = String(r[1]).trim();
+            if (!infoMap[k]) infoMap[k] = r[2];
+          }
+        });
+
+        // Use fuzzy lookup so minor label differences don't break parsing
+        cfg.storeName = String(infoLookup(infoMap,'cửa hàng','store')||'Cửa hàng').trim();
+        cfg.campaignName = String(infoLookup(infoMap,'chiến dịch','campaign')||'Push Sale').trim();
+        cfg.startDate = normDateStr(infoLookup(infoMap,'bắt đầu','start','begin'));
+        cfg.endDate = normDateStr(infoLookup(infoMap,'kết thúc','end','finish'));
+        cfg.dayWeights = {
+          weekday: parseFloat(infoLookup(infoMap,'thường','weekday','thứ 2','mon')||1.0)||1.0,
+          saturday: parseFloat(infoLookup(infoMap,'thứ 7','sat','saturday')||1.5)||1.5,
+          sunday: parseFloat(infoLookup(infoMap,'chủ nhật','sun','sunday')||2.0)||2.0
+        };
+        if (!cfg.startDate || !cfg.endDate) {
+          const keys = Object.keys(infoMap).join(', ');
+          throw new Error('Thiếu ngày bắt đầu hoặc kết thúc. Các nhãn tìm thấy: ' + keys);
+        }
+        // Normalize to LOCAL midnight so date-diff calculations are timezone-safe
+        cfg.startDate.setHours(0,0,0,0);
+        cfg.endDate.setHours(0,0,0,0);
+
+        // ---- SHEET 3: NHÓM SẢN PHẨM ----
+        const sh3 = wb.Sheets[wb.SheetNames[2]];
+        const rows3 = XLSX.utils.sheet_to_json(sh3, {header:1, raw:false, defval:null});
+        // Find header row (contains "Nhóm#")
+        let hIdx3 = rows3.findIndex(r => r.some(c => c && String(c).includes('Nhóm')));
+        if (hIdx3 < 0) hIdx3 = 0;
+        // Detect which column has Nhóm# to auto-determine offset
+        const hRow3 = rows3[hIdx3]||[];
+        const nhomCol = hRow3.findIndex(c => c && String(c).includes('Nhóm'));
+        // Columns relative to nhomCol: +0=Nhóm#, +1=Tên nhóm, +2=Emoji, +3=Target, +4=Barcode, +5=Tên SP
+        const c0 = nhomCol >= 0 ? nhomCol : 0;
+        cfg.groups = [];
+        let curGroup = null;
+        for (let i = hIdx3+1; i < rows3.length; i++) {
+          const r = rows3[i];
+          const groupNum = r[c0], groupName = r[c0+1], emoji = r[c0+2], target = r[c0+3], barcode = r[c0+4];
+          if (groupNum && String(groupNum).trim() && !isNaN(String(groupNum).trim()) && String(groupName||'').trim()) {
+            curGroup = {
+              id: 'G' + String(groupNum).trim(),
+              name: String(groupName||'').trim(),
+              emoji: String(emoji||'🛒').trim(),
+              target: parseInt(target)||0,
+              barcodes: []
+            };
+            const bc = String(barcode||'').trim();
+            if (bc) curGroup.barcodes.push(bc);
+            cfg.groups.push(curGroup);
+          } else if (curGroup && barcode && String(barcode).trim()) {
+            curGroup.barcodes.push(String(barcode).trim());
+          }
+        }
+        if (cfg.groups.length === 0) throw new Error('Không tìm thấy nhóm sản phẩm');
+
+        // Build barcode→groupId map
+        cfg.barcodeMap = {};
+        cfg.groups.forEach(g => g.barcodes.forEach(b => { if(b) cfg.barcodeMap[b] = g.id; }));
+
+        // ---- SHEET 4: NHÂN VIÊN ----
+        const sh4 = wb.Sheets[wb.SheetNames[3]];
+        const rows4 = XLSX.utils.sheet_to_json(sh4, {header:1, raw:false, defval:null});
+        // Find header row (contains "Tên nhân viên")
+        let hIdx4 = rows4.findIndex(r => r.some(c => c && String(c).includes('Tên nhân viên')));
+        if (hIdx4 < 0) hIdx4 = 4;
+        const hRow4 = rows4[hIdx4]||[];
+        // Auto-detect name column position
+        const nameCol4 = hRow4.findIndex(c => c && String(c).includes('Tên nhân viên'));
+        const nc = nameCol4 >= 0 ? nameCol4 : 1; // default col B
+        // Find group target columns
+        const groupColMap = {}; // groupId -> colIndex
+        cfg.groups.forEach(g => {
+          const idx = hRow4.findIndex(c => c && String(c).trim() === g.name);
+          if (idx >= 0) groupColMap[g.id] = idx;
+        });
+        cfg.staff = [];
+        for (let i = hIdx4+1; i < rows4.length; i++) {
+          const r = rows4[i];
+          const name = r[nc], kw = r[nc+1];
+          if (!name || !String(name).trim()) continue;
+          const nameStr = String(name).trim();
+          const keywords = kw ? String(kw).split('|').map(k=>k.trim()).filter(Boolean) : [nameStr];
+          const targets = {};
+          cfg.groups.forEach(g => {
+            const col = groupColMap[g.id];
+            targets[g.id] = col != null ? (parseInt(r[col])||0) : 0;
+          });
+          cfg.staff.push({
+            id: 'S' + i,
+            name: nameStr,
+            keywords,
+            targets,
+            color: AVATAR_COLORS[(cfg.staff.length) % AVATAR_COLORS.length]
+          });
+        }
+        if (cfg.staff.length === 0) throw new Error('Không tìm thấy nhân viên');
+
+        resolve(cfg);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error('Không đọc được file'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// ================================================================
+// INITIALIZE APP STATE
+// ================================================================
+function initAppState(cfg) {
+  config = cfg;
+  STORAGE_KEY = 'PUSH_SALE_' + (cfg.storeName+'_'+cfg.campaignName).replace(/[^a-z0-9]/gi,'_').toUpperCase() + '_' + STORAGE_VERSION;
+
+  const days = generateDays(cfg);
+  const inv = {};
+  const billStats = { totalBills:{}, pushBills:{} };
+  cfg.groups.forEach(g => {
+    inv[g.id] = { openingStock:0, restocks:[], salesQty:0, incomeQty:0, closeQty:0 };
+    billStats.pushBills[g.id] = {};
+  });
+
+  const staffList = cfg.staff.map(s => {
+    const actualQty = {}; const actualRev = {};
+    cfg.groups.forEach(g => { actualQty[g.id]=0; actualRev[g.id]=0; });
+    return {...s, actualQty, actualRev};
+  });
+
+  appState = {
+    currentGroup: 'ALL',
+    tableFilter: 'ALL',
+    selectedStaffId: cfg.staff[0]?.id || null,
+    totalStoreRevenue: 0,
+    staffList,
+    days,
+    inventory: inv,
+    billStats
+  };
+}
+
+function generateDays(cfg) {
+  const days = [];
+  const start = new Date(cfg.startDate); start.setHours(0,0,0,0);
+  const end = new Date(cfg.endDate); end.setHours(0,0,0,0);
+  const NAMES = ['Chủ Nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+  let cur = new Date(start), num = 1;
+  while (cur <= end) {
+    const dow = cur.getDay();
+    const isSat = dow===6, isSun = dow===0;
+    const isWeekend = isSat || isSun;
+    const dd = String(cur.getDate()).padStart(2,'0');
+    const mm = String(cur.getMonth()+1).padStart(2,'0');
+    let weight = cfg.dayWeights.weekday;
+    if (isSat) weight = cfg.dayWeights.saturday;
+    if (isSun) weight = cfg.dayWeights.sunday;
+    const groupActual = {}, groupRevenue = {}, staffDaily = {};
+    cfg.groups.forEach(g => { groupActual[g.id]=0; groupRevenue[g.id]=0; });
+    cfg.staff.forEach(s => {
+      const qa={}, ra={};
+      cfg.groups.forEach(g => { qa[g.id]=0; ra[g.id]=0; });
+      staffDaily[s.id] = { qty:qa, rev:ra };
+    });
+    days.push({ dayNum:num, dd, mm, dateStr:`${dd}/${mm}/${cur.getFullYear()}`, dow, dayName:NAMES[dow], isWeekend, isSat, isSun, weight, groupActual, groupRevenue, staffDaily });
+    cur.setDate(cur.getDate()+1); num++;
+  }
+  return days;
+}
+
+// ================================================================
+// CONFIG UPLOAD HANDLER
+// ================================================================
+async function handleConfigUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('importProgress').classList.remove('hidden');
+  document.getElementById('importError').classList.add('hidden');
+  try {
+    const cfg = await parseConfigExcel(file);
+    await detectStorageBackend();
+    // Try to load existing state from storage
+    const saved = await sGet(STORAGE_KEY + '_' + cfg.storeName.replace(/\s/g,'_') + '_' + cfg.campaignName.replace(/\s/g,'_'));
+    initAppState(cfg);
+    if (saved) {
+      try { mergeStateFromStorage(saved); showToast('Đã khôi phục dữ liệu đã lưu ✅','success'); }
+      catch(e){ showToast('Tải cấu hình thành công ✅','success'); }
+    } else { showToast('Tải cấu hình thành công ✅','success'); }
+    // Try load by actual STORAGE_KEY
+    const saved2 = await sGet(STORAGE_KEY);
+    if (saved2) { try { mergeStateFromStorage(saved2); } catch(e){} }
+    activateDashboard();
+  } catch(err) {
+    document.getElementById('importError').textContent = 'Lỗi: ' + err.message;
+    document.getElementById('importError').classList.remove('hidden');
+  }
+  document.getElementById('importProgress').classList.add('hidden');
+  input.value = '';
+}
+
+function mergeStateFromStorage(saved) {
+  if (!saved || !appState) return;
+  // Merge days actual data
+  if (saved.days && Array.isArray(saved.days)) {
+    saved.days.forEach((sd, i) => {
+      if (appState.days[i]) {
+        appState.days[i].groupActual = sd.groupActual || appState.days[i].groupActual;
+        appState.days[i].groupRevenue = sd.groupRevenue || appState.days[i].groupRevenue;
+        appState.days[i].staffDaily = sd.staffDaily || appState.days[i].staffDaily;
+      }
+    });
+  }
+  if (saved.inventory) {
+    config.groups.forEach(g => {
+      if (saved.inventory[g.id]) {
+        appState.inventory[g.id] = {...appState.inventory[g.id], ...saved.inventory[g.id]};
+      }
+    });
+  }
+  if (saved.billStats) appState.billStats = saved.billStats;
+  if (saved.totalStoreRevenue) appState.totalStoreRevenue = saved.totalStoreRevenue;
+  recomputeStaffTotals();
+}
+
+function recomputeStaffTotals() {
+  if (!appState) return;
+  appState.staffList.forEach(s => {
+    config.groups.forEach(g => { s.actualQty[g.id]=0; s.actualRev[g.id]=0; });
+  });
+  appState.days.forEach(day => {
+    appState.staffList.forEach(s => {
+      const sd = day.staffDaily[s.id];
+      if (!sd) return;
+      config.groups.forEach(g => {
+        s.actualQty[g.id] += (sd.qty[g.id]||0);
+        s.actualRev[g.id] += (sd.rev[g.id]||0);
+      });
+    });
+  });
+  // Also recompute inventory salesQty from state
+  config.groups.forEach(g => {
+    appState.inventory[g.id].salesQty = appState.days.reduce((sum,d) => sum+(d.groupActual[g.id]||0),0);
+  });
+}
+
+async function saveState() {
+  if (!appState || !config) return;
+  const snapshot = {
+    config: {
+      storeName: config.storeName,
+      campaignName: config.campaignName,
+      startDate: config.startDate.toISOString(),
+      endDate: config.endDate.toISOString(),
+      groups: config.groups,
+      staff: config.staff,
+      targets: config.targets,
+      barcodeMap: config.barcodeMap,
+      staffList: appState.staffList
+    },
+    days: appState.days.map(d => ({ groupActual:{...d.groupActual}, groupRevenue:{...d.groupRevenue}, staffDaily: JSON.parse(JSON.stringify(d.staffDaily)) })),
+    inventory: JSON.parse(JSON.stringify(appState.inventory)),
+    billStats: JSON.parse(JSON.stringify(appState.billStats)),
+    totalStoreRevenue: appState.totalStoreRevenue
+  };
+  await sSet(STORAGE_KEY, snapshot);
+  await sSet(META_KEY, STORAGE_KEY);
+}
+
+// ================================================================
+// ACTIVATE DASHBOARD
+// ================================================================
+function activateDashboard() {
+  document.getElementById('importScreen').classList.add('hidden');
+  document.getElementById('dashboardScreen').classList.remove('hidden');
+  // Set page title
+  document.title = config.campaignName + ' – ' + config.storeName;
+  document.getElementById('pageTitle').textContent = config.campaignName;
+  document.getElementById('navTitle').textContent = config.campaignName;
+  document.getElementById('navSubtitle').textContent = config.storeName + ' · ' + config.startDate.toLocaleDateString('vi-VN') + ' – ' + config.endDate.toLocaleDateString('vi-VN');
+  // Build group tabs
+  const tabsEl = document.getElementById('groupTabs');
+  tabsEl.innerHTML = config.groups.map(g => `<button class="tab-btn" id="tab${g.id}" onclick="setGroupFilter('${g.id}')">${g.emoji} ${g.name}</button>`).join('');
+  // Build barcode modal content
+  document.getElementById('barcodeModalContent').innerHTML = config.groups.map(g => `
+    <div class="mb-4">
+      <div class="font-bold text-slate-800 mb-2">${g.emoji} ${g.name}</div>
+      <div class="bg-slate-50 rounded-lg p-3 space-y-1">
+        ${g.barcodes.map(b=>`<div class="font-mono text-sm text-slate-700">${b}</div>`).join('')}
+      </div>
+    </div>`).join('');
+  // Build alias modal content
+  document.getElementById('aliasModalContent').innerHTML = config.staff.map(s => `
+    <div class="flex items-start gap-3 mb-3 p-3 bg-slate-50 rounded-lg">
+      <div class="avatar-circle" style="background:${s.color}">${initials(s.name)}</div>
+      <div><div class="font-semibold text-sm text-slate-800">${s.name}</div>
+      <div class="text-xs text-slate-500 mt-1">${s.keywords.join(' | ')}</div></div>
+    </div>`).join('');
+  // Staff selector
+  const sel = document.getElementById('staffSelector');
+  sel.innerHTML = appState.staffList.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  appState.selectedStaffId = appState.staffList[0]?.id;
+  // Quick add form
+  buildQuickAddForm();
+  renderAll();
+}
+
+function setGroupFilter(gid) {
+  if (!appState) return;
+  appState.currentGroup = gid;
+  document.querySelectorAll('[id^="tab"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab'+gid)?.classList.add('active');
+  renderKPI(); renderDailyTable(); renderIndividual(); renderLeaderboard(); renderCharts();
+}
+
+function setTableFilter(f) {
+  if (!appState) return;
+  appState.tableFilter = f;
+  ['ALL','DONE','TODAY'].forEach(x => {
+    const el = document.getElementById('filter'+x);
+    if (el) el.classList.toggle('active', x===f);
+  });
+  renderDailyTable();
+}
+
+// ================================================================
+// RENDER ALL
+// ================================================================
+function renderAll() {
+  renderKPI();
+  renderInventory();
+  renderDailyTable();
+  renderIndividual();
+  renderRevenue();
+  renderLeaderboard();
+  renderCharts();
+}
+
+// ================================================================
+// KPI CARDS
+// ================================================================
+function renderKPI() {
+  if (!appState) return;
+  const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
+  const today = getToday();
+
+  let totalTarget=0, totalActual=0, totalRevenue=0;
+  grps.forEach(g => {
+    totalTarget += g.target;
+    totalActual += appState.days.reduce((s,d)=>s+(d.groupActual[g.id]||0),0);
+    totalRevenue += appState.days.reduce((s,d)=>s+(d.groupRevenue[g.id]||0),0);
+  });
+
+  // Daily averages
+  const pastDays = appState.days.filter(d => { const dd=new Date(config.startDate); dd.setDate(dd.getDate()+d.dayNum-1); dd.setHours(0,0,0,0); return dd<today; });
+  const weekdayPast = pastDays.filter(d=>!d.isWeekend);
+  const weekendPast = pastDays.filter(d=>d.isWeekend);
+  const avgWeekday = weekdayPast.length ? grps.reduce((s,g)=>s+weekdayPast.reduce((ss,d)=>ss+(d.groupActual[g.id]||0),0),0)/weekdayPast.length : 0;
+  const avgWeekend = weekendPast.length ? grps.reduce((s,g)=>s+weekendPast.reduce((ss,d)=>ss+(d.groupActual[g.id]||0),0),0)/weekendPast.length : 0;
+
+  const progress = pct(totalActual, totalTarget);
+
+  const kpis = [
+    { label:'Mục tiêu tổng', val: fmt(totalTarget)+' sp', sub:'Cả chiến dịch', grad:'linear-gradient(135deg,#f97316,#ea580c)', icon:'🎯' },
+    { label:'Thực tế', val: fmt(totalActual)+' sp', sub: fmtVND(totalRevenue), grad:'linear-gradient(135deg,#0ea5e9,#0284c7)', icon:'📦' },
+    { label:'Tiến độ', val: progress+'%', sub: progress>=100?'🎉 Hoàn thành!': (totalTarget-totalActual)+' sp còn lại', grad: progress>=100?'linear-gradient(135deg,#10b981,#059669)':'linear-gradient(135deg,#8b5cf6,#7c3aed)', icon:'📈' },
+    { label:'TB ngày thường', val: fmt(avgWeekday,1)+' sp', sub:'Trung bình/ngày thường', grad:'linear-gradient(135deg,#f59e0b,#d97706)', icon:'📅' },
+    { label:'TB ngày cuối tuần', val: fmt(avgWeekend,1)+' sp', sub:'Trung bình/ngày cuối tuần', grad:'linear-gradient(135deg,#ec4899,#db2777)', icon:'🌟' }
+  ];
+
+  document.getElementById('kpiSection').innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-1">
+      ${kpis.map(k=>`
+        <div class="kpi-card fade-in" style="background:${k.grad}">
+          <div class="text-2xl mb-1">${k.icon}</div>
+          <div class="text-2xl font-black leading-none">${k.val}</div>
+          <div class="text-xs font-semibold opacity-80 mt-1">${k.label}</div>
+          <div class="text-xs opacity-60 mt-0.5">${k.sub}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function getGroupTotalTarget(g) {
+  return g.target; // Excel target IS the total for the campaign period
+}
+
+function groupCampaignTarget(g) { return g.target; }
+
+// ================================================================
+// INVENTORY + GP SECTION
+// ================================================================
+function renderInventory() {
+  if (!appState) return;
+  // Recompute sales qty from days
+  config.groups.forEach(g => {
+    appState.inventory[g.id].salesQty = appState.days.reduce((s,d)=>s+(d.groupActual[g.id]||0),0);
+  });
+
+  const html = `
+    <div class="flex items-center gap-3 mb-4 flex-wrap">
+      <button onclick="openModal('pluModal')" class="btn-orange text-sm">📥 Nhập file tồn kho</button>
+      <span class="text-xs text-slate-400">Nhập file Excel/CSV có barcode + số lượng tồn để tự điền Tồn đầu kỳ</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-${config.groups.length>1?2:1} gap-4">
+      ${config.groups.map(g => renderInventoryCard(g)).join('')}
+    </div>`;
+  document.getElementById('inventorySection').innerHTML = html;
+}
+
+function renderInventoryCard(g) {
+  const inv = appState.inventory[g.id];
+  const restockTotal = inv.restocks.reduce((s,r)=>s+r.qty,0);
+  const totalIn = inv.openingStock + restockTotal;
+  const closing = totalIn - inv.salesQty;
+  inv.closeQty = Math.max(0, closing);
+  const low = closing < 20;
+  return `
+    <div class="section-wrap fade-in">
+      <div class="section-title">${g.emoji} ${g.name}</div>
+
+      <!-- Tồn kho 3-block summary -->
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="bg-blue-50 rounded-xl p-3 text-center">
+          <div class="text-xs text-blue-500 font-semibold mb-1">Tồn đầu kỳ</div>
+          <div class="text-xl font-black text-blue-700">${fmt(inv.openingStock)}</div>
+          <div class="text-xs text-blue-400">sp</div>
+        </div>
+        <div class="bg-red-50 rounded-xl p-3 text-center">
+          <div class="text-xs text-red-500 font-semibold mb-1">Đã xuất (bán)</div>
+          <div class="text-xl font-black text-red-600">${fmt(inv.salesQty)}</div>
+          <div class="text-xs text-red-400">sp từ CSV</div>
+        </div>
+        <div class="rounded-xl p-3 text-center ${low?'bg-red-100':'bg-green-50'}">
+          <div class="text-xs font-semibold mb-1 ${low?'text-red-500':'text-green-600'}">Tồn hiện tại</div>
+          <div class="text-xl font-black ${low?'text-red-700':'text-green-700'}">${fmt(inv.closeQty)} ${low?'⚠️':''}</div>
+          <div class="text-xs ${low?'text-red-400':'text-green-400'}">sp còn lại</div>
+        </div>
+      </div>
+
+      <!-- Edit fields -->
+      <div class="space-y-2 border-t border-slate-100 pt-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-500">Tồn đầu kỳ (chỉnh thủ công)</span>
+          <input type="number" class="input-field text-right font-bold" style="width:90px" value="${inv.openingStock}" onchange="setOpeningStock('${g.id}',this.value)">
+        </div>
+        ${inv.restocks.map((r,i)=>`
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-400">+ Nhập thêm ${i+1} (${r.date})</span>
+            <span class="font-semibold text-green-600 text-sm">+${fmt(r.qty)}</span>
+          </div>`).join('')}
+        <button onclick="addRestock('${g.id}')" class="text-xs text-orange-600 font-semibold hover:underline">+ Ghi nhận nhập thêm hàng</button>
+      </div>
+
+    </div>`;
+}
+
+function setOpeningStock(gid, val) { appState.inventory[gid].openingStock=parseInt(val)||0; saveState(); renderInventory(); }
+
+function addRestock(gid) {
+  const qty = parseInt(prompt('Số lượng nhập thêm:'));
+  if (!qty || isNaN(qty)) return;
+  const date = new Date().toLocaleDateString('vi-VN');
+  appState.inventory[gid].restocks.push({qty, date});
+  saveState(); renderInventory();
+}
+
+// ================================================================
+// DAILY TEAM TABLE
+// ================================================================
+function renderDailyTable() {
+  if (!appState) return;
+  const today = getToday();
+  let days = appState.days;
+  if (appState.tableFilter==='DONE') days = days.filter(d=>{ const dd=new Date(config.startDate); dd.setDate(dd.getDate()+d.dayNum-1); return dd<today; });
+  if (appState.tableFilter==='TODAY') days = days.filter(d=>{ const dd=new Date(config.startDate); dd.setDate(dd.getDate()+d.dayNum-1); dd.setHours(0,0,0,0); return dd.getTime()===today.getTime(); });
+
+  const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
+  const totalWeight = appState.days.reduce((s,d)=>s+d.weight,0);
+
+  let cumActual = 0;
+  const rows = days.map(day => {
+    let dayTarget=0, dayActual=0, dayRevenue=0;
+    grps.forEach(g => {
+      const wdTarget = Math.round(groupCampaignTarget(g) * day.weight / totalWeight);
+      dayTarget += wdTarget;
+      dayActual += (day.groupActual[g.id]||0);
+      dayRevenue += (day.groupRevenue[g.id]||0);
+    });
+    cumActual += dayActual;
+    const p = pct(dayActual,dayTarget);
+    const badge = dayActual===0 ? '<span class="badge-near">—</span>' : statusBadge(dayActual,dayTarget);
+    const grpCols = grps.map(g => {
+      const wt = Math.round(groupCampaignTarget(g)*day.weight/totalWeight);
+      const act = day.groupActual[g.id]||0;
+      return `<td class="td">${fmt(wt)}</td><td class="td font-semibold">${fmt(act)}</td><td class="td">${act?pct(act,wt)+'%':'—'}</td>`;
+    }).join('');
+    return `<tr class="hover:bg-slate-50 cursor-pointer" ondblclick="openQuickEditDay(${day.dayNum-1})">
+      <td class="td sticky-col font-bold">${day.dayNum}</td>
+      <td class="td">${day.dd}/${day.mm}</td>
+      <td class="td text-xs ${day.isWeekend?'text-orange-600 font-semibold':''}">${day.dayName}</td>
+      ${grpCols}
+      <td class="td font-bold">${fmt(dayActual)}</td>
+      <td class="td text-xs">${fmtVND(dayRevenue)}</td>
+      <td class="td">${fmt(cumActual)}</td>
+      <td class="td">${badge}</td>
+    </tr>`;
+  });
+
+  const grpHeaders = grps.map(g=>`<th class="th" colspan="3">${g.emoji} ${g.name}</th>`).join('');
+  const subHeaders = grps.map(g=>`<th class="th">Target</th><th class="th">Thực tế</th><th class="th">%</th>`).join('');
+
+  document.getElementById('dailyTableWrap').innerHTML = `
+    <table class="w-full" style="min-width:600px">
+      <thead>
+        <tr><th class="th sticky-col">#</th><th class="th">Ngày</th><th class="th">Thứ</th>${grpHeaders}<th class="th">Tổng</th><th class="th">Doanh thu</th><th class="th">Cộng dồn</th><th class="th">Trạng thái</th></tr>
+        <tr><th class="th sticky-col"></th><th class="th"></th><th class="th"></th>${subHeaders}<th class="th"></th><th class="th"></th><th class="th"></th><th class="th"></th></tr>
+      </thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>`;
+}
+
+// ================================================================
+// INDIVIDUAL ROADMAP
+// ================================================================
+function renderIndividual() {
+  if (!appState) return;
+  const sel = document.getElementById('staffSelector');
+  if (!sel) return;
+  appState.selectedStaffId = sel.value || appState.selectedStaffId;
+  const staff = appState.staffList.find(s=>s.id===appState.selectedStaffId);
+  if (!staff) return;
+  const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
+
+  const totalTarget = grps.reduce((s,g)=>s+(staff.targets[g.id]||0),0);
+  const totalActual = grps.reduce((s,g)=>s+(staff.actualQty[g.id]||0),0);
+  const totalRev = grps.reduce((s,g)=>s+(staff.actualRev[g.id]||0),0);
+  const p = pct(totalActual, totalTarget);
+
+  // Conversion rate
+  const bs = appState.billStats;
+  const staffTotalBills = Object.values(bs.totalBills[staff.id]||{}).reduce((s,dayMap)=>s+Object.keys(dayMap).length,0);
+  let staffPushBills = 0;
+  grps.forEach(g => { staffPushBills += Object.values((bs.pushBills[g.id]||{})[staff.id]||{}).reduce((s,dm)=>s+Object.keys(dm).length,0); });
+  const convRate = staffTotalBills ? pct(staffPushBills,staffTotalBills) : 0;
+
+  // Milestones
+  const milestones = [25,50,75,100].map(m => ({ pct:m, achieved: p>=m }));
+
+  // Group breakdown rows
+  const groupRows = grps.map(g => {
+    const tgt = staff.targets[g.id]||0, act = staff.actualQty[g.id]||0, rev = staff.actualRev[g.id]||0;
+    const gp = pct(act,tgt);
+    return `<tr class="stat-row">
+      <td class="td sticky-col">${g.emoji} ${g.name}</td>
+      <td class="td">${fmt(tgt)}</td>
+      <td class="td font-semibold">${fmt(act)}</td>
+      <td class="td"><div class="w-20 bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full progress-bar-inner" style="width:${Math.min(100,gp)}%;background:#f97316"></div></div></td>
+      <td class="td">${gp}%</td>
+      <td class="td text-xs">${fmtVND(rev)}</td>
+    </tr>`;
+  }).join('');
+
+  // Daily table for staff
+  const today = getToday();
+  const totalWeight = appState.days.reduce((s,d)=>s+d.weight,0);
+  const dailyRows = appState.days.map(day => {
+    let dTarget=0, dActual=0, dRev=0;
+    grps.forEach(g => {
+      dTarget += Math.round((staff.targets[g.id]||0)*day.weight/totalWeight);
+      dActual += (day.staffDaily[staff.id]?.qty[g.id]||0);
+      dRev += (day.staffDaily[staff.id]?.rev[g.id]||0);
+    });
+    const dp = dActual ? pct(dActual,dTarget) : 0;
+    return `<tr class="hover:bg-slate-50 cursor-pointer" ondblclick="openQuickEditDayStaff(${day.dayNum-1},'${staff.id}')">
+      <td class="td">${day.dayNum}</td><td class="td">${day.dd}/${day.mm}</td>
+      <td class="td text-xs ${day.isWeekend?'text-orange-600 font-semibold':''}">${day.dayName}</td>
+      <td class="td">${fmt(dTarget)}</td><td class="td font-semibold">${fmt(dActual)}</td>
+      <td class="td text-xs">${fmtVND(dRev)}</td>
+      <td class="td">${dActual?statusBadge(dActual,dTarget):'<span class="badge-near">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('individualSection').innerHTML = `
+    <div class="fade-in">
+      <!-- Progress bar -->
+      <div class="flex items-center gap-3 mb-2 flex-wrap">
+        <div class="avatar-circle text-base" style="background:${staff.color}">${initials(staff.name)}</div>
+        <div><div class="font-bold text-slate-800">${staff.name}</div><div class="text-xs text-slate-500">Tổng: ${fmt(totalActual)}/${fmt(totalTarget)} sp · ${fmtVND(totalRev)} · Tỷ lệ chốt: ${convRate}%</div></div>
+        <div class="ml-auto text-2xl font-black ${p>=100?'text-green-600':'text-orange-600'}">${p}%</div>
+      </div>
+      <div class="relative bg-slate-100 rounded-full h-5 mb-6">
+        <div class="h-5 rounded-full progress-bar-inner flex items-center justify-end pr-2" style="width:${Math.min(100,p)}%;background:${p>=100?'linear-gradient(90deg,#10b981,#059669)':'linear-gradient(90deg,#f97316,#ea580c)'}">
+          <span class="text-white text-xs font-bold">${p>5?p+'%':''}</span>
+        </div>
+        ${milestones.map(m=>`
+          <div class="milestone-line" style="left:${m.pct}%"></div>
+          <div class="milestone-txt" style="left:${m.pct}%">${m.achieved?'✅':'·'}${m.pct}%</div>`).join('')}
+      </div>
+      <!-- Group breakdown -->
+      <div class="table-scroll mb-4">
+        <table class="w-full">
+          <thead><tr><th class="th sticky-col">Nhóm</th><th class="th">Target</th><th class="th">Thực tế</th><th class="th" colspan="2">Tiến độ</th><th class="th">Doanh thu</th></tr></thead>
+          <tbody>${groupRows}</tbody>
+        </table>
+      </div>
+      <!-- Daily detail -->
+      <div class="table-scroll">
+        <table class="w-full" style="min-width:500px">
+          <thead><tr><th class="th">#</th><th class="th">Ngày</th><th class="th">Thứ</th><th class="th">Target</th><th class="th">Thực tế</th><th class="th">Doanh thu</th><th class="th">Trạng thái</th></tr></thead>
+          <tbody>${dailyRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ================================================================
+// REVENUE COMPARISON
+// ================================================================
+function renderRevenue() {
+  if (!appState) return;
+  const pushRev = appState.days.reduce((s,d)=>s+config.groups.reduce((ss,g)=>ss+(d.groupRevenue[g.id]||0),0),0);
+  const storeRev = appState.totalStoreRevenue;
+  const sharePct = storeRev ? pct(pushRev,storeRev) : 0;
+  document.getElementById('storeRevenueInput').value = storeRev||'';
+  document.getElementById('revenueCompareCards').innerHTML = `
+    <div class="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
+      <div class="text-xs text-orange-600 font-semibold">Doanh thu Push Sale</div>
+      <div class="text-xl font-black text-orange-700">${fmtVND(pushRev)}</div>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+      <div class="text-xs text-blue-600 font-semibold">Tỷ trọng Push Sale</div>
+      <div class="text-xl font-black text-blue-700">${sharePct}%</div>
+      <div class="text-xs text-blue-500">${storeRev?'của '+fmtVND(storeRev):'Chưa nhập doanh thu CH'}</div>
+    </div>`;
+}
+
+function updateStoreRevenue(val) {
+  if (!appState) return;
+  appState.totalStoreRevenue = parseFloat(val)||0;
+  saveState(); renderRevenue();
+}
+
+// ================================================================
+// LEADERBOARD
+// ================================================================
+function renderLeaderboard() {
+  if (!appState) return;
+  const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
+  const ranked = [...appState.staffList].map(s => ({
+    ...s,
+    total: grps.reduce((ss,g)=>ss+(s.actualQty[g.id]||0),0),
+    totalRev: grps.reduce((ss,g)=>ss+(s.actualRev[g.id]||0),0),
+    totalTarget: grps.reduce((ss,g)=>ss+(s.targets[g.id]||0),0)
+  })).sort((a,b)=>b.total-a.total);
+
+  // Podium (top 3)
+  const top3 = ranked.slice(0,3);
+  const podiumOrder = top3.length>=2 ? [top3[1],top3[0],top3[2]].filter(Boolean) : top3;
+  const podiumHeights = ['podium-2','podium-1','podium-3'];
+  const podiumColors = ['linear-gradient(180deg,#94a3b8,#64748b)','linear-gradient(180deg,#f59e0b,#d97706)','linear-gradient(180deg,#b45309,#92400e)'];
+  const medals = ['🥈','🥇','🥉'];
+  const podiumHTML = podiumOrder.length ? `
+    <div class="flex items-end justify-center gap-4 mb-6">
+      ${podiumOrder.map((s,i)=>`
+        <div class="text-center">
+          <div class="avatar-circle mx-auto mb-2 text-sm" style="background:${s.color};width:44px;height:44px">${initials(s.name)}</div>
+          <div class="text-xs font-bold text-slate-700 mb-1">${s.name.split(' ').pop()}</div>
+          <div class="text-lg font-black text-slate-800">${fmt(s.total)}</div>
+          <div class="text-xs text-slate-500">${fmtVND(s.totalRev)}</div>
+          <div class="podium-bar mt-1 w-20" style="height:${[65,90,50][i]}px;background:${podiumColors[i]};border-radius:8px 8px 0 0">
+            <span class="text-2xl">${medals[i]}</span>
+          </div>
+        </div>`).join('')}
+    </div>` : '';
+
+  // Table
+  const tableRows = ranked.map((s,i)=>{
+    const p = pct(s.total,s.totalTarget);
+    const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'text-slate-600';
+    const grpCols = grps.map(g=>`<td class="td">${fmt(s.actualQty[g.id]||0)}</td><td class="td text-xs">${fmtVND(s.actualRev[g.id]||0)}</td>`).join('');
+    return `<tr class="hover:bg-slate-50">
+      <td class="td sticky-col font-bold ${rankClass}">${i+1}</td>
+      <td class="td sticky-col">
+        <div class="flex items-center gap-2">
+          <div class="avatar-circle" style="background:${s.color}">${initials(s.name)}</div>
+          <span class="font-semibold text-sm">${s.name}</span>
+        </div>
+      </td>
+      ${grpCols}
+      <td class="td font-bold">${fmt(s.total)}</td>
+      <td class="td text-xs">${fmtVND(s.totalRev)}</td>
+      <td class="td">${statusBadge(s.total,s.totalTarget)}</td>
+    </tr>`;
+  }).join('');
+
+  const grpHeaders = grps.map(g=>`<th class="th" colspan="2">${g.emoji} ${g.name}</th>`).join('');
+  const subHeaders = grps.map(g=>`<th class="th">SL</th><th class="th">Doanh thu</th>`).join('');
+
+  document.getElementById('podiumSection').innerHTML = podiumHTML;
+  document.getElementById('leaderboardTable').innerHTML = `
+    <table class="w-full" style="min-width:600px">
+      <thead>
+        <tr><th class="th sticky-col">#</th><th class="th sticky-col">Nhân viên</th>${grpHeaders}<th class="th">Tổng</th><th class="th">Doanh thu</th><th class="th">Tiến độ</th></tr>
+        <tr><th></th><th></th>${subHeaders}<th></th><th></th><th></th></tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>`;
+}
+
+// ================================================================
+// CHARTS
+// ================================================================
+function renderCharts() {
+  if (!appState) return;
+  const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
+  const labels = appState.staffList.map(s=>s.name.split(' ').pop());
+  const revenueData = appState.staffList.map(s=>grps.reduce((sum,g)=>sum+(s.actualRev[g.id]||0),0));
+  const shareData = appState.staffList.map(s=>grps.reduce((sum,g)=>sum+(s.actualQty[g.id]||0),0));
+  const colors = appState.staffList.map(s=>s.color);
+
+  // Revenue bar chart
+  if (charts.revenue) charts.revenue.destroy();
+  const ctx1 = document.getElementById('revenueChart');
+  if (ctx1) {
+    charts.revenue = new Chart(ctx1, {
+      type:'bar',
+      data:{ labels, datasets:[{ label:'Doanh thu (₫)', data:revenueData, backgroundColor:colors, borderRadius:8 }] },
+      options:{ responsive:true, plugins:{ legend:{display:false}, datalabels:{ anchor:'end', align:'top', formatter:v=>fmtVND(v), font:{size:10,weight:'bold'}, color:'#64748b' } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>fmtVND(v), font:{size:10} } } } }
+    });
+  }
+
+  // Doughnut share chart
+  if (charts.share) charts.share.destroy();
+  const ctx2 = document.getElementById('shareChart');
+  const hasData = shareData.some(v=>v>0);
+  if (ctx2) {
+    charts.share = new Chart(ctx2, {
+      type:'doughnut',
+      data:{ labels, datasets:[{ data: hasData?shareData:[1], backgroundColor: hasData?colors:['#e2e8f0'], borderWidth:2 }] },
+      options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{font:{size:11}} }, datalabels:{ formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?Math.round(v/total*100)+'%':''; }, font:{size:12,weight:'bold'}, color:'white' } } }
+    });
+  }
+}
+
+// ================================================================
+// CSV PROCESSING
+// ================================================================
+function readTabularFile(file) {
+  return new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const bytes = new Uint8Array(e.target.result);
+        const ext = file.name.toLowerCase().split('.').pop();
+        let wb;
+        if (ext==='xlsx'||ext==='xls') {
+          wb = XLSX.read(bytes, {type:'array'});
+        } else {
+          // CSV: detect encoding by BOM
+          let text;
+          if (bytes[0]===0xFF && bytes[1]===0xFE) { // UTF-16 LE
+            text = new TextDecoder('utf-16le').decode(bytes.slice(2));
+          } else if (bytes[0]===0xFE && bytes[1]===0xFF) { // UTF-16 BE
+            text = new TextDecoder('utf-16be').decode(bytes.slice(2));
+          } else if (bytes[0]===0xEF && bytes[1]===0xBB && bytes[2]===0xBF) { // UTF-8 BOM
+            text = new TextDecoder('utf-8').decode(bytes.slice(3));
+          } else {
+            try { text = new TextDecoder('utf-8',{fatal:true}).decode(bytes); }
+            catch(_) { text = new TextDecoder('latin1').decode(bytes); }
+          }
+          wb = XLSX.read(text, {type:'string'});
+        }
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, {header:1,raw:false,defval:null});
+        resolve(rows);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error('Read error'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function findColIdx(headerRow, ...candidates) {
+  if (!headerRow) return -1;
+  for (const c of candidates) {
+    if (c instanceof RegExp) {
+      // Regex candidate
+      const i = headerRow.findIndex(h => h && c.test(String(h)));
+      if (i>=0) return i;
+      continue;
+    }
+    const normC = removeVietnameseTones(c);
+    const i = headerRow.findIndex(h => {
+      if (!h) return false;
+      const hs = String(h);
+      if (hs.toLowerCase().includes(c.toLowerCase())) return true;
+      return removeVietnameseTones(hs).includes(normC);
+    });
+    if (i>=0) return i;
+  }
+  return -1;
+}
+
+// Find the real header row by scanning first N rows for known POS column keywords.
+// POS CSV files often have a title/metadata row above the actual column header row.
+function findHeaderRowIdx(rows, isDetailFile) {
+  const limit = Math.min(8, rows.length);
+  for (let i=0; i<limit; i++) {
+    const r = rows[i]||[];
+    const low = r.map(c=>String(c||'').toLowerCase());
+    if (isDetailFile) {
+      // DETAIL header contains barcode/qty/item name
+      if (low.some(h=>/barcode|^qty$|item name|mã vạch|số lượng/.test(h))) return i;
+    } else {
+      // BILL header contains slip no / sales staff / slip div
+      if (low.some(h=>/slip\s*no|sales staff|slip\s*div|nhân viên/.test(h))) return i;
+    }
+  }
+  // Fallback: first non-empty row
+  const idx = rows.findIndex(r=>r&&r.some(c=>c&&c!==''));
+  return idx>=0 ? idx : 0;
+}
+
+function classifyFile(rows) {
+  // Scan first 8 rows to find a row with known column names (avoid title/metadata rows)
+  const limit = Math.min(8, rows.length);
+  for (let i=0; i<limit; i++) {
+    const r = rows[i]||[];
+    const h = r.map(c=>String(c||'').toLowerCase());
+    const hasBillCols = h.some(c=>/sales staff|nhân viên|nhan vien|cashier/.test(c));
+    const hasDetailCols = h.some(c=>/barcode|item name|mã vạch/.test(c));
+    const hasSlipNo = h.some(c=>/slip\s*no/.test(c));
+    if (hasBillCols && !hasDetailCols) return 'BILL';
+    if (hasDetailCols && !hasBillCols) return 'DETAIL';
+    if (hasSlipNo && hasDetailCols) return 'DETAIL';
+  }
+  // Fallback by column count of first non-empty row
+  const header = rows.find(r=>r.some(c=>c&&c!==''));
+  return (header&&header.length>10) ? 'DETAIL' : 'BILL';
+}
+
+function matchStaffFromText(text) {
+  if (!text || !appState) return null;
+  const norm = removeVietnameseTones(text);
+  for (const s of appState.staffList) {
+    const sorted = [...s.keywords].sort((a,b)=>b.length-a.length);
+    for (const kw of sorted) {
+      if (norm.includes(removeVietnameseTones(kw))) return s;
+    }
+  }
+  return null;
+}
+
+async function handleCSVImport() {
+  const billFile = document.getElementById('billFileInput').files[0];
+  const detailFile = document.getElementById('detailFileInput').files[0];
+  const mode = document.querySelector('input[name="csvMode"]:checked')?.value || 'add';
+
+  if (!billFile && !detailFile) { showToast('Vui lòng chọn ít nhất một file','error'); return; }
+
+  try {
+    showToast('Đang xử lý...','info');
+    let billRows = null, detailRows = null;
+
+    // Read files
+    const files = [billFile, detailFile].filter(Boolean);
+    const allRows = await Promise.all(files.map(f=>readTabularFile(f)));
+
+    // Auto-classify
+    let bRows=null, dRows=null;
+    allRows.forEach((rows,i) => {
+      const type = classifyFile(rows);
+      if (type==='BILL') bRows = rows;
+      else dRows = rows;
+    });
+
+    // If only one file, classify by name
+    if (files.length===1) {
+      const name = files[0].name.toLowerCase();
+      if (name.includes('bill')) bRows = allRows[0];
+      else dRows = allRows[0];
+    }
+
+    await processCSVData(bRows, dRows, mode);
+    closeModal('csvModal');
+    renderAll();
+    saveState();
+    // Summary toast — shows product count + how many staff were recognised
+    const totalQty = config.groups.reduce((s,g)=>s+appState.days.reduce((ss,d)=>ss+(d.groupActual[g.id]||0),0),0);
+    const staffWithData = appState.staffList.filter(s=>config.groups.some(g=>(s.actualQty[g.id]||0)>0)).length;
+    const noStaffWarning = staffWithData===0 ? ' ⚠️ Không nhận diện được NV nào — kiểm tra cột "Sales Staff" và keyword trong Excel template.' : '';
+    showToast(`✅ Nhập xong: ${fmt(totalQty)} sp, ${staffWithData}/${appState.staffList.length} NV có dữ liệu.${noStaffWarning}`,'success',noStaffWarning?8000:4000);
+  } catch(err) {
+    showToast('Lỗi: '+err.message,'error');
+  }
+}
+
+async function processCSVData(billRows, detailRows, mode) {
+  if (!billRows && !detailRows) throw new Error('Không có dữ liệu hợp lệ');
+
+  if (mode==='overwrite') {
+    // Reset all actual data
+    appState.days.forEach(day => {
+      config.groups.forEach(g => { day.groupActual[g.id]=0; day.groupRevenue[g.id]=0; });
+      appState.staffList.forEach(s => {
+        config.groups.forEach(g => { day.staffDaily[s.id].qty[g.id]=0; day.staffDaily[s.id].rev[g.id]=0; });
+      });
+    });
+    appState.billStats = { totalBills:{}, pushBills:Object.fromEntries(config.groups.map(g=>[g.id,{}])) };
+    appState.staffList.forEach(s => { config.groups.forEach(g => { s.actualQty[g.id]=0; s.actualRev[g.id]=0; }); });
+  }
+
+  // Build Slip No. → Staff map from BILL
+  const slipStaffMap = {}; // slipNo → staffObj
+  const slipDayMap = {};   // slipNo → dayIndex
+  const slipDiv_col_bill = -1;
+
+  if (billRows) {
+    // Scan up to 8 rows to find the actual header row (POS CSV may have title rows above)
+    const hIdx = findHeaderRowIdx(billRows, false);
+    const hdr = billRows[hIdx]||[];
+    const slipCol = findColIdx(hdr,'Slip No','slip no','slip_no','receipt','bill no', /slip\s*no/i);
+    const staffCol = findColIdx(hdr,'Sales Staff','Staff','Cashier','Nhân viên','Nhan vien','staff name','Sales Person','salesperson', /sales\s*staff|nhân\s*viên/i);
+    const dateCol = findColIdx(hdr,'Sales Day','Sales Date','Trading Datetime','Trading Date','Date','Ngày','date', /sales\s*day|trading\s*date/i);
+    const divCol = findColIdx(hdr,'Slip Div','slip div','Type','type', /slip\s*div/i);
+
+    for (let i=hIdx+1; i<billRows.length; i++) {
+      const r = billRows[i];
+      if (!r || !r.some(c=>c)) continue;
+      const div = r[divCol]||'';
+      // Only skip rows that are explicitly returns/voids — do NOT require "sales" keyword
+      if (divCol>=0 && /return|void|refund|cancel|hủy|trả hàng/i.test(String(div))) continue;
+      const slipNo = r[slipCol]||'';
+      const staffName = r[staffCol]||'';
+      const dateVal = r[dateCol]||'';
+      if (!slipNo) continue;
+
+      const staff = matchStaffFromText(staffName);
+      if (staff) slipStaffMap[slipNo] = staff;
+
+      // Map slip to day
+      const dt = normDateStr(dateVal);
+      if (dt) {
+        const diff = dayDiff(dt, config.startDate);
+        if (diff>=0 && diff<appState.days.length) slipDayMap[slipNo] = diff;
+      }
+
+      // Track total bills
+      if (staff && slipDayMap[slipNo]!=null) {
+        const si = staff.id, di = slipDayMap[slipNo];
+        if (!appState.billStats.totalBills[si]) appState.billStats.totalBills[si]={};
+        if (!appState.billStats.totalBills[si][di]) appState.billStats.totalBills[si][di]={};
+        appState.billStats.totalBills[si][di][slipNo]=true;
+      }
+    }
+  }
+
+  // Track out-of-range records
+  let outOfRangeCount = 0;
+  let outOfRangeMinDate = null, outOfRangeMaxDate = null;
+
+  // Process DETAIL rows
+  if (detailRows) {
+    // Scan up to 8 rows to find the actual header row (POS CSV may have title rows above)
+    const hIdx = findHeaderRowIdx(detailRows, true);
+    const hdr = detailRows[hIdx]||[];
+    const slipCol = findColIdx(hdr,'Slip No','slip no','receipt','bill no', /slip\s*no/i);
+    const barcodeCol = findColIdx(hdr,'Barcode','barcode','JAN','jan','EAN','PLU', /barcode|^jan$/i);
+    const qtyCol = findColIdx(hdr,'Qty','qty','Quantity','quantity','SL','sl','So luong','Số lượng', /^qty$|số lượng/i);
+    const amtCol = findColIdx(hdr,'Amount(Tax excl.)','Amount(Tax Excl.)','Amount','amount','Revenue','revenue','Doanh thu','Thành tiền','Tổng tiền','thanh tien','tong tien','Net Sales','Net Amount','Giá trị','gia tri','Tien hang','Tổng cộng','total','Tien', /amount\(tax excl\.\)|amount.*tax.*excl/i);
+    const priceCol = findColIdx(hdr,'Price','Unit Price','Don gia','Đơn giá','unit price','gia ban','Giá bán');
+    const dateCol = findColIdx(hdr,'Sales Day','Sales Date','Trading Datetime','Trading Date','Date','date','Ngày','Ngay', /sales\s*day|trading\s*date/i);
+    const divCol = findColIdx(hdr,'Slip Div','slip div','Type','type', /slip\s*div/i);
+    const staffCol = findColIdx(hdr,'Sales Staff','Staff','Cashier','Nhân viên','Nhan vien','Sales Person','salesperson', /sales\s*staff|nhân\s*viên/i);
+
+    for (let i=hIdx+1; i<detailRows.length; i++) {
+      const r = detailRows[i];
+      if (!r || !r.some(c=>c)) continue;
+      const div = r[divCol]||'';
+      // Only skip rows that are explicitly returns/voids — do NOT require "sales" keyword
+      if (divCol>=0 && /return|void|refund|cancel|hủy|trả hàng/i.test(String(div))) continue;
+
+      const slipNo = String(r[slipCol]||'').trim();
+      // Normalize barcode: handle scientific notation (e.g. 8.94E+12), trim whitespace
+      let barcode = String(r[barcodeCol]||'').trim();
+      if (/e/i.test(barcode) && !isNaN(parseFloat(barcode))) {
+        barcode = Math.round(parseFloat(barcode)).toString();
+      }
+      const qty = parseFloat(String(r[qtyCol]||'').replace(/,/g,''))||0;
+      let amt = parseFloat(String(r[amtCol]||'').replace(/,/g,''))||0;
+      // Fallback: unit price × qty when amount column not found or empty
+      if (amt===0 && priceCol>=0) {
+        const price = parseFloat(String(r[priceCol]||'').replace(/,/g,''))||0;
+        if (price>0 && qty>0) amt = price * qty;
+      }
+      const dateVal = r[dateCol]||'';
+
+      // Find group from barcode
+      const gid = config.barcodeMap[barcode];
+      if (!gid || qty<=0) continue;
+
+      // Find day
+      let dayIdx = slipDayMap[slipNo];
+      if (dayIdx==null) {
+        const dt = normDateStr(dateVal);
+        if (dt) {
+          dayIdx = dayDiff(dt, config.startDate);
+          if (slipNo) slipDayMap[slipNo] = dayIdx;
+        }
+      }
+      if (dayIdx==null || dayIdx<0 || dayIdx>=appState.days.length) {
+        // Track records that fall outside campaign date range
+        if (dayIdx!=null && dayIdx>=appState.days.length) {
+          outOfRangeCount++;
+          const dt = normDateStr(dateVal);
+          if (dt) {
+            if (!outOfRangeMinDate || dt < outOfRangeMinDate) outOfRangeMinDate = dt;
+            if (!outOfRangeMaxDate || dt > outOfRangeMaxDate) outOfRangeMaxDate = dt;
+          }
+        }
+        continue;
+      }
+
+      const day = appState.days[dayIdx];
+
+      // Accumulate GROUP totals regardless of staff match
+      day.groupActual[gid] = (day.groupActual[gid]||0) + qty;
+      day.groupRevenue[gid] = (day.groupRevenue[gid]||0) + amt;
+
+      // Find staff — optional; group totals already recorded above
+      let staff = slipStaffMap[slipNo];
+      if (!staff && staffCol>=0) staff = matchStaffFromText(r[staffCol]);
+
+      if (staff) {
+        if (day.staffDaily[staff.id]) {
+          day.staffDaily[staff.id].qty[gid] = (day.staffDaily[staff.id].qty[gid]||0) + qty;
+          day.staffDaily[staff.id].rev[gid] = (day.staffDaily[staff.id].rev[gid]||0) + amt;
+        }
+        staff.actualQty[gid] = (staff.actualQty[gid]||0) + qty;
+        staff.actualRev[gid] = (staff.actualRev[gid]||0) + amt;
+
+        // Track push bills
+        if (slipNo) {
+          if (!appState.billStats.pushBills[gid]) appState.billStats.pushBills[gid]={};
+          if (!appState.billStats.pushBills[gid][staff.id]) appState.billStats.pushBills[gid][staff.id]={};
+          if (!appState.billStats.pushBills[gid][staff.id][dayIdx]) appState.billStats.pushBills[gid][staff.id][dayIdx]={};
+          appState.billStats.pushBills[gid][staff.id][dayIdx][slipNo]=true;
+        }
+      }
+    }
+  }
+  // Recompute staff totals from days
+  recomputeStaffTotals();
+
+  // Warn user about records outside campaign date range
+  if (outOfRangeCount > 0) {
+    const fmtD = d => d ? d.toLocaleDateString('vi-VN') : '?';
+    const rangeStr = outOfRangeMinDate && outOfRangeMaxDate && outOfRangeMinDate.getTime()!==outOfRangeMaxDate.getTime()
+      ? `${fmtD(outOfRangeMinDate)} – ${fmtD(outOfRangeMaxDate)}`
+      : fmtD(outOfRangeMinDate||outOfRangeMaxDate);
+    setTimeout(()=>{
+      showToast(`⚠️ ${outOfRangeCount} giao dịch (${rangeStr}) nằm ngoài phạm vi chiến dịch. Kiểm tra Ngày kết thúc trong file cấu hình.`, 'error');
+    }, 1000);
+  }
+}
+
+// ================================================================
+// QUICK ADD / EDIT
+// ================================================================
+function buildQuickAddForm() {
+  const dayOpts = appState.days.map(d=>`<option value="${d.dayNum-1}">${d.dayNum} · ${d.dateStr} (${d.dayName})</option>`).join('');
+  const staffOpts = appState.staffList.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  const groupOpts = config.groups.map(g=>`<option value="${g.id}">${g.emoji} ${g.name}</option>`).join('');
+  document.getElementById('quickAddForm').innerHTML = `
+    <div><label class="text-xs font-semibold text-slate-500 block mb-1">Ngày</label><select id="qa_day" class="input-field">${dayOpts}</select></div>
+    <div><label class="text-xs font-semibold text-slate-500 block mb-1">Nhân viên</label><select id="qa_staff" class="input-field">${staffOpts}</select></div>
+    <div><label class="text-xs font-semibold text-slate-500 block mb-1">Nhóm sản phẩm</label><select id="qa_group" class="input-field">${groupOpts}</select></div>
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="text-xs font-semibold text-slate-500 block mb-1">Số lượng</label><input type="number" id="qa_qty" class="input-field" placeholder="0" min="0"></div>
+      <div><label class="text-xs font-semibold text-slate-500 block mb-1">Doanh thu (₫)</label><input type="number" id="qa_rev" class="input-field" placeholder="0" min="0"></div>
+    </div>`;
+}
+
+function handleQuickAdd() {
+  const di = parseInt(document.getElementById('qa_day')?.value);
+  const sid = document.getElementById('qa_staff')?.value;
+  const gid = document.getElementById('qa_group')?.value;
+  const qty = parseInt(document.getElementById('qa_qty')?.value)||0;
+  const rev = parseFloat(document.getElementById('qa_rev')?.value)||0;
+  if (isNaN(di)||!sid||!gid) { showToast('Vui lòng điền đầy đủ','error'); return; }
+  const day = appState.days[di];
+  const staff = appState.staffList.find(s=>s.id===sid);
+  if (!day||!staff) return;
+
+  day.groupActual[gid] = (day.groupActual[gid]||0)+qty;
+  day.groupRevenue[gid] = (day.groupRevenue[gid]||0)+rev;
+  day.staffDaily[sid].qty[gid] = (day.staffDaily[sid].qty[gid]||0)+qty;
+  day.staffDaily[sid].rev[gid] = (day.staffDaily[sid].rev[gid]||0)+rev;
+  staff.actualQty[gid] = (staff.actualQty[gid]||0)+qty;
+  staff.actualRev[gid] = (staff.actualRev[gid]||0)+rev;
+
+  saveState(); closeModal('quickAddModal'); renderAll();
+  showToast(`Đã thêm ${qty} sp cho ${staff.name} ✅`,'success');
+}
+
+function openQuickEditDay(dayIdx) {
+  // Set the day in quick add form and open modal
+  openModal('quickAddModal');
+  setTimeout(()=>{ const el=document.getElementById('qa_day'); if(el) el.value=dayIdx; },100);
+}
+
+function openQuickEditDayStaff(dayIdx, staffId) {
+  openModal('quickAddModal');
+  setTimeout(()=>{
+    const de=document.getElementById('qa_day'); if(de) de.value=dayIdx;
+    const se=document.getElementById('qa_staff'); if(se) se.value=staffId;
+  },100);
+}
+
+// ================================================================
+// PLU IMPORT
+// ================================================================
+async function handlePLUImport() {
+  const file = document.getElementById('pluFileInput').files[0];
+  if (!file) { showToast('Chọn file PLU','error'); return; }
+  try {
+    const rows = await readTabularFile(file);
+    const hdr = rows.find(r=>r.some(c=>c&&c!==''))||[];
+    const hIdx = rows.indexOf(hdr);
+    const bcCol = findColIdx(hdr,'barcode','Barcode','JAN','jan','EAN','PLU','plu','mã hàng','ma hang');
+    const openCol = findColIdx(hdr,'ton dau','Tồn đầu','opening','open stock','dau ky','Đầu kỳ','tồn đầu kỳ');
+    const incomeCol = findColIdx(hdr,'nhap','Nhập','income','Nhập kỳ','nhap ky','restock','in qty','Nhập trong kỳ','so luong nhap');
+    const qtyCol = openCol>=0 ? openCol : findColIdx(hdr,'qty','Qty','tồn','ton','stock','Stock','quantity','số lượng','so luong','sl','Tồn cuối','ton cuoi','closing');
+    if (bcCol<0) { showToast('Không tìm thấy cột Barcode/JAN','error'); return; }
+    // Reset opening stock and restocks before import
+    config.groups.forEach(g => { appState.inventory[g.id].openingStock = 0; appState.inventory[g.id].restocks = []; });
+    let matched = 0;
+    const importDate = new Date().toLocaleDateString('vi-VN');
+    const incomeByGroup = {}; // gid -> total income qty
+    for (let i=hIdx+1; i<rows.length; i++) {
+      const r=rows[i]; if(!r) continue;
+      let bc = String(r[bcCol]||'').trim();
+      // Handle scientific notation
+      if (/e/i.test(bc) && !isNaN(parseFloat(bc))) bc = Math.round(parseFloat(bc)).toString();
+      if (!bc) continue;
+      const qty = parseFloat(String(r[qtyCol]||'').replace(/,/g,''))||0;
+      const incomeQty = incomeCol>=0 ? (parseFloat(String(r[incomeCol]||'').replace(/,/g,''))||0) : 0;
+      const gid = config.barcodeMap[bc];
+      if (gid) {
+        if (qty>0) { appState.inventory[gid].openingStock += qty; matched++; }
+        if (incomeQty>0) { incomeByGroup[gid] = (incomeByGroup[gid]||0) + incomeQty; }
+      }
+    }
+    // Add income as restock entries
+    config.groups.forEach(g => {
+      const inc = incomeByGroup[g.id];
+      if (inc>0) appState.inventory[g.id].restocks.push({qty:inc, date:importDate+' (từ PLU)'});
+    });
+    saveState(); closeModal('pluModal'); renderInventory();
+    const incomeGroups = config.groups.filter(g=>incomeByGroup[g.id]>0).length;
+    const incomeMsg = incomeGroups>0 ? ` + ${incomeGroups} nhóm có nhập hàng` : '';
+    showToast(`✅ Đã nhập tồn kho: ${matched} barcode khớp${incomeMsg}`,'success');
+  } catch(err) { showToast('Lỗi: '+err.message,'error'); }
+}
+
+// ================================================================
+// REPORT EXPORT
+// ================================================================
+function exportReport(type) {
+  if (!appState) return;
+  const grps = config.groups;
+  const ranked = [...appState.staffList].map(s=>({
+    ...s,
+    total: grps.reduce((ss,g)=>ss+(s.actualQty[g.id]||0),0),
+    totalRev: grps.reduce((ss,g)=>ss+(s.actualRev[g.id]||0),0),
+    totalTarget: grps.reduce((ss,g)=>ss+(s.targets[g.id]||0),0)
+  })).sort((a,b)=>b.total-a.total);
+
+  const campaignTotal = grps.reduce((s,g)=>s+groupCampaignTarget(g),0);
+  const actualTotal = grps.reduce((s,g)=>s+appState.days.reduce((ss,d)=>ss+(d.groupActual[g.id]||0),0),0);
+  const totalRev = appState.days.reduce((s,d)=>s+grps.reduce((ss,g)=>ss+(d.groupRevenue[g.id]||0),0),0);
+  const progress = pct(actualTotal,campaignTotal);
+
+  const medals = ['🥇','🥈','🥉'];
+  const podiumRows = ranked.slice(0,3).map((s,i)=>`<div style="text-align:center;flex:1">
+    <div style="font-size:32px">${medals[i]}</div>
+    <div style="font-weight:700;color:#1e293b">${s.name}</div>
+    <div style="font-size:20px;font-weight:900;color:${i===0?'#f59e0b':i===1?'#94a3b8':'#b45309'}">${fmt(s.total)}</div>
+    <div style="font-size:12px;color:#64748b">${fmtVND(s.totalRev)}</div>
+  </div>`).join('');
+
+  const tableRows = ranked.map((s,i)=>{
+    const p=pct(s.total,s.totalTarget);
+    const grpCols = grps.map(g=>`<td style="padding:6px 10px;text-align:center">${fmt(s.actualQty[g.id]||0)}</td>`).join('');
+    return `<tr style="border-bottom:1px solid #f1f5f9;${i%2?'background:#fafafa':''}">
+      <td style="padding:6px 10px;font-weight:700;color:${i<3?['#f59e0b','#94a3b8','#b45309'][i]:'#64748b'}">${i+1}</td>
+      <td style="padding:6px 10px;font-weight:600">${s.name}</td>
+      ${grpCols}
+      <td style="padding:6px 10px;font-weight:700;text-align:center">${fmt(s.total)}</td>
+      <td style="padding:6px 10px;font-size:12px;color:#64748b">${fmtVND(s.totalRev)}</td>
+      <td style="padding:6px 10px;text-align:center"><span style="background:${p>=100?'#dcfce7':p>=80?'#fef9c3':'#fee2e2'};color:${p>=100?'#16a34a':p>=80?'#ca8a04':'#dc2626'};padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">${p}%</span></td>
+    </tr>`;
+  }).join('');
+
+  const grpHeaders = grps.map(g=>`<th style="padding:8px 10px;background:#f8fafc;font-size:12px;color:#64748b">${g.emoji} ${g.name}</th>`).join('');
+
+  let detailSection = '';
+  if (type==='detailed') {
+    detailSection = ranked.map(s => {
+      const p = pct(grps.reduce((ss,g)=>ss+(s.actualQty[g.id]||0),0), grps.reduce((ss,g)=>ss+(s.targets[g.id]||0),0));
+      const strengths = grps.filter(g=>(s.actualQty[g.id]||0)>0).map(g=>g.name).join(', ')||'Chưa có dữ liệu';
+      return `<div style="background:white;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #f1f5f9">
+        <div style="font-weight:700;color:#1e293b;margin-bottom:4px">${s.name} – ${p}%</div>
+        <div style="font-size:13px;color:#64748b">✅ Điểm mạnh: ${strengths}</div>
+        <div style="font-size:13px;color:${p>=100?'#16a34a':'#f97316'};margin-top:4px">${p>=100?'🎉 Hoàn thành mục tiêu! Xuất sắc!':p>=80?'⚡ Rất gần mục tiêu, cố lên!':'💪 Cần nỗ lực thêm để đạt mục tiêu!'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Báo cáo ${config.campaignName}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>*{font-family:'Inter',sans-serif;box-sizing:border-box}body{background:#f8fafc;padding:24px}
+  .kpi{background:linear-gradient(135deg,#f97316,#ea580c);color:white;border-radius:12px;padding:16px;text-align:center}
+  </style></head><body>
+  <div style="max-width:900px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:24px">
+      <h1 style="font-size:28px;font-weight:900;color:#1e293b">${config.campaignName}</h1>
+      <p style="color:#64748b">${config.storeName} · ${new Date().toLocaleDateString('vi-VN')}</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="kpi"><div style="font-size:28px;font-weight:900">${fmt(actualTotal)}</div><div style="font-size:12px;opacity:.8">Tổng thực tế</div></div>
+      <div class="kpi" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)"><div style="font-size:28px;font-weight:900">${fmtVND(totalRev)}</div><div style="font-size:12px;opacity:.8">Doanh thu</div></div>
+      <div class="kpi" style="background:linear-gradient(135deg,${progress>=100?'#10b981,#059669':'#8b5cf6,#7c3aed'})"><div style="font-size:28px;font-weight:900">${progress}%</div><div style="font-size:12px;opacity:.8">Tiến độ</div></div>
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-bottom:24px;background:white;border-radius:16px;padding:20px">${podiumRows}</div>
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:24px">
+      <h2 style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:12px">🏆 Bảng xếp hạng</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid #e2e8f0">
+          <th style="padding:8px 10px;text-align:left;font-size:12px;color:#64748b">#</th>
+          <th style="padding:8px 10px;text-align:left;font-size:12px;color:#64748b">Nhân viên</th>
+          ${grpHeaders}
+          <th style="padding:8px 10px;font-size:12px;color:#64748b">Tổng</th>
+          <th style="padding:8px 10px;font-size:12px;color:#64748b">Doanh thu</th>
+          <th style="padding:8px 10px;font-size:12px;color:#64748b">%</th>
+        </tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    ${type==='detailed'?`<div style="background:white;border-radius:16px;padding:20px"><h2 style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:12px">📝 Nhận xét cá nhân</h2>${detailSection}</div>`:''}
+  </div></body></html>`;
+
+  const blob = new Blob([html],{type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `BaoCao_${config.campaignName.replace(/\s+/g,'_')}_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'')}.html`;
+  a.click();
+  showToast('Đã xuất báo cáo ✅','success');
+}
+
+// ================================================================
+// MODAL HELPERS
+// ================================================================
+function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+function showToast(msg, type='info', duration=3500) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = type==='success'?'#10b981':type==='error'?'#ef4444':'#0ea5e9';
+  toast.style.color = 'white';
+  toast.classList.remove('hidden');
+  clearTimeout(toast._tid);
+  toast._tid = setTimeout(()=>toast.classList.add('hidden'), duration);
+}
+
+function confirmReset() {
+  if (!confirm('⚠️ Đặt lại toàn bộ dữ liệu? Hành động này không thể hoàn tác!')) return;
+  initAppState(config);
+  saveState(); renderAll();
+  showToast('Đã đặt lại dữ liệu','info');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+(async function init() {
+  await detectStorageBackend();
+
+  // ── F5 auto-restore ─────────────────────────────────────────
+  try {
+    const lastKey = await sGet(META_KEY);
+    if (lastKey) {
+      const saved = await sGet(lastKey);
+      if (saved && saved.config) {
+        const sc = saved.config;
+        // Reconstruct config object
+        const cfg = {
+          storeName:    sc.storeName,
+          campaignName: sc.campaignName,
+          startDate:    new Date(sc.startDate),
+          endDate:      new Date(sc.endDate),
+          groups:       sc.groups,
+          staff:        sc.staff,
+          targets:      sc.targets,
+          barcodeMap:   sc.barcodeMap
+        };
+        cfg.startDate.setHours(0,0,0,0);
+        cfg.endDate.setHours(0,0,0,0);
+        STORAGE_KEY = lastKey;
+        initAppState(cfg);
+        // Restore staffList aliases/targets from saved snapshot
+        if (sc.staffList) appState.staffList = sc.staffList;
+        mergeStateFromStorage(saved);
+        activateDashboard();
+        showToast('Dữ liệu đã được khôi phục tự động 🔄','success');
+        // Skip to drop-zone setup (don't show import screen)
+      }
+    }
+  } catch(e) { /* ignore — fall through to normal import screen */ }
+
+  // Drop zone drag support
+  const dz = document.getElementById('dropZone');
+  if (dz) {
+    dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.style.borderColor='#f97316'; });
+    dz.addEventListener('dragleave', ()=>{ dz.style.borderColor=''; });
+    dz.addEventListener('drop', e=>{
+      e.preventDefault(); dz.style.borderColor='';
+      const file = e.dataTransfer.files[0];
+      if (file) { const inp=document.getElementById('configFileInput'); inp.files=[...e.dataTransfer.files]; handleConfigUpload({files:e.dataTransfer.files}); }
+    });
+  }
+
+  // Keyboard shortcut
+  document.addEventListener('keydown', e=>{
+    if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); if(appState){ saveState(); showToast('Đã lưu ✅','success'); } }
+  });
+
+  // Register Chart.js plugin
+  if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,3221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Cập Nhật & Theo Dõi Lộ Trình Push Sale - Team Admin (Tháng 9)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js & Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- SheetJS for Excel Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .custom-card {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .custom-card:hover {
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        }
+        .progress-bar-glow {
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+        }
+        .badge-peak-sale {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            animation: pulse-border 2s infinite;
+        }
+        .badge-peak-payday {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        .badge-weekend {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+        .badge-weekday {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        @media print {
+            /* ===== Ẩn mọi thứ mang tính tương tác, không cần thiết khi in ===== */
+            .no-print { display: none !important; }
+            nav select, nav button { display: none !important; }
+            #dayFilterChips, #inventoryCardsContainer form, #inventoryCardsContainer button,
+            #excelModal, #barcodeInfoModal, #aliasModal, #quickAddModal,
+            #dropZone, #uploadStatus, #leaderboardDaySelect { display: none !important; }
+
+            body { background-color: #ffffff !important; }
+            .custom-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+
+            /* ===== Sửa lỗi bảng bị cắt: bỏ giới hạn chiều cao / vùng cuộn ===== */
+            /* Mọi container bảng có max-height + overflow-y (cuộn dọc) sẽ hiện ĐẦY ĐỦ
+               nội dung khi in, thay vì chỉ in phần đang nhìn thấy trên màn hình. */
+            .overflow-x-auto, .overflow-y-auto {
+                overflow: visible !important;
+                max-height: none !important;
+            }
+
+            /* ===== Tiêu đề bảng lặp lại ở đầu mỗi trang in ===== */
+            table { width: 100% !important; border-collapse: collapse !important; }
+            thead { display: table-header-group !important; position: static !important; }
+            tfoot { display: table-footer-group !important; }
+
+            /* ===== Không để 1 dòng bị cắt ngang giữa 2 trang ===== */
+            tr, td, th { page-break-inside: avoid; break-inside: avoid; }
+
+            /* ===== Không để 1 thẻ/section bị cắt ngang giữa 2 trang khi có thể ===== */
+            .custom-card, .stat-card, .emp-card, .podium-card { page-break-inside: avoid; break-inside: avoid; }
+
+            /* ===== Ô nhập liệu hiện như chữ thường, không viền/nền xám ===== */
+            input[type="number"], input[type="date"], input[type="text"] {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+
+            /* ===== Bỏ sticky (dễ gây lỗi chồng lấp/khoảng trắng khi in) ===== */
+            .sticky, nav { position: static !important; }
+
+            /* ===== Chọn nhân viên: hiện tên đang xem dạng chữ tĩnh thay vì dropdown ===== */
+            #employeeSelect { display: none !important; }
+
+            a[href]:after { content: "" !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col justify-between">
+
+    <div>
+        <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3.5 px-4 md:px-8 shadow-sm">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 bg-gradient-to-tr from-red-600 to-orange-500 text-white rounded-xl font-black text-xl shadow-sm">POS</span>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-black text-slate-900 tracking-tight leading-none">TEAM ADMIN PUSH SALE TRACKER</h1>
+                        <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">Lộ Trình Theo Ngày / Cuối Tuần & Kohnan Day 5/9, 20/9 / Ngày Lễ 1-2/9 (Đủ 31 Ngày, 24/8 - 23/9)</p>
+                        <p id="storageStatusBadge" class="text-[10px] font-bold mt-1 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300 animate-pulse"></span>
+                            <span class="text-slate-400">Đang kiểm tra bộ nhớ lưu trữ...</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="campaignFilter" onchange="switchCampaign(this.value)" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer transition focus:ring-2 focus:ring-orange-500">
+                        <option value="SUATAM">🧴 Sữa Tắm On: The Body (600 Chai)</option>
+                        <option value="REMOS">🦟 Xịt Muỗi Remos (140 Chai)</option>
+                        <option value="ALL">🔥 Tất Cả Sản Phẩm Sale</option>
+                    </select>
+
+                    <button onclick="openModal('barcodeInfoModal')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        🏷️ 8 Barcode
+                    </button>
+
+                    <button onclick="openModal('aliasModal')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        ⚙️ 9 NV Excel
+                    </button>
+
+                    <button onclick="openModal('inventoryImportModal')" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        📥 Nhập Tồn Kho (PLU)
+                    </button>
+
+                    <button onclick="openModal('excelModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        📂 Tải File Excel / CSV
+                    </button>
+
+                    <button onclick="openModal('quickAddModal')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        ➕ Nhập Số Ngày
+                    </button>
+
+                    <button onclick="resetDataToDefault()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Khôi phục dữ liệu ban đầu">
+                        🔄 Dữ Liệu Mẫu
+                    </button>
+
+                    <button onclick="openModal('reportTypeModal')" class="no-print bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        📄 Xuất Báo Cáo
+                    </button>
+
+                    <button onclick="window.print()" class="no-print bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition">
+                        🖨️ In PDF
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+            
+            <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none flex items-center pr-8">
+                    <span class="text-9xl">📅</span>
+                </div>
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-black uppercase tracking-wider mb-3 border border-orange-500/30">
+                        ⚡ Hệ Thống Định Mức Chuẩn Xác 31 Ngày (24/8 - 23/9) (Tự Động Lưu Khi F5)
+                    </div>
+                    <h2 class="text-2xl md:text-4xl font-black tracking-tight mb-2">
+                        Theo Dõi Tiến Độ Ngày Thường, Cuối Tuần, Kohnan Day (5/9, 20/9) & Ngày Lễ (1-2/9)
+                    </h2>
+                    <p class="text-xs md:text-sm text-slate-300 leading-relaxed font-normal">
+                        Mục tiêu tháng 9 được chia tỷ trọng thông minh từ ngày 24/8 đến ngày 23/9: **Ngày thường (T2-T6)** áp lực vừa sức — **Các Ngày Cuối Tuần (T7 & CN)**, **Ngày Kohnan Giảm 5% Tất Cả SP (5/9 & 20/9)** và **🎉 Ngày Lễ (1/9, 2/9)** đều tăng gấp 2.2 lần để bùng nổ doanh số!
+                    </p>
+                </div>
+            </header>
+
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5">
+                <div class="custom-card border-l-4 border-slate-400">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng Chỉ Tiêu Tháng</span>
+                    <div class="flex items-baseline mt-2">
+                        <span id="kpiTarget" class="text-3xl font-black text-slate-800">600</span>
+                        <span id="kpiUnit" class="ml-1.5 text-sm font-bold text-slate-500">Chai</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium mt-2 border-t pt-2">Áp dụng cho 9 NV Team Admin</p>
+                </div>
+
+                <div class="custom-card border-l-4 border-orange-500 bg-gradient-to-br from-white to-orange-50/50">
+                    <span class="text-xs font-bold text-orange-600 uppercase tracking-wider">Đã Bán Lũy Kế</span>
+                    <div class="flex items-baseline mt-2">
+                        <span id="kpiActual" class="text-3xl font-black text-orange-600">0</span>
+                        <span id="kpiActualUnit" class="ml-1.5 text-sm font-bold text-orange-600">Chai</span>
+                    </div>
+                    <p id="kpiDailyRate" class="text-[11px] font-bold text-emerald-600 mt-2 border-t border-orange-100 pt-2">🚀 Dữ liệu cập nhật đầy đủ kỳ 24/8 - 23/9</p>
+                </div>
+
+                <div class="custom-card border-l-4 border-indigo-500 bg-gradient-to-br from-white to-indigo-50/50">
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Tiến Độ Chung</span>
+                    <div class="flex items-baseline mt-2">
+                        <span id="kpiProgress" class="text-3xl font-black text-indigo-600">12.5%</span>
+                    </div>
+                    <p id="kpiRemaining" class="text-[11px] font-bold text-indigo-800 mt-2 border-t border-indigo-100 pt-2">📊 Còn thiếu 600 chai</p>
+                </div>
+
+                <div class="custom-card border-l-4 border-amber-500 bg-gradient-to-br from-white to-amber-50/50">
+                    <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">TB Thực Tế / Ngày Thường</span>
+                    <div class="flex items-baseline mt-2">
+                        <span id="kpiWeekdayDaily" class="text-3xl font-black text-amber-700">13.9</span>
+                        <span class="ml-1 text-xs font-bold text-amber-700">/ ngày</span>
+                    </div>
+                    <p class="text-[11px] font-bold text-slate-600 mt-2 border-t border-amber-100 pt-2">💼 Trung bình đã bán được (T2-T6, các ngày đã qua)</p>
+                </div>
+
+                <div class="custom-card border-l-4 border-rose-500 bg-gradient-to-br from-white to-rose-50/50">
+                    <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">TB Thực Tế / Ngày Cao Điểm</span>
+                    <div class="flex items-baseline mt-2">
+                        <span id="kpiPeakDaily" class="text-3xl font-black text-rose-700">30.6</span>
+                        <span class="ml-1 text-xs font-bold text-rose-700">/ ngày</span>
+                    </div>
+                    <p class="text-[11px] font-bold text-rose-800 mt-2 border-t border-rose-100 pt-2">🔥 Trung bình đã bán (Cuối tuần, Kohnan & Lễ, các ngày đã qua)</p>
+                </div>
+            </section>
+
+            <!-- LOW STOCK WARNING BANNER (chỉ hiện khi có SP tồn dưới 20 chai) -->
+            <div id="lowStockBanner" class="hidden rounded-2xl border-2 border-rose-400 bg-rose-50 px-5 py-4 flex items-center gap-3 shadow-sm">
+                <span class="text-3xl">🚨</span>
+                <div class="flex-1">
+                    <p class="text-sm font-black text-rose-800">Cảnh báo tồn kho thấp!</p>
+                    <p id="lowStockBannerText" class="text-xs font-semibold text-rose-700 mt-0.5"></p>
+                </div>
+            </div>
+
+            <!-- SECTION INVENTORY: THEO DÕI TỒN KHO THỰC THỜI -->
+            <section class="custom-card border-t-4 border-purple-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5">
+                    <div>
+                        <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">📦 TỒN KHO</span>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Theo Dõi Tồn Kho Thực Thời</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Nhập tay hoặc <strong>tải file</strong> Tồn đầu kỳ & Số nhập vào — Số bán ra được lấy TỰ ĐỘNG từ dữ liệu Push Sale để ra Tồn kho thực tế. Cảnh báo khi tồn kho dưới mức bán dự kiến trong <strong>1 tuần</strong> (dựa theo tốc độ bán thực tế), phù hợp chu kỳ đặt hàng NCC 1 - 1.5 tuần/lần (gửi PO Thứ 3, giao hàng sau 1-3 ngày).</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button onclick="downloadInventoryTemplate()" class="no-print bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 text-[11px] font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Tải file mẫu CSV để điền tồn kho">
+                            ⬇️ File Mẫu
+                        </button>
+                        <button onclick="document.getElementById('inventoryFileInput').click()" class="no-print bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                            📥 Nhập File Tồn Kho
+                        </button>
+                        <input type="file" id="inventoryFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleInventoryFileUpload(event)">
+                    </div>
+                </div>
+
+                <div id="inventoryUploadStatus" class="text-xs font-bold text-slate-700 min-h-[20px] bg-slate-50 p-3 rounded-xl border border-slate-200 hidden mb-4"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="inventoryCardsContainer">
+                    <!-- Dynamic inventory cards for SUATAM and REMOS -->
+                </div>
+            </section>
+
+            <!-- SECTION GP%: BIÊN LỢI NHUẬN GỘP -->
+            <section class="custom-card border-t-4 border-teal-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5">
+                    <div>
+                        <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">💹 GP%</span>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Biên Lợi Nhuận Gộp Của Sản Phẩm</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Nhập tay GP% (biên lợi nhuận gộp theo giá vốn nội bộ) cho từng sản phẩm — dashboard tự tính <strong>Lợi Nhuận Gộp Ước Tính = Doanh Thu Đã Bán × GP%</strong> dựa trên số liệu Push Sale đang có.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="grossProfitCardsContainer">
+                    <!-- Dynamic GP% cards for SUATAM and REMOS -->
+                </div>
+            </section>
+
+            <!-- SECTION 1: TEAM DAILY TRACKER TABLE (31 DAYS, 24/8 - 23/9) -->
+            <section class="custom-card border-t-4 border-indigo-600">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">📊 BẢNG THEO DÕI TOÀN TEAM (ĐỦ 31 NGÀY, 24/8 - 23/9)</span>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Tiến Độ Bán Hàng Chi Tiết Theo Ngày (24/08 - 23/09)</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Theo dõi chuẩn xác từng ngày trong kỳ push sale, khắc phục hoàn toàn lỗi định dạng ngày</p>
+                    </div>
+
+                    <!-- Filter buttons for table -->
+                    <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-bold">
+                        <button onclick="filterDailyTable('ALL')" id="btnFilterAll" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm">Tất Cả (31 Ngày)</button>
+                        <button onclick="filterDailyTable('PEAK_SPECIAL')" id="btnFilterPeak" class="px-3 py-1.5 rounded-lg hover:bg-white text-rose-700 transition">🔥 Kohnan Day (5/9, 20/9)</button>
+                        <button onclick="filterDailyTable('HOLIDAY')" id="btnFilterHoliday" class="px-3 py-1.5 rounded-lg hover:bg-white text-purple-700 transition">🎉 Ngày Lễ (1/9, 2/9)</button>
+                        <button onclick="filterDailyTable('WEEKEND')" id="btnFilterWeekend" class="px-3 py-1.5 rounded-lg hover:bg-white text-orange-700 transition">🏖️ Cuối Tuần</button>
+                        <button onclick="filterDailyTable('WEEKDAY')" id="btnFilterWeekday" class="px-3 py-1.5 rounded-lg hover:bg-white text-slate-700 transition">💼 Ngày Thường</button>
+                    </div>
+                </div>
+
+                <!-- Daily Summary Stats Banner -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Tổng Số Ngày Kỳ Push Sale</span>
+                        <span class="text-lg font-black text-slate-900">31 Ngày Đầy Đủ</span>
+                    </div>
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                        <span class="text-[10px] font-bold text-amber-800 uppercase block">Chỉ Tiêu Ngày Kohnan (5/9)</span>
+                        <span id="statPaydayTarget" class="text-lg font-black text-amber-900">30.6 Chai</span>
+                    </div>
+                    <div class="p-3 bg-rose-50 rounded-xl border border-rose-200">
+                        <span class="text-[10px] font-bold text-rose-800 uppercase block">Chỉ Tiêu Ngày Kohnan (20/9)</span>
+                        <span id="statPeakTarget" class="text-lg font-black text-rose-900">30.6 Chai</span>
+                    </div>
+                    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="text-[10px] font-bold text-emerald-800 uppercase block">Đạt Trung Bình Ngày</span>
+                        <span id="statAvgDailyActual" class="text-lg font-black text-emerald-900">0.0 Chai / Ngày</span>
+                    </div>
+                </div>
+
+                <!-- Daily Team Table -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3 text-center">Ngày</th>
+                                <th class="p-3 text-center">Thứ</th>
+                                <th class="p-3">Phân Loại Ngày</th>
+                                <th class="p-3 text-center bg-blue-50 text-blue-900">Chỉ Tiêu Ngày</th>
+                                <th class="p-3 text-center bg-orange-50 text-orange-900">Bán Thực Tế</th>
+                                <th class="p-3 text-center bg-purple-50 text-purple-900">Lũy Kế Đã Bán</th>
+                                <th class="p-3 text-center bg-indigo-50 text-indigo-900">Lũy Kế Target</th>
+                                <th class="p-3 text-center">Tiến Độ Lũy Kế</th>
+                                <th class="p-3 text-center">Trạng Thái</th>
+                                <th class="p-3 text-center no-print">Cập Nhật</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamDailyTableBody" class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                            <!-- Populated dynamically via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 2: INDIVIDUAL ROADMAP & INDIVIDUAL DAILY TABLE -->
+            <section class="custom-card border-2 border-orange-400 bg-gradient-to-b from-orange-50/20 to-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <span class="bg-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">👤 DÀNH CHO TỪNG NHÂN VIÊN</span>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Lộ Trình & Bảng Theo Dõi Số Sale Hàng Ngày Cá Nhân</h3>
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <label for="employeeSelect" class="text-xs font-bold text-slate-700 whitespace-nowrap">Chọn nhân viên:</label>
+                        <select id="employeeSelect" onchange="renderIndividualRoadmap(this.value)" class="w-full md:w-64 bg-white border border-slate-300 font-bold text-slate-900 text-sm rounded-xl px-3 py-2 shadow-sm focus:ring-2 focus:ring-orange-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Personal Detail Card -->
+                <div id="personalRoadmapContainer" class="bg-white p-6 rounded-2xl border border-orange-200 shadow-sm space-y-6 mb-6">
+                    <!-- Dynamic personal info populated via JS -->
+                </div>
+
+                <!-- Individual Daily Breakdown Table -->
+                <div class="bg-white p-6 rounded-2xl border border-orange-200 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b pb-3">
+                        <div>
+                            <h4 id="indivTableTitle" class="text-base font-black text-slate-900">📅 Nhật Ký Push Sale Từng Ngày Của Nhân Viên</h4>
+                            <p class="text-xs text-slate-500">Nhấp vào một ngày cụ thể hoặc xem chi tiết doanh số, doanh thu, số lượng đã bán lũy kế và target lũy kế.</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-200 text-xs font-bold text-orange-900">
+                            <span>💡 Mẹo: Có thể sửa số lượng & doanh thu từng ngày trực tiếp</span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-96">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-slate-100 z-10">
+                                <tr class="text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="p-3 text-center">Ngày</th>
+                                    <th class="p-3 text-center">Thứ</th>
+                                    <th class="p-3">Loại Ngày</th>
+                                    <th class="p-3 text-center bg-blue-50 text-blue-900">Target Ngày</th>
+                                    <th class="p-3 text-center bg-indigo-50 text-indigo-900">Target Lũy Kế</th>
+                                    <th class="p-3 text-center bg-orange-50 text-orange-900">Đã Bán (SL)</th>
+                                    <th class="p-3 text-center bg-purple-50 text-purple-900">Đã Bán Lũy Kế</th>
+                                    <th class="p-3 text-center bg-emerald-50 text-emerald-900">Doanh Thu (Amount Tax Excl.)</th>
+                                    <th class="p-3 text-center">Đóng Góp Team (%)</th>
+                                    <th class="p-3 text-center no-print">Thao Tác Nhanh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="indivDailyTableBody" class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: REVENUE COMPARISON & STORE SHARE -->
+            <section class="custom-card border-2 border-emerald-500 bg-gradient-to-br from-emerald-50/20 to-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <span class="bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">💰 ĐỐI SÁT DOANH THU & AMOUNT(TAX EXCL.)</span>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Phân Tích Tỷ Trọng Doanh Thu Push Sale / Toàn Cửa Hàng</h3>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-emerald-200 shadow-sm">
+                        <span class="text-xs font-bold text-slate-600">Tổng Doanh Thu Store (Kỳ 24/8 - 23/9):</span>
+                        <input type="number" id="storeTotalRevInput" onchange="updateStoreRevenue(this.value)" class="w-36 bg-slate-50 border border-slate-300 font-black text-emerald-700 text-sm rounded-lg px-2.5 py-1 text-right" value="280000000">
+                        <span class="text-xs font-bold text-slate-500">VNĐ</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+                        <span class="text-xs font-bold text-slate-500 block uppercase">Tổng Doanh Thu Push Sale</span>
+                        <div class="flex items-baseline mt-2">
+                            <span id="summaryPushRev" class="text-2xl font-black text-emerald-700">0 đ</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-2 border-t pt-2">Tính từ cột Amount(Tax excl.) các sản phẩm bán được</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+                        <span class="text-xs font-bold text-slate-500 block uppercase">Tổng Doanh Thu Cửa Hàng</span>
+                        <div class="flex items-baseline mt-2">
+                            <span id="summaryStoreRevDisp" class="text-2xl font-black text-slate-800">280.000.000 đ</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-2 border-t pt-2">Nhập từ file báo cáo POS tổng cửa hàng</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+                        <span class="text-xs font-bold text-slate-500 block uppercase">Tỷ Trọng Đóng Góp Doanh Thu</span>
+                        <div class="flex items-baseline mt-2">
+                            <span id="summaryRevSharePct" class="text-2xl font-black text-indigo-600">0.00%</span>
+                        </div>
+                        <p class="text-[11px] font-bold text-emerald-700 mt-2 border-t pt-2">📈 Đánh giá mức độ hiệu quả doanh thu quầy</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <h4 class="text-base font-black text-slate-900 mb-1">So Sánh Doanh Thu Push Sale Từng Nhân Viên</h4>
+                        <p class="text-xs text-slate-500 mb-4">Tính theo cột Amount(Tax excl.) (VNĐ)</p>
+                        <div class="chart-container">
+                            <canvas id="staffChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <h4 class="text-base font-black text-slate-900 mb-1">Tỷ Lệ Đóng Góp Số Lượng Của Team</h4>
+                        <p class="text-xs text-slate-500 mb-4">Phần trăm số lượng đã chốt so với tổng toàn đội</p>
+                        <div class="chart-container">
+                            <canvas id="shareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: LEADERBOARD & PODIUM -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Leaderboard Table -->
+                <div class="lg:col-span-2 custom-card border-t-4 border-indigo-600">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5">
+                        <div>
+                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">🏆 LEADERBOARD</span>
+                            <h3 class="text-xl font-black text-slate-900 mt-1">Bảng Xếp Hạng Doanh Thu & Số Lượng Nhân Viên</h3>
+                            <span id="leaderboardScopeLabel" class="text-xs font-semibold text-slate-500">Xếp theo doanh thu Amount(Tax excl.) · Toàn kỳ 24/8 - 23/9</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            <label class="text-[11px] font-black text-slate-600 uppercase whitespace-nowrap">📅 Xem theo:</label>
+                            <select id="leaderboardDaySelect" onchange="handleLeaderboardDayChange(this.value)" class="bg-white border border-slate-300 font-bold text-xs rounded-lg px-2.5 py-1.5">
+                                <option value="ALL">📊 Tổng Toàn Kỳ (24/8 - 23/9)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="p-3">Hạng</th>
+                                    <th class="p-3">Nhân Viên</th>
+                                    <th class="p-3 text-center">Chức Danh</th>
+                                    <th class="p-3 text-center bg-orange-50 text-orange-900">Đã Bán</th>
+                                    <th class="p-3 text-center bg-emerald-50 text-emerald-900">Doanh Thu (Tax Excl.)</th>
+                                    <th class="p-3 text-center">Tiến Độ (%)</th>
+                                    <th class="p-3 text-center bg-indigo-50 text-indigo-900">Tỷ Lệ Chốt Đơn</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTableBody" class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top 3 Podium Card -->
+                <div class="custom-card border-t-4 border-amber-400 bg-gradient-to-b from-amber-50/40 to-white flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">👑 TOP BỨT PHÁ</span>
+                            <span class="text-2xl">🏆</span>
+                        </div>
+                        <h3 class="text-lg font-black text-slate-900 mb-4">Vinh Danh Dẫn Đầu</h3>
+                        
+                        <div id="podiumContainer" class="space-y-3">
+                            <!-- Dynamic podium list -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-3 bg-amber-100/60 rounded-xl border border-amber-200 text-[11px] text-amber-900 font-semibold leading-relaxed">
+                        💡 <strong>Mẹo nhỏ:</strong> Tăng tỷ lệ mở lời 100% tại quầy thanh toán trong các ngày cao điểm (5/9, 20/9, Ngày Lễ 1-2/9 & Cuối tuần) để bứt phá doanh thu!
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCRIPTS & SALES SCRIPTS -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl border-2 border-orange-500 p-6 shadow-sm">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="text-2xl">🧴</span>
+                        <h3 class="text-lg font-black text-orange-900 uppercase">Kịch Bản Push Sale Sữa Tắm On: The Body (30s)</h3>
+                    </div>
+                    <div class="space-y-3 text-xs text-slate-800 leading-relaxed">
+                        <div class="p-2.5 bg-orange-50 rounded-xl border border-orange-200">
+                            <strong>1. Chuẩn Bị:</strong> Trưng bày đủ 3 mùi hương (Thảo Mộc / Mẫu Đơn Xạ Hương / Ly Ly Kim Ngân) ngay vị trí quầy POS bắt mắt.
+                        </div>
+                        <div class="p-2.5 bg-orange-50 rounded-xl border border-orange-200">
+                            <strong>2. Mở Lời:</strong> <em>"Dạ chị ơi, bên em đang có sữa tắm nước hoa On the Body thơm lâu cả ngày, mùi rất được yêu thích ạ, mình dùng thử nha!"</em>
+                        </div>
+                        <div class="p-2.5 bg-orange-50 rounded-xl border border-orange-200">
+                            <strong>3. Chốt Đơn:</strong> <em>"Chai dùng được cả tháng, mua thêm 1 chai tặng người nhà luôn cũng tiện chị ạ!"</em>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border-2 border-teal-500 p-6 shadow-sm">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="text-2xl">🦟</span>
+                        <h3 class="text-lg font-black text-teal-900 uppercase">Kịch Bản Push Sale Xịt Chống Muỗi Remos</h3>
+                    </div>
+                    <div class="space-y-3 text-xs text-slate-800 leading-relaxed">
+                        <div class="p-2.5 bg-teal-50 rounded-xl border border-teal-200">
+                            <strong>1. Điểm Nhấn:</strong> Bảo vệ liên tục 10 tiếng, dùng an toàn cho bé từ 4 tuổi.
+                        </div>
+                        <div class="p-2.5 bg-teal-50 rounded-xl border border-teal-200">
+                            <strong>2. Mở Lời Chéo:</strong> <em>"Dạ anh/chị ơi, tiện thể mình lấy thêm xịt chống muỗi Remos cho gia đình luôn nha. Mùa này muỗi nhiều, dùng xịt bảo vệ da 10 tiếng rất êm ạ!"</em>
+                        </div>
+                        <div class="p-2.5 bg-teal-50 rounded-xl border border-teal-200">
+                            <strong>3. Tư Vấn Linh Hoạt:</strong> Lavender dịu nhẹ ban đêm, Sả Chanh tươi mát ban ngày, Khuynh Diệp Baby dành riêng cho bé.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: EXCEL IMPORT -->
+    <div id="excelModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 my-8">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 class="text-lg font-black text-slate-900">📂 Tải File Giao Dịch POS & Trích Xuất Doanh Thu</h3>
+                    <p class="text-xs text-slate-500">Đọc 2 file xuất từ hệ thống POS (transaction + transaction_detail), nối qua Slip No. để biết đúng nhân viên, sản phẩm, số lượng và Amount(Tax excl.)</p>
+                </div>
+                <button onclick="closeModal('excelModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <!-- Barcode Config Reference Card -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-2">
+                <div class="font-extrabold text-slate-800 flex items-center gap-1.5">
+                    <span>🏷️ Danh sách 8 Mã Barcode/SKU & Trích Xuất Cột Amount(Tax excl.):</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+                    <div class="bg-orange-50 p-2 rounded-lg border border-orange-200">
+                        <span class="font-bold text-orange-900 block">🧴 Nhóm 1: Sữa Tắm On: The Body (3 mã)</span>
+                        <ul class="space-y-0.5 mt-1 font-mono text-[10px] text-orange-800">
+                            <li>• <code>8935030229065</code>: ST-Nước Hoa OTB Thảo Mộc</li>
+                            <li>• <code>8935030229072</code>: ST-N.Hoa OTB Mẫu Đơn Xạ Hương</li>
+                            <li>• <code>8935030229058</code>: ST-N.Hoa OTB Ly Ly Kim Ngân</li>
+                        </ul>
+                    </div>
+                    <div class="bg-teal-50 p-2 rounded-lg border border-teal-200">
+                        <span class="font-bold text-teal-900 block">🦟 Nhóm 2: Xịt Muỗi Remos (5 mã)</span>
+                        <ul class="space-y-0.5 mt-1 font-mono text-[10px] text-teal-800">
+                            <li>• <code>8935006546035</code>: Remos Lavender 70ml</li>
+                            <li>• <code>8935006546042</code>: Remos Lavender 150ml</li>
+                            <li>• <code>8935006546059</code>: Remos Sả Chanh 70ml</li>
+                            <li>• <code>8935006546066</code>: Remos Sả Chanh 150ml</li>
+                            <li>• <code>8935006546073</code>: Remos Khuynh Diệp Baby 70ml</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Mode Toggle -->
+            <div class="flex items-center gap-4 bg-slate-100 p-2.5 rounded-xl text-xs font-bold text-slate-700">
+                <span>Chế độ cập nhật:</span>
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="importMode" value="add" checked class="text-orange-500 focus:ring-orange-500">
+                    <span>➕ Cộng dồn vào số liệu hiện tại</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="importMode" value="overwrite" class="text-orange-500 focus:ring-orange-500">
+                    <span>🔄 Ghi đè lại từ đầu</span>
+                </label>
+            </div>
+
+            <div id="dropZone" onclick="document.getElementById('excelFileInput').click()" class="border-2 border-dashed border-emerald-400 bg-emerald-50/50 hover:bg-emerald-50 rounded-xl p-6 text-center cursor-pointer transition">
+                <span class="text-4xl block mb-2">📊</span>
+                <p class="text-xs font-bold text-emerald-800">Nhấp vào đây rồi chọn CẢ 2 FILE cùng lúc (giữ Ctrl/Cmd khi chọn)</p>
+                <p class="text-[10px] text-emerald-600 mt-1">
+                    <strong>1️⃣ transaction_*.csv</strong> (Hóa đơn, có cột Sales Staff) &nbsp;+&nbsp;
+                    <strong>2️⃣ transaction_detail_*.csv</strong> (Chi tiết sản phẩm, có cột Barcode/QTY/Amount)
+                </p>
+                <p class="text-[10px] text-slate-500 mt-1">Dashboard tự nhận diện từng file qua tên cột, rồi nối 2 file qua <strong>Slip No.</strong> để biết đúng nhân viên nào bán sản phẩm nào.</p>
+                <p class="text-[10px] text-amber-700 mt-1 font-semibold">⚠️ Chỉ chọn 1 file (thiếu file Hóa đơn) vẫn nhập được số lượng/doanh thu, nhưng Tỷ Lệ Chốt Đơn sẽ không chính xác vì thiếu tổng số hóa đơn.</p>
+                <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="handleFileUpload(event)">
+            </div>
+
+            <div id="uploadStatus" class="text-xs font-bold text-slate-700 min-h-[20px] bg-slate-50 p-3 rounded-xl border border-slate-200 hidden"></div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button onclick="closeModal('excelModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BARCODE INFO -->
+    <div id="barcodeInfoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-black text-slate-900">🏷️ Bảng Mã Barcode Sản Phẩm Push Sale</h3>
+                <button onclick="closeModal('barcodeInfoModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div class="p-3 bg-orange-50 border border-orange-200 rounded-xl">
+                    <p class="font-black text-orange-900 mb-1">🧴 1. Sữa Tắm On: The Body (3 Mã)</p>
+                    <div class="space-y-1 font-mono text-[10px]">
+                        <div class="flex justify-between bg-white p-1 rounded"><span>ST-Nước Hoa OTB Thảo Mộc</span><strong>8935030229065</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>ST-N.Hoa OTB Mẫu Đơn Xạ Hương</span><strong>8935030229072</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>ST-N.Hoa OTB Ly Ly Kim Ngân</span><strong>8935030229058</strong></div>
+                    </div>
+                </div>
+                <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl">
+                    <p class="font-black text-teal-900 mb-1">🦟 2. Xịt Muỗi Remos (5 Mã)</p>
+                    <div class="space-y-1 font-mono text-[10px]">
+                        <div class="flex justify-between bg-white p-1 rounded"><span>Lavender 70ml</span><strong>8935006546035</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>Lavender 150ml</span><strong>8935006546042</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>Sả Chanh 70ml</span><strong>8935006546059</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>Sả Chanh 150ml</span><strong>8935006546066</strong></div>
+                        <div class="flex justify-between bg-white p-1 rounded"><span>Khuynh Diệp Baby 70ml</span><strong>8935006546073</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="closeModal('barcodeInfoModal')" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ALIAS / ABBREVIATION CONFIG -->
+    <div id="aliasModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-black text-slate-900">⚙️ Danh Sách 9 Nhân Viên & Mã Tên Excel</h3>
+                <button onclick="closeModal('aliasModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+            
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Hệ thống chỉ tính doanh số & doanh thu cho đúng 9 nhân viên trong danh sách dưới đây. Giao dịch do nhân viên khác ngoài danh sách thực hiện sẽ <strong>tự động bị bỏ qua</strong>.
+            </p>
+
+            <div id="aliasListContainer" class="max-h-64 overflow-y-auto space-y-2 text-xs">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <div class="pt-3 border-t flex justify-between items-center">
+                <span class="text-[11px] text-emerald-700 font-bold">✅ Đã cập nhật chuẩn 9 nhân viên theo danh sách!</span>
+                <button onclick="closeModal('aliasModal')" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: QUICK EDIT DAY -->
+    <div id="quickAddModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-black text-slate-900">➕ Cập Nhật / Thêm Doanh Số Theo Ngày</h3>
+                <button onclick="closeModal('quickAddModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+            <form onsubmit="handleQuickAddDay(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Chọn ngày trong kỳ (24/8 - 23/9):</label>
+                    <select id="quickDaySelect" class="w-full bg-slate-50 border border-slate-300 font-bold text-xs rounded-xl p-2.5">
+                        <!-- Populated dynamically for 31 days -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Chọn nhân viên:</label>
+                    <select id="quickStaffSelect" class="w-full bg-slate-50 border border-slate-300 font-bold text-xs rounded-xl p-2.5">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Chiến dịch / Sản phẩm:</label>
+                    <select id="quickCampaignSelect" class="w-full bg-slate-50 border border-slate-300 font-bold text-xs rounded-xl p-2.5">
+                        <option value="SUATAM">🧴 Sữa Tắm On: The Body</option>
+                        <option value="REMOS">🦟 Xịt Chống Muỗi Remos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Số lượng cộng thêm:</label>
+                    <input type="number" id="quickAddQty" min="1" value="1" required class="w-full bg-slate-50 border border-slate-300 font-bold text-sm rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Doanh thu Amount(Tax excl.) tương ứng (VNĐ):</label>
+                    <input type="number" id="quickAddRevenue" min="0" value="95000" required class="w-full bg-slate-50 border border-slate-300 font-bold text-sm rounded-xl p-2.5">
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('quickAddModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl shadow-sm">Lưu Dữ Liệu Ngày</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CHỌN LOẠI BÁO CÁO -->
+    <div id="reportTypeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-black text-slate-900">📄 Chọn Loại Báo Cáo Xuất Ra</h3>
+                <button onclick="closeModal('reportTypeModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button onclick="exportReport('summary')" class="text-left border-2 border-slate-200 hover:border-rose-400 rounded-2xl p-4 transition group">
+                    <div class="text-2xl mb-2">📊</div>
+                    <div class="font-black text-sm text-slate-900 group-hover:text-rose-600">Báo Cáo Tổng</div>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Tổng quan nhanh: chỉ tiêu, doanh thu, tồn kho, Top 3 và bảng xếp hạng toàn team. Gọn nhẹ, phù hợp gửi nhanh cho quản lý.</p>
+                </button>
+                <button onclick="exportReport('detailed')" class="text-left border-2 border-slate-200 hover:border-amber-400 rounded-2xl p-4 transition group">
+                    <div class="text-2xl mb-2">📋</div>
+                    <div class="font-black text-sm text-slate-900 group-hover:text-amber-600">Báo Cáo Chi Tiết</div>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Đầy đủ như Báo Cáo Tổng, kèm <strong>nhận xét điểm sáng & điểm cần cải thiện riêng cho từng nhân viên</strong>, lời cảm ơn team và slogan khích lệ tinh thần. Phù hợp gửi cả team đọc.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NHẬP TỒN KHO TỪ FILE PLU -->
+    <div id="inventoryImportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 my-8">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-black text-slate-900">📥 Nhập Tồn Kho & GP% Từ File PLU</h3>
+                <button onclick="closeModal('inventoryImportModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Tải file xuất từ hệ thống dạng <strong>InventoryPLU_*.xlsx</strong> hoặc <strong>.csv</strong> (có các cột Barcode, Open Qty, Income Qty, Close Qty, G.P.%(COGS)...). Dashboard sẽ tự lọc đúng 8 mã Sữa Tắm & Xịt Muỗi, rồi tự động cập nhật:
+            </p>
+            <ul class="text-xs text-slate-600 list-disc pl-5 space-y-1">
+                <li><strong>Tồn đầu kỳ</strong> = tổng "Open Qty" các mã khớp (ghi đè số đang có)</li>
+                <li><strong>Nhập kho bổ sung</strong> = tổng "Income Qty" (thêm 1 dòng nhật ký nhập kho mới, ngày hôm nay)</li>
+                <li><strong>GP%</strong> = trung bình "G.P.%(COGS)" của các mã khớp (ghi đè số đang có)</li>
+            </ul>
+
+            <div id="inventoryDropZone" onclick="document.getElementById('inventoryPLUFileInput').click()" class="border-2 border-dashed border-purple-400 bg-purple-50/50 hover:bg-purple-50 rounded-xl p-6 text-center cursor-pointer transition">
+                <span class="text-4xl block mb-2">📦</span>
+                <p class="text-xs font-bold text-purple-800">Nhấp vào đây để chọn file tồn kho (.xlsx hoặc .csv)</p>
+                <input type="file" id="inventoryPLUFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleInventoryImport(event)">
+            </div>
+
+            <div id="inventoryImportStatus" class="text-xs font-bold text-slate-700 min-h-[20px] bg-slate-50 p-3 rounded-xl border border-slate-200 hidden"></div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <span id="toastIcon">✅</span>
+        <span id="toastMsg">Cập nhật thành công!</span>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 font-medium mt-12">
+        Team Admin Sales Tracker © 2026 Kohnan POS Push Sale Campaign (September Edition, 24/8 - 23/9)
+    </footer>
+
+    <script>
+        const PRODUCT_BARCODES = {
+            SUATAM: [
+                "8935030229065", // ST-Nước Hoa OTB Thảo Mộc
+                "8935030229072", // ST-N.Hoa OTB Mẫu Đơn Xạ Hương
+                "8935030229058"  // ST-N.Hoa OTB Ly Ly Kim Ngân
+            ],
+            REMOS: [
+                "8935006546035", // Lavender 70ml
+                "8935006546042", // Lavender 150ml
+                "8935006546059", // Sả Chanh 70ml
+                "8935006546066", // Sả Chanh 150ml
+                "8935006546073"  // Khuynh Diệp Baby 70ml
+            ]
+        };
+
+        const PRODUCT_NAME_KEYWORDS = {
+            SUATAM: ["sữa tắm on the body", "on the body", "st-nước hoa otb", "st-nuoc hoa otb", "sua tam on the body"],
+            REMOS: ["remos xịt muỗi", "xịt muỗi remos", "remos", "xit muoi remos"]
+        };
+
+        // 9 Staff members with keywords for Excel matching
+        const initialStaffList = [
+            { id: "NGAN", name: "Dương Xuân Hoàng Ngân", role: "Admin Chief", targetSuaTam: 50, targetRemos: 11, shift: "Full-Time", keywords: ["DUONG NGAN", "NGAN", "DƯƠNG XUÂN HOÀNG NGÂN", "HOÀNG NGÂN", "DXHN"] },
+            { id: "MTHU", name: "Nguyễn Lê Minh Thư", role: "CS Full-Time", targetSuaTam: 150, targetRemos: 34, shift: "Full-Time", keywords: ["NGUYEN THU", "MINH THƯ", "NGUYỄN LÊ MINH THƯ", "MTHU", "NLMT"] },
+            { id: "QUYEN", name: "Võ Đặng Tú Quyên", role: "Admin", targetSuaTam: 70, targetRemos: 15, shift: "Full-Time", keywords: ["VO QUYEN", "TÚ QUYÊN", "VÕ ĐẶNG TÚ QUYÊN", "QUYEN", "VDTQ"] },
+            { id: "UNHI", name: "Lê Uyên Nhi", role: "SC Full-Time", targetSuaTam: 120, targetRemos: 28, shift: "Full-Time", keywords: ["LE NHI", "UYÊN NHI", "LÊ UYÊN NHI", "UNHI", "LUN"] },
+            { id: "QNHI", name: "Tăng Quế Nhi", role: "Admin", targetSuaTam: 60, targetRemos: 15, shift: "Full-Time", keywords: ["TANG NHI", "QUẾ NHI", "TĂNG QUẾ NHI", "QNHI", "TQN"] },
+            { id: "DUONG", name: "Phan Thị Thùy Dương", role: "Cashier PT", targetSuaTam: 50, targetRemos: 13, shift: "Part-Time", keywords: ["PHAN DUONG", "THÙY DƯƠNG", "PHAN THỊ THÙY DƯƠNG", "DUONG", "PTD"] },
+            { id: "LINH", name: "Phan Thị Chúc Linh", role: "Admin", targetSuaTam: 50, targetRemos: 11, shift: "Full-Time", keywords: ["PHAN LINH", "CHÚC LINH", "PHAN THỊ CHÚC LINH", "LINH", "PTCL"] },
+            { id: "THAO", name: "Thanh Thảo", role: "Cashier PT", targetSuaTam: 20, targetRemos: 6, shift: "Part-Time", keywords: ["VO THAO", "THANH THẢO", "VÕ THẢO", "THẢO"] },
+            { id: "VY", name: "Quách Vy", role: "Cashier PT", targetSuaTam: 30, targetRemos: 7, shift: "Part-Time", keywords: ["TRINH VY", "QUÁCH VY", "TRỊNH VY", "VY"] }
+        ];
+
+        // Generate the September campaign calendar data structure (31 days: 24/08 - 23/09/2026)
+        const CAMPAIGN_START = new Date(2026, 7, 24); // 24/08/2026
+        const CAMPAIGN_END = new Date(2026, 8, 23);   // 23/09/2026
+        const CAMPAIGN_TOTAL_DAYS = 31;
+
+        function isKohnanDate(dd, mm) {
+            // Kohnan Member Day giảm 5%: 5/9 và 20/9 (20/8 đã nằm ngoài kỳ 24/8 - 23/9)
+            return (mm === 9 && dd === 5) || (mm === 9 && dd === 20);
+        }
+
+        function isHolidayDate(dd, mm) {
+            // Ngày Lễ: 1/9 và 2/9 - target được tính giống ngày cuối tuần (trọng số 2.2x)
+            return (mm === 9 && dd === 1) || (mm === 9 && dd === 2);
+        }
+
+        function generateSeptDays() {
+            let days = [];
+            let totalWeight = 0;
+            let cursor = new Date(CAMPAIGN_START);
+
+            // First pass: compute total weight across all 31 days
+            for (let i = 0; i < CAMPAIGN_TOTAL_DAYS; i++) {
+                let jsDay = cursor.getDay();
+                let dd = cursor.getDate(), mm = cursor.getMonth() + 1;
+                let isPeak = isKohnanDate(dd, mm);
+                let isHoliday = isHolidayDate(dd, mm);
+                let isWeekend = (jsDay === 0 || jsDay === 6);
+                let weight = (isPeak || isWeekend || isHoliday) ? 2.2 : 1.0;
+                totalWeight += weight;
+                cursor.setDate(cursor.getDate() + 1);
+            }
+
+            let totalTargetSuaTam = 600;
+            let totalTargetRemos = 140;
+
+            cursor = new Date(CAMPAIGN_START);
+            for (let i = 1; i <= CAMPAIGN_TOTAL_DAYS; i++) {
+                let jsDay = cursor.getDay();
+                let dd = cursor.getDate(), mm = cursor.getMonth() + 1;
+                let isPeak = isKohnanDate(dd, mm);
+                let isHoliday = isHolidayDate(dd, mm);
+                let isWeekend = (jsDay === 0 || jsDay === 6);
+                let weight = (isPeak || isWeekend || isHoliday) ? 2.2 : 1.0;
+
+                let dayTargetSuaTam = parseFloat(((weight / totalWeight) * totalTargetSuaTam).toFixed(1));
+                let dayTargetRemos = parseFloat(((weight / totalWeight) * totalTargetRemos).toFixed(1));
+
+                let dayName = jsDay === 0 ? "Chủ Nhật" : `Thứ ${jsDay + 1}`;
+                if (jsDay === 1) dayName = "Thứ 2";
+                if (jsDay === 2) dayName = "Thứ 3";
+                if (jsDay === 3) dayName = "Thứ 4";
+                if (jsDay === 4) dayName = "Thứ 5";
+                if (jsDay === 5) dayName = "Thứ 6";
+                if (jsDay === 6) dayName = "Thứ 7";
+
+                let dayType = "WEEKDAY";
+                if (isPeak) dayType = "PEAK_SPECIAL";
+                else if (isHoliday) dayType = "HOLIDAY";
+                else if (isWeekend) dayType = "WEEKEND";
+
+                let sampleSuaTam = i <= 5 ? Math.floor(Math.random() * 5) + 2 : 0;
+                let sampleRemos = i <= 5 ? Math.floor(Math.random() * 2) + 1 : 0;
+                let sampleRev = sampleSuaTam * 95000 + sampleRemos * 70000;
+
+                let staffDaily = {};
+                initialStaffList.forEach(s => {
+                    let share = s.targetSuaTam / 600;
+                    let sSuaTam = Math.round(sampleSuaTam * share);
+                    let sRemos = Math.round(sampleRemos * share);
+                    staffDaily[s.id] = {
+                        actualSuaTam: sSuaTam,
+                        revenueSuaTam: sSuaTam * 95000,
+                        actualRemos: sRemos,
+                        revenueRemos: sRemos * 70000
+                    };
+                });
+
+                let ddStr = String(dd).padStart(2, '0');
+                let mmStr = String(mm).padStart(2, '0');
+
+                days.push({
+                    day: i,
+                    dd: dd,
+                    mm: mm,
+                    dateStr: `${ddStr}/${mmStr}/2026`,
+                    dayOfWeek: dayName,
+                    dayType: dayType,
+                    isPeak: isPeak,
+                    isHoliday: isHoliday,
+                    isWeekend: isWeekend,
+                    targetSuaTam: dayTargetSuaTam,
+                    targetRemos: dayTargetRemos,
+                    actualSuaTam: sampleSuaTam,
+                    actualRemos: sampleRemos,
+                    revenue: sampleRev,
+                    staffDaily: staffDaily
+                });
+
+                cursor.setDate(cursor.getDate() + 1);
+            }
+            return days;
+        }
+
+        // ============================================================
+        // LỚP LƯU TRỮ THÍCH ỨNG (Adaptive Storage)
+        // File này có thể được mở theo 2 cách:
+        //   (1) Xem trực tiếp trong khung Artifact của Claude.ai -> có window.storage
+        //   (2) Tải file .html về máy rồi mở bằng trình duyệt (Chrome/Edge...) -> KHÔNG có
+        //       window.storage (API này chỉ được Claude.ai bơm vào khi hiển thị artifact).
+        // Nếu chỉ dùng window.storage, dữ liệu sẽ "mất" ngay khi F5 ở trường hợp (2) vì
+        // mọi lệnh gọi đều lỗi âm thầm. Để dashboard luôn lưu được sau F5 dù mở theo cách
+        // nào, ta tự dò xem window.storage có thật sự dùng được không, nếu không thì
+        // chuyển sang localStorage của chính trình duyệt (vẫn lưu được qua các lần F5,
+        // chỉ khác là dữ liệu gắn với máy/trình duyệt đang mở file, không đồng bộ nhiều máy).
+        // ============================================================
+        const STORAGE_KEY = "TEAM_ADMIN_POS_PUSH_SALE_SEPT_2026_V1";
+
+        let storageBackend = null; // "artifact" | "local" | "memory"
+        let memoryFallback = {};   // phòng khi cả 2 cách trên đều không dùng được
+
+        async function detectStorageBackend() {
+            // Thử window.storage trước (môi trường Artifact Claude.ai)
+            try {
+                if (window.storage && typeof window.storage.set === 'function') {
+                    const probeKey = "__probe__" + STORAGE_KEY;
+                    await window.storage.set(probeKey, "1");
+                    const probe = await window.storage.get(probeKey);
+                    if (probe && probe.value === "1") {
+                        try { await window.storage.delete(probeKey); } catch (e) {}
+                        storageBackend = "artifact";
+                        return;
+                    }
+                }
+            } catch (e) { /* window.storage không dùng được -> thử tiếp localStorage */ }
+
+            // Thử localStorage (trường hợp mở file .html trực tiếp ngoài Claude.ai)
+            try {
+                const probeKey = "__probe__" + STORAGE_KEY;
+                localStorage.setItem(probeKey, "1");
+                const ok = localStorage.getItem(probeKey) === "1";
+                localStorage.removeItem(probeKey);
+                if (ok) {
+                    storageBackend = "local";
+                    return;
+                }
+            } catch (e) { /* localStorage cũng không dùng được (VD trình duyệt chặn) */ }
+
+            // Không còn cách nào lưu qua F5 được -> chỉ giữ trong bộ nhớ tạm của phiên hiện tại
+            storageBackend = "memory";
+        }
+
+        async function storageGet(key) {
+            if (storageBackend === "artifact") {
+                try {
+                    const res = await window.storage.get(key);
+                    return res && res.value !== undefined ? res.value : null;
+                } catch (e) { return null; }
+            }
+            if (storageBackend === "local") {
+                try { return localStorage.getItem(key); } catch (e) { return null; }
+            }
+            return Object.prototype.hasOwnProperty.call(memoryFallback, key) ? memoryFallback[key] : null;
+        }
+
+        async function storageSet(key, value) {
+            if (storageBackend === "artifact") {
+                try { await window.storage.set(key, value); return; } catch (e) { /* rơi xuống memory */ }
+            } else if (storageBackend === "local") {
+                try { localStorage.setItem(key, value); return; } catch (e) { /* rơi xuống memory */ }
+            }
+            memoryFallback[key] = value;
+        }
+
+        async function storageDelete(key) {
+            if (storageBackend === "artifact") {
+                try { await window.storage.delete(key); return; } catch (e) {}
+            } else if (storageBackend === "local") {
+                try { localStorage.removeItem(key); return; } catch (e) {}
+            }
+            delete memoryFallback[key];
+        }
+
+        function defaultState() {
+            return {
+                staffList: JSON.parse(JSON.stringify(initialStaffList)),
+                days: generateSeptDays(),
+                totalStoreRevenue: 280000000,
+                currentCampaign: "SUATAM",
+                tableFilter: "ALL",
+                // Thống kê hóa đơn để tính "Tỷ Lệ Chốt Đơn" (conversion rate) chính xác, phân theo TỪNG NGÀY:
+                // totalBills[staffId][dayNum] = { slipNo: true, ... } -> TẤT CẢ hóa đơn NV đó phục vụ trong ngày dayNum.
+                // pushBillsSuaTam / pushBillsRemos: tương tự nhưng chỉ hóa đơn có bán được SP push sale tương ứng.
+                billStats: {
+                    totalBills: {},
+                    pushBillsSuaTam: {},
+                    pushBillsRemos: {}
+                },
+                // Theo dõi tồn kho thực thời: người dùng nhập tay Tồn đầu kỳ + các lần Nhập kho bổ sung.
+                // "Đã bán" được LẤY TỰ ĐỘNG từ dữ liệu push sale đã ghi nhận (actualSuaTam/actualRemos toàn kỳ),
+                // không cần nhập tay. Tồn kho thực tế = Tồn đầu + Tổng nhập thêm - Đã bán.
+                inventory: {
+                    SUATAM: { openingStock: 0, restocks: [] },
+                    REMOS: { openingStock: 0, restocks: [] }
+                },
+                // GP% (Gross Profit % - biên lợi nhuận gộp) của từng sản phẩm, nhập tay vì đây là
+                // số liệu giá vốn nội bộ, không có trong dữ liệu POS. Dùng để ước tính lợi nhuận gộp
+                // = Doanh thu đã bán (Amount Tax excl.) x GP% / 100.
+                grossProfit: {
+                    SUATAM: { gpPercent: null },
+                    REMOS: { gpPercent: null }
+                }
+            };
+        }
+
+        function ensureBillStats(state) {
+            if (!state.billStats) {
+                state.billStats = { totalBills: {}, pushBillsSuaTam: {}, pushBillsRemos: {} };
+            }
+            if (!state.billStats.totalBills) state.billStats.totalBills = {};
+            if (!state.billStats.pushBillsSuaTam) state.billStats.pushBillsSuaTam = {};
+            if (!state.billStats.pushBillsRemos) state.billStats.pushBillsRemos = {};
+            return state;
+        }
+
+        function ensureInventory(state) {
+            if (!state.inventory) {
+                state.inventory = { SUATAM: { openingStock: 0, restocks: [] }, REMOS: { openingStock: 0, restocks: [] } };
+            }
+            ["SUATAM", "REMOS"].forEach(k => {
+                if (!state.inventory[k]) state.inventory[k] = { openingStock: 0, restocks: [] };
+                if (typeof state.inventory[k].openingStock !== "number") state.inventory[k].openingStock = 0;
+                if (!Array.isArray(state.inventory[k].restocks)) state.inventory[k].restocks = [];
+            });
+            return state;
+        }
+
+        function ensureGrossProfit(state) {
+            if (!state.grossProfit) {
+                state.grossProfit = { SUATAM: { gpPercent: null }, REMOS: { gpPercent: null } };
+            }
+            ["SUATAM", "REMOS"].forEach(k => {
+                if (!state.grossProfit[k]) state.grossProfit[k] = { gpPercent: null };
+                if (typeof state.grossProfit[k].gpPercent !== "number") state.grossProfit[k].gpPercent = null;
+            });
+            return state;
+        }
+
+        // Dữ liệu được lưu bằng lớp lưu trữ thích ứng ở trên (không dùng thẳng localStorage/window.storage).
+        let appState = ensureGrossProfit(ensureInventory(ensureBillStats(defaultState())));
+        let staffChartInstance = null;
+        let shareChartInstance = null;
+
+        function renderStorageStatusBadge() {
+            const el = document.getElementById('storageStatusBadge');
+            if (!el) return;
+            if (storageBackend === "artifact") {
+                el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span class="text-emerald-700">💾 Tự động lưu khi F5 (Claude.ai Artifact)</span>';
+            } else if (storageBackend === "local") {
+                el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span class="text-emerald-700">💾 Tự động lưu khi F5 (trên trình duyệt này)</span>';
+            } else {
+                el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span class="text-rose-600">⚠️ Trình duyệt chặn lưu trữ — dữ liệu sẽ mất khi F5, hãy dùng "In PDF" để lưu lại</span>';
+            }
+        }
+
+        async function loadInitialState() {
+            await detectStorageBackend();
+            renderStorageStatusBadge();
+            try {
+                const raw = await storageGet(STORAGE_KEY);
+                if (raw) {
+                    appState = ensureGrossProfit(ensureInventory(ensureBillStats(JSON.parse(raw))));
+                }
+            } catch (e) {
+                // Chưa có dữ liệu lưu trước đó -> giữ nguyên appState mặc định
+            }
+        }
+
+        async function saveState() {
+            try {
+                await storageSet(STORAGE_KEY, JSON.stringify(appState));
+            } catch (e) {
+                console.error("Lỗi khi lưu dữ liệu:", e);
+            }
+        }
+
+        // Tính "Tỷ Lệ Chốt Đơn" (conversion rate): % hóa đơn có bán được SP push sale
+        // trên tổng số hóa đơn nhân viên đó đã phục vụ trong kỳ 24/8 - 23/9.
+        // Gộp các Set hóa đơn (theo Slip No.) của 1 nhân viên trong 1 hoặc nhiều ngày.
+        // dayFilter = "ALL" -> gộp toàn bộ các ngày; dayFilter = số ngày (1..35) -> chỉ lấy đúng ngày đó.
+        function collectBillSet(bucketRoot, staffId, dayFilter) {
+            const staffBucket = bucketRoot[staffId] || {};
+            if (!dayFilter || dayFilter === "ALL") {
+                let merged = {};
+                Object.values(staffBucket).forEach(daySet => Object.assign(merged, daySet));
+                return merged;
+            }
+            return staffBucket[dayFilter] || {};
+        }
+
+        // Tổng số lượng ĐÃ BÁN (push sale) của 1 sản phẩm, cộng dồn toàn kỳ, lấy từ dữ liệu
+        // đã ghi nhận qua nhật ký/Excel import — không cần nhập tay số bán ra.
+        function getTotalSoldForProduct(campaignKey) {
+            let total = 0;
+            appState.staffList.forEach(s => {
+                const m = getCampaignMetricsForStaffTotal(s, campaignKey);
+                total += m.actual;
+            });
+            return total;
+        }
+
+        // Số ngày đã trôi qua kể từ ngày bắt đầu kỳ (24/8) tính đến hôm nay (giới hạn trong 1..31).
+        // Dùng để tính TỐC ĐỘ BÁN THỰC TẾ trung bình/ngày, làm cơ sở dự báo ngưỡng cảnh báo tồn kho.
+        function getElapsedDaysCount() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let count = appState.days.filter(d => {
+                const dDate = new Date(2026, d.mm - 1, d.dd);
+                return dDate <= today;
+            }).length;
+            return Math.max(1, count);
+        }
+
+        // Tốc độ bán trung bình/ngày: ưu tiên tốc độ THỰC TẾ đã bán được; nếu chưa có dữ liệu bán
+        // (đầu kỳ chưa ghi nhận gì), tạm dùng tốc độ theo TARGET trung bình để không báo sai.
+        function getDailySalesPace(campaignKey) {
+            const totalSold = getTotalSoldForProduct(campaignKey);
+            const elapsed = getElapsedDaysCount();
+            if (totalSold > 0) {
+                return totalSold / elapsed;
+            }
+            const totalTarget = campaignKey === "SUATAM" ? 600 : 140;
+            return totalTarget / CAMPAIGN_TOTAL_DAYS;
+        }
+
+        // Ngày gửi PO gần nhất (Thứ 3) và ngày dự kiến NCC giao hàng (PO + 1 đến 3 ngày).
+        function getNextPOInfo() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dow = today.getDay(); // 0 CN .. 6 T7, Thứ 3 = 2
+            let diffToTue = (2 - dow + 7) % 7;
+            const poDate = new Date(today);
+            poDate.setDate(today.getDate() + diffToTue);
+            const deliverFrom = new Date(poDate); deliverFrom.setDate(poDate.getDate() + 1);
+            const deliverTo = new Date(poDate); deliverTo.setDate(poDate.getDate() + 3);
+            const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+            return {
+                poDateLabel: diffToTue === 0 ? `Hôm nay (Thứ 3, ${fmt(poDate)})` : `Thứ 3 tới (${fmt(poDate)})`,
+                deliverLabel: `${fmt(deliverFrom)} - ${fmt(deliverTo)}`
+            };
+        }
+
+        // Tồn kho thực tế = Tồn đầu kỳ + Tổng nhập thêm - Tổng đã bán (tự động).
+        // Ngưỡng cảnh báo = số lượng push sale dự kiến bán được trong 1 TUẦN (không còn cố định 20 chai),
+        // vì chu kỳ đặt hàng NCC là 1 - 1.5 tuần/lần (gửi PO thứ 3, NCC giao sau 1-3 ngày).
+        function getInventoryStats(campaignKey) {
+            ensureInventory(appState);
+            const inv = appState.inventory[campaignKey];
+            const totalRestocked = inv.restocks.reduce((s, r) => s + (Number(r.qty) || 0), 0);
+            const totalReceived = inv.openingStock + totalRestocked;
+            const totalSold = getTotalSoldForProduct(campaignKey);
+            const currentStock = totalReceived - totalSold;
+
+            const dailyPace = getDailySalesPace(campaignKey);
+            const weeklyThreshold = Math.max(1, Math.round(dailyPace * 7));
+            const daysOfStockLeft = dailyPace > 0 ? (currentStock / dailyPace) : Infinity;
+
+            return {
+                openingStock: inv.openingStock,
+                totalRestocked,
+                totalReceived,
+                totalSold,
+                currentStock,
+                dailyPace,
+                daysOfStockLeft,
+                isLow: currentStock < weeklyThreshold,
+                threshold: weeklyThreshold
+            };
+        }
+
+        const INVENTORY_PRODUCT_META = {
+            SUATAM: { label: "Sữa Tắm On: The Body", emoji: "🧴", color: "orange" },
+            REMOS: { label: "Xịt Muỗi Remos", emoji: "🦟", color: "teal" }
+        };
+
+        function renderInventorySection() {
+            ensureInventory(appState);
+            const container = document.getElementById('inventoryCardsContainer');
+            if (!container) return;
+
+            const poInfo = getNextPOInfo();
+            let lowStockMsgs = [];
+            let html = '';
+
+            ["SUATAM", "REMOS"].forEach(key => {
+                const meta = INVENTORY_PRODUCT_META[key];
+                const stats = getInventoryStats(key);
+                const inv = appState.inventory[key];
+
+                if (stats.isLow) {
+                    lowStockMsgs.push(`${meta.emoji} <strong>${meta.label}</strong>: chỉ còn <strong>${stats.currentStock}</strong> chai — dưới mức bán dự kiến 1 tuần (${stats.threshold} chai). Gửi PO ${poInfo.poDateLabel}, NCC giao ${poInfo.deliverLabel}.`);
+                }
+
+                const stockColor = stats.isLow ? 'text-rose-600' : stats.currentStock < stats.threshold * 1.5 ? 'text-amber-600' : 'text-emerald-600';
+                const stockBg = stats.isLow ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200';
+                const daysLeftLabel = isFinite(stats.daysOfStockLeft) ? `${stats.daysOfStockLeft.toFixed(1)} ngày` : 'Chưa có tốc độ bán';
+
+                const restockRows = inv.restocks.length === 0
+                    ? `<p class="text-[11px] text-slate-400 italic py-2">Chưa có lần nhập kho bổ sung nào.</p>`
+                    : inv.restocks.map(r => `
+                        <div class="flex items-center justify-between text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5">
+                            <span class="font-semibold text-slate-700">📅 ${r.date || '—'} ${r.source === 'plu_import' ? '<span class="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full ml-1">Từ file PLU</span>' : ''}</span>
+                            <span class="font-black text-purple-700">+${r.qty} chai</span>
+                            <button onclick="removeRestockEntry('${key}', '${r.id}')" class="text-rose-500 hover:text-rose-700 font-bold text-sm">✕</button>
+                        </div>
+                    `).join('');
+
+                html += `
+                    <div class="rounded-2xl border-2 ${stats.isLow ? 'border-rose-300' : 'border-slate-200'} p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-black text-slate-900">${meta.emoji} ${meta.label}</h4>
+                            ${stats.isLow ? `<span class="text-[10px] font-black text-rose-700 bg-rose-100 px-2 py-1 rounded-full">🚨 CẦN ĐẶT HÀNG</span>` : `<span class="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">✓ Ổn định</span>`}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <label class="text-[11px] font-bold text-slate-600 flex flex-col gap-1">
+                                Tồn đầu kỳ (chai)
+                                <input type="number" min="0" value="${inv.openingStock}" onchange="updateOpeningStock('${key}', this.value)" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm font-bold">
+                            </label>
+                            <div class="text-[11px] font-bold text-slate-600 flex flex-col gap-1">
+                                Tổng đã nhập thêm
+                                <div class="bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm font-black text-purple-700">+${stats.totalRestocked} chai</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="text-[11px] font-bold text-slate-600 block mb-1.5">📥 Nhật ký nhập kho bổ sung</span>
+                            <div class="space-y-1.5 max-h-32 overflow-y-auto mb-2">${restockRows}</div>
+                            <form onsubmit="handleAddRestock(event, '${key}')" class="flex items-center gap-1.5">
+                                <input type="date" name="date" required class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs">
+                                <input type="number" name="qty" min="1" placeholder="SL" required class="w-16 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold">
+                                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ Thêm</button>
+                            </form>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100">
+                            <div class="text-center">
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase">Tổng nhập</span>
+                                <span class="text-sm font-black text-slate-800">${stats.totalReceived}</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase">Đã bán (tự động)</span>
+                                <span class="text-sm font-black text-orange-600">${stats.totalSold}</span>
+                            </div>
+                            <div class="text-center ${stockBg} rounded-lg py-1 border">
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase">Tồn thực tế</span>
+                                <span class="text-lg font-black ${stockColor}">${stats.currentStock}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-dashed border-slate-200">
+                            <div class="text-center">
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase">Tốc độ bán</span>
+                                <span class="text-xs font-black text-slate-700">${stats.dailyPace.toFixed(1)} chai/ngày</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase">Dự kiến hết hàng</span>
+                                <span class="text-xs font-black ${stats.isLow ? 'text-rose-600' : 'text-slate-700'}">${daysLeftLabel}</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-2 text-center">🎯 Ngưỡng cảnh báo (bán ~1 tuần): <strong>${stats.threshold} chai</strong></p>
+
+                        ${stats.isLow ? `
+                        <div class="mt-2 bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-[11px] text-rose-800 font-semibold text-center">
+                            📦 Gửi PO cho NCC: <strong>${poInfo.poDateLabel}</strong> · Dự kiến giao hàng: <strong>${poInfo.deliverLabel}</strong>
+                        </div>` : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            const banner = document.getElementById('lowStockBanner');
+            const bannerText = document.getElementById('lowStockBannerText');
+            if (lowStockMsgs.length > 0) {
+                banner.classList.remove('hidden');
+                bannerText.innerHTML = lowStockMsgs.join('<br>');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function updateOpeningStock(key, val) {
+            ensureInventory(appState);
+            const num = parseInt(val);
+            appState.inventory[key].openingStock = isNaN(num) ? 0 : Math.max(0, num);
+            saveState();
+            renderInventorySection();
+        }
+
+        function handleAddRestock(event, key) {
+            event.preventDefault();
+            ensureInventory(appState);
+            const form = event.target;
+            const date = form.date.value;
+            const qty = parseInt(form.qty.value);
+            if (!date || isNaN(qty) || qty <= 0) return;
+
+            appState.inventory[key].restocks.push({
+                id: 'rs_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                date: date,
+                qty: qty
+            });
+            // Sắp xếp theo ngày nhập cho dễ theo dõi
+            appState.inventory[key].restocks.sort((a, b) => a.date.localeCompare(b.date));
+
+            saveState();
+            renderInventorySection();
+            showToast(`Đã ghi nhận nhập kho +${qty} chai (${INVENTORY_PRODUCT_META[key].label})`);
+            form.reset();
+        }
+
+        function removeRestockEntry(key, entryId) {
+            ensureInventory(appState);
+            appState.inventory[key].restocks = appState.inventory[key].restocks.filter(r => r.id !== entryId);
+            saveState();
+            renderInventorySection();
+        }
+
+        // ============================================================
+        // NHẬP FILE TỒN KHO — cho phép tải lên 1 file CSV/Excel để tự động điền
+        // Tồn đầu kỳ + Nhật ký nhập kho cho cả 2 sản phẩm, thay vì gõ tay từng dòng.
+        // Định dạng file: San Pham | Loai | Ngay | So Luong
+        //   - San Pham: SUATAM / REMOS (hoặc "Sữa Tắm" / "Xịt Muỗi", tự nhận diện)
+        //   - Loai: "Tồn đầu kỳ" hoặc "Nhập kho" (hoặc TON_DAU / NHAP_KHO)
+        //   - Ngay: chỉ cần cho dòng "Nhập kho", định dạng dd/mm/yyyy
+        //   - So Luong: số lượng (chai)
+        // ============================================================
+        function downloadInventoryTemplate() {
+            const csvLines = [
+                "San Pham,Loai,Ngay,So Luong",
+                "SUATAM,Ton dau ky,,120",
+                "SUATAM,Nhap kho,26/08/2026,100",
+                "SUATAM,Nhap kho,02/09/2026,80",
+                "REMOS,Ton dau ky,,40",
+                "REMOS,Nhap kho,26/08/2026,30"
+            ];
+            const blob = new Blob(["\uFEFF" + csvLines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Mau_Ton_Kho_Push_Sale.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Đã tải file mẫu tồn kho!");
+        }
+
+        function matchProductFromText(text) {
+            const t = removeVietnameseTones(String(text || '')).toLowerCase();
+            if (/suatam|sua tam/.test(t)) return "SUATAM";
+            if (/remos|xit muoi/.test(t)) return "REMOS";
+            return null;
+        }
+
+        function isOpeningStockRow(text) {
+            const t = removeVietnameseTones(String(text || '')).toLowerCase();
+            return /ton dau|ton_dau|opening/.test(t);
+        }
+        function isRestockRow(text) {
+            const t = removeVietnameseTones(String(text || '')).toLowerCase();
+            return /nhap kho|nhap_kho|restock|nhap them/.test(t);
+        }
+
+        async function handleInventoryFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('inventoryUploadStatus');
+            status.classList.remove('hidden');
+            status.innerHTML = "⏳ Đang đọc file tồn kho...";
+
+            try {
+                const parsed = await readTabularFile(file);
+                const rows = parsed.rows;
+                if (!rows || rows.length < 2) {
+                    status.innerHTML = `<p class="text-rose-700 font-bold">❌ File trống hoặc không đúng định dạng.</p>`;
+                    return;
+                }
+
+                const header = rows[0];
+                const prodIdx = findColIdx(header, /san\s*pham|sản\s*phẩm|product/i);
+                const typeIdx = findColIdx(header, /loai|loại|type/i);
+                const dateIdx = findColIdx(header, /ngay|ngày|date/i);
+                const qtyIdx = findColIdx(header, /so\s*luong|số\s*lượng|qty|quantity/i);
+
+                if (prodIdx === -1 || typeIdx === -1 || qtyIdx === -1) {
+                    status.innerHTML = `<p class="text-rose-700 font-bold">❌ Không tìm thấy đủ cột bắt buộc (San Pham / Loai / So Luong). Hãy tải "File Mẫu" để xem đúng định dạng.</p>`;
+                    return;
+                }
+
+                ensureInventory(appState);
+                let openingSetCount = 0, restockAddedCount = 0, restockSkippedDup = 0, unrecognizedRows = 0;
+
+                for (let r = 1; r < rows.length; r++) {
+                    const row = rows[r];
+                    if (!row || row.length === 0) continue;
+                    const rowJoined = row.map(c => String(c || '')).join(' | ');
+                    if (!rowJoined.trim()) continue;
+
+                    const productKey = matchProductFromText(row[prodIdx]);
+                    if (!productKey) { unrecognizedRows++; continue; }
+
+                    const typeText = row[typeIdx];
+                    const qty = parseFloat(String(row[qtyIdx] || '').replace(/,/g, ''));
+                    if (isNaN(qty) || qty < 0) { unrecognizedRows++; continue; }
+
+                    if (isOpeningStockRow(typeText)) {
+                        appState.inventory[productKey].openingStock = qty;
+                        openingSetCount++;
+                    } else if (isRestockRow(typeText)) {
+                        let dateStr = dateIdx !== -1 ? String(row[dateIdx] || '').trim() : '';
+                        // Chuẩn hóa ngày về yyyy-mm-dd cho input[type=date]; chấp nhận dd/mm/yyyy
+                        const m = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+                        let isoDate = '';
+                        if (m) {
+                            const dd = m[1].padStart(2, '0'), mm = m[2].padStart(2, '0');
+                            let yyyy = m[3].length === 2 ? '20' + m[3] : m[3];
+                            isoDate = `${yyyy}-${mm}-${dd}`;
+                        }
+                        // Tránh nhập trùng nếu file được tải lại nhiều lần: bỏ qua nếu đã có
+                        // đúng 1 dòng cùng ngày + cùng số lượng cho sản phẩm này.
+                        const dup = appState.inventory[productKey].restocks.some(x => x.date === isoDate && Number(x.qty) === qty);
+                        if (dup) { restockSkippedDup++; continue; }
+
+                        appState.inventory[productKey].restocks.push({
+                            id: 'rs_' + Date.now() + '_' + Math.floor(Math.random() * 1000) + '_' + r,
+                            date: isoDate,
+                            qty: qty
+                        });
+                        restockAddedCount++;
+                    } else {
+                        unrecognizedRows++;
+                    }
+                }
+
+                appState.inventory.SUATAM.restocks.sort((a,b) => a.date.localeCompare(b.date));
+                appState.inventory.REMOS.restocks.sort((a,b) => a.date.localeCompare(b.date));
+
+                saveState();
+                renderInventorySection();
+
+                status.innerHTML = `
+                    <div class="space-y-1 text-emerald-800 font-bold">
+                        <p>✅ Đã nhập file tồn kho thành công!</p>
+                        <p class="text-purple-900 text-[11px]">• Cập nhật Tồn đầu kỳ: ${openingSetCount} sản phẩm</p>
+                        <p class="text-purple-900 text-[11px]">• Thêm mới: ${restockAddedCount} lần nhập kho</p>
+                        ${restockSkippedDup > 0 ? `<p class="text-slate-500 text-[10px]">⏭️ Bỏ qua ${restockSkippedDup} dòng trùng lặp (đã có sẵn).</p>` : ''}
+                        ${unrecognizedRows > 0 ? `<p class="text-rose-600 text-[10px]">⚠️ ${unrecognizedRows} dòng không nhận diện được (kiểm tra lại cột Sản Phẩm/Loại/Số Lượng).</p>` : ''}
+                    </div>
+                `;
+                showToast("Nhập file tồn kho thành công!");
+            } catch (err) {
+                console.error(err);
+                status.innerHTML = `<p class="text-rose-700 font-bold">❌ Lỗi đọc file. Kiểm tra lại định dạng CSV/Excel.</p>`;
+            }
+            event.target.value = '';
+        }
+
+        // Tổng DOANH THU (Amount Tax excl.) đã bán được của 1 sản phẩm, cộng dồn toàn kỳ.
+        function getTotalRevenueForProduct(campaignKey) {
+            let total = 0;
+            appState.staffList.forEach(s => {
+                const m = getCampaignMetricsForStaffTotal(s, campaignKey);
+                total += m.revenue;
+            });
+            return total;
+        }
+
+        function renderGrossProfitSection() {
+            ensureGrossProfit(appState);
+            const container = document.getElementById('grossProfitCardsContainer');
+            if (!container) return;
+
+            let html = '';
+            ["SUATAM", "REMOS"].forEach(key => {
+                const meta = INVENTORY_PRODUCT_META[key];
+                const gp = appState.grossProfit[key];
+                const revenue = getTotalRevenueForProduct(key);
+                const hasGP = typeof gp.gpPercent === "number" && !isNaN(gp.gpPercent);
+                const grossProfitAmount = hasGP ? revenue * (gp.gpPercent / 100) : null;
+
+                html += `
+                    <div class="rounded-2xl border-2 border-slate-200 p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-black text-slate-900">${meta.emoji} ${meta.label}</h4>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <label class="text-[11px] font-bold text-slate-600 flex flex-col gap-1">
+                                GP% (biên lợi nhuận gộp)
+                                <div class="relative">
+                                    <input type="number" min="0" max="100" step="0.1" value="${hasGP ? gp.gpPercent : ''}" placeholder="VD: 35" onchange="updateGrossProfitPercent('${key}', this.value)" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm font-bold pr-7">
+                                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">%</span>
+                                </div>
+                            </label>
+                            <div class="text-[11px] font-bold text-slate-600 flex flex-col gap-1">
+                                Doanh thu đã bán
+                                <div class="bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm font-black text-slate-700">${formatVND(revenue)}</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center ${hasGP ? 'bg-teal-50 border-teal-200' : 'bg-slate-50 border-slate-200'} rounded-lg py-2.5 border">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Lợi Nhuận Gộp Ước Tính</span>
+                            <span class="text-lg font-black ${hasGP ? 'text-teal-700' : 'text-slate-400'}">${hasGP ? formatVND(grossProfitAmount) : 'Chưa nhập GP%'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updateGrossProfitPercent(key, val) {
+            ensureGrossProfit(appState);
+            const num = parseFloat(val);
+            appState.grossProfit[key].gpPercent = (isNaN(num) || num < 0) ? null : Math.min(100, num);
+            saveState();
+            renderGrossProfitSection();
+        }
+
+        // Nhập Tồn Kho & GP% từ file InventoryPLU_*.xlsx / .csv của hệ thống.
+        // Cấu trúc cột thực tế: Barcode, Product Name, Supplier Code, Open Qty, Open Cst,
+        // Income Qty, Income Cst, Sales Qty, Sales Amt, Close Qty, Close Cst,
+        // G.P.%(COGS), G.P.%(COGS/EXP/LOSS), ...
+        async function handleInventoryImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('inventoryImportStatus');
+            status.classList.remove('hidden');
+            status.innerHTML = "⏳ Đang đọc file tồn kho...";
+
+            // Khối chẩn đoán: LUÔN hiển thị (dù thành công hay lỗi) để biết chính xác trình duyệt
+            // đã đọc được gì từ file — giúp tự tìm nguyên nhân ngay nếu vẫn không khớp được.
+            let debugInfo = { fileName: file.name, fileSize: file.size, rowCount: 0, headerRaw: [], colIdx: {}, sampleBarcodes: [] };
+
+            try {
+                let parsed;
+                try {
+                    parsed = await readTabularFile(file);
+                } catch (readErr) {
+                    status.innerHTML = `
+                        <p class="text-rose-700 font-bold">❌ Lỗi khi đọc file: ${readErr.message || readErr}</p>
+                        <p class="text-slate-500 text-[10px] mt-1">File: ${file.name} (${(file.size/1024).toFixed(1)} KB) — kiểm tra file có bị hỏng hoặc sai định dạng .xlsx/.csv không.</p>
+                    `;
+                    return;
+                }
+
+                const rows = parsed.rows;
+                debugInfo.rowCount = rows ? rows.length : 0;
+
+                if (!rows || rows.length < 2) {
+                    status.innerHTML = `
+                        <p class="text-rose-700 font-bold">❌ File trống hoặc không đúng định dạng.</p>
+                        <p class="text-slate-500 text-[10px] mt-1">Đọc được ${debugInfo.rowCount} dòng từ file "${debugInfo.fileName}".</p>
+                    `;
+                    return;
+                }
+
+                debugInfo.headerRaw = rows[0].map(h => String(h || ''));
+                const header = rows[0].map(h => String(h || '').trim().toLowerCase());
+                const barcodeIdx = header.findIndex(h => /barcode/i.test(h));
+                const openQtyIdx = header.findIndex(h => /^open qty$/i.test(h));
+                const incomeQtyIdx = header.findIndex(h => /^income qty$/i.test(h));
+                const closeQtyIdx = header.findIndex(h => /^close qty$/i.test(h));
+                const gpIdx = header.findIndex(h => /g\.?p\.?%\s*\(cogs\)$/i.test(h) || /^g\.p\.%\(cogs\)$/i.test(h));
+                debugInfo.colIdx = { barcodeIdx, openQtyIdx, incomeQtyIdx, closeQtyIdx, gpIdx };
+
+                // Lấy 3 giá trị Barcode đầu tiên (RAW, chưa qua xử lý gì) để xem đúng những gì trình duyệt đọc được
+                if (barcodeIdx !== -1) {
+                    for (let r = 1; r < rows.length && debugInfo.sampleBarcodes.length < 3; r++) {
+                        const raw = rows[r] ? rows[r][barcodeIdx] : undefined;
+                        if (raw !== undefined && raw !== null && raw !== '') {
+                            debugInfo.sampleBarcodes.push(`${JSON.stringify(raw)} (kiểu: ${typeof raw})`);
+                        }
+                    }
+                }
+
+                function renderDebugPanel() {
+                    return `
+                        <details class="mt-2 pt-2 border-t border-slate-200">
+                            <summary class="text-[10px] text-slate-500 cursor-pointer select-none">🔧 Chi tiết chẩn đoán (bấm để xem)</summary>
+                            <div class="text-[10px] text-slate-500 font-mono mt-1 space-y-0.5">
+                                <div>File: ${debugInfo.fileName} (${(debugInfo.fileSize/1024).toFixed(1)} KB)</div>
+                                <div>Số dòng đọc được: ${debugInfo.rowCount}</div>
+                                <div>Header dòng 1: [${debugInfo.headerRaw.map(h => `"${h}"`).join(', ')}]</div>
+                                <div>Vị trí cột tìm thấy: Barcode=${debugInfo.colIdx.barcodeIdx}, Open Qty=${debugInfo.colIdx.openQtyIdx}, Income Qty=${debugInfo.colIdx.incomeQtyIdx}, Close Qty=${debugInfo.colIdx.closeQtyIdx}, GP%=${debugInfo.colIdx.gpIdx}</div>
+                                <div>3 Barcode đầu tiên đọc được (raw): ${debugInfo.sampleBarcodes.length > 0 ? debugInfo.sampleBarcodes.join(' | ') : '(không có)'}</div>
+                            </div>
+                        </details>
+                    `;
+                }
+
+                if (barcodeIdx === -1) {
+                    status.innerHTML = `
+                        <p class="text-rose-700 font-bold">❌ Không tìm thấy cột "Barcode" trong file. Kiểm tra lại đúng file InventoryPLU chưa.</p>
+                        ${renderDebugPanel()}
+                    `;
+                    return;
+                }
+
+                ensureInventory(appState);
+                ensureGrossProfit(appState);
+
+                const barcodeToProduct = {};
+                PRODUCT_BARCODES.SUATAM.forEach(c => barcodeToProduct[c] = "SUATAM");
+                PRODUCT_BARCODES.REMOS.forEach(c => barcodeToProduct[c] = "REMOS");
+
+                const nameColIdx = header.findIndex(h => /product name|tên sp|tên sản phẩm/i.test(h));
+
+                const agg = {
+                    SUATAM: { openQty: 0, incomeQty: 0, closeQty: 0, gpValues: [], matchedRows: 0 },
+                    REMOS: { openQty: 0, incomeQty: 0, closeQty: 0, gpValues: [], matchedRows: 0 }
+                };
+
+                // Vài dòng mẫu (barcode + tên SP) để hiển thị chẩn đoán nếu không khớp được gì —
+                // giúp người dùng tự so sánh xem file có đúng nhóm hàng/kỳ báo cáo không.
+                const sampleRows = [];
+
+                for (let r = 1; r < rows.length; r++) {
+                    const row = rows[r];
+                    if (!row || row.length === 0) continue;
+                    let bcRaw = row[barcodeIdx];
+                    if (bcRaw === null || bcRaw === undefined || bcRaw === '') continue;
+                    let bcNum = Number(bcRaw);
+                    let bcStr = !isNaN(bcNum) && isFinite(bcNum) ? String(Math.round(bcNum)) : String(bcRaw).trim();
+                    const nameVal = nameColIdx !== -1 ? String(row[nameColIdx] || '').toLowerCase() : '';
+
+                    if (sampleRows.length < 5 && bcStr) {
+                        sampleRows.push(`${bcStr} — ${nameColIdx !== -1 ? String(row[nameColIdx] || '(không có tên)') : ''}`);
+                    }
+
+                    // Ưu tiên khớp theo Barcode; nếu không khớp, thử khớp theo TÊN sản phẩm
+                    // (dự phòng cho trường hợp mã vạch trong hệ thống PLU khác với POS).
+                    let productKey = barcodeToProduct[bcStr];
+                    if (!productKey && nameVal) {
+                        if (PRODUCT_NAME_KEYWORDS.SUATAM.some(kw => nameVal.includes(kw))) productKey = "SUATAM";
+                        else if (PRODUCT_NAME_KEYWORDS.REMOS.some(kw => nameVal.includes(kw))) productKey = "REMOS";
+                    }
+                    if (!productKey) continue;
+
+                    const a = agg[productKey];
+                    a.matchedRows++;
+                    if (openQtyIdx !== -1) { const v = parseFloat(String(row[openQtyIdx]).replace(/,/g,'')); if (!isNaN(v)) a.openQty += v; }
+                    if (incomeQtyIdx !== -1) { const v = parseFloat(String(row[incomeQtyIdx]).replace(/,/g,'')); if (!isNaN(v)) a.incomeQty += v; }
+                    if (closeQtyIdx !== -1) { const v = parseFloat(String(row[closeQtyIdx]).replace(/,/g,'')); if (!isNaN(v)) a.closeQty += v; }
+                    if (gpIdx !== -1) {
+                        const v = parseFloat(String(row[gpIdx]).replace(/,/g,'').replace('%',''));
+                        if (!isNaN(v) && v !== 0) a.gpValues.push(v);
+                    }
+                }
+
+                const todayIso = new Date().toISOString().slice(0,10);
+                let summaryLines = [];
+                let anyMatched = false;
+
+                ["SUATAM", "REMOS"].forEach(key => {
+                    const a = agg[key];
+                    const meta = INVENTORY_PRODUCT_META[key];
+                    if (a.matchedRows === 0) {
+                        summaryLines.push(`<p class="text-slate-500 text-[11px]">⚠️ ${meta.emoji} ${meta.label}: không tìm thấy mã nào khớp trong file.</p>`);
+                        return;
+                    }
+                    anyMatched = true;
+
+                    // Tồn đầu kỳ: ghi đè bằng số thực tế từ file (nguồn xác thực hơn số nhập tay trước đó)
+                    appState.inventory[key].openingStock = a.openQty;
+
+                    // Nhập kho bổ sung: THAY THẾ dòng nhật ký được tạo từ lần nhập file PLU trước đó
+                    // (nếu có) bằng dòng mới — tránh cộng dồn chồng lên nhau nếu người dùng nhập lại
+                    // cùng 1 file (hoặc file cập nhật) nhiều lần. Các dòng do người dùng TỰ TAY thêm
+                    // qua form "+ Thêm" (không có nguồn "plu_import") vẫn được giữ nguyên, không đụng tới.
+                    // Nhận diện CẢ dòng nhập cũ (trước khi có nhãn 'source', chỉ có tiền tố ID 'rs_plu_')
+                    // lẫn dòng mới (có nhãn 'source') để xóa hết trước khi thêm dòng mới — tránh sót
+                    // lại dòng "mồ côi" từ lần nhập trước gây cộng dồn sai số lượng.
+                    appState.inventory[key].restocks = appState.inventory[key].restocks.filter(r => r.source !== 'plu_import' && !String(r.id).startsWith('rs_plu_'));
+                    if (a.incomeQty > 0) {
+                        appState.inventory[key].restocks.push({
+                            id: 'rs_plu_' + Date.now() + '_' + key,
+                            date: todayIso,
+                            qty: a.incomeQty,
+                            source: 'plu_import'
+                        });
+                        appState.inventory[key].restocks.sort((x,y) => x.date.localeCompare(y.date));
+                    }
+
+                    // GP%: trung bình các giá trị hợp lệ tìm được (bỏ qua giá trị 0, thường là do chưa có doanh số)
+                    if (a.gpValues.length > 0) {
+                        const avgGP = a.gpValues.reduce((s,v)=>s+v,0) / a.gpValues.length;
+                        appState.grossProfit[key].gpPercent = Math.min(100, Math.max(0, avgGP));
+                    }
+
+                    summaryLines.push(`
+                        <p class="text-emerald-800 text-[11px] font-bold">✓ ${meta.emoji} ${meta.label}: khớp ${a.matchedRows} mã · Tồn đầu = ${a.openQty} · Nhập thêm = ${a.incomeQty}${a.gpValues.length>0 ? ' · GP% = '+(a.gpValues.reduce((s,v)=>s+v,0)/a.gpValues.length).toFixed(1)+'%' : ' · GP% giữ nguyên (không có dữ liệu)'} </p>
+                        <p class="text-slate-400 text-[10px] pl-4">Tồn cuối theo file (Close Qty) = ${a.closeQty} — dùng để đối chiếu, không ghi đè số tự tính của dashboard.</p>
+                    `);
+                });
+
+                if (!anyMatched) {
+                    const sampleHtml = sampleRows.length > 0
+                        ? `<div class="mt-2 pt-2 border-t border-rose-200">
+                             <p class="text-rose-700 text-[10px] font-bold mb-1">📋 Vài dòng mẫu thực tế có trong file (đối chiếu xem đúng nhóm hàng chưa):</p>
+                             <ul class="text-[10px] text-slate-600 font-mono space-y-0.5">${sampleRows.map(s => `<li>${s}</li>`).join('')}</ul>
+                           </div>`
+                        : '';
+                    status.innerHTML = `
+                        <p class="text-rose-700 font-bold">❌ Không tìm thấy mã hoặc tên sản phẩm Sữa Tắm/Xịt Muỗi nào trong file này (đã thử khớp cả Barcode và Tên sản phẩm).</p>
+                        <p class="text-slate-500 text-[10px] mt-1">Có thể file này thuộc nhóm hàng khác, kỳ báo cáo khác, hoặc chưa đúng file cần dùng. Trong lúc chờ file đúng, bạn vẫn có thể <strong>nhập tay GP%</strong> trực tiếp ở ô bên dưới.</p>
+                        ${sampleHtml}
+                        ${renderDebugPanel()}
+                    `;
+                    return;
+                }
+
+                saveState();
+                renderInventorySection();
+                renderGrossProfitSection();
+
+                status.innerHTML = `<div class="space-y-1">${summaryLines.join('')}${renderDebugPanel()}</div>`;
+                showToast("Đã cập nhật Tồn Kho & GP% từ file PLU!");
+
+            } catch (err) {
+                console.error(err);
+                status.innerHTML = `
+                    <p class="text-rose-700 font-bold">❌ Lỗi xử lý file: ${err.message || err}</p>
+                    <p class="text-slate-500 text-[10px] mt-1 font-mono">File: ${debugInfo.fileName} · Đọc được ${debugInfo.rowCount} dòng trước khi lỗi xảy ra.</p>
+                `;
+            }
+
+            event.target.value = '';
+        }
+
+        function getConversionStats(staffId, campaign, dayFilter) {
+            dayFilter = dayFilter || "ALL";
+            ensureBillStats(appState);
+            const totalSet = collectBillSet(appState.billStats.totalBills, staffId, dayFilter);
+            const total = Object.keys(totalSet).length;
+            let pushSet;
+            if (campaign === "SUATAM") {
+                pushSet = collectBillSet(appState.billStats.pushBillsSuaTam, staffId, dayFilter);
+            } else if (campaign === "REMOS") {
+                pushSet = collectBillSet(appState.billStats.pushBillsRemos, staffId, dayFilter);
+            } else {
+                // ALL: hóa đơn có ít nhất 1 trong 2 sản phẩm (hợp của 2 tập, không đếm trùng)
+                const a = collectBillSet(appState.billStats.pushBillsSuaTam, staffId, dayFilter);
+                const b = collectBillSet(appState.billStats.pushBillsRemos, staffId, dayFilter);
+                pushSet = { ...a, ...b };
+            }
+            const pushCount = Object.keys(pushSet).length;
+            const rate = total > 0 ? (pushCount / total) * 100 : 0;
+            return { totalBills: total, pushBills: pushCount, rate: rate };
+        }
+
+        async function resetDataToDefault() {
+            if (confirm("Bạn có chắc chắn muốn khôi phục lại dữ liệu mẫu ban đầu của kỳ Push Sale Tháng 9 không?")) {
+                await storageDelete(STORAGE_KEY);
+                appState = ensureGrossProfit(ensureInventory(ensureBillStats(defaultState())));
+                initApp();
+                showToast("Đã khôi phục dữ liệu mẫu thành công!");
+            }
+        }
+
+        function removeVietnameseTones(str) {
+            if (!str) return '';
+            return str
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                .toUpperCase()
+                .trim();
+        }
+
+        window.onload = async function() {
+            await loadInitialState();
+            initApp();
+        };
+
+        function initApp() {
+            populateStaffSelects();
+            populateDaySelects();
+            populateLeaderboardDaySelect();
+            renderAliasList();
+            updateDashboard();
+        }
+
+        // Bộ lọc ngày đang chọn cho Bảng Xếp Hạng: "ALL" (toàn kỳ) hoặc số ngày (1..35)
+        let leaderboardDayFilter = "ALL";
+
+        function populateLeaderboardDaySelect() {
+            const sel = document.getElementById('leaderboardDaySelect');
+            if (!sel) return;
+            const prevVal = sel.value || "ALL";
+            sel.innerHTML = '<option value="ALL">📊 Tổng Toàn Kỳ (24/8 - 23/9)</option>';
+            appState.days.forEach(day => {
+                const opt = document.createElement('option');
+                opt.value = day.day;
+                opt.textContent = `${day.dateStr} (${day.dayOfWeek}${day.isPeak ? ' 🔥 Kohnan' : day.isHoliday ? ' 🎉 Lễ' : day.isWeekend ? ' 🏖️' : ''})`;
+                sel.appendChild(opt);
+            });
+            sel.value = prevVal;
+        }
+
+        function handleLeaderboardDayChange(val) {
+            leaderboardDayFilter = val === "ALL" ? "ALL" : parseInt(val);
+            const label = document.getElementById('leaderboardScopeLabel');
+            if (label) {
+                if (leaderboardDayFilter === "ALL") {
+                    label.textContent = "Xếp theo doanh thu Amount(Tax excl.) · Toàn kỳ 24/8 - 23/9";
+                } else {
+                    const dayObj = appState.days.find(d => d.day === leaderboardDayFilter);
+                    label.textContent = `Xếp theo doanh thu Amount(Tax excl.) · Ngày ${dayObj ? dayObj.dateStr : ''} (${dayObj ? dayObj.dayOfWeek : ''})`;
+                }
+            }
+            renderLeaderboard();
+        }
+
+        function populateStaffSelects() {
+            const empSelect = document.getElementById('employeeSelect');
+            const quickSelect = document.getElementById('quickStaffSelect');
+            
+            if (!empSelect || !quickSelect) return;
+
+            let currentSelected = empSelect.value || "NGAN";
+
+            empSelect.innerHTML = '';
+            quickSelect.innerHTML = '';
+
+            appState.staffList.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `${s.name} (${s.role})`;
+                empSelect.appendChild(opt);
+
+                const opt2 = document.createElement('option');
+                opt2.value = s.id;
+                opt2.textContent = `${s.name} (${s.role})`;
+                quickSelect.appendChild(opt2);
+            });
+
+            empSelect.value = appState.staffList.some(s => s.id === currentSelected) ? currentSelected : appState.staffList[0].id;
+        }
+
+        function populateDaySelects() {
+            const quickDaySelect = document.getElementById('quickDaySelect');
+            if (!quickDaySelect) return;
+            quickDaySelect.innerHTML = '';
+
+            appState.days.forEach(day => {
+                const opt = document.createElement('option');
+                opt.value = day.day;
+                opt.textContent = `Ngày ${day.dateStr} (${day.dayOfWeek}${day.isPeak ? ' - 🔥 Kohnan -5%' : day.isHoliday ? ' - 🎉 Ngày Lễ' : day.isWeekend ? ' - 🏖️ Cuối tuần' : ''})`;
+                quickDaySelect.appendChild(opt);
+            });
+        }
+
+        function renderAliasList() {
+            const container = document.getElementById('aliasListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            appState.staffList.forEach(s => {
+                const div = document.createElement('div');
+                div.className = "p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-slate-900">${s.name}</span>
+                        <span class="text-[10px] bg-slate-200 font-mono px-1.5 py-0.5 rounded text-slate-700">${s.id}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-600 font-mono">
+                        Từ khóa / Mã Excel: <span class="text-purple-700 font-bold">${s.keywords.join(' | ')}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function switchCampaign(val) {
+            appState.currentCampaign = val;
+            saveState();
+            updateDashboard();
+            showToast(`Đã chuyển chiến dịch: ${val === 'SUATAM' ? 'Sữa Tắm On: The Body' : val === 'REMOS' ? 'Xịt Remos' : 'Tất cả'}`);
+        }
+
+        function filterDailyTable(filterType) {
+            appState.tableFilter = filterType;
+            
+            ['All', 'Peak', 'Holiday', 'Weekend', 'Weekday'].forEach(b => {
+                const btn = document.getElementById(`btnFilter${b}`);
+                if (btn) {
+                    btn.className = "px-3 py-1.5 rounded-lg hover:bg-white text-slate-700 transition";
+                }
+            });
+
+            let activeId = "btnFilterAll";
+            if (filterType === 'PEAK_SPECIAL') activeId = "btnFilterPeak";
+            else if (filterType === 'HOLIDAY') activeId = "btnFilterHoliday";
+            else if (filterType === 'WEEKEND') activeId = "btnFilterWeekend";
+            else if (filterType === 'WEEKDAY') activeId = "btnFilterWeekday";
+
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.className = "px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-black";
+            }
+
+            renderTeamDailyTable();
+        }
+
+        function updateStoreRevenue(val) {
+            let num = parseFloat(val);
+            if (!isNaN(num) && num >= 0) {
+                appState.totalStoreRevenue = num;
+                saveState();
+                updateDashboard();
+                showToast("Đã cập nhật doanh thu tổng cửa hàng!");
+            }
+        }
+
+        function updateDashboard() {
+            renderKPICards();
+            renderInventorySection();
+            renderGrossProfitSection();
+            renderTeamDailyTable();
+            const currentSelectedEmp = document.getElementById('employeeSelect')?.value || appState.staffList[0].id;
+            renderIndividualRoadmap(currentSelectedEmp);
+            renderRevenueComparison();
+            renderLeaderboard();
+            renderCharts();
+        }
+
+        function getCampaignMetricsForDay(dayObj, campaignType) {
+            if (campaignType === "SUATAM") {
+                return { target: dayObj.targetSuaTam, actual: dayObj.actualSuaTam, unit: "Chai" };
+            } else if (campaignType === "REMOS") {
+                return { target: dayObj.targetRemos, actual: dayObj.actualRemos, unit: "Chai" };
+            } else {
+                return { target: dayObj.targetSuaTam + dayObj.targetRemos, actual: dayObj.actualSuaTam + dayObj.actualRemos, unit: "Chai" };
+            }
+        }
+
+        function getCampaignMetricsForStaffTotal(staff, campaignType) {
+            let target = 0, actual = 0, revenue = 0;
+            if (campaignType === "SUATAM") {
+                target = staff.targetSuaTam;
+                appState.days.forEach(d => {
+                    let stData = d.staffDaily[staff.id];
+                    if (stData) {
+                        actual += stData.actualSuaTam;
+                        revenue += stData.revenueSuaTam;
+                    }
+                });
+                return { target, actual, revenue, unit: "Chai" };
+            } else if (campaignType === "REMOS") {
+                target = staff.targetRemos;
+                appState.days.forEach(d => {
+                    let stData = d.staffDaily[staff.id];
+                    if (stData) {
+                        actual += stData.actualRemos;
+                        revenue += stData.revenueRemos;
+                    }
+                });
+                return { target, actual, revenue, unit: "Chai" };
+            } else {
+                target = staff.targetSuaTam + staff.targetRemos;
+                appState.days.forEach(d => {
+                    let stData = d.staffDaily[staff.id];
+                    if (stData) {
+                        actual += (stData.actualSuaTam + stData.actualRemos);
+                        revenue += (stData.revenueSuaTam + stData.revenueRemos);
+                    }
+                });
+                return { target, actual, revenue, unit: "Chai" };
+            }
+        }
+
+        function formatVND(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        // ============================================================
+        // XUẤT BÁO CÁO — tạo file HTML báo cáo tổng kết độc lập, tĩnh (snapshot),
+        // dùng đúng bảng màu thương hiệu rose/pink/amber (khớp bảng chiến lược Sữa Tắm).
+        // File tải về KHÔNG có tương tác/nút bấm — chỉ để xem, in PDF, hoặc gửi cho người khác.
+        // ============================================================
+        // Danh sách slogan vui để khích lệ tinh thần team — chọn ngẫu nhiên mỗi lần xuất báo cáo chi tiết
+        const TEAM_SLOGANS = [
+            "Target không đợi ai, nhưng Team Admin luôn về đích trước hẹn! 🏁",
+            "Mỗi lượt mở lời 10 giây, một bước gần hơn tới vinh quang! 🚀",
+            "Sữa Tắm thơm mát, doanh số cũng phải thơm không kém! 🧴✨",
+            "Không có gì là không thể, chỉ là chưa đủ combo thôi! 💪",
+            "Cháy hết mình hôm nay, rực rỡ bảng xếp hạng ngày mai! 🔥",
+            "Team Admin: nơi mọi hóa đơn đều có cơ hội trở thành hóa đơn VIP! 👑",
+            "Chốt đơn nhanh như chớp, doanh số vọt như tên lửa! ⚡"
+        ];
+
+        // Sinh nhận xét "Điểm sáng" & "Điểm cần cải thiện" cho 1 nhân viên, dựa hoàn toàn trên
+        // số liệu thực tế (không hard-code) — để luôn đúng dù target/kỳ thay đổi mỗi tháng.
+        function generateStaffCommentary(row, ctx) {
+            const strengths = [];
+            const improvements = [];
+            const isPT = row.staff.group === "PT";
+            const remaining = Math.max(0, row.target - row.actual);
+
+            // ==== ĐIỂM SÁNG ====
+            if (row.pct >= 100) {
+                strengths.push(`Đã hoàn thành/vượt chỉ tiêu cá nhân (${row.pct.toFixed(1)}%) — xuất sắc!`);
+            } else if (row.pct >= ctx.avgPct) {
+                strengths.push(`Tiến độ (${row.pct.toFixed(1)}%) cao hơn mức trung bình team (${ctx.avgPct.toFixed(1)}%).`);
+            }
+            if (ctx.top3Ids.includes(row.staff.id)) {
+                strengths.push(`Nằm trong Top 3 doanh thu Push Sale toàn team.`);
+            }
+            if (row.conv.totalBills > 0 && row.conv.rate >= ctx.avgConv) {
+                strengths.push(`Tỷ lệ chốt đơn (${row.conv.rate.toFixed(1)}%) cao hơn trung bình team (${ctx.avgConv.toFixed(1)}%).`);
+            }
+            if (row.target === ctx.maxTarget) {
+                strengths.push(`Đảm nhận chỉ tiêu cá nhân cao nhất toàn team (${row.target} chai).`);
+            }
+            if (row.conv.totalBills === ctx.maxBills && ctx.maxBills > 0) {
+                strengths.push(`Phục vụ lượng khách (hóa đơn) nhiều nhất toàn team.`);
+            }
+            if (isPT && row.pct >= 80) {
+                strengths.push(`Là nhân viên Part-Time nhưng vẫn đạt tiến độ rất tốt dù giới hạn giờ làm (tối đa 79h/tháng).`);
+            }
+            if (strengths.length === 0) {
+                strengths.push(`Đã có đóng góp ổn định vào kết quả chung của cả team.`);
+            }
+
+            // ==== ĐIỂM CẦN CẢI THIỆN ====
+            if (row.pct < 100) {
+                improvements.push(`Còn thiếu ${remaining} chai để đạt 100% chỉ tiêu cá nhân.`);
+            }
+            if (row.conv.totalBills > 0 && row.conv.rate < ctx.avgConv) {
+                improvements.push(`Tỷ lệ chốt đơn (${row.conv.rate.toFixed(1)}%) thấp hơn trung bình team (${ctx.avgConv.toFixed(1)}%) — nên trau dồi thêm kịch bản mở lời nhanh trong 10 giây.`);
+            }
+            if (row.conv.totalBills === 0) {
+                improvements.push(`Chưa đủ dữ liệu hóa đơn để tính Tỷ Lệ Chốt Đơn — cần nhập đủ file Hóa đơn (transaction) khi cập nhật để đánh giá chính xác hơn.`);
+            }
+            // Quy tắc bắt buộc: Part-Time KHÔNG BAO GIỜ được đề xuất "làm thêm ca" (giới hạn 79h/12 ca/tháng)
+            if (isPT && row.pct < 100) {
+                improvements.push(`Đã bị giới hạn tối đa 79h/12 ca/tháng nên không thể tăng thêm ca — hướng cải thiện là nâng tỷ lệ chốt đơn trên mỗi ca hiện có.`);
+            }
+            if (improvements.length === 0) {
+                improvements.push(`Đã hoàn thành xuất sắc mọi mặt trong kỳ này — tiếp tục duy trì phong độ này nhé!`);
+            }
+
+            return { strengths, improvements };
+        }
+
+        function exportReport(type) {
+            type = type === 'detailed' ? 'detailed' : 'summary';
+            closeModal('reportTypeModal');
+            ensureInventory(appState);
+            ensureBillStats(appState);
+
+            const today = new Date();
+            const todayLabel = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+
+            const products = ["SUATAM", "REMOS"];
+            const productMeta = {
+                SUATAM: { label: "Sữa Tắm On: The Body", emoji: "🧴", target: 600, unit: "Chai" },
+                REMOS: { label: "Xịt Muỗi Remos", emoji: "🦟", target: 140, unit: "Chai" }
+            };
+
+            // Tổng theo từng sản phẩm
+            const productSummary = {};
+            products.forEach(p => {
+                let actual = 0, revenue = 0;
+                appState.staffList.forEach(s => {
+                    const m = getCampaignMetricsForStaffTotal(s, p);
+                    actual += m.actual; revenue += m.revenue;
+                });
+                const target = productMeta[p].target;
+                productSummary[p] = { actual, revenue, target, pct: target > 0 ? (actual/target*100) : 0 };
+            });
+
+            const combinedTarget = productMeta.SUATAM.target + productMeta.REMOS.target;
+            const combinedActual = productSummary.SUATAM.actual + productSummary.REMOS.actual;
+            const combinedRevenue = productSummary.SUATAM.revenue + productSummary.REMOS.revenue;
+            const combinedPct = combinedTarget > 0 ? (combinedActual/combinedTarget*100) : 0;
+
+            const storeRevenue = appState.totalStoreRevenue || 0;
+            const contributionPct = storeRevenue > 0 ? (combinedRevenue/storeRevenue*100) : 0;
+
+            // Số liệu từng nhân viên (tổng hợp cả 2 sản phẩm)
+            const staffRows = appState.staffList.map(s => {
+                const mS = getCampaignMetricsForStaffTotal(s, "SUATAM");
+                const mR = getCampaignMetricsForStaffTotal(s, "REMOS");
+                const target = mS.target + mR.target;
+                const actual = mS.actual + mR.actual;
+                const revenue = mS.revenue + mR.revenue;
+                const pct = target > 0 ? (actual/target*100) : 0;
+                const conv = getConversionStats(s.id, "ALL", "ALL");
+                return { staff: s, target, actual, revenue, pct, conv };
+            }).sort((a,b) => b.revenue - a.revenue);
+
+            const top3 = staffRows.slice(0,3);
+
+            const invSuaTam = getInventoryStats("SUATAM");
+            const invRemos = getInventoryStats("REMOS");
+
+            const medal = (i) => i===0?"🥇":i===1?"🥈":i===2?"🥉":`#${i+1}`;
+
+            const staffTableRows = staffRows.map((r,i) => `
+                <tr style="${i<3?'background:#fff7ed;':''}">
+                    <td style="padding:10px;font-weight:700;">${medal(i)}</td>
+                    <td style="padding:10px;font-weight:700;">${r.staff.name}</td>
+                    <td style="padding:10px;color:#64748b;">${r.staff.role}</td>
+                    <td style="padding:10px;text-align:center;font-weight:700;color:#e11d48;">${r.actual}/${r.target}</td>
+                    <td style="padding:10px;text-align:center;font-weight:700;">${r.pct.toFixed(1)}%</td>
+                    <td style="padding:10px;text-align:center;font-weight:700;color:#047857;">${formatVND(r.revenue)}</td>
+                    <td style="padding:10px;text-align:center;">${r.conv.totalBills>0 ? r.conv.rate.toFixed(1)+'% <span style="color:#94a3b8;font-weight:400;">('+r.conv.pushBills+'/'+r.conv.totalBills+')</span>' : '<span style="color:#94a3b8;">—</span>'}</td>
+                </tr>`).join('');
+
+            const top3Cards = top3.map((r,i) => `
+                <div style="flex:1;min-width:160px;background:#fff;border:2px solid ${i===0?'#fbbf24':i===1?'#cbd5e1':'#fb923c'};border-radius:16px;padding:18px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:6px;">${medal(i)}</div>
+                    <div style="font-weight:800;font-size:14px;">${r.staff.name}</div>
+                    <div style="font-size:11px;color:#64748b;margin-bottom:8px;">${r.staff.role}</div>
+                    <div style="font-weight:800;color:#047857;font-family:monospace;">${formatVND(r.revenue)}</div>
+                    <div style="font-size:11px;color:#64748b;">${r.actual} chai · ${r.pct.toFixed(1)}%</div>
+                </div>`).join('');
+
+            function productCard(key) {
+                const meta = productMeta[key];
+                const sum = productSummary[key];
+                const inv = key === "SUATAM" ? invSuaTam : invRemos;
+                return `
+                <div style="flex:1;min-width:260px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+                    <div style="font-weight:800;font-size:15px;margin-bottom:10px;">${meta.emoji} ${meta.label}</div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:4px;">
+                        <span>Đã bán / Target</span><span style="font-weight:700;color:#0f172a;">${sum.actual} / ${sum.target} ${meta.unit}</span>
+                    </div>
+                    <div style="background:#f1f5f9;border-radius:100px;height:8px;overflow:hidden;margin:6px 0 10px;">
+                        <div style="background:linear-gradient(90deg,#e11d48,#f59e0b);height:100%;width:${Math.min(100,sum.pct)}%;"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;">
+                        <span>Tiến độ</span><span style="font-weight:700;color:${sum.pct>=100?'#047857':'#0f172a'};">${sum.pct.toFixed(1)}%</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;">
+                        <span>Doanh thu</span><span style="font-weight:700;color:#047857;">${formatVND(sum.revenue)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;">
+                        <span>Tồn kho thực tế</span><span style="font-weight:700;color:${inv.isLow?'#e11d48':'#0f172a'};">${inv.currentStock} chai ${inv.isLow?'⚠️':''}</span>
+                    </div>
+                </div>`;
+            }
+
+            // ==== Phần chỉ dành cho Báo Cáo Chi Tiết ====
+            let detailedSectionsHtml = '';
+            if (type === 'detailed') {
+                const validConvRows = staffRows.filter(r => r.conv.totalBills > 0);
+                const avgPct = staffRows.reduce((s,r) => s + r.pct, 0) / (staffRows.length || 1);
+                const avgConv = validConvRows.length > 0 ? validConvRows.reduce((s,r) => s + r.conv.rate, 0) / validConvRows.length : 0;
+                const maxTarget = Math.max(...staffRows.map(r => r.target));
+                const maxBills = Math.max(...staffRows.map(r => r.conv.totalBills));
+                const ctx = { avgPct, avgConv, maxTarget, maxBills, top3Ids: top3.map(r => r.staff.id) };
+
+                const commentaryCards = staffRows.map((r,i) => {
+                    const c = generateStaffCommentary(r, ctx);
+                    return `
+                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                            <div>
+                                <span style="font-weight:800;font-size:14px;">${medal(i)} ${r.staff.name}</span>
+                                <span style="font-size:11px;color:#64748b;margin-left:6px;">${r.staff.role}</span>
+                            </div>
+                            <div style="font-size:12px;font-weight:700;color:#e11d48;">${r.actual}/${r.target} chai · ${r.pct.toFixed(1)}%</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div style="background:#ecfdf5;border-radius:10px;padding:10px 12px;">
+                                <div style="font-size:11px;font-weight:800;color:#047857;text-transform:uppercase;margin-bottom:5px;">✅ Điểm Sáng</div>
+                                <ul style="margin:0;padding-left:16px;font-size:12px;color:#065f46;line-height:1.6;">
+                                    ${c.strengths.map(s => `<li>${s}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div style="background:#fff7ed;border-radius:10px;padding:10px 12px;">
+                                <div style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;margin-bottom:5px;">📌 Cần Cải Thiện</div>
+                                <ul style="margin:0;padding-left:16px;font-size:12px;color:#92400e;line-height:1.6;">
+                                    ${c.improvements.map(s => `<li>${s}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                const slogan = TEAM_SLOGANS[Math.floor(Math.random() * TEAM_SLOGANS.length)];
+
+                detailedSectionsHtml = `
+                    <h2>🔍 Nhận Xét Chi Tiết Từng Nhân Viên</h2>
+                    ${commentaryCards}
+
+                    <div style="background:linear-gradient(120deg,#e11d48 0%,#ec4899 50%,#f59e0b 100%);color:#fff;border-radius:20px;padding:32px 24px;text-align:center;margin-top:30px;">
+                        <div style="font-size:34px;margin-bottom:10px;">🙌</div>
+                        <div style="font-size:19px;font-weight:800;margin-bottom:8px;">Cảm Ơn Cả Team Đã Nỗ Lực Hết Mình!</div>
+                        <p style="font-size:13px;opacity:0.95;max-width:560px;margin:0 auto 16px;line-height:1.6;">
+                            Mỗi con số trong báo cáo này đều là kết quả của những lượt mở lời, những nụ cười với khách hàng,
+                            và sự kiên trì mỗi ngày của các bạn. Cảm ơn Team Admin đã luôn cố gắng, dù là ngày cao điểm hay
+                            những ca trực bình thường nhất!
+                        </p>
+                        <div style="display:inline-block;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:100px;padding:10px 20px;font-weight:800;font-size:13px;">
+                            ${slogan}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const reportTitle = type === 'detailed' ? 'Báo Cáo Chi Tiết Chiến Dịch Tháng 9' : 'Báo Cáo Tổng Kết Chiến Dịch Tháng 9';
+            const reportHtml = `<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><title>${reportTitle} - ${todayLabel}</title>
+<style>
+  body{font-family:'Segoe UI',Inter,sans-serif;background:#f8fafc;color:#0f172a;margin:0;padding:0;}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px 60px;}
+  .hero{background:linear-gradient(120deg,#e11d48 0%,#ec4899 50%,#f59e0b 100%);color:#fff;padding:40px 24px;margin-bottom:24px;}
+  .hero h1{margin:0 0 6px;font-size:28px;font-weight:800;}
+  .hero p{margin:0;opacity:0.95;font-size:13px;}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;}
+  thead tr{background:#f1f5f9;text-transform:uppercase;font-size:11px;letter-spacing:.04em;color:#475569;}
+  th{padding:10px;text-align:left;}
+  tr{border-bottom:1px solid #f1f5f9;}
+  h2{font-size:18px;margin:30px 0 14px;}
+  @media print { .hero{ -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+</style></head>
+<body>
+  <div class="hero">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:0.85;margin-bottom:10px;">${type === 'detailed' ? '📋 Báo Cáo Chi Tiết' : '📊 Báo Cáo Tổng'} · Team Admin · Kohnan POS</div>
+    <h1>${reportTitle}</h1>
+    <p>Kỳ 24/08 – 23/09/2026 · Xuất báo cáo lúc: ${todayLabel} ${String(today.getHours()).padStart(2,'0')}:${String(today.getMinutes()).padStart(2,'0')}</p>
+  </div>
+  <div class="wrap">
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
+      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Tổng Chỉ Tiêu</div>
+        <div style="font-size:22px;font-weight:800;">${combinedTarget} Chai</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Đã Bán</div>
+        <div style="font-size:22px;font-weight:800;color:#047857;">${combinedActual} Chai</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Tiến Độ</div>
+        <div style="font-size:22px;font-weight:800;color:${combinedPct>=100?'#047857':'#e11d48'};">${combinedPct.toFixed(1)}%</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Doanh Thu Push Sale</div>
+        <div style="font-size:16px;font-weight:800;">${formatVND(combinedRevenue)}</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Tỷ Trọng Doanh Thu</div>
+        <div style="font-size:22px;font-weight:800;color:#f59e0b;">${contributionPct.toFixed(2)}%</div>
+      </div>
+    </div>
+
+    <h2>📦 Theo Từng Sản Phẩm</h2>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      ${productCard("SUATAM")}
+      ${productCard("REMOS")}
+    </div>
+
+    <h2>🏆 Top 3 Doanh Thu</h2>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      ${top3Cards}
+    </div>
+
+    <h2>👥 Bảng Xếp Hạng Toàn Team (Tổng Hợp 2 Sản Phẩm)</h2>
+    <table>
+      <thead><tr><th>Hạng</th><th>Nhân Viên</th><th>Chức Danh</th><th>Đã Bán/Target</th><th>Tiến Độ</th><th>Doanh Thu</th><th>Tỷ Lệ Chốt Đơn</th></tr></thead>
+      <tbody>${staffTableRows}</tbody>
+    </table>
+
+    ${detailedSectionsHtml}
+
+    <p style="font-size:11px;color:#94a3b8;margin-top:30px;text-align:center;">
+      Báo cáo được tạo tự động từ Team Admin Push Sale Tracker · Kohnan POS Push Sale Campaign · Đây là bản chụp số liệu (snapshot) tại thời điểm xuất, không tự cập nhật.
+    </p>
+  </div>
+</body></html>`;
+
+            const blob = new Blob([reportHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const fileDate = `${String(today.getDate()).padStart(2,'0')}${String(today.getMonth()+1).padStart(2,'0')}${today.getFullYear()}`;
+            const fileTag = type === 'detailed' ? 'ChiTiet' : 'Tong';
+            a.href = url;
+            a.download = `Bao_Cao_Push_Sale_Thang9_${fileTag}_${fileDate}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast(type === 'detailed' ? "Đã xuất Báo Cáo Chi Tiết thành công!" : "Đã xuất Báo Cáo Tổng thành công!");
+        }
+
+        function getDayWeight(dayObj) {
+            return (dayObj.isPeak || dayObj.isWeekend || dayObj.isHoliday) ? 2.2 : 1.0;
+        }
+        function getTotalWeightAllDays() {
+            return appState.days.reduce((s, d) => s + getDayWeight(d), 0);
+        }
+
+        // Lấy số liệu (target/actual/revenue) của 1 nhân viên trong PHẠM VI được chọn:
+        // dayFilter = "ALL" -> cả kỳ 24/8-23/9 (giống getCampaignMetricsForStaffTotal)
+        // dayFilter = số ngày (1..35) -> chỉ đúng 1 ngày đó, target được chia theo đúng
+        // công thức trọng số ngày thường/cuối tuần/Kohnan (giống bảng nhật ký cá nhân).
+        function getCampaignMetricsForStaffScoped(staff, campaignType, dayFilter) {
+            if (!dayFilter || dayFilter === "ALL") {
+                return getCampaignMetricsForStaffTotal(staff, campaignType);
+            }
+            const dayObj = appState.days.find(d => d.day === parseInt(dayFilter));
+            if (!dayObj) return { target: 0, actual: 0, revenue: 0, unit: "Chai" };
+
+            const staffTotalTarget = campaignType === 'SUATAM' ? staff.targetSuaTam : campaignType === 'REMOS' ? staff.targetRemos : (staff.targetSuaTam + staff.targetRemos);
+            const totalWeight = getTotalWeightAllDays();
+            const weight = getDayWeight(dayObj);
+            const target = parseFloat(((weight / totalWeight) * staffTotalTarget).toFixed(1));
+
+            const stData = dayObj.staffDaily[staff.id] || { actualSuaTam: 0, revenueSuaTam: 0, actualRemos: 0, revenueRemos: 0 };
+            let actual = 0, revenue = 0;
+            if (campaignType === 'SUATAM') {
+                actual = stData.actualSuaTam; revenue = stData.revenueSuaTam;
+            } else if (campaignType === 'REMOS') {
+                actual = stData.actualRemos; revenue = stData.revenueRemos;
+            } else {
+                actual = stData.actualSuaTam + stData.actualRemos;
+                revenue = stData.revenueSuaTam + stData.revenueRemos;
+            }
+            return { target, actual, revenue, unit: "Chai" };
+        }
+
+        function renderKPICards() {
+            let totalTarget = 0;
+            let totalActual = 0;
+            let totalPushRevenue = 0;
+            let unit = "Chai";
+
+            if (appState.currentCampaign === "SUATAM") unit = "Chai";
+            else if (appState.currentCampaign === "REMOS") unit = "Chai";
+            else unit = "Chai";
+
+            appState.staffList.forEach(s => {
+                const m = getCampaignMetricsForStaffTotal(s, appState.currentCampaign);
+                totalTarget += m.target;
+                totalActual += m.actual;
+                totalPushRevenue += m.revenue;
+            });
+
+            const pct = totalTarget > 0 ? ((totalActual / totalTarget) * 100).toFixed(1) : 0;
+            const remaining = Math.max(0, totalTarget - totalActual);
+
+            document.getElementById('kpiTarget').textContent = totalTarget;
+            document.getElementById('kpiUnit').textContent = unit;
+            document.getElementById('kpiActual').textContent = totalActual;
+            document.getElementById('kpiActualUnit').textContent = unit;
+            document.getElementById('kpiProgress').textContent = `${pct}%`;
+            document.getElementById('kpiRemaining').textContent = `📊 Còn thiếu ${remaining} ${unit}`;
+
+            let weekdayActualSum = 0, weekdayCount = 0;
+            let peakActualSum = 0, peakCount = 0;
+            const todayForAvg = new Date(); todayForAvg.setHours(0, 0, 0, 0);
+            appState.days.forEach(d => {
+                const dDate = new Date(2026, d.mm - 1, d.dd);
+                if (dDate > todayForAvg) return; // chỉ tính các ngày đã qua để phản ánh đúng thực tế
+                let m = getCampaignMetricsForDay(d, appState.currentCampaign);
+                if (d.dayType === "WEEKDAY") {
+                    weekdayActualSum += m.actual;
+                    weekdayCount++;
+                } else {
+                    peakActualSum += m.actual;
+                    peakCount++;
+                }
+            });
+
+            document.getElementById('kpiWeekdayDaily').textContent = weekdayCount > 0 ? (weekdayActualSum / weekdayCount).toFixed(1) : "0";
+            document.getElementById('kpiPeakDaily').textContent = peakCount > 0 ? (peakActualSum / peakCount).toFixed(1) : "0";
+
+            const targetField = appState.currentCampaign === 'REMOS' ? 'targetRemos' : 'targetSuaTam';
+            document.getElementById('statPaydayTarget').textContent = `${(appState.days.find(d => d.dd === 5 && d.mm === 9)?.[targetField] || 0).toFixed(1)} ${unit}`;
+            document.getElementById('statPeakTarget').textContent = `${(appState.days.find(d => d.dd === 20 && d.mm === 9)?.[targetField] || 0).toFixed(1)} ${unit}`;
+
+            let totalActualSum = 0;
+            appState.days.forEach(d => {
+                let m = getCampaignMetricsForDay(d, appState.currentCampaign);
+                totalActualSum += m.actual;
+            });
+            document.getElementById('statAvgDailyActual').textContent = `${(totalActualSum / appState.days.length).toFixed(1)} ${unit} / Ngày`;
+        }
+
+        function renderTeamDailyTable() {
+            const tbody = document.getElementById('teamDailyTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let cumulativeActual = 0;
+            let cumulativeTarget = 0;
+            let unit = 'Chai';
+
+            appState.days.forEach(d => {
+                if (appState.tableFilter !== 'ALL' && d.dayType !== appState.tableFilter) {
+                    let m = getCampaignMetricsForDay(d, appState.currentCampaign);
+                    cumulativeActual += m.actual;
+                    cumulativeTarget += m.target;
+                    return;
+                }
+
+                let m = getCampaignMetricsForDay(d, appState.currentCampaign);
+                cumulativeActual += m.actual;
+                cumulativeTarget += m.target;
+
+                let pct = m.target > 0 ? ((m.actual / m.target) * 100).toFixed(1) : 0;
+                let diff = Math.round(m.actual - m.target);
+
+                let badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold badge-weekday">Ngày Thường</span>`;
+                if (d.isPeak) {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-black badge-peak-sale">🔥 Kohnan -5% (${String(d.dd).padStart(2,'0')}/${String(d.mm).padStart(2,'0')})</span>`;
+                } else if (d.isHoliday) {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-purple-100 text-purple-800">🎉 Ngày Lễ (${String(d.dd).padStart(2,'0')}/${String(d.mm).padStart(2,'0')})</span>`;
+                } else if (d.isWeekend) {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold badge-weekend">🏖️ Cuối Tuần</span>`;
+                }
+
+                let statusBadge = `<span class="text-emerald-600 font-bold">✓ Đạt</span>`;
+                if (diff < 0) statusBadge = `<span class="text-rose-600 font-bold">⚠️ Thiếu ${Math.abs(diff)}</span>`;
+                else if (diff > 0) statusBadge = `<span class="text-indigo-600 font-bold">🚀 Vượt +${diff}</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = d.isPeak ? "bg-rose-50/40 font-semibold" : d.isHoliday ? "bg-purple-50/40 font-semibold" : d.isWeekend ? "bg-amber-50/20" : "";
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-black">${String(d.dd).padStart(2,'0')}/${String(d.mm).padStart(2,'0')}</td>
+                    <td class="p-3 text-center text-slate-600">${d.dayOfWeek}</td>
+                    <td class="p-3">${badgeHtml}</td>
+                    <td class="p-3 text-center font-bold text-blue-700 bg-blue-50/30">${m.target} ${unit}</td>
+                    <td class="p-3 text-center font-black text-orange-600 bg-orange-50/50">${m.actual} ${unit}</td>
+                    <td class="p-3 text-center font-bold text-purple-700 bg-purple-50/30">${cumulativeActual} ${unit}</td>
+                    <td class="p-3 text-center font-bold text-indigo-700 bg-indigo-50/30">${Math.round(cumulativeTarget)} ${unit}</td>
+                    <td class="p-3 text-center font-extrabold ${pct >= 100 ? 'text-emerald-600' : 'text-slate-800'}">${pct}%</td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                    <td class="p-3 text-center no-print">
+                        <button onclick="openQuickEditDay(${d.day})" class="px-2.5 py-1 bg-slate-100 hover:bg-orange-500 hover:text-white text-slate-700 rounded-lg text-[11px] font-bold transition">Sửa</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderIndividualRoadmap(staffId) {
+            const staff = appState.staffList.find(s => s.id === staffId);
+            if (!staff) return;
+
+            const m = getCampaignMetricsForStaffTotal(staff, appState.currentCampaign);
+            const pct = m.target > 0 ? Math.min(100, ((m.actual / m.target) * 100)).toFixed(1) : 0;
+            const remaining = Math.max(0, m.target - m.actual);
+            const conv = getConversionStats(staff.id, appState.currentCampaign);
+
+            const is25 = pct >= 25;
+            const is50 = pct >= 50;
+            const is75 = pct >= 75;
+            const is100 = pct >= 100;
+
+            const container = document.getElementById('personalRoadmapContainer');
+            container.innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-xl font-black text-slate-900">${staff.name}</h4>
+                            <span class="text-xs bg-orange-100 text-orange-800 font-extrabold px-2.5 py-0.5 rounded-full">${staff.role}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Lộ trình Push Sale Tháng 9: <strong class="text-slate-800">${m.actual} / ${m.target} ${m.unit}</strong> | Doanh Thu Amount(Tax excl.): <strong class="text-emerald-700">${formatVND(m.revenue)}</strong></p>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
+                        <div class="text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Còn Lại Cần Bán</span>
+                            <span class="text-base font-black text-orange-600">${remaining} ${m.unit}</span>
+                        </div>
+                        <div class="h-8 w-[1px] bg-slate-200"></div>
+                        <div class="text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Doanh Thu Push</span>
+                            <span class="text-base font-black text-emerald-700">${formatVND(m.revenue)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div>
+                    <div class="flex justify-between items-center mb-2 text-xs font-bold">
+                        <span class="text-slate-700">Tiến độ hoàn thành chỉ tiêu cá nhân:</span>
+                        <span class="text-orange-600 font-black text-sm">${pct}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div class="bg-gradient-to-r from-orange-500 to-amber-400 h-full rounded-full transition-all duration-700 progress-bar-glow" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+
+                <!-- Tỷ Lệ Chốt Đơn -->
+                <div class="flex items-center justify-between gap-4 bg-indigo-50 border border-indigo-200 rounded-xl p-3.5">
+                    <div>
+                        <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block">🧾 Tỷ Lệ Chốt Đơn (Conversion Rate)</span>
+                        <span class="text-[10px] text-indigo-600">% hóa đơn có bán được SP push sale / Tổng hóa đơn đã phục vụ</span>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        ${conv.totalBills === 0
+                            ? `<span class="text-xs font-bold text-slate-400">Chưa có dữ liệu hóa đơn</span>`
+                            : `<span class="text-2xl font-black ${conv.rate >= 30 ? 'text-emerald-600' : conv.rate >= 15 ? 'text-amber-600' : 'text-rose-600'}">${conv.rate.toFixed(1)}%</span>
+                               <span class="block text-[10px] font-bold text-slate-500">${conv.pushBills} / ${conv.totalBills} hóa đơn</span>`
+                        }
+                    </div>
+                </div>
+
+                <!-- Milestones Timeline -->
+                <div>
+                    <span class="text-xs font-bold text-slate-700 block mb-3">🚩 Cột Mốc Thành Tích Cá Nhân:</span>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="p-3 rounded-xl border text-center transition ${is25 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-400'}">
+                            <span class="text-lg block">${is25 ? '🌱' : '🔒'}</span>
+                            <span class="text-xs font-black block mt-1">Cột mốc 25%</span>
+                            <span class="text-[10px] font-medium block">Khởi Động</span>
+                        </div>
+                        <div class="p-3 rounded-xl border text-center transition ${is50 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-400'}">
+                            <span class="text-lg block">${is50 ? '🚀' : '🔒'}</span>
+                            <span class="text-xs font-black block mt-1">Cột mốc 50%</span>
+                            <span class="text-[10px] font-medium block">Tăng Tốc</span>
+                        </div>
+                        <div class="p-3 rounded-xl border text-center transition ${is75 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-400'}">
+                            <span class="text-lg block">${is75 ? '🔥' : '🔒'}</span>
+                            <span class="text-xs font-black block mt-1">Cột mốc 75%</span>
+                            <span class="text-[10px] font-medium block">Về Đích</span>
+                        </div>
+                        <div class="p-3 rounded-xl border text-center transition ${is100 ? 'bg-amber-100 border-amber-400 text-amber-900 font-bold' : 'bg-slate-50 border-slate-200 text-slate-400'}">
+                            <span class="text-lg block">${is100 ? '👑' : '🔒'}</span>
+                            <span class="text-xs font-black block mt-1">Cột mốc 100%</span>
+                            <span class="text-[10px] font-medium block">Xuất Sắc</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            renderIndivDailyTable(staffId);
+        }
+
+        function renderIndivDailyTable(staffId) {
+            const staff = appState.staffList.find(s => s.id === staffId);
+            if (!staff) return;
+
+            const tbody = document.getElementById('indivDailyTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            document.getElementById('indivTableTitle').textContent = `📅 Nhật Ký Push Sale Hàng Ngày Của: ${staff.name}`;
+
+            let unit = 'Chai';
+            let staffTotalTarget = appState.currentCampaign === 'SUATAM' ? staff.targetSuaTam : appState.currentCampaign === 'REMOS' ? staff.targetRemos : (staff.targetSuaTam + staff.targetRemos);
+
+            let totalWeightAllDays = 0;
+            appState.days.forEach(d => {
+                totalWeightAllDays += getDayWeight(d);
+            });
+
+            let cumulativeStaffTarget = 0;
+            let cumulativeStaffActual = 0;
+
+            appState.days.forEach(d => {
+                let weight = getDayWeight(d);
+                let dayStaffTarget = parseFloat(((weight / totalWeightAllDays) * staffTotalTarget).toFixed(1));
+                cumulativeStaffTarget += dayStaffTarget;
+
+                let stData = d.staffDaily[staffId] || { actualSuaTam: 0, revenueSuaTam: 0, actualRemos: 0, revenueRemos: 0 };
+                let actual = 0, revenue = 0;
+                if (appState.currentCampaign === 'SUATAM') {
+                    actual = stData.actualSuaTam;
+                    revenue = stData.revenueSuaTam;
+                } else if (appState.currentCampaign === 'REMOS') {
+                    actual = stData.actualRemos;
+                    revenue = stData.revenueRemos;
+                } else {
+                    actual = stData.actualSuaTam + stData.actualRemos;
+                    revenue = stData.revenueSuaTam + stData.revenueRemos;
+                }
+
+                cumulativeStaffActual += actual;
+
+                let teamDayTotal = 0;
+                appState.staffList.forEach(st => {
+                    let sd = d.staffDaily[st.id];
+                    if (sd) {
+                        if (appState.currentCampaign === 'SUATAM') teamDayTotal += sd.actualSuaTam;
+                        else if (appState.currentCampaign === 'REMOS') teamDayTotal += sd.actualRemos;
+                        else teamDayTotal += (sd.actualSuaTam + sd.actualRemos);
+                    }
+                });
+
+                let sharePct = teamDayTotal > 0 ? ((actual / teamDayTotal) * 100).toFixed(1) : 0;
+
+                let badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] badge-weekday">Ngày Thường</span>`;
+                if (d.isPeak) {
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] badge-peak-sale font-bold">🔥 Kohnan -5%</span>`;
+                } else if (d.isHoliday) {
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800">🎉 Ngày Lễ</span>`;
+                } else if (d.isWeekend) {
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] badge-weekend">🏖️ Cuối Tuần</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = d.isPeak ? "bg-rose-50/30" : d.isHoliday ? "bg-purple-50/30" : "";
+                tr.innerHTML = `
+                    <td class="p-2.5 text-center font-black">${String(d.dd).padStart(2,'0')}/${String(d.mm).padStart(2,'0')}</td>
+                    <td class="p-2.5 text-center text-slate-600">${d.dayOfWeek}</td>
+                    <td class="p-2.5">${badgeHtml}</td>
+                    <td class="p-2.5 text-center font-bold text-blue-700 bg-blue-50/30">${dayStaffTarget} ${unit}</td>
+                    <td class="p-2.5 text-center font-bold text-indigo-700 bg-indigo-50/30">${Math.round(cumulativeStaffTarget)} ${unit}</td>
+                    <td class="p-2.5 text-center font-black text-orange-600 bg-orange-50/50">${actual} ${unit}</td>
+                    <td class="p-2.5 text-center font-black text-purple-700 bg-purple-50/30">${cumulativeStaffActual} ${unit}</td>
+                    <td class="p-2.5 text-center font-black text-emerald-700 bg-emerald-50/50">${formatVND(revenue)}</td>
+                    <td class="p-2.5 text-center font-bold text-indigo-700">${sharePct}%</td>
+                    <td class="p-2.5 text-center no-print">
+                        <button onclick="openQuickEditDayAndStaff(${d.day}, '${staffId}')" class="px-2 py-1 bg-slate-100 hover:bg-orange-500 hover:text-white text-slate-700 rounded text-[10px] font-bold transition">Cập Nhật</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderRevenueComparison() {
+            let totalPushRev = 0;
+            appState.staffList.forEach(s => {
+                let m = getCampaignMetricsForStaffTotal(s, appState.currentCampaign);
+                totalPushRev += m.revenue;
+            });
+
+            const storeRev = appState.totalStoreRevenue;
+            const revShare = storeRev > 0 ? ((totalPushRev / storeRev) * 100).toFixed(2) : 0;
+
+            document.getElementById('summaryPushRev').textContent = formatVND(totalPushRev);
+            document.getElementById('summaryStoreRevDisp').textContent = formatVND(storeRev);
+            document.getElementById('summaryRevSharePct').textContent = `${revShare}%`;
+            document.getElementById('storeTotalRevInput').value = storeRev;
+        }
+
+        function renderLeaderboard() {
+            const sorted = [...appState.staffList].map(s => {
+                const m = getCampaignMetricsForStaffScoped(s, appState.currentCampaign, leaderboardDayFilter);
+                const pct = m.target > 0 ? (m.actual / m.target) * 100 : 0;
+                const conv = getConversionStats(s.id, appState.currentCampaign, leaderboardDayFilter);
+                return { ...s, metrics: m, pct, conv };
+            }).sort((a, b) => b.metrics.revenue - a.metrics.revenue);
+
+            const tbody = document.getElementById('leaderboardTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            sorted.forEach((item, index) => {
+                const rank = index + 1;
+                let badge = `<span class="font-bold text-slate-500">#${rank}</span>`;
+                if (rank === 1) badge = `🥇 <span class="font-black text-amber-600">Top 1</span>`;
+                else if (rank === 2) badge = `🥈 <span class="font-black text-slate-600">Top 2</span>`;
+                else if (rank === 3) badge = `🥉 <span class="font-black text-amber-700">Top 3</span>`;
+
+                const convColor = item.conv.totalBills === 0 ? 'text-slate-400' : item.conv.rate >= 30 ? 'text-emerald-600' : item.conv.rate >= 15 ? 'text-amber-600' : 'text-rose-600';
+                const convDisplay = item.conv.totalBills === 0
+                    ? `<span class="text-slate-400 text-[10px]">Chưa có dữ liệu HĐ</span>`
+                    : `<span class="font-black ${convColor}">${item.conv.rate.toFixed(1)}%</span><span class="block text-[9px] text-slate-500 font-normal">${item.conv.pushBills}/${item.conv.totalBills} hóa đơn</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = rank <= 3 ? "bg-amber-50/30 font-semibold" : "";
+                tr.innerHTML = `
+                    <td class="p-3">${badge}</td>
+                    <td class="p-3 font-bold">${item.name}</td>
+                    <td class="p-3 text-center text-slate-500">${item.role}</td>
+                    <td class="p-3 text-center font-black text-orange-600 text-sm bg-orange-50/50">${item.metrics.actual} ${item.metrics.unit}</td>
+                    <td class="p-3 text-center font-black text-emerald-700 bg-emerald-50/50">${formatVND(item.metrics.revenue)}</td>
+                    <td class="p-3 text-center font-bold ${item.pct >= 50 ? 'text-emerald-600' : 'text-slate-700'}">${item.pct.toFixed(1)}%</td>
+                    <td class="p-3 text-center bg-indigo-50/40">${convDisplay}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const podium = document.getElementById('podiumContainer');
+            if (!podium) return;
+            podium.innerHTML = '';
+
+            sorted.slice(0, 3).forEach((item, idx) => {
+                const medals = ['🥇', '🥈', '🥉'];
+                const bgColors = ['bg-amber-100 border-amber-300', 'bg-slate-100 border-slate-300', 'bg-orange-100 border-orange-300'];
+                
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border ${bgColors[idx]} flex justify-between items-center`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">${medals[idx]}</span>
+                        <div>
+                            <h5 class="text-xs font-black text-slate-900">${item.name}</h5>
+                            <span class="text-[10px] text-slate-500 font-semibold">${item.role}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-black text-emerald-700 block">${formatVND(item.metrics.revenue)}</span>
+                        <span class="text-[10px] font-bold text-orange-600">${item.metrics.actual} ${item.metrics.unit}</span>
+                    </div>
+                `;
+                podium.appendChild(div);
+            });
+        }
+
+        function renderCharts() {
+            const labels = appState.staffList.map(s => s.name.split(' ').pop());
+            const revenues = appState.staffList.map(s => getCampaignMetricsForStaffTotal(s, appState.currentCampaign).revenue);
+            const actuals = appState.staffList.map(s => getCampaignMetricsForStaffTotal(s, appState.currentCampaign).actual);
+
+            const ctx1 = document.getElementById('staffChart')?.getContext('2d');
+            if (ctx1) {
+                if (staffChartInstance) staffChartInstance.destroy();
+                staffChartInstance = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Doanh Thu Amount(Tax excl.) (VNĐ)',
+                                data: revenues,
+                                backgroundColor: '#10b981',
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { font: { weight: 'bold', size: 11 } } },
+                            datalabels: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                            x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 10 } } }
+                        }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('shareChart')?.getContext('2d');
+            if (ctx2) {
+                if (shareChartInstance) shareChartInstance.destroy();
+                shareChartInstance = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: actuals,
+                            backgroundColor: [
+                                '#f97316', '#3b82f6', '#10b981', '#8b5cf6', 
+                                '#ec4899', '#f59e0b', '#06b6d4', '#64748b'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { font: { weight: 'bold', size: 10 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Đọc 1 file (CSV hoặc Excel) thành mảng 2 chiều (hàng x cột), dùng SheetJS.
+        // CSV đọc bằng FileReader.readAsText (SheetJS parse chuỗi CSV trực tiếp, chính xác hơn
+        // so với ép qua ArrayBuffer). File .xlsx/.xls vẫn đọc bằng ArrayBuffer như cũ.
+        function readTabularFile(file) {
+            return new Promise((resolve, reject) => {
+                const isCsv = /\.csv$/i.test(file.name);
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error("Không đọc được file: " + file.name));
+                reader.onload = (e) => {
+                    try {
+                        let workbook;
+                        if (isCsv) {
+                            workbook = XLSX.read(e.target.result, { type: 'string' });
+                        } else {
+                            workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                        }
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: null });
+                        resolve({ fileName: file.name, rows });
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                if (isCsv) reader.readAsText(file, 'utf-8');
+                else reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Xác định 1 file đã đọc là file "Hóa đơn" (BILL - có cột Sales Staff, mỗi dòng = 1 hóa đơn)
+        // hay file "Chi tiết sản phẩm" (DETAIL - có cột Barcode/QTY, KHÔNG có Sales Staff).
+        // Đây đúng theo cấu trúc export thực tế của hệ thống POS: 2 file tách rời, nối qua Slip No.
+        function classifyFile(parsed) {
+            const headerRow = (parsed.rows[0] || []).map(h => String(h || '').trim().toLowerCase());
+            const hasStaff = headerRow.some(h => /sales staff|nhân viên|thu ngân|người bán/i.test(h));
+            const hasBarcode = headerRow.some(h => /barcode|mã vạch|mã sp/i.test(h));
+            const hasQty = headerRow.some(h => /^qty$|số lượng/i.test(h));
+            if (hasBarcode && hasQty) return "DETAIL";
+            if (hasStaff && !hasBarcode) return "BILL";
+            // Dự phòng theo tên file nếu không đoán được qua tiêu đề cột
+            if (/detail/i.test(parsed.fileName)) return "DETAIL";
+            if (/transaction|bill|hoa[_ ]?don/i.test(parsed.fileName)) return "BILL";
+            return "UNKNOWN";
+        }
+
+        function findColIdx(headerRow, patterns) {
+            for (let i = 0; i < headerRow.length; i++) {
+                const str = String(headerRow[i] || '').trim().toLowerCase();
+                if (patterns.test(str)) return i;
+            }
+            return -1;
+        }
+
+        async function handleFileUpload(event) {
+            const files = Array.from(event.target.files || []);
+            if (files.length === 0) return;
+
+            const status = document.getElementById('uploadStatus');
+            status.classList.remove('hidden');
+            status.innerHTML = "⏳ Đang đọc file (Hóa đơn + Chi tiết sản phẩm), nối dữ liệu qua Slip No....";
+
+            const importMode = document.querySelector('input[name="importMode"]:checked')?.value || 'add';
+
+            try {
+                const parsedFiles = await Promise.all(files.map(readTabularFile));
+
+                let billFile = null;
+                let detailFile = null;
+                for (const pf of parsedFiles) {
+                    const kind = classifyFile(pf);
+                    if (kind === "BILL" && !billFile) billFile = pf;
+                    else if (kind === "DETAIL" && !detailFile) detailFile = pf;
+                }
+
+                // Cho phép nhập chỉ 1 file DETAIL (nếu file đó tự có sẵn cột nhân viên, trường hợp cũ)
+                // nhưng khuyến khích mạnh việc có đủ cả 2 file để tính đúng Tỷ Lệ Chốt Đơn.
+                if (!detailFile && billFile) {
+                    // Chỉ có file hóa đơn, không có chi tiết sản phẩm -> không đủ dữ liệu để tính push sale
+                    status.innerHTML = `<p class="text-rose-700 font-bold">❌ Chỉ nhận được file Hóa đơn (transaction). Cần thêm file <strong>transaction_detail_*.csv</strong> (chứa Barcode, QTY, Amount) để nối dữ liệu — hãy chọn CẢ 2 file cùng lúc (giữ Ctrl khi chọn file).</p>`;
+                    return;
+                }
+                if (!detailFile) {
+                    status.innerHTML = `<p class="text-rose-700 font-bold">❌ Không nhận diện được file chi tiết sản phẩm (cần có cột Barcode và QTY). Hãy kiểm tra lại file đã chọn.</p>`;
+                    return;
+                }
+
+                // ==== Xây map Slip No. -> Nhân viên từ file BILL (nếu có) ====
+                const slipToStaffRaw = {};
+                let billRowCount = 0;
+                if (billFile) {
+                    const billHeader = (billFile.rows[0] || []).map(h => String(h || '').trim().toLowerCase());
+                    const billSlipIdx = findColIdx(billHeader, /slip\s*no/i);
+                    const billStaffIdx = findColIdx(billHeader, /sales staff|nhân viên/i);
+                    const billDateIdx = findColIdx(billHeader, /sales day|ngày/i);
+
+                    for (let r = 1; r < billFile.rows.length; r++) {
+                        const row = billFile.rows[r];
+                        if (!row || row.length === 0) continue;
+                        const slip = billSlipIdx !== -1 && row[billSlipIdx] !== undefined ? String(row[billSlipIdx]).trim() : null;
+                        if (!slip) continue;
+                        billRowCount++;
+                        const staffRaw = billStaffIdx !== -1 ? String(row[billStaffIdx] || '').trim() : '';
+                        slipToStaffRaw[slip] = staffRaw;
+                    }
+                }
+
+                if (importMode === 'overwrite') {
+                    appState.days.forEach(d => {
+                        d.actualSuaTam = 0;
+                        d.actualRemos = 0;
+                        d.revenue = 0;
+                        Object.keys(d.staffDaily).forEach(sid => {
+                            d.staffDaily[sid] = { actualSuaTam: 0, revenueSuaTam: 0, actualRemos: 0, revenueRemos: 0 };
+                        });
+                    });
+                    appState.totalStoreRevenue = 0;
+                    ensureBillStats(appState);
+                    appState.billStats.totalBills = {};
+                    appState.billStats.pushBillsSuaTam = {};
+                    appState.billStats.pushBillsRemos = {};
+                }
+                ensureBillStats(appState);
+
+                // ==== Xác định vị trí cột trong file DETAIL ====
+                const detailHeader = (detailFile.rows[0] || []).map(h => String(h || '').trim().toLowerCase());
+                const barcodeColIdx = findColIdx(detailHeader, /barcode|mã vạch|mã sp/i);
+                const nameColIdx = findColIdx(detailHeader, /item name|tên sp|tên sản phẩm/i);
+                const qtyColIdx = findColIdx(detailHeader, /^qty$|số lượng/i);
+                const staffColIdx = findColIdx(detailHeader, /sales staff|nhân viên/i); // hiếm khi có trong DETAIL, dự phòng
+                const dateColIdx = findColIdx(detailHeader, /sales day|trading datetime|ngày/i);
+                const amountTaxExclColIdx = findColIdx(detailHeader, /amount\(tax excl\.\)|amount.*tax.*excl/i);
+                const slipColIdx = findColIdx(detailHeader, /slip\s*no/i);
+
+                let matchedSuaTamCount = 0;
+                let matchedSuaTamRevenue = 0;
+                let matchedRemosCount = 0;
+                let matchedRemosRevenue = 0;
+                let unassignedCount = 0;
+                let unmatchedStaffSlips = 0;
+                let totalStoreRevAccumulated = 0;
+                let totalRowsScanned = 0;
+
+                const cleanStr = (val) => String(val || '').replace(/\s+/g, '').toUpperCase();
+
+                function findDayByDDMM(dVal, mVal) {
+                    if (!dVal || !mVal) return null;
+                    return appState.days.find(dd => dd.dd === dVal && dd.mm === mVal) || null;
+                }
+
+                function matchStaffFromText(text) {
+                    const normalizedText = removeVietnameseTones(text || '');
+                    for (let staff of appState.staffList) {
+                        const sortedKw = [...staff.keywords].sort((a, b) => b.length - a.length);
+                        for (let kw of sortedKw) {
+                            if (normalizedText.includes(removeVietnameseTones(kw))) return staff;
+                        }
+                    }
+                    return null;
+                }
+
+                // ==== Bước 1: đếm TỔNG số hóa đơn mỗi nhân viên trực tiếp từ file BILL ====
+                // File BILL vốn đã 1 dòng = 1 hóa đơn, không cần khử trùng lặp qua nhiều dòng
+                // sản phẩm như trước — đây là cách chính xác nhất để tính mẫu số Tỷ Lệ Chốt Đơn.
+                if (billFile) {
+                    const billHeader = (billFile.rows[0] || []).map(h => String(h || '').trim().toLowerCase());
+                    const billSlipIdx = findColIdx(billHeader, /slip\s*no/i);
+                    const billStaffIdx = findColIdx(billHeader, /sales staff|nhân viên/i);
+                    const billDateIdx = findColIdx(billHeader, /sales day|ngày/i);
+
+                    for (let r = 1; r < billFile.rows.length; r++) {
+                        const row = billFile.rows[r];
+                        if (!row || row.length === 0) continue;
+                        const slip = billSlipIdx !== -1 && row[billSlipIdx] !== undefined ? String(row[billSlipIdx]).trim() : null;
+                        if (!slip) continue;
+
+                        let dayObj = null;
+                        if (billDateIdx !== -1 && row[billDateIdx]) {
+                            const m = String(row[billDateIdx]).match(/(\d{1,2})[\/\-](\d{1,2})/);
+                            if (m) dayObj = findDayByDDMM(parseInt(m[1]), parseInt(m[2]));
+                        }
+                        if (!dayObj) continue; // ngoài kỳ 24/8 - 23/9, bỏ qua
+
+                        const staffRaw = billStaffIdx !== -1 ? String(row[billStaffIdx] || '') : '';
+                        const matchedStaff = matchStaffFromText(staffRaw);
+                        if (!matchedStaff) continue;
+
+                        if (!appState.billStats.totalBills[matchedStaff.id]) appState.billStats.totalBills[matchedStaff.id] = {};
+                        if (!appState.billStats.totalBills[matchedStaff.id][dayObj.day]) appState.billStats.totalBills[matchedStaff.id][dayObj.day] = {};
+                        appState.billStats.totalBills[matchedStaff.id][dayObj.day][slip] = true;
+                    }
+                }
+
+                // ==== Bước 2: xử lý file DETAIL — sản phẩm, số lượng, doanh thu ====
+                for (let r = 1; r < detailFile.rows.length; r++) {
+                    const row = detailFile.rows[r];
+                    if (!row || row.length === 0) continue;
+
+                    const rowTextAll = row.map(cell => String(cell || '').trim()).join(" | ");
+                    const rowTextLower = rowTextAll.toLowerCase();
+                    if (/tổng cộng|total|cộng|báo cáo/i.test(rowTextLower)) continue;
+
+                    totalRowsScanned++;
+
+                    // Xác định ngày TRƯỚC khi cộng doanh thu, để doanh thu store chỉ tính đúng trong kỳ
+                    let matchedDayObj = null;
+                    if (dateColIdx !== -1 && row[dateColIdx] !== undefined) {
+                        let dStr = String(row[dateColIdx]);
+                        let matchNum = dStr.match(/(\d{1,2})[\/\-](\d{1,2})/);
+                        if (matchNum) {
+                            matchedDayObj = findDayByDDMM(parseInt(matchNum[1]), parseInt(matchNum[2])) || findDayByDDMM(parseInt(matchNum[2]), parseInt(matchNum[1]));
+                        } else {
+                            let serial = parseFloat(dStr);
+                            if (!isNaN(serial) && serial > 20000) {
+                                let parsedDate = new Date(Math.round((serial - 25569) * 86400 * 1000));
+                                matchedDayObj = findDayByDDMM(parsedDate.getDate(), parsedDate.getMonth() + 1);
+                            }
+                        }
+                    }
+                    if (!matchedDayObj) continue;
+                    let targetDayObj = matchedDayObj;
+
+                    // Số hóa đơn (Slip No.) - dùng để nối sang file BILL lấy tên nhân viên
+                    let slipVal = slipColIdx !== -1 && row[slipColIdx] !== undefined ? String(row[slipColIdx]).trim() : null;
+
+                    // Nhân viên: ưu tiên nối qua Slip No. sang file BILL; nếu DETAIL có sẵn cột
+                    // nhân viên (một số kiểu export cũ) thì dùng trực tiếp như dự phòng.
+                    let matchedStaff = null;
+                    if (slipVal && slipToStaffRaw.hasOwnProperty(slipVal)) {
+                        matchedStaff = matchStaffFromText(slipToStaffRaw[slipVal]);
+                    }
+                    if (!matchedStaff && staffColIdx !== -1) {
+                        matchedStaff = matchStaffFromText(String(row[staffColIdx] || ''));
+                    }
+                    if (!matchedStaff && slipVal && billFile) {
+                        unmatchedStaffSlips++;
+                    }
+
+                    // Trích xuất Amount(Tax excl.) - loại trừ cột Barcode/SL/Ngày khỏi vòng quét dự phòng
+                    // để không nhầm barcode (12-13 chữ số, luôn > 10.000) thành doanh thu.
+                    let rowAmountTaxExcl = 0;
+                    if (amountTaxExclColIdx !== -1 && row[amountTaxExclColIdx] !== undefined) {
+                        let parsedRev = parseFloat(String(row[amountTaxExclColIdx]).replace(/,/g, ''));
+                        if (!isNaN(parsedRev)) rowAmountTaxExcl = parsedRev;
+                    } else {
+                        for (let cIdx = 0; cIdx < row.length; cIdx++) {
+                            if (cIdx === barcodeColIdx || cIdx === qtyColIdx || cIdx === dateColIdx) continue;
+                            let cellStr = String(row[cIdx] || '').replace(/,/g, '');
+                            if (/^\d{8,}$/.test(cellStr.trim())) continue;
+                            let num = parseFloat(cellStr);
+                            if (!isNaN(num) && num > 10000 && num < 50000000) {
+                                rowAmountTaxExcl = num;
+                                break;
+                            }
+                        }
+                    }
+                    totalStoreRevAccumulated += rowAmountTaxExcl;
+
+                    let detectedProduct = null;
+                    let barcodeVal = barcodeColIdx !== -1 ? cleanStr(row[barcodeColIdx]) : cleanStr(rowTextAll);
+                    let productNameVal = nameColIdx !== -1 ? String(row[nameColIdx] || '').toLowerCase() : rowTextLower;
+
+                    for (let code of PRODUCT_BARCODES.SUATAM) {
+                        if (barcodeVal.includes(code)) { detectedProduct = "SUATAM"; break; }
+                    }
+                    if (!detectedProduct) {
+                        for (let code of PRODUCT_BARCODES.REMOS) {
+                            if (barcodeVal.includes(code)) { detectedProduct = "REMOS"; break; }
+                        }
+                    }
+                    if (!detectedProduct) {
+                        for (let kw of PRODUCT_NAME_KEYWORDS.SUATAM) {
+                            if (productNameVal.includes(kw)) { detectedProduct = "SUATAM"; break; }
+                        }
+                    }
+                    if (!detectedProduct) {
+                        for (let kw of PRODUCT_NAME_KEYWORDS.REMOS) {
+                            if (productNameVal.includes(kw)) { detectedProduct = "REMOS"; break; }
+                        }
+                    }
+
+                    // Ghi nhận hóa đơn có bán được SP push sale (để tính Tỷ Lệ Chốt Đơn)
+                    if (detectedProduct && matchedStaff && slipVal) {
+                        const bucket = detectedProduct === "SUATAM" ? appState.billStats.pushBillsSuaTam : appState.billStats.pushBillsRemos;
+                        if (!bucket[matchedStaff.id]) bucket[matchedStaff.id] = {};
+                        if (!bucket[matchedStaff.id][targetDayObj.day]) bucket[matchedStaff.id][targetDayObj.day] = {};
+                        bucket[matchedStaff.id][targetDayObj.day][slipVal] = true;
+                    }
+
+                    if (!detectedProduct) continue;
+
+                    let qty = 1;
+                    if (qtyColIdx !== -1 && row[qtyColIdx] !== undefined) {
+                        let parsed = parseFloat(String(row[qtyColIdx]).replace(/,/g, ''));
+                        if (!isNaN(parsed) && parsed > 0) qty = parsed;
+                    }
+
+                    if (rowAmountTaxExcl <= 0) {
+                        rowAmountTaxExcl = (detectedProduct === "SUATAM" ? 95000 : 70000) * qty;
+                    }
+
+                    if (!matchedStaff) {
+                        unassignedCount += qty;
+                        continue;
+                    }
+
+                    if (!targetDayObj.staffDaily[matchedStaff.id]) {
+                        targetDayObj.staffDaily[matchedStaff.id] = { actualSuaTam: 0, revenueSuaTam: 0, actualRemos: 0, revenueRemos: 0 };
+                    }
+                    let stDay = targetDayObj.staffDaily[matchedStaff.id];
+
+                    if (detectedProduct === "SUATAM") {
+                        stDay.actualSuaTam += qty;
+                        stDay.revenueSuaTam += rowAmountTaxExcl;
+                        targetDayObj.actualSuaTam += qty;
+                        matchedSuaTamCount += qty;
+                        matchedSuaTamRevenue += rowAmountTaxExcl;
+                    } else if (detectedProduct === "REMOS") {
+                        stDay.actualRemos += qty;
+                        stDay.revenueRemos += rowAmountTaxExcl;
+                        targetDayObj.actualRemos += qty;
+                        matchedRemosCount += qty;
+                        matchedRemosRevenue += rowAmountTaxExcl;
+                    }
+                    targetDayObj.revenue += rowAmountTaxExcl;
+                }
+
+                // Cộng dồn vào doanh thu store hiện có (không ghi đè) — xem ghi chú ở nơi khác trong file
+                // về lý do dùng += thay vì gán trực tiếp.
+                appState.totalStoreRevenue += totalStoreRevAccumulated;
+
+                saveState();
+                updateDashboard();
+
+                status.innerHTML = `
+                    <div class="space-y-1 text-emerald-800 font-bold">
+                        <p>✅ Đã nối ${billFile ? billRowCount + ' hóa đơn' : '(không có file hóa đơn)'} với ${totalRowsScanned} dòng sản phẩm qua Slip No.</p>
+                        <p class="text-orange-900">• Sữa Tắm: +${matchedSuaTamCount} chai (${formatVND(matchedSuaTamRevenue)})</p>
+                        <p class="text-teal-900">• Xịt Remos: +${matchedRemosCount} chai (${formatVND(matchedRemosRevenue)})</p>
+                        ${unassignedCount > 0 ? `<p class="text-slate-600 text-[10px]">⚠️ Bỏ qua ${unassignedCount} sản phẩm không khớp được nhân viên trong danh sách 9 NV.</p>` : ''}
+                        ${!billFile ? `<p class="text-rose-700 text-[10px]">⚠️ Không có file Hóa đơn (transaction_*.csv) đi kèm — Tỷ Lệ Chốt Đơn sẽ KHÔNG chính xác vì thiếu tổng số hóa đơn. Hãy chọn thêm file đó và nhập lại.</p>` : `<p class="text-indigo-700 text-[10px]">✓ Đã ghép đủ 2 file — Tỷ Lệ Chốt Đơn được tính chính xác cho từng nhân viên.</p>`}
+                    </div>
+                `;
+                showToast("Nhập file & nối dữ liệu qua Slip No. thành công!");
+
+            } catch (err) {
+                console.error(err);
+                status.innerHTML = "❌ Lỗi đọc file. Vui lòng kiểm tra lại định dạng file CSV/Excel.";
+            }
+
+            event.target.value = '';
+        }
+
+        function handleQuickAddDay(event) {
+            event.preventDefault();
+            const dayNum = parseInt(document.getElementById('quickDaySelect').value);
+            const staffId = document.getElementById('quickStaffSelect').value;
+            const campaign = document.getElementById('quickCampaignSelect').value;
+            const qty = parseInt(document.getElementById('quickAddQty').value) || 0;
+            const revenue = parseFloat(document.getElementById('quickAddRevenue').value) || 0;
+
+            const dayObj = appState.days.find(d => d.day === dayNum);
+            if (!dayObj) return;
+
+            if (!dayObj.staffDaily[staffId]) {
+                dayObj.staffDaily[staffId] = { actualSuaTam: 0, revenueSuaTam: 0, actualRemos: 0, revenueRemos: 0 };
+            }
+
+            let st = dayObj.staffDaily[staffId];
+            if (campaign === 'SUATAM') {
+                st.actualSuaTam += qty;
+                st.revenueSuaTam += revenue;
+                dayObj.actualSuaTam += qty;
+            } else if (campaign === 'REMOS') {
+                st.actualRemos += qty;
+                st.revenueRemos += revenue;
+                dayObj.actualRemos += qty;
+            }
+            dayObj.revenue += revenue;
+
+            saveState();
+            updateDashboard();
+            closeModal('quickAddModal');
+            showToast(`Đã thêm thành công vào ngày ${dayObj.dateStr}!`);
+        }
+
+        function openQuickEditDay(dayNum) {
+            document.getElementById('quickDaySelect').value = dayNum;
+            openModal('quickAddModal');
+        }
+
+        function openQuickEditDayAndStaff(dayNum, staffId) {
+            document.getElementById('quickDaySelect').value = dayNum;
+            document.getElementById('quickStaffSelect').value = staffId;
+            openModal('quickAddModal');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

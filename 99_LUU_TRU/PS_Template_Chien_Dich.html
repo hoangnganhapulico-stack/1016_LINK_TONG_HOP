@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Push Sale Template — Kohnan</title>
+<style>
+:root{
+  --bg:#f4f5f7;--surface:#fff;--border:#e2e4e8;--ink:#1a1d23;--ink-2:#5a6070;--muted:#9aa0ae;
+  --accent:#2a78d6;--good:#16a34a;--warn:#d97706;--crit:#dc2626;--info:#0891b2;
+  --kohnan:#009900;
+  --tile-r:12px;--card-r:14px;--shadow:0 1px 4px rgba(0,0,0,.08);
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--ink:#e8eaf0;--ink-2:#9aa0b8;--muted:#5a6080;--shadow:0 1px 4px rgba(0,0,0,.4);}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;}
+button,input,select,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;}
+
+/* ── HEADER ── */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;}
+@media(prefers-color-scheme:dark){.site-header{background:rgba(26,29,39,.9);}}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--kohnan);flex-shrink:0;}
+.site-title{font-weight:700;font-size:15px;}
+.header-meta{font-size:12px;color:var(--muted);margin-left:auto;}
+.edit-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--ink-2);font-size:13px;font-weight:500;transition:all .15s;}
+.edit-btn:hover{border-color:var(--accent);color:var(--accent);}
+.edit-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.print-btn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--ink-2);font-size:13px;font-weight:500;}
+.print-btn:hover{border-color:var(--kohnan);color:var(--kohnan);}
+
+/* ── LAYOUT ── */
+.main{max-width:1100px;margin:0 auto;padding:20px 16px;}
+.section{margin-bottom:28px;}
+.section-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title .badge{font-size:11px;font-weight:600;background:var(--border);color:var(--ink-2);padding:2px 8px;border-radius:99px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:18px;box-shadow:var(--shadow);}
+
+/* ── CAMPAIGN BANNER ── */
+.campaign-banner{background:linear-gradient(135deg,#009900 0%,#007a00 100%);border-radius:var(--card-r);padding:24px 28px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;}
+.campaign-banner::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+.campaign-banner::before{content:'';position:absolute;right:60px;bottom:-60px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);}
+.cb-store{font-size:12px;font-weight:600;opacity:.8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.cb-title{font-size:22px;font-weight:800;margin-bottom:8px;line-height:1.3;}
+.cb-period{font-size:13px;opacity:.85;display:flex;align-items:center;gap:8px;}
+.cb-period span{background:rgba(255,255,255,.15);padding:2px 10px;border-radius:99px;font-weight:600;}
+.cb-meta{margin-top:14px;display:flex;gap:20px;flex-wrap:wrap;}
+.cb-stat{text-align:center;}
+.cb-stat .cs-val{font-size:20px;font-weight:800;}
+.cb-stat .cs-lbl{font-size:11px;opacity:.75;}
+.cb-divider{width:1px;background:rgba(255,255,255,.2);align-self:stretch;}
+
+/* ── TILES ── */
+.tile-grid{display:grid;gap:12px;}
+.cols2{grid-template-columns:1fr 1fr;}
+.cols3{grid-template-columns:repeat(3,1fr);}
+.cols4{grid-template-columns:repeat(4,1fr);}
+.cols5{grid-template-columns:repeat(5,1fr);}
+@media(max-width:900px){.cols5{grid-template-columns:repeat(3,1fr);}.cols4{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.cols5,.cols4,.cols3{grid-template-columns:1fr 1fr;}.cols2{grid-template-columns:1fr;}}
+
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--tile-r);padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tc,var(--accent));}
+.tile.green::before{background:var(--kohnan);}
+.tile.warn::before{background:var(--warn);}
+.tile.crit::before{background:var(--crit);}
+.tile.info::before{background:var(--info);}
+.tile .t-label{font-size:11.5px;color:var(--ink-2);font-weight:500;margin-bottom:4px;}
+.tile .t-value{font-size:22px;font-weight:700;line-height:1.2;}
+.tile .t-unit{font-size:13px;font-weight:500;color:var(--muted);margin-left:3px;}
+.tile .t-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.t-progress{margin-top:8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.t-progress-bar{height:100%;background:var(--kohnan);border-radius:2px;transition:width .4s;}
+
+/* ── PRODUCT CARDS ── */
+.product-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;}
+.pc-header{display:flex;align-items:flex-start;gap:10px;}
+.pc-emoji{font-size:28px;flex-shrink:0;line-height:1;}
+.pc-name{font-size:14px;font-weight:700;line-height:1.3;}
+.pc-brand{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.pc-targets{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pc-stat{background:var(--bg);border-radius:8px;padding:10px 12px;}
+.pc-stat .ps-lbl{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.pc-stat .ps-val{font-size:18px;font-weight:700;color:var(--kohnan);}
+.pc-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pc-bar{height:100%;background:var(--kohnan);border-radius:3px;transition:width .4s;}
+.pc-pct{font-size:11.5px;color:var(--muted);margin-top:4px;text-align:right;}
+
+/* ── STAFF TABLE ── */
+.staff-table-wrap{overflow-x:auto;}
+table.staff-table{width:100%;border-collapse:collapse;min-width:560px;}
+.staff-table th{font-size:12px;font-weight:600;color:var(--ink-2);text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);white-space:nowrap;}
+.staff-table th.center,.staff-table td.center{text-align:center;}
+.staff-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.staff-table tr:last-child td{border-bottom:none;}
+.staff-table tr:hover td{background:rgba(0,153,0,.03);}
+.staff-name-cell{display:flex;align-items:center;gap:8px;}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--kohnan);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.staff-name{font-weight:600;font-size:13px;}
+.staff-role{font-size:11px;color:var(--muted);}
+.progress-cell{min-width:120px;}
+.mini-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;}
+.mini-bar-fill{height:100%;background:var(--kohnan);border-radius:3px;transition:width .4s;}
+.pct-text{font-size:11.5px;color:var(--muted);}
+.target-val{font-weight:700;color:var(--kohnan);}
+.actual-input{width:70px;text-align:center;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;background:var(--bg);font-weight:600;}
+.actual-input:focus{outline:none;border-color:var(--kohnan);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.status-badge.good{background:rgba(22,163,74,.12);color:var(--good);}
+.status-badge.warn{background:rgba(217,119,6,.12);color:var(--warn);}
+.status-badge.crit{background:rgba(220,38,38,.12);color:var(--crit);}
+.status-badge.pending{background:var(--border);color:var(--muted);}
+
+/* ── DAILY TABLE ── */
+.daily-table-wrap{overflow-x:auto;}
+table.daily-table{width:100%;border-collapse:collapse;min-width:700px;}
+.daily-table th{font-size:11.5px;font-weight:600;color:var(--ink-2);text-align:center;padding:8px 6px;border-bottom:2px solid var(--border);white-space:nowrap;}
+.daily-table th.left{text-align:left;padding-left:12px;}
+.daily-table td{padding:9px 6px;border-bottom:1px solid var(--border);text-align:center;font-size:13px;}
+.daily-table td.left{text-align:left;padding-left:12px;font-weight:600;}
+.daily-table tr:last-child td{border-bottom:none;}
+.daily-table tr:hover td{background:rgba(0,153,0,.03);}
+.day-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.day-num{font-weight:700;font-size:13px;}
+.day-wd{font-size:10.5px;color:var(--muted);}
+.day-weekend{color:var(--warn);}
+.daily-actual{width:60px;text-align:center;border:1.5px solid var(--border);border-radius:5px;padding:3px 4px;background:var(--bg);font-weight:600;font-size:12px;}
+.daily-actual:focus{outline:none;border-color:var(--kohnan);}
+.daily-total-row td{background:rgba(0,153,0,.06);font-weight:700;border-top:2px solid var(--kohnan);}
+
+/* ── EDIT PANEL ── */
+.edit-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:20px;box-shadow:var(--shadow);margin-bottom:24px;}
+.edit-panel.show{display:block;}
+.ep-title{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--kohnan);}
+.ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.ep-grid{grid-template-columns:1fr;}}
+.ep-group{display:flex;flex-direction:column;gap:4px;}
+.ep-group.full{grid-column:1/-1;}
+.ep-label{font-size:12px;font-weight:600;color:var(--ink-2);}
+.ep-input{border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--bg);width:100%;}
+.ep-input:focus{outline:none;border-color:var(--kohnan);}
+.ep-divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.ep-section{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink-2);}
+.product-list,.staff-list{display:flex;flex-direction:column;gap:10px;}
+.product-row,.staff-row{display:grid;gap:8px;align-items:center;background:var(--bg);border-radius:8px;padding:10px 12px;}
+.product-row{grid-template-columns:2fr 1fr 1fr 1fr auto;}
+.staff-row{grid-template-columns:2fr 1fr auto;}
+@media(max-width:700px){.product-row{grid-template-columns:1fr 1fr auto;}.staff-row{grid-template-columns:1fr auto;}}
+.row-label{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.remove-btn{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--crit);color:var(--crit);background:transparent;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.remove-btn:hover{background:var(--crit);color:#fff;}
+.add-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px dashed var(--border);background:transparent;color:var(--ink-2);font-size:13px;font-weight:500;transition:all .15s;width:100%;justify-content:center;margin-top:4px;}
+.add-btn:hover{border-color:var(--kohnan);color:var(--kohnan);}
+.apply-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:8px;border:none;background:var(--kohnan);color:#fff;font-size:14px;font-weight:600;margin-top:16px;width:100%;transition:background .15s;}
+.apply-btn:hover{background:#007a00;}
+
+/* ── NOTES ── */
+.notes-area{width:100%;min-height:80px;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;background:var(--bg);resize:vertical;}
+.notes-area:focus{outline:none;border-color:var(--kohnan);}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:28px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:20px;}
+
+/* ── PRINT ── */
+@media print{
+  .site-header,.edit-panel,.edit-btn,.print-btn,.add-btn,.remove-btn,.apply-btn,.ep-divider{display:none!important;}
+  body{background:#fff;}
+  .main{padding:0;}
+  .campaign-banner{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
+.empty-state .es-icon{font-size:36px;margin-bottom:8px;}
+.info-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;background:rgba(8,145,178,.1);color:var(--info);padding:3px 10px;border-radius:99px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo-dot"></div>
+    <span class="site-title" id="h-title">Push Sale — Kohnan</span>
+    <span class="info-chip" id="h-period">⏱ Chưa cấu hình</span>
+    <span class="header-meta" id="h-store"></span>
+    <button class="edit-btn" id="toggleEdit" onclick="toggleEdit()">✏️ Chỉnh sửa</button>
+    <button class="print-btn" onclick="window.print()">🖨️ In</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- EDIT PANEL -->
+  <div class="edit-panel" id="editPanel">
+    <div class="ep-title">⚙️ Cấu hình chiến dịch Push Sale</div>
+
+    <div class="ep-grid">
+      <div class="ep-group">
+        <label class="ep-label">Tên cửa hàng</label>
+        <input class="ep-input" id="cfg-store" placeholder="VD: Kohnan Parc Mall 1016" value="">
+      </div>
+      <div class="ep-group">
+        <label class="ep-label">Tên chiến dịch</label>
+        <input class="ep-input" id="cfg-name" placeholder="VD: PUSH SALE THÁNG 9 - GĐ2" value="">
+      </div>
+      <div class="ep-group">
+        <label class="ep-label">Ngày bắt đầu</label>
+        <input class="ep-input" id="cfg-start" type="date" value="">
+      </div>
+      <div class="ep-group">
+        <label class="ep-label">Ngày kết thúc</label>
+        <input class="ep-input" id="cfg-end" type="date" value="">
+      </div>
+    </div>
+
+    <hr class="ep-divider">
+    <div class="ep-section">📦 Sản phẩm Push Sale</div>
+    <div class="product-list" id="productList"></div>
+    <button class="add-btn" onclick="addProduct()">+ Thêm sản phẩm</button>
+
+    <hr class="ep-divider">
+    <div class="ep-section">👥 Nhân viên &amp; Target cá nhân</div>
+    <div class="staff-list" id="staffList"></div>
+    <button class="add-btn" onclick="addStaff()">+ Thêm nhân viên</button>
+
+    <hr class="ep-divider">
+    <div class="ep-group full">
+      <label class="ep-label">Ghi chú / Lưu ý chiến dịch</label>
+      <textarea class="notes-area" id="cfg-notes" placeholder="VD: Ưu tiên giờ cao điểm 11h-13h và 17h-20h. Nhân viên chủ động chào hỏi tại quầy..."></textarea>
+    </div>
+
+    <button class="apply-btn" onclick="applyConfig()">✅ Áp dụng & Cập nhật dashboard</button>
+  </div>
+
+  <!-- CAMPAIGN BANNER -->
+  <div class="campaign-banner" id="campaignBanner">
+    <div class="cb-store" id="b-store">TÊN CỬA HÀNG</div>
+    <div class="cb-title" id="b-title">TÊN CHIẾN DỊCH PUSH SALE</div>
+    <div class="cb-period">
+      Thời gian: <span id="b-period">-- / -- / ---- đến -- / -- / ----</span>
+    </div>
+    <div class="cb-meta" id="b-meta">
+      <div class="cb-stat"><div class="cs-val" id="b-products">0</div><div class="cs-lbl">Sản phẩm</div></div>
+      <div class="cb-divider"></div>
+      <div class="cb-stat"><div class="cs-val" id="b-staff">0</div><div class="cs-lbl">Nhân viên</div></div>
+      <div class="cb-divider"></div>
+      <div class="cb-stat"><div class="cs-val" id="b-days">0</div><div class="cs-lbl">Ngày</div></div>
+      <div class="cb-divider"></div>
+      <div class="cb-stat"><div class="cs-val" id="b-total">0</div><div class="cs-lbl">Tổng target (sp)</div></div>
+    </div>
+  </div>
+
+  <!-- TỔNG QUAN -->
+  <div class="section" id="overviewSection">
+    <div class="section-title">📊 Tổng quan tiến độ</div>
+    <div class="tile-grid cols4" id="overviewTiles">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="es-icon">⚙️</div>
+        Nhấn <strong>Chỉnh sửa</strong> để cấu hình chiến dịch
+      </div>
+    </div>
+  </div>
+
+  <!-- SẢN PHẨM -->
+  <div class="section" id="productsSection">
+    <div class="section-title">📦 Target theo sản phẩm <span class="badge" id="products-count">0</span></div>
+    <div class="tile-grid cols3" id="productCards">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="es-icon">📦</div>
+        Chưa có sản phẩm nào được cấu hình
+      </div>
+    </div>
+  </div>
+
+  <!-- NHÂN VIÊN -->
+  <div class="section" id="staffSection">
+    <div class="section-title">👥 Target nhân viên <span class="badge" id="staff-count">0</span></div>
+    <div class="card">
+      <div class="staff-table-wrap">
+        <table class="staff-table" id="staffTable">
+          <thead>
+            <tr>
+              <th>Nhân viên</th>
+              <th id="sh-products">Sản phẩm</th>
+              <th class="center">Target cá nhân</th>
+              <th class="center">Thực tế</th>
+              <th class="center">Tiến độ</th>
+              <th class="center">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="staffTbody">
+            <tr><td colspan="6" class="empty-state"><div class="es-icon">👥</div>Chưa có nhân viên</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARGET THEO NGÀY -->
+  <div class="section" id="dailySection">
+    <div class="section-title">📅 Chỉ tiêu &amp; Theo dõi theo ngày</div>
+    <div class="card">
+      <div class="daily-table-wrap">
+        <table class="daily-table" id="dailyTable">
+          <thead>
+            <tr id="daily-header">
+              <th class="left">Mục / Ngày</th>
+            </tr>
+          </thead>
+          <tbody id="dailyTbody">
+            <tr><td class="empty-state">Chưa có dữ liệu ngày</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- GHI CHÚ -->
+  <div class="section" id="notesSection" style="display:none">
+    <div class="section-title">📌 Ghi chú chiến dịch</div>
+    <div class="card" id="notesDisplay" style="white-space:pre-wrap;font-size:13px;color:var(--ink-2);line-height:1.7;"></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Kohnan Push Sale Template · Tự động tính toán · Nhấn <strong>Chỉnh sửa</strong> để cập nhật thông tin
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let cfg = {
+  store: '',
+  name: '',
+  start: '',
+  end: '',
+  notes: '',
+  products: [],  // {id, name, brand, emoji, unitTarget, totalTarget}
+  staff: []      // {id, name, role, targets:{prodId: qty}, actuals:{prodId: qty}}
+};
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function fmtDate(d){
+  if(!d) return '--/--/----';
+  const [y,m,dd]=d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+function uid(){return Math.random().toString(36).slice(2,8);}
+function getDays(){
+  if(!cfg.start||!cfg.end) return [];
+  const s=new Date(cfg.start), e=new Date(cfg.end);
+  const days=[];
+  let c=new Date(s);
+  while(c<=e){days.push(new Date(c));c.setDate(c.getDate()+1);}
+  return days;
+}
+function getWd(d){return['CN','T2','T3','T4','T5','T6','T7'][d.getDay()];}
+function isWeekend(d){return d.getDay()===0||d.getDay()===6;}
+function pct(a,b){if(!b||b===0) return 0; return Math.min(Math.round(a/b*100),100);}
+
+function getStaffTotalTarget(s){
+  return Object.values(s.targets||{}).reduce((sum,v)=>sum+(parseInt(v)||0),0);
+}
+function getStaffTotalActual(s){
+  return Object.values(s.actuals||{}).reduce((sum,v)=>sum+(parseInt(v)||0),0);
+}
+function getAllTotalTarget(){
+  return cfg.staff.reduce((sum,s)=>sum+getStaffTotalTarget(s),0);
+}
+function getAllTotalActual(){
+  return cfg.staff.reduce((sum,s)=>sum+getStaffTotalActual(s),0);
+}
+
+// Per-product total target & actual
+function getProdTotalTarget(pid){
+  return cfg.staff.reduce((sum,s)=>sum+(parseInt((s.targets||{})[pid])||0),0);
+}
+function getProdTotalActual(pid){
+  return cfg.staff.reduce((sum,s)=>sum+(parseInt((s.actuals||{})[pid])||0),0);
+}
+
+// Daily per-product targets (evenly spread)
+function getDailyTargetForProd(pid){
+  const days=getDays();
+  if(!days.length) return 0;
+  const total=getProdTotalTarget(pid);
+  return Math.round(total/days.length);
+}
+
+// ══════════════════════════════════════════
+// EDIT PANEL
+// ══════════════════════════════════════════
+function toggleEdit(){
+  const panel=document.getElementById('editPanel');
+  const btn=document.getElementById('toggleEdit');
+  const show=!panel.classList.contains('show');
+  panel.classList.toggle('show',show);
+  btn.classList.toggle('active',show);
+  if(show) syncEditPanel();
+}
+
+function syncEditPanel(){
+  document.getElementById('cfg-store').value=cfg.store;
+  document.getElementById('cfg-name').value=cfg.name;
+  document.getElementById('cfg-start').value=cfg.start;
+  document.getElementById('cfg-end').value=cfg.end;
+  document.getElementById('cfg-notes').value=cfg.notes;
+  renderProductList();
+  renderStaffList();
+}
+
+function addProduct(){
+  cfg.products.push({id:uid(),name:'',brand:'',emoji:'📦',totalTarget:0});
+  renderProductList();
+}
+
+function removeProduct(pid){
+  cfg.products=cfg.products.filter(p=>p.id!==pid);
+  cfg.staff.forEach(s=>{
+    delete s.targets[pid];
+    delete s.actuals[pid];
+  });
+  renderProductList();
+  renderStaffList();
+}
+
+function renderProductList(){
+  const el=document.getElementById('productList');
+  if(!cfg.products.length){
+    el.innerHTML='<div class="empty-state" style="padding:12px">Chưa có sản phẩm</div>';
+    return;
+  }
+  el.innerHTML=cfg.products.map(p=>`
+    <div class="product-row" data-pid="${p.id}">
+      <div>
+        <div class="row-label">Tên sản phẩm</div>
+        <input class="ep-input" placeholder="Tên sản phẩm..." value="${esc(p.name)}"
+          onchange="updateProduct('${p.id}','name',this.value)">
+      </div>
+      <div>
+        <div class="row-label">Thương hiệu</div>
+        <input class="ep-input" placeholder="Thương hiệu..." value="${esc(p.brand)}"
+          onchange="updateProduct('${p.id}','brand',this.value)">
+      </div>
+      <div>
+        <div class="row-label">Icon (emoji)</div>
+        <input class="ep-input" placeholder="📦" value="${esc(p.emoji)}" style="font-size:18px;text-align:center"
+          onchange="updateProduct('${p.id}','emoji',this.value)">
+      </div>
+      <div>
+        <div class="row-label">Target tổng (sp)</div>
+        <input class="ep-input" type="number" min="0" placeholder="0" value="${p.totalTarget||''}"
+          onchange="updateProduct('${p.id}','totalTarget',+this.value)">
+      </div>
+      <button class="remove-btn" onclick="removeProduct('${p.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function updateProduct(pid,key,val){
+  const p=cfg.products.find(x=>x.id===pid);
+  if(p) p[key]=val;
+}
+
+function addStaff(){
+  const targets={}, actuals={};
+  cfg.products.forEach(p=>{targets[p.id]=0;actuals[p.id]=0;});
+  cfg.staff.push({id:uid(),name:'',role:'Admin',targets,actuals});
+  renderStaffList();
+}
+
+function removeStaff(sid){
+  cfg.staff=cfg.staff.filter(s=>s.id!==sid);
+  renderStaffList();
+}
+
+function renderStaffList(){
+  const el=document.getElementById('staffList');
+  if(!cfg.staff.length){
+    el.innerHTML='<div class="empty-state" style="padding:12px">Chưa có nhân viên</div>';
+    return;
+  }
+  el.innerHTML=cfg.staff.map(s=>`
+    <div class="staff-row" data-sid="${s.id}">
+      <div>
+        <div class="row-label">Tên nhân viên</div>
+        <input class="ep-input" placeholder="Họ tên..." value="${esc(s.name)}"
+          onchange="updateStaff('${s.id}','name',this.value)">
+      </div>
+      ${cfg.products.map(p=>`
+        <div>
+          <div class="row-label">Target: ${esc(p.name||'SP '+p.id.slice(0,4))}</div>
+          <input class="ep-input" type="number" min="0" placeholder="0" value="${(s.targets||{})[p.id]||''}"
+            onchange="updateStaffTarget('${s.id}','${p.id}',+this.value)">
+        </div>
+      `).join('')}
+      <button class="remove-btn" onclick="removeStaff('${s.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function updateStaff(sid,key,val){
+  const s=cfg.staff.find(x=>x.id===sid);
+  if(s) s[key]=val;
+}
+function updateStaffTarget(sid,pid,val){
+  const s=cfg.staff.find(x=>x.id===sid);
+  if(s){if(!s.targets)s.targets={};s.targets[pid]=val;}
+}
+
+function esc(str){
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════
+// APPLY CONFIG → RENDER DASHBOARD
+// ══════════════════════════════════════════
+function applyConfig(){
+  cfg.store=document.getElementById('cfg-store').value.trim();
+  cfg.name=document.getElementById('cfg-name').value.trim();
+  cfg.start=document.getElementById('cfg-start').value;
+  cfg.end=document.getElementById('cfg-end').value;
+  cfg.notes=document.getElementById('cfg-notes').value.trim();
+
+  // Read product values from DOM
+  cfg.products.forEach(p=>{
+    const row=document.querySelector(`.product-row[data-pid="${p.id}"]`);
+    if(row){
+      const inputs=row.querySelectorAll('input');
+      p.name=inputs[0].value.trim();
+      p.brand=inputs[1].value.trim();
+      p.emoji=inputs[2].value.trim()||'📦';
+      p.totalTarget=+inputs[3].value||0;
+    }
+  });
+
+  // Read staff values from DOM
+  cfg.staff.forEach(s=>{
+    const row=document.querySelector(`.staff-row[data-sid="${s.id}"]`);
+    if(row){
+      const inputs=row.querySelectorAll('input');
+      s.name=inputs[0].value.trim();
+      cfg.products.forEach((p,i)=>{
+        if(!s.targets)s.targets={};
+        s.targets[p.id]=+inputs[i+1].value||0;
+      });
+    }
+  });
+
+  // Distribute product totalTarget if staff targets not set
+  cfg.products.forEach(p=>{
+    const hasTargets=cfg.staff.some(s=>((s.targets||{})[p.id]||0)>0);
+    if(!hasTargets && p.totalTarget>0 && cfg.staff.length>0){
+      const perStaff=Math.round(p.totalTarget/cfg.staff.length);
+      const remainder=p.totalTarget - perStaff*(cfg.staff.length-1);
+      cfg.staff.forEach((s,i)=>{
+        if(!s.targets)s.targets={};
+        s.targets[p.id]=(i===cfg.staff.length-1)?remainder:perStaff;
+      });
+    }
+    if(!s) {}
+  });
+
+  renderDashboard();
+  // Close edit panel
+  document.getElementById('editPanel').classList.remove('show');
+  document.getElementById('toggleEdit').classList.remove('active');
+}
+
+// ══════════════════════════════════════════
+// RENDER DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard(){
+  renderBanner();
+  renderOverview();
+  renderProducts();
+  renderStaffTable();
+  renderDailyTable();
+  renderNotes();
+}
+
+function renderBanner(){
+  const days=getDays();
+  const totalTarget=getAllTotalTarget();
+  document.getElementById('b-store').textContent=cfg.store||'TÊN CỬA HÀNG';
+  document.getElementById('b-title').textContent=cfg.name||'TÊN CHIẾN DỊCH PUSH SALE';
+  document.getElementById('b-period').textContent=
+    (cfg.start&&cfg.end)?`${fmtDate(cfg.start)} → ${fmtDate(cfg.end)}`:'Chưa cấu hình';
+  document.getElementById('b-products').textContent=cfg.products.length;
+  document.getElementById('b-staff').textContent=cfg.staff.length;
+  document.getElementById('b-days').textContent=days.length;
+  document.getElementById('b-total').textContent=totalTarget.toLocaleString('vi');
+  document.getElementById('h-title').textContent=cfg.name||(cfg.store?`Push Sale — ${cfg.store}`:'Push Sale — Kohnan');
+  document.getElementById('h-store').textContent=cfg.store||'';
+  document.getElementById('h-period').textContent=
+    (cfg.start&&cfg.end)?`⏱ ${fmtDate(cfg.start)} - ${fmtDate(cfg.end)}`:'⏱ Chưa cấu hình';
+}
+
+function renderOverview(){
+  const totalTarget=getAllTotalTarget();
+  const totalActual=getAllTotalActual();
+  const p=pct(totalActual,totalTarget);
+  const days=getDays();
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  let daysGone=0;
+  if(cfg.start){
+    const s=new Date(cfg.start);
+    days.forEach(d=>{if(d<=today)daysGone++;});
+  }
+  const dailyTarget=days.length?Math.round(totalTarget/days.length):0;
+
+  const el=document.getElementById('overviewTiles');
+  el.innerHTML=`
+    <div class="tile green">
+      <div class="t-label">Target toàn chiến dịch</div>
+      <div class="t-value">${totalTarget.toLocaleString('vi')}<span class="t-unit">sp</span></div>
+      <div class="t-sub">${cfg.products.length} sản phẩm · ${cfg.staff.length} nhân viên</div>
+    </div>
+    <div class="tile ${p>=100?'green':p>=70?'warn':'crit'}">
+      <div class="t-label">Thực tế đã bán</div>
+      <div class="t-value">${totalActual.toLocaleString('vi')}<span class="t-unit">sp</span></div>
+      <div class="t-progress"><div class="t-progress-bar" style="width:${p}%"></div></div>
+      <div class="t-sub">${p}% hoàn thành · còn ${Math.max(0,totalTarget-totalActual).toLocaleString('vi')} sp</div>
+    </div>
+    <div class="tile info">
+      <div class="t-label">Chỉ tiêu theo ngày</div>
+      <div class="t-value">${dailyTarget.toLocaleString('vi')}<span class="t-unit">sp/ngày</span></div>
+      <div class="t-sub">${days.length} ngày · đã qua ${daysGone} ngày</div>
+    </div>
+    <div class="tile ${daysGone>0&&(totalActual/daysGone)<dailyTarget?'warn':'green'}">
+      <div class="t-label">Trung bình / ngày</div>
+      <div class="t-value">${daysGone?Math.round(totalActual/daysGone).toLocaleString('vi'):0}<span class="t-unit">sp</span></div>
+      <div class="t-sub">Cần ${dailyTarget.toLocaleString('vi')} sp/ngày để đạt target</div>
+    </div>
+  `;
+}
+
+function renderProducts(){
+  const el=document.getElementById('productCards');
+  document.getElementById('products-count').textContent=cfg.products.length;
+  if(!cfg.products.length){
+    el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">📦</div>Chưa có sản phẩm</div>';
+    return;
+  }
+  el.innerHTML=cfg.products.map(p=>{
+    const target=getProdTotalTarget(p.id)||p.totalTarget||0;
+    const actual=getProdTotalActual(p.id);
+    const p2=pct(actual,target);
+    return `
+      <div class="product-card">
+        <div class="pc-header">
+          <div class="pc-emoji">${p.emoji||'📦'}</div>
+          <div>
+            <div class="pc-name">${esc(p.name||'(Chưa đặt tên)')}</div>
+            <div class="pc-brand">${esc(p.brand||'')}</div>
+          </div>
+        </div>
+        <div class="pc-targets">
+          <div class="pc-stat"><div class="ps-lbl">Target</div><div class="ps-val">${target.toLocaleString('vi')} sp</div></div>
+          <div class="pc-stat"><div class="ps-lbl">Thực tế</div><div class="ps-val">${actual.toLocaleString('vi')} sp</div></div>
+        </div>
+        <div class="pc-bar-wrap"><div class="pc-bar" style="width:${p2}%"></div></div>
+        <div class="pc-pct">${p2}% · còn ${Math.max(0,target-actual).toLocaleString('vi')} sp</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStaffTable(){
+  document.getElementById('staff-count').textContent=cfg.staff.length;
+  const tbody=document.getElementById('staffTbody');
+  if(!cfg.staff.length){
+    tbody.innerHTML='<tr><td colspan="6" class="empty-state"><div class="es-icon">👥</div>Chưa có nhân viên</td></tr>';
+    return;
+  }
+
+  const prodCols=cfg.products.map(p=>`<th class="center">${esc(p.emoji||'📦')} ${esc(p.name||'SP')}</th>`).join('');
+  // Update header
+  const headerRow=document.querySelector('#staffTable thead tr');
+  headerRow.innerHTML=`
+    <th>Nhân viên</th>
+    ${prodCols}
+    <th class="center">Tổng target</th>
+    <th class="center">Thực tế</th>
+    <th class="center">Tiến độ</th>
+    <th class="center">Trạng thái</th>
+  `;
+
+  tbody.innerHTML=cfg.staff.map(s=>{
+    const totalTarget=getStaffTotalTarget(s);
+    const totalActual=getStaffTotalActual(s);
+    const p=pct(totalActual,totalTarget);
+    const initials=(s.name||'?').split(' ').map(w=>w[0]).slice(-2).join('').toUpperCase();
+    let status,statusClass;
+    if(totalTarget===0){status='Chưa có target';statusClass='pending';}
+    else if(p>=100){status='✅ Đạt';statusClass='good';}
+    else if(p>=70){status='⚠️ Gần đạt';statusClass='warn';}
+    else{status='❌ Cần cố gắng';statusClass='crit';}
+
+    const prodCells=cfg.products.map(p2=>{
+      const t=(s.targets||{})[p2.id]||0;
+      const a=(s.actuals||{})[p2.id]||0;
+      return `
+        <td class="center">
+          <div style="font-size:12px;color:var(--muted)">${t} sp</div>
+          <input class="actual-input" type="number" min="0" value="${a||''}" placeholder="0"
+            onchange="updateActual('${s.id}','${p2.id}',+this.value)"
+            title="Nhập thực tế">
+        </td>
+      `;
+    }).join('');
+
+    return `
+      <tr>
+        <td>
+          <div class="staff-name-cell">
+            <div class="avatar">${initials}</div>
+            <div>
+              <div class="staff-name">${esc(s.name||'(Chưa đặt tên)')}</div>
+              <div class="staff-role">${esc(s.role||'')}</div>
+            </div>
+          </div>
+        </td>
+        ${prodCells}
+        <td class="center"><span class="target-val">${totalTarget.toLocaleString('vi')}</span></td>
+        <td class="center"><strong>${totalActual.toLocaleString('vi')}</strong></td>
+        <td class="progress-cell">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:${p}%"></div></div>
+          <div class="pct-text">${p}%</div>
+        </td>
+        <td class="center"><span class="status-badge ${statusClass}">${status}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateActual(sid,pid,val){
+  const s=cfg.staff.find(x=>x.id===sid);
+  if(s){if(!s.actuals)s.actuals={};s.actuals[pid]=val;}
+  renderOverview();
+  renderProducts();
+  renderStaffTable();
+  renderDailyTable();
+}
+
+function renderDailyTable(){
+  const days=getDays();
+  const thead=document.getElementById('daily-header');
+  const tbody=document.getElementById('dailyTbody');
+
+  if(!days.length||!cfg.products.length){
+    thead.innerHTML='<th class="left">Mục / Ngày</th>';
+    tbody.innerHTML='<tr><td class="empty-state">Chưa có dữ liệu ngày</td></tr>';
+    return;
+  }
+
+  // Header: day columns
+  thead.innerHTML=`
+    <th class="left">Sản phẩm</th>
+    ${days.map(d=>`
+      <th>
+        <div class="day-cell">
+          <div class="day-num ${isWeekend(d)?'day-weekend':''}">${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}</div>
+          <div class="day-wd ${isWeekend(d)?'day-weekend':''}">${getWd(d)}</div>
+        </div>
+      </th>
+    `).join('')}
+    <th class="center">Tổng</th>
+  `;
+
+  // Body: one row per product (target/day) + total row
+  const rows=cfg.products.map(p=>{
+    const target=getProdTotalTarget(p.id)||p.totalTarget||0;
+    const dailyTarget=days.length?Math.round(target/days.length):0;
+    return `
+      <tr>
+        <td class="left">${p.emoji||'📦'} ${esc(p.name||'(SP)')}</td>
+        ${days.map(d=>`<td>${dailyTarget.toLocaleString('vi')}</td>`).join('')}
+        <td class="center" style="color:var(--kohnan);font-weight:700">${target.toLocaleString('vi')}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Actual row - manual entry per day (shared across products)
+  const actualRowId='daily-actual-row';
+  const existingVals=window._dailyActuals||(window._dailyActuals={});
+  const actualCells=days.map((d,i)=>{
+    const key=d.toISOString().slice(0,10);
+    const val=existingVals[key]||'';
+    return `<td><input class="daily-actual" type="number" min="0" value="${val}" placeholder="0"
+      onchange="window._dailyActuals['${key}']=+this.value;renderDashboard()" title="${fmtDate(d)}"></td>`;
+  }).join('');
+  const totalActualDaily=Object.values(existingVals).reduce((s,v)=>s+(+v||0),0);
+
+  // Total row (target)
+  const totalTarget=cfg.products.reduce((sum,p)=>sum+(getProdTotalTarget(p.id)||p.totalTarget||0),0);
+  const totalDailyTarget=days.length?Math.round(totalTarget/days.length):0;
+
+  tbody.innerHTML=`
+    ${rows}
+    <tr>
+      <td class="left" style="color:var(--muted);font-size:12px">Chỉ tiêu/ngày (tổng)</td>
+      ${days.map(()=>`<td style="color:var(--kohnan);font-weight:600">${totalDailyTarget.toLocaleString('vi')}</td>`).join('')}
+      <td class="center" style="color:var(--kohnan);font-weight:700">${totalTarget.toLocaleString('vi')}</td>
+    </tr>
+    <tr style="background:rgba(0,153,0,.04)">
+      <td class="left" style="font-weight:700">📝 Thực tế (nhập tay)</td>
+      ${actualCells}
+      <td class="center" style="font-weight:700">${totalActualDaily.toLocaleString('vi')}</td>
+    </tr>
+  `;
+}
+
+function renderNotes(){
+  const s=document.getElementById('notesSection');
+  const d=document.getElementById('notesDisplay');
+  if(cfg.notes){
+    s.style.display='block';
+    d.textContent=cfg.notes;
+  } else {
+    s.style.display='none';
+  }
+}
+
+// ══════════════════════════════════════════
+// INIT WITH SAMPLE DATA (xoá khi dùng thật)
+// ══════════════════════════════════════════
+function initSampleData(){
+  const pid1=uid(), pid2=uid();
+  const sids=[uid(),uid(),uid()];
+
+  cfg={
+    store:'[TÊN CỬA HÀNG]',
+    name:'[TÊN CHIẾN DỊCH PUSH SALE]',
+    start:'',
+    end:'',
+    notes:'',
+    products:[
+      {id:pid1,name:'[Sản phẩm 1]',brand:'[Thương hiệu]',emoji:'📦',totalTarget:0},
+      {id:pid2,name:'[Sản phẩm 2]',brand:'[Thương hiệu]',emoji:'📦',totalTarget:0}
+    ],
+    staff:[
+      {id:sids[0],name:'[Nhân viên 1]',role:'Admin',targets:{[pid1]:0,[pid2]:0},actuals:{[pid1]:0,[pid2]:0}},
+      {id:sids[1],name:'[Nhân viên 2]',role:'Admin',targets:{[pid1]:0,[pid2]:0},actuals:{[pid1]:0,[pid2]:0}},
+      {id:sids[2],name:'[Nhân viên 3]',role:'Admin',targets:{[pid1]:0,[pid2]:0},actuals:{[pid1]:0,[pid2]:0}}
+    ]
+  };
+  renderDashboard();
+}
+
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initSampleData();
+});
+</script>
+</body>
+</html>

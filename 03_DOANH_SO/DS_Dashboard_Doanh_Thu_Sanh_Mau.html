@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doanh Thu Sảnh</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8;--card:#fff;--ink:#1d2330;--mute:#667085;--line:#e4e7ec;
+  --brand:#d6001c;--brand2:#0b5cad;--good:#12805c;--warn:#b54708;--bad:#c01048;
+  --goodbg:#e7f6ef;--warnbg:#fff4e5;--badbg:#fde8ef;--soft:#f2f4f7;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151b;--card:#1b1f27;--ink:#e6e8ec;--mute:#98a2b3;--line:#2c323d;
+  --brand:#ff4d61;--brand2:#5aa3f0;--good:#3ccb8f;--warn:#f5a454;--bad:#ff6b8f;
+  --goodbg:#143326;--warnbg:#3a2a14;--badbg:#3b1824;--soft:#222733;}}
+:root[data-theme="dark"]{
+  --bg:#12151b;--card:#1b1f27;--ink:#e6e8ec;--mute:#98a2b3;--line:#2c323d;
+  --brand:#ff4d61;--brand2:#5aa3f0;--good:#3ccb8f;--warn:#f5a454;--bad:#ff6b8f;
+  --goodbg:#143326;--warnbg:#3a2a14;--badbg:#3b1824;--soft:#222733;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px;margin-bottom:12px}
+h1{margin:0;font-size:22px}
+h1 span{color:var(--brand)}
+.sub{color:var(--mute);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .no{background:var(--brand);color:#fff;border-radius:6px;padding:0 8px;font-size:13px}
+.grid{display:grid;gap:10px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+label{display:block;font-size:12px;color:var(--mute);margin-bottom:3px}
+input,textarea,select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+textarea{min-height:80px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.btn{display:inline-block;border:0;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer;background:var(--brand);color:#fff}
+.btn.ghost{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:12px;background:var(--soft)}
+.drop b{display:block;margin-bottom:4px}
+.drop .fn{font-size:12px;color:var(--mute);margin-top:6px;word-break:break-all}
+.kpi{background:var(--soft);border-radius:10px;padding:12px}
+.kpi .l{font-size:12px;color:var(--mute)}
+.kpi .v{font-size:22px;font-weight:700;margin-top:2px}
+.kpi .s{font-size:12px;color:var(--mute)}
+.kpi.hl{background:var(--goodbg)}.kpi.hl .v{color:var(--good)}
+.kpi.neg{background:var(--badbg)}.kpi.neg .v{color:var(--bad)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--soft);font-weight:600;color:var(--mute);position:sticky;top:0}
+td.t,th.t{text-align:left;white-space:normal}
+tr.tot td{font-weight:700;background:var(--soft)}
+.tag{display:inline-block;border-radius:20px;padding:1px 9px;font-size:12px;font-weight:600}
+.tag.g{background:var(--goodbg);color:var(--good)}.tag.w{background:var(--warnbg);color:var(--warn)}.tag.b{background:var(--badbg);color:var(--bad)}
+.alert{border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px}
+.alert.b{background:var(--badbg);color:var(--bad)}.alert.w{background:var(--warnbg);color:var(--warn)}.alert.g{background:var(--goodbg);color:var(--good)}
+.alert ul{margin:4px 0 0 18px;padding:0}
+.note{font-size:12px;color:var(--mute);margin-top:6px}
+.formula{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:13px;margin:8px 0}
+.verdict{font-size:15px;font-weight:600;padding:12px 14px;border-radius:10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+svg text{fill:var(--ink);font-size:11px}
+svg .m{fill:var(--mute)}
+#sanhTbl td{padding:4px}#sanhTbl input{min-width:96px;padding:6px 7px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 14px;cursor:pointer;font:inherit;font-weight:600}
+.tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.rk{display:inline-block;min-width:22px;text-align:center;border-radius:6px;background:var(--soft);font-weight:700}
+#out:empty::before{content:"Nạp file DETAIL (bắt buộc) rồi bấm Phân tích.";color:var(--mute)}
+@media (max-width:600px){.kpi .v{font-size:18px}h1{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1 id="pageTitle">Doanh Thu <span>Sảnh</span></h1>
+    <div class="sub">Kohnan Parc Mall - Store 1016 · Theo dõi nhiều sảnh cùng lúc - khai báo các sảnh rồi nạp DETAIL</div>
+  </div>
+  <div class="row"><button class="btn ghost sm" id="btnTheme">Đổi giao diện</button></div>
+</header>
+
+<div class="card">
+  <h2>Nhập dữ liệu</h2>
+  <div class="grid g3" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="drop"><b>1. DETAIL (bắt buộc)</b>
+      <div class="sub">Chi tiết mặt hàng: Sales Day, POS, Slip No., Layer1, Barcode, Item Name, QTY, Amount(Tax excl.). Khách = số Slip No. khác nhau tại POS sảnh. Nên xuất <strong>toàn cửa hàng</strong> (mọi POS) để so sánh với quầy.</div>
+      <input type="file" id="fDetail" accept=".csv,.xlsx,.xls" multiple>
+      <div class="fn" id="nDetail"></div></div>
+    <div class="drop"><b>2. Tồn kho PLU (tuỳ chọn)</b>
+      <div class="sub">File "1016 TỒN KHO": Barcode, Supplier Code, M.A.C, Close Qty - để tính GP%, lãi gộp và lấy Mã NCC.</div>
+      <input type="file" id="fInv" accept=".csv,.xlsx,.xls">
+      <div class="fn" id="nInv"></div></div>
+    <div class="drop"><b>3. Danh sách NCC (tuỳ chọn)</b>
+      <div class="sub">File có cột <b>Supplier Code</b> + <b>Supplier Name</b> (Mã NCC + Tên NCC) để điền tên NCC. Có thể nhập/sửa tay ở mục Danh mục NCC bên dưới.</div>
+      <input type="file" id="fSup" accept=".csv,.xlsx,.xls">
+      <div class="fn" id="nSup"></div></div>
+  </div>
+  <div class="note">Có thể chọn nhiều file 1 lúc (vd DETAIL 3/10 + DETAIL 4/10). Nạp lại cùng loại file sẽ thay thế dữ liệu cũ của loại đó. Dữ liệu tự lưu trên trình duyệt - F5 không mất.</div>
+</div>
+
+<div class="card">
+  <h2>Cấu hình các sảnh</h2>
+  <div class="grid g4"><div><label>DT kinh doanh toàn CH (m²)</label><input id="cfgStoreArea" value="" placeholder="vd 3000"></div></div>
+  <div class="tw" style="margin-top:10px"><table id="sanhTbl"></table></div>
+  <div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btnAdd">+ Thêm sảnh</button><span class="sub">Mỗi dòng 1 sảnh. Ngày để trống = tự lấy theo ngày có bán của POS đó. Nạp DETAIL toàn cửa hàng gồm đủ các ngày của mọi sảnh.</span></div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="btnRun">Phân tích</button>
+    <button class="btn ghost" id="btnCsv">Xuất báo cáo .CSV</button>
+    <button class="btn ghost" id="btnXlsx">Xuất báo cáo .XLSX</button>
+    <button class="btn ghost" id="btnClear">Xoá file dữ liệu đã nạp</button>
+    <span class="sub" id="status"></span>
+  </div>
+</div>
+
+<details class="card" id="supCard"><summary style="cursor:pointer;font-weight:700;font-size:16px">Danh mục NCC (Mã NCC - Tên NCC) <span class="sub" id="supSum"></span></summary>
+  <div class="sub" style="margin:8px 0">Mã NCC lấy từ DETAIL hoặc file tồn kho (cột Supplier Code). Tên NCC lấy từ file Danh sách NCC hoặc nhập tay tại đây - tự lưu, F5 không mất. Mã hàng chưa có NCC (không có trong file tồn kho) nhập Mã NCC ở bảng dưới.</div>
+  <div class="grid g3" style="grid-template-columns:repeat(auto-fit,minmax(380px,1fr));align-items:start">
+    <div><b>NCC tại các sảnh</b><div class="tw" style="max-height:420px;overflow:auto;margin-top:6px"><table id="supNameTbl"></table></div></div>
+    <div><b>Mã hàng chưa có NCC</b><div class="tw" style="max-height:420px;overflow:auto;margin-top:6px"><table id="supBcTbl"></table></div></div>
+  </div>
+</details>
+
+<div id="out"></div>
+
+<div class="card" id="archCard">
+  <h2>📦 Sảnh đã kết thúc (lưu trữ)</h2>
+  <div class="sub">Bấm <b>Kết thúc &amp; lưu</b> ở dòng sảnh trong bảng cấu hình để chuyển sảnh xuống đây. Kết quả được lưu lại - bấm <b>Xem</b> là ra báo cáo, không cần nạp lại DETAIL.</div>
+  <div class="row" style="margin:10px 0">
+    <input id="archQ" placeholder="Tìm tên sảnh / POS" style="max-width:260px">
+    <button class="btn ghost sm" id="archXlsx">Xuất tổng hợp .XLSX</button>
+    <button class="btn ghost sm" id="archCsv">Xuất tổng hợp .CSV</button>
+    <button class="btn ghost sm" id="archBackup">Tải file sao lưu</button>
+    <label class="btn ghost sm" style="margin:0">Nạp file sao lưu<input type="file" id="archImport" accept=".json" style="display:none"></label>
+  </div>
+  <div class="tw"><table id="archTbl"></table></div>
+</div>
+</div>
+
+<script>
+/* ================= Utils ================= */
+const IDB_NAME='kohnan_sanh_mau_v1';
+const $=id=>document.getElementById(id);
+const fmt=n=>(n==null||isNaN(n))?'-':Math.round(n).toLocaleString('vi-VN');
+const fmtD=(n,d=1)=>(n==null||isNaN(n)||!isFinite(n))?'-':n.toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=(n,d=1)=>(n==null||isNaN(n)||!isFinite(n))?'-':fmtD(n*100,d)+'%';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const strip=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D');
+const norm=s=>strip(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+const posNorm=v=>{const s=String(v??'').trim();const m=s.match(/\d+/);return m?String(parseInt(m[0],10)):s.toUpperCase();};
+const bcNorm=v=>{let s=String(v??'').trim();if(/e\+/i.test(s)&&!isNaN(+s))s=BigInt(Math.round(+s)).toString();return s.replace(/\.0+$/,'').replace(/^'+/,'').replace(/\s/g,'');};
+const staffNorm=s=>strip(s).toUpperCase().replace(/\s+/g,' ').trim();
+function fullToPos(full){const p=staffNorm(full).split(' ').filter(Boolean);return p.length<2?p.join(' '):p[0]+' '+p[p.length-1];}
+
+function parseNum(v){
+  if(typeof v==='number')return v;
+  let s=String(v??'').trim();if(!s)return 0;
+  let neg=false;if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+  s=s.replace(/[^\d,.\-]/g,'');
+  const c=s.lastIndexOf(','),d=s.lastIndexOf('.');
+  if(c>-1&&d>-1){ if(c>d)s=s.replace(/\./g,'').replace(',','.'); else s=s.replace(/,/g,''); }
+  else if(c>-1){ s=/^-?\d{1,3}(,\d{3})+$/.test(s)?s.replace(/,/g,''):s.replace(',','.'); }
+  else if(d>-1){ if(/^-?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,''); }
+  const n=parseFloat(s);return isNaN(n)?0:(neg?-n:n);
+}
+const pad=n=>String(n).padStart(2,'0');
+function parseVNDate(v){
+  if(v==null||v==='')return null;
+  if(v instanceof Date&&!isNaN(v))return v.getFullYear()+'-'+pad(v.getMonth()+1)+'-'+pad(v.getDate());
+  if(typeof v==='number'||/^\d{5}(\.\d+)?$/.test(String(v).trim())){
+    const n=+v;if(n>20000&&n<80000){const d=new Date(Math.round((n-25569)*86400000));return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());}
+    if(/^\d{8}$/.test(String(v))){const s=String(v);return s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);}
+    return null;
+  }
+  const s=String(v).trim().split(/[ T]/)[0];
+  let m=s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if(m)return m[1]+'-'+pad(m[2])+'-'+pad(m[3]);
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){let a=+m[1],b=+m[2],y=+m[3];if(y<100)y+=2000;let dd=a,mm=b;if(b>12&&a<=12){dd=b;mm=a;}if(mm<1||mm>12||dd<1||dd>31)return null;return y+'-'+pad(mm)+'-'+pad(dd);}
+  m=s.match(/^(\d{4})(\d{2})(\d{2})$/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  return null;
+}
+const dLabel=iso=>{if(!iso)return'-';const p=iso.split('-');return p[2]+'/'+p[1];};
+
+/* RFC4180 CSV */
+function parseCSV(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  const first=text.slice(0,5000).split(/\r?\n/)[0]||'';
+  const delim=[',',';','\t'].map(d=>[d,first.split(d).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;}
+    else if(ch==='"')q=true;
+    else if(ch===delim){row.push(f);f='';}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}
+    else f+=ch;}
+  if(f!==''||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+async function readTable(file){
+  const name=file.name.toLowerCase();
+  if(name.endsWith('.csv')){
+    const buf=await file.arrayBuffer();let txt=new TextDecoder('utf-8').decode(buf);
+    if(txt.includes('�')){try{txt=new TextDecoder('windows-1258').decode(buf);}catch(e){}}
+    return parseCSV(txt);
+  }
+  if(typeof XLSX==='undefined')throw new Error('Không tải được thư viện đọc Excel (mạng chặn cdnjs). Hãy lưu file thành .csv rồi nạp lại.');
+  const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+  let best=null;
+  for(const sn of wb.SheetNames){const r=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});if(!best||r.length>best.length)best=r;}
+  return best||[];
+}
+
+/* Column mapping */
+const COLS={
+  day:['salesday','salesdate','ngayban','businessday','date','ngay'],
+  pos:['pos','posno','mapos','posnumber'],
+  slip:['slipno','slip','sohoadon','billno','receiptno','slipnumber'],
+  l1code:['layer1code','layer1cd'],
+  l1:['layer1','layer1name','tenlayer1'],
+  barcode:['barcode','jancode','jan','mavach','plu'],
+  name:['itemname','tenhang','productname','itemdescription','description'],
+  qty:['qty','quantity','soluong','salesqty'],
+  amt:['amounttaxexcl','amounttaxexcluded','amountexcltax','netamount','amountexcl','amount'],
+  staff:['salesstaff','staff','cashier','thungan','staffname'],
+  mac:['mac','macvnd','unitmac','movingaveragecost','giavon','giavondonvi','unitcost','avgcost','cost'],
+  supName:['suppliername','vendorname','tennhacungcap','tenncc','nhacungcap','ncc','supplier','vendor'],
+  supCode:['suppliercode','vendorcode','supplierno','vendorno','supplierid','vendorid','mancc','manhacungcap'],
+  gpSys:['gpcogs'],
+  tmonth:['targetmonth','thangton'],
+  stock:['closeqty','closingqty','endqty','stockqty','onhandqty','onhand','tonkho','soluongton','slton','stock','inventoryqty','invqty','qty','quantity','soluong']
+};
+function mapHeader(h){
+  const n=h.map(norm),m={};
+  for(const k in COLS){
+    let idx=-1;
+    for(const c of COLS[k]){idx=n.indexOf(c);if(idx>-1)break;}
+    if(idx<0)for(const c of COLS[k]){if(c.length<4)continue;idx=n.findIndex(x=>x.startsWith(c)&&!/incl|code$/.test(x.slice(c.length))&&!((k==='mac'||k==='stock')&&/amount|amt|value|total|tien|giatri/.test(x))||(k==='amt'&&x.includes('taxexcl')));if(idx>-1)break;}
+    if(idx>-1)m[k]=idx;
+  }
+  if(m.l1!=null&&m.l1===m.l1code)delete m.l1;
+  if(m.supName!=null&&m.supName===m.supCode)delete m.supName;
+  return m;
+}
+function findHeader(rows,need){
+  for(let i=0;i<Math.min(rows.length,40);i++){const m=mapHeader(rows[i]);if(need.every(k=>m[k]!=null))return{i,m};}
+  return null;
+}
+function toDetail(rows){
+  const h=findHeader(rows,['slip','amt']);if(!h)throw new Error('DETAIL: không tìm thấy dòng tiêu đề có Slip No. và Amount(Tax excl.)');
+  const m=h.m,out=[];
+  for(let i=h.i+1;i<rows.length;i++){const r=rows[i];if(!r||r.every(x=>x===''||x==null))continue;
+    out.push({dr:r[m.day],day:parseVNDate(r[m.day]),pos:posNorm(r[m.pos]),slip:String(r[m.slip]??'').trim(),
+      l1code:m.l1code!=null?String(r[m.l1code]).trim():'',l1:m.l1!=null?String(r[m.l1]).trim():'',
+      bc:bcNorm(r[m.barcode]),name:m.name!=null?String(r[m.name]).trim():'',qty:parseNum(r[m.qty]),amt:parseNum(r[m.amt]),
+      staff:m.staff!=null?staffNorm(r[m.staff]):'',supC:supParts(r,m)[0],supN:supParts(r,m)[1]});}
+  return{rows:out,cols:Object.keys(m)};
+}
+function toInv(rows){
+  const h=findHeader(rows,['barcode','mac']);if(!h)throw new Error('Tồn kho: không tìm thấy cột Barcode và M.A.C');
+  const m=h.m,map={},hd=rows[h.i],months={};
+  for(let i=h.i+1;i<rows.length;i++){const r=rows[i];if(!r)continue;const b=bcNorm(r[m.barcode]);if(!b)continue;
+    const c=parseNum(r[m.mac]),st=m.stock!=null&&r[m.stock]!==''?parseNum(r[m.stock]):null;
+    const [sc,sn]=supParts(r,m),k=bcKey(b);
+    const g=m.gpSys!=null&&r[m.gpSys]!==''?parseNum(r[m.gpSys]):null,gs=g?g/100:null;
+    if(m.tmonth!=null&&r[m.tmonth]!=='')months[String(r[m.tmonth]).replace(/\D/g,'').slice(0,6)]=1;
+    const o=map[k];if(o){if(!(o[0]>0)&&c>0)o[0]=c;if(st!=null)o[1]=(o[1]||0)+st;if(!o[2])o[2]=sc;if(!o[3])o[3]=sn;if(o[4]==null)o[4]=gs;}else map[k]=[c,st,sc,sn,gs];}
+  return{m:map,macCol:String(hd[m.mac]),stockCol:m.stock!=null?String(hd[m.stock]):'',gpCol:m.gpSys!=null?String(hd[m.gpSys]):'',months:Object.keys(months).sort()};
+}
+
+const bcKey=b=>String(b??'').replace(/^0+/,'');
+const supCodeNorm=v=>{let x=String(v??'').trim();if(/^\d+\.0+$/.test(x))x=x.replace(/\.0+$/,'');return x;};
+function supParts(r,m){const c=m.supCode!=null?supCodeNorm(r[m.supCode]):'',n=m.supName!=null?String(r[m.supName]??'').trim():'';
+  return[c,c&&norm(c)===norm(n)?'':n];}
+function toSupList(rows){const h=findHeader(rows,['supCode','supName']);if(!h)throw new Error('Danh sách NCC: cần có cột Supplier Code (Mã NCC) và Supplier Name (Tên NCC).');
+  const o={};for(let i=h.i+1;i<rows.length;i++){const r=rows[i];if(!r)continue;const[c,n]=supParts(r,h.m);if(c&&n)o[c]=n;}return o;}
+/* IndexedDB */
+function idb(){return new Promise((res,rej)=>{const o=indexedDB.open(IDB_NAME,1);o.onupgradeneeded=()=>o.result.createObjectStore('kv');o.onsuccess=()=>res(o.result);o.onerror=()=>rej(o.error);});}
+async function idbSet(k,v){try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}catch(e){console.warn(e);}}
+async function idbGet(k){try{const db=await idb();return await new Promise((res,rej)=>{const t=db.transaction('kv','readonly');const q=t.objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}catch(e){return undefined;}}
+async function idbClear(){try{const db=await idb();await new Promise(res=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').clear();t.oncomplete=res;});}catch(e){}}
+
+/* State */
+let SM={names:{},bcs:{},master:{},masterName:'',ck:{}};
+function saveSM(){idbSet('supmap',SM);}
+function invMap(){const v=S.inv;if(!v)return{};if(v._n)return v._n;const src=v.m||v,o={};
+  for(const k in src){const x=src[k];o[bcKey(k)]=Array.isArray(x)?x:[x,null];}
+  try{Object.defineProperty(v,'_n',{value:o,enumerable:false,configurable:true});}catch(e){}return o;}
+const S={detail:null,inv:null,names:{detail:'',inv:''}};
+const CFG_IDS=['cfgStoreArea'];
+let SANHS=[],ACTIVE='all';
+const newSanh=()=>({id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:'',pos:'4',from:'',to:'',rent:'0',area:''});
+const SF=[['name','Tên sảnh','text','vd PET'],['pos','POS','text',''],['from','Từ ngày','date',''],['to','Đến ngày','date',''],['rent','Tiền thuê (đ)','text','0'],['area','Diện tích (m²)','text','vd 20']];
+function saveSanhs(){idbSet('sanhs',{list:SANHS,active:ACTIVE});}
+function drawSanhTbl(){
+  $('sanhTbl').innerHTML='<tr><th class="t">#</th>'+SF.map(f=>`<th class="t">${f[1]}</th>`).join('')+'<th></th></tr>'+
+    SANHS.map((x,i)=>`<tr><td class="t">${i+1}</td>${SF.map(f=>`<td><input type="${f[2]}" data-i="${i}" data-k="${f[0]}" value="${esc(x[f[0]]??'')}" placeholder="${f[3]}"></td>`).join('')}<td style="white-space:nowrap"><button class="btn ghost sm" data-arch="${i}" title="Lưu kết quả sảnh này xuống mục Sảnh đã kết thúc">Kết thúc &amp; lưu</button> <button class="btn ghost sm" data-del="${i}" title="Xoá sảnh">✕</button></td></tr>`).join('');
+  $('sanhTbl').querySelectorAll('[data-arch]').forEach(b=>b.onclick=()=>archiveSanh(+b.dataset.arch));
+  $('sanhTbl').querySelectorAll('input').forEach(el=>{
+    el.oninput=()=>{SANHS[+el.dataset.i][el.dataset.k]=el.value;updateTitle();};
+    el.onchange=()=>{SANHS[+el.dataset.i][el.dataset.k]=el.value;saveSanhs();if(S.detail)run();};});
+  $('sanhTbl').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(SANHS.length<=1){alert('Cần ít nhất 1 sảnh.');return;}
+    const x=SANHS.splice(+b.dataset.del,1)[0];if(ACTIVE===x.id)ACTIVE='all';saveSanhs();drawSanhTbl();if(S.detail)run();else updateTitle();});
+}
+/* ================= Lưu trữ sảnh đã kết thúc ================= */
+let ARCHIVE=[],ARCH_VIEW=null;
+function snap(A){const B=JSON.parse(JSON.stringify(A));B.W={badDate:[],outRange:0,outRangeDays:{}};return B;}
+function saveArchive(){idbSet('archive',ARCHIVE);}
+function archiveSanh(i){
+  const sc=SANHS[i];const A=(window.__ALL||[]).find(a=>a.id===sc.id);
+  if(!S.detail||!A){alert('Hãy nạp DETAIL và bấm Phân tích trước khi lưu sảnh.');return;}
+  if(!A.T.net){alert('Sảnh "'+A.name+'" chưa có doanh thu - kiểm tra POS/ngày trước khi lưu.');return;}
+  ARCHIVE.unshift({id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),savedAt:new Date().toISOString(),A:snap(A)});saveArchive();
+  SANHS.splice(i,1);if(!SANHS.length)SANHS.push(newSanh());if(ACTIVE===sc.id)ACTIVE='all';saveSanhs();drawSanhTbl();drawArchive();
+  run();$('status').textContent='Đã lưu sảnh '+A.name+' xuống mục Sảnh đã kết thúc (cuối trang).';
+}
+function drawArchive(){
+  const q=norm($('archQ').value);const list=ARCHIVE.filter(x=>!q||norm(x.A.name+' pos'+x.A.POS).includes(q));
+  if(!ARCHIVE.length){$('archTbl').innerHTML='<tr><td class="t sub">Chưa có sảnh nào được lưu.</td></tr>';return;}
+  const hasGP=ARCHIVE.some(x=>x.A.gp);
+  $('archTbl').innerHTML=`<tr><th class="t">Sảnh</th><th>POS</th><th class="t">Thời gian</th><th>Ngày</th><th>Net Sales</th><th>Khách</th><th>AOV</th><th>DT/m²/ngày</th>${hasGP?'<th>GP%</th><th>LN gộp sau thuê</th>':''}<th class="t">Ngày lưu</th><th></th></tr>`+
+    list.map(x=>{const A=x.A,T=A.T;return`<tr><td class="t"><b>${esc(A.name)}</b></td><td>${esc(A.POS)}</td><td class="t">${dRange(A.from,A.to)}</td><td>${A.nDays}</td><td>${fmt(T.net)}</td><td>${fmt(T.cust)}</td><td>${fmt(T.cust?T.net/T.cust:0)}</td><td>${A.area?fmt(T.net/A.area/A.nDays):'-'}</td>${hasGP?`<td>${A.gp?pct(A.gp.gpPct):'-'}</td><td>${A.gp?fmt(A.gp.est-A.rent):'-'}</td>`:''}<td class="t">${new Date(x.savedAt).toLocaleDateString('vi-VN')}</td>
+      <td style="white-space:nowrap"><button class="btn sm" data-view="${x.id}">Xem</button> <button class="btn ghost sm" data-unarch="${x.id}" title="Đưa lại lên danh sách đang chạy (cần nạp DETAIL để phân tích lại)">Mở lại</button> <button class="btn ghost sm" data-rm="${x.id}" title="Xoá khỏi lưu trữ">✕</button></td></tr>`;}).join('')+
+    (list.length>1?`<tr class="tot"><td class="t">Tổng ${list.length} sảnh</td><td></td><td></td><td></td><td>${fmt(list.reduce((a,x)=>a+x.A.T.net,0))}</td><td>${fmt(list.reduce((a,x)=>a+x.A.T.cust,0))}</td><td></td><td></td>${hasGP?`<td></td><td>${fmt(list.reduce((a,x)=>a+(x.A.gp?x.A.gp.est-x.A.rent:0),0))}</td>`:''}<td></td><td></td></tr>`:'');
+  $('archTbl').querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>viewArchive(b.dataset.view));
+  $('archTbl').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const x=ARCHIVE.find(a=>a.id===b.dataset.rm);
+    if(!confirm('Xoá "'+x.A.name+'" khỏi lưu trữ? Không khôi phục được.'))return;ARCHIVE=ARCHIVE.filter(a=>a!==x);saveArchive();drawArchive();if(ARCH_VIEW&&ARCH_VIEW.id===x.id)closeArchive();});
+  $('archTbl').querySelectorAll('[data-unarch]').forEach(b=>b.onclick=()=>{const x=ARCHIVE.find(a=>a.id===b.dataset.unarch);const A=x.A;
+    const n=newSanh();Object.assign(n,{name:A.name,pos:A.POS,from:A.from,to:A.to,rent:String(A.rent||0),area:A.area?String(A.area):''});
+    if(SANHS.length===1&&!SANHS[0].name&&!SANHS[0].from)SANHS=[n];else SANHS.push(n);
+    ARCHIVE=ARCHIVE.filter(a=>a!==x);saveArchive();saveSanhs();drawSanhTbl();drawArchive();if(ARCH_VIEW&&ARCH_VIEW.id===x.id)closeArchive();else if(S.detail)run();});
+}
+function viewArchive(id){
+  const x=ARCHIVE.find(a=>a.id===id);if(!x)return;ARCH_VIEW={id,A:x.A};
+  $('out').innerHTML=`<div class="alert w row" style="justify-content:space-between"><span>📦 Đang xem <b>sảnh đã kết thúc: ${esc(x.A.name)}</b> (${dRange(x.A.from,x.A.to)}) · lưu ngày ${new Date(x.savedAt).toLocaleDateString('vi-VN')}</span><button class="btn ghost sm" id="btnBack">← Quay lại các sảnh đang chạy</button></div><div id="sanhOut"></div>`;
+  safeRender(x.A);window.__A=x.A;$('btnBack').onclick=closeArchive;updateTitle();
+  window.scrollTo({top:$('out').offsetTop-10,behavior:'smooth'});
+}
+function closeArchive(){ARCH_VIEW=null;$('out').innerHTML='';if(S.detail)run();else{window.__A=null;updateTitle();}}
+function archExport(kind){
+  if(!ARCHIVE.length){alert('Chưa có sảnh nào được lưu.');return;}
+  const q=norm($('archQ').value);const L=ARCHIVE.filter(x=>!q||norm(x.A.name+' pos'+x.A.POS).includes(q)).map(x=>x.A);
+  const d=new Date(),E={sheets:buildAll(L),name:'BaoCao_SanhDaKetThuc_'+L.length+'_Sanh_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())};
+  kind==='csv'?exportCSV(E):exportXLSX(E);
+}
+/* ================= Danh mục NCC ================= */
+function drawSupEditor(){
+  const ALL=window.__ALL||[];const codes={},miss={};
+  ALL.forEach(A=>A.sku.forEach(s=>{if(s.supC){const o=codes[s.supC]||(codes[s.supC]={nm:s.supN||'',net:0,n:0,sanh:new Set()});o.net+=s.net;o.n++;o.sanh.add(A.name);}
+    else{const k=bcKey(s.bc)||s.name;const o=miss[k]||(miss[k]={bc:s.bc,name:s.name,net:0,sanh:new Set()});o.net+=s.net;o.sanh.add(A.name);}}));
+  const cl=Object.entries(codes).sort((a,b)=>(a[1].nm?1:0)-(b[1].nm?1:0)||b[1].net-a[1].net),ml=Object.values(miss).sort((a,b)=>b.net-a.net);
+  const noName=cl.filter(x=>!x[1].nm).length;
+  $('supSum').textContent=ALL.length?`· ${cl.length} NCC · ${noName} chưa có tên · ${ml.length} mã chưa có NCC`:'';
+  const sig1=JSON.stringify(cl.map(([c,o])=>[c,o.nm,o.n,Math.round(o.net)])),sig2=JSON.stringify(ml.map(o=>[o.bc,Math.round(o.net)]));
+  if($('supNameTbl').dataset.sig!==sig1){$('supNameTbl').dataset.sig=sig1;
+  $('supNameTbl').innerHTML='<tr><th class="t">Mã NCC</th><th class="t">Tên NCC</th><th>Số mã</th><th>DT sảnh</th><th title="Chỉ nhập cho NCC ký gửi: % chiết khấu/biên lợi nhuận cửa hàng được hưởng theo hợp đồng. Có giá trị này thì GP% của NCC tính theo hợp đồng thay cho M.A.C.">GP% ký gửi theo HĐ</th></tr>'+(cl.length?cl.map(([c,o])=>`<tr><td class="t"><b>${esc(c)}</b></td><td><input data-sn="${esc(c)}" value="${esc(SM.names[c]||o.nm)}" placeholder="Nhập tên NCC" style="min-width:200px;${o.nm?'':'border-color:var(--warn)'}"></td><td>${fmt(o.n)}</td><td>${fmt(o.net)}</td><td><input data-ck="${esc(c)}" value="${SM.ck&&SM.ck[c]!=null?SM.ck[c]:''}" placeholder="vd 25" style="width:70px;min-width:70px"> %</td></tr>`).join(''):'<tr><td class="t sub" colspan="5">Chưa có dữ liệu - nạp DETAIL + tồn kho rồi Phân tích.</td></tr>');
+  }
+  if($('supBcTbl').dataset.sig!==sig2){$('supBcTbl').dataset.sig=sig2;
+  $('supBcTbl').innerHTML='<tr><th class="t">Barcode</th><th class="t">Tên hàng</th><th>DT sảnh</th><th class="t">Mã NCC</th></tr>'+(ml.length?ml.map(o=>`<tr><td class="t">${esc(o.bc)}</td><td class="t">${esc(o.name)}</td><td>${fmt(o.net)}</td><td><input data-sb="${esc(bcKey(o.bc))}" value="${esc(SM.bcs[bcKey(o.bc)]||'')}" placeholder="vd 100405" style="min-width:110px;border-color:var(--bad)"></td></tr>`).join(''):'<tr><td class="t sub" colspan="4">Tất cả mã hàng đã có NCC.</td></tr>');
+  }
+  $('supNameTbl').querySelectorAll('[data-ck]').forEach(el=>el.onchange=()=>{SM.ck=SM.ck||{};const v=el.value.trim();const n=parseNum(v);
+    if(v!==''&&n>0&&n<100)SM.ck[el.dataset.ck]=n;else{delete SM.ck[el.dataset.ck];if(v!=='')el.value='';}saveSM();if(S.detail)run();});
+  $('supNameTbl').querySelectorAll('[data-sn]').forEach(el=>el.onchange=()=>{const v=el.value.trim();if(v)SM.names[el.dataset.sn]=v;else delete SM.names[el.dataset.sn];saveSM();if(S.detail)run();});
+  $('supBcTbl').querySelectorAll('[data-sb]').forEach(el=>el.onchange=()=>{const v=supCodeNorm(el.value);if(v)SM.bcs[el.dataset.sb]=v;else delete SM.bcs[el.dataset.sb];saveSM();if(S.detail)run();});
+  if(ALL.length&&(noName||ml.length))$('supCard').open=true;
+}
+function getCfg(){const c={};CFG_IDS.forEach(id=>c[id]=$(id).value);return c;}
+function setCfg(c){if(!c)return;CFG_IDS.forEach(id=>{if(c[id]!=null)$(id).value=c[id];});}
+function showNames(){$('nDetail').textContent=S.names.detail?('Đã nạp: '+S.names.detail+' ('+fmt(S.detail?.rows.length)+' dòng)'):'';
+  $('nInv').textContent=S.names.inv?('Đã nạp: '+S.names.inv+' ('+fmt(Object.keys(invMap()).length)+' mã)'):'';
+  $('nSup').textContent=SM.masterName?('Đã nạp: '+SM.masterName+' ('+fmt(Object.keys(SM.master).length)+' NCC)'):'';}
+
+async function loadFiles(input,kind){
+  const files=[...input.files];if(!files.length)return;
+  $('status').textContent='Đang đọc '+files.length+' file...';
+  try{
+    if(kind==='sup'){SM.master=toSupList(await readTable(files[0]));SM.masterName=files[0].name;saveSM();showNames();$('status').textContent='Đã nạp danh sách NCC.';if(S.detail)run();input.value='';return;}
+    if(kind==='inv'){S.inv=toInv(await readTable(files[0]));S.names.inv=files[0].name;}
+    else{let all=[],cols=null;for(const f of files){const t=toDetail(await readTable(f));all=all.concat(t.rows);cols=cols||t.cols;}
+      S[kind]={rows:all,cols};S.names[kind]=files.map(f=>f.name).join(', ');}
+    await idbSet('data',{detail:S.detail,inv:S.inv,names:S.names});
+    showNames();$('status').textContent='Đã nạp xong.';
+    if(S.detail)run();
+  }catch(e){$('status').textContent='';alert(e.message);console.error(e);}
+  input.value='';
+}
+
+/* ================= Analysis ================= */
+function catOf(r){
+  let code=String(r.l1code||'').trim().replace(/^cat\s*/i,''),name=String(r.l1||'').trim();
+  if(!code){const m=name.match(/^(?:cat\s*)?(\d{1,4})\s*[.\-:_)]?\s+(.+)$/i);if(m){code=m[1];name=m[2];}}
+  if(/^\d+$/.test(code))code=String(parseInt(code,10));
+  if(code&&norm(name)===norm(code))name='';
+  return code?'CAT '+code+(name?' - '+name:''):(name||'(Không rõ ngành)');
+}
+function analyze(sc){
+  const c={cfgName:sc.name||'',cfgPos:sc.pos||'',cfgFrom:sc.from||'',cfgTo:sc.to||'',cfgRent:sc.rent||'0',cfgArea:sc.area||'',cfgStoreArea:$('cfgStoreArea').value},POS=posNorm(c.cfgPos);let from=c.cfgFrom,to=c.cfgTo;
+  if(!from||!to){const ds=S.detail.rows.filter(r=>r.day&&r.pos===POS).map(r=>r.day).sort();if(ds.length){from=from||ds[0];to=to||ds[ds.length-1];}}
+  const rent=parseNum(c.cfgRent),area=parseNum(c.cfgArea),storeArea=parseNum(c.cfgStoreArea);
+  const W={badDate:[],outRange:0,outRangeDays:{}};
+  const D=S.detail.rows,inv=invMap();
+
+
+  const skuDay={},days={},layerS={},layerQ={},sku={},supQ={},inRange=[];
+  const NOSUP='(Không rõ NCC)',autoN={};
+  for(const k in inv){const v=inv[k];if(v[2]&&v[3])autoN[v[2]]=v[3];}
+  for(const r of D)if(r.supC&&r.supN)autoN[r.supC]=r.supN;
+  const supNm=c=>c?(SM.names[c]||SM.master[c]||autoN[c]||''):'';
+  const supInfo=r=>{const k=bcKey(r.bc),iv=inv[k];let c=r.supC||(iv&&iv[2])||SM.bcs[k]||'';let n=r.supN||supNm(c);
+    if(!c&&!n&&r.sup)n=r.sup;return[c,n,c?(n?c+' - '+n:c):(n||NOSUP)];};
+  const supOf=r=>supInfo(r)[2];
+  let allDays=new Set();
+  for(const r of D){
+    if(!r.day){W.badDate.push(r);continue;}
+    allDays.add(r.day);
+    if(r.day<from||r.day>to){W.outRange++;W.outRangeDays[r.day]=(W.outRangeDays[r.day]||0)+1;continue;}
+    inRange.push(r);
+    const d=days[r.day]||(days[r.day]={net:0,qty:0,slips:new Set(),store:0,storeSlips:new Set(),cost:0,mNet:0});
+    d.store+=r.amt;d.storeSlips.add(r.pos+'|'+r.slip);
+    const lk=catOf(r);
+    if(r.pos===POS){
+      d.net+=r.amt;d.qty+=r.qty;d.slips.add(r.slip);
+      const L=layerS[lk]||(layerS[lk]={net:0,qty:0,code:r.l1code});L.net+=r.amt;L.qty+=r.qty;
+      const dk=r.day+'|'+(r.bc||r.name);const sd=skuDay[dk]||(skuDay[dk]={day:r.day,bc:r.bc,name:r.name,l1:lk,supC:supInfo(r)[0],supN:supInfo(r)[1],sup:supOf(r),qty:0,net:0});sd.qty+=r.qty;sd.net+=r.amt;
+      const k=r.bc||r.name;const s=sku[k]||(sku[k]={bc:r.bc,name:r.name,l1:lk,supC:supInfo(r)[0],supN:supInfo(r)[1],sup:supOf(r),qty:0,net:0,cost:null});s.qty+=r.qty;s.net+=r.amt;
+    }else{const L=layerQ[lk]||(layerQ[lk]={net:0});L.net+=r.amt;const sq=supOf(r);supQ[sq]=(supQ[sq]||0)+r.amt;}
+  }
+  const dayKeys=Object.keys(days).sort();
+  const daily=dayKeys.map(k=>{const d=days[k];const cust=d.slips.size;
+    return{day:k,net:d.net,qty:d.qty,cust,aov:cust?d.net/cust:0,store:d.store,share:d.store?d.net/d.store:0,cost:d.cost,mNet:d.mNet};});
+  const T=daily.reduce((a,d)=>({net:a.net+d.net,qty:a.qty+d.qty,cust:a.cust+d.cust,store:a.store+d.store,cost:a.cost+d.cost,mNet:a.mNet+d.mNet}),{net:0,qty:0,cust:0,store:0,cost:0,mNet:0});
+  const nDays=daily.filter(d=>d.net!==0).length||1;
+
+  // Layers relative effectiveness
+  const layers=Object.entries(layerS).map(([k,v])=>{const q=layerQ[k]?.net||0;return{name:k,net:v.net,qty:v.qty,share:T.net?v.net/T.net:0,quay:q,raw:q>0?v.net/q:null};}).sort((a,b)=>b.net-a.net);
+  const raws=layers.map(l=>l.raw).filter(x=>x!=null&&x>0).sort((a,b)=>a-b);
+  const med=raws.length?(raws.length%2?raws[(raws.length-1)/2]:(raws[raws.length/2-1]+raws[raws.length/2])/2):null;
+  layers.forEach(l=>{l.rel=(l.raw!=null&&med)?l.raw/med:null;l.rate=l.rel==null?'n':l.rel>=1.3?'g':l.rel>=0.6?'w':'b';
+    if(area&&storeArea>area){l.dS=l.net/area/nDays;l.dQ=l.quay/(storeArea-area)/nDays;}});
+
+  const skuArr=Object.values(sku).sort((a,b)=>b.net-a.net);
+  // GP: chỉ tính trên mã có giá vốn hợp lệ; loại mã tồn âm (hàng ký gửi/chưa nhập kho), MAC=0, giá vốn bất thường
+  let gp=null;
+  const CK=SM.ck||{},hasCK=skuArr.some(s=>s.supC&&CK[s.supC]!=null);
+  if(Object.keys(inv).length||hasCK){
+    let mNet=0,cost=0,ckNet=0,negNet=0,negN=0,sysNet=0,sysGp=0;const excl=[],diffs=[];const RS={nomatch:'Không có trong file tồn kho',mac0:'Không có M.A.C (=0) - chưa tính được GP%',neg:'Tồn âm (hàng ký gửi) - đã tính GP% theo M.A.C',abn:'M.A.C > 150% giá bán - đã tính GP%, nên kiểm tra lại'};
+    for(const s of skuArr){const iv=inv[bcKey(s.bc)];s.cost=null;s.mac=iv?iv[0]:null;s.stock=iv?iv[1]:null;s.up=s.qty?s.net/s.qty:null;s.gpSys=iv&&iv[4]!=null?iv[4]:null;s.src='';
+      if(s.gpSys!=null){sysNet+=s.net;sysGp+=s.net*s.gpSys;}
+      if(s.supC&&CK[s.supC]!=null){s.cost=s.net*(1-CK[s.supC]/100);s.src='ck';s.gpWhy='';mNet+=s.net;cost+=s.cost;ckNet+=s.net;continue;}
+      let why=!iv?'nomatch':!(iv[0]>0)?'mac0':(iv[1]!=null&&iv[1]<0)?'neg':(s.up>0&&iv[0]>s.up*1.5)?'abn':'';
+      s.gpWhy=why;
+      if(why&&why!=='nomatch')excl.push(s);
+      if(why==='nomatch'||why==='mac0')continue;
+      s.cost=iv[0]*s.qty;s.src='mac';mNet+=s.net;cost+=s.cost;if(why==='neg'){negNet+=s.net;negN++;}
+      if(s.gpSys!=null&&s.net>0){const gm=(s.net-s.cost)/s.net;if(Math.abs(gm-s.gpSys)>0.05)diffs.push(s);}}
+    diffs.sort((a,b)=>Math.abs((a.net-a.cost)/a.net-a.gpSys)*a.net<Math.abs((b.net-b.cost)/b.net-b.gpSys)*b.net?1:-1);
+    const byWhy={};excl.forEach(s=>{const w=byWhy[s.gpWhy]||(byWhy[s.gpWhy]={n:0,net:0});w.n++;w.net+=s.net;});
+    T.mNet=mNet;T.cost=cost;
+    gp={cov:T.net?mNet/T.net:0,gp:mNet-cost,gpPct:mNet?(mNet-cost)/mNet:0,est:mNet?(mNet-cost)/mNet*T.net:0,excl,byWhy,RS,
+      nomatch:skuArr.filter(s=>s.gpWhy==='nomatch').length,macCol:(S.inv&&S.inv.macCol)||'M.A.C',stockCol:(S.inv&&S.inv.stockCol)||'',
+      ckNet,negNet,negN,diffs,sysPct:sysNet?sysGp/sysNet:null,sysCov:T.net?sysNet/T.net:0,months:(S.inv&&S.inv.months)||[],gpCol:(S.inv&&S.inv.gpCol)||''};
+  }
+  // Hiệu quả theo NCC
+  const supS={};
+  for(const s of skuArr){const o=supS[s.sup]||(supS[s.sup]={name:s.sup,code:s.supC||'',nm:s.supN||'',n:0,qty:0,net:0,mNet:0,cost:0,top:null});o.n++;o.qty+=s.qty;o.net+=s.net;
+    if(s.cost!=null){o.mNet+=s.net;o.cost+=s.cost;}if(!o.top||s.net>o.top.net)o.top=s;}
+  const sups=Object.values(supS).map(o=>{const q=supQ[o.name]||0;return{name:o.name,code:o.code,nm:o.nm,n:o.n,qty:o.qty,net:o.net,share:T.net?o.net/T.net:0,quay:q,
+    raw:q>0?o.net/q:null,gpPct:o.mNet?(o.mNet-o.cost)/o.mNet:null,gpEst:o.mNet?(o.mNet-o.cost)/o.mNet*o.net:null,cov:o.net?o.mNet/o.net:0,
+    perSku:o.n?o.net/o.n:0,top:o.top?o.top.name:''};}).sort((a,b)=>b.net-a.net);
+  const sr=sups.filter(x=>x.name!==NOSUP&&x.raw>0).map(x=>x.raw).sort((a,b)=>a-b);
+  const smed=sr.length?(sr.length%2?sr[(sr.length-1)/2]:(sr[sr.length/2-1]+sr[sr.length/2])/2):null;
+  // Điểm tổng hợp = TB 3 chỉ số (mỗi chỉ số tối đa 3): Đóng góp DT, DT/mã, Sức kéo so với quầy
+  const kn=sups.filter(x=>x.name!==NOSUP),avgSh=kn.length?1/kn.length:0;
+  const ps=kn.map(x=>x.perSku).filter(v=>v>0).sort((a,b)=>a-b),mps=ps.length?(ps.length%2?ps[(ps.length-1)/2]:(ps[ps.length/2-1]+ps[ps.length/2])/2):0;
+  const cap=v=>Math.max(0,Math.min(3,v));
+  sups.forEach(x=>{x.rel=(x.raw!=null&&smed&&x.name!==NOSUP)?x.raw/smed:null;
+    if(x.name===NOSUP){x.rate='u';x.act='Nhập Mã NCC ở mục Danh mục NCC';return;}
+    x.iShare=avgSh?cap(x.share/avgSh):null;x.iSku=mps?cap(x.perSku/mps):null;x.iRel=x.rel==null?null:cap(x.rel);
+    const parts=[x.iShare,x.iSku,x.iRel].filter(v=>v!=null);x.score=parts.length?parts.reduce((a,b)=>a+b,0)/parts.length:null;
+    x.rate=x.score==null?'n':x.score>=1.3?'g':x.score>=0.6?'w':'b';
+    x.act=x.rate==='g'?(x.gpPct!=null&&x.gpPct<0.1?'Bán tốt nhưng GP thấp - đề nghị NCC hỗ trợ giá/chiết khấu':
+        (x.iRel!=null&&x.iRel<0.6?'DT lớn nhờ quy mô NCC, sảnh chưa kéo thêm nhiều so với quầy - giữ, đổi mã/khuyến mãi để tạo khác biệt':'Ưu tiên mời lại / mở rộng mã đợt sau')):
+      x.rate==='w'?(x.iShare>=1.3?'Đóng góp DT tốt - duy trì, chọn lọc mã bán chạy':'Duy trì, chọn lọc mã bán chạy'):
+      'Cân nhắc giảm/thay mã hoặc thay NCC';
+    if(x.iRel==null)x.act+=' (chỉ bán ở sảnh trong kỳ)';});
+  return{id:sc.id,c,name:c.cfgName.trim()||'(chưa đặt tên)',POS,from,to,rent,area,storeArea,nDays,daily,T,layers,med,sups,sku:skuArr,skuDay:Object.values(skuDay).sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:b.net-a.net),gp,W,allDays:[...allDays].sort()};
+}
+
+/* ================= Render ================= */
+function barChart(data,valKey,labelKey,color){
+  const w=520,h=200,pl=10,pb=28,pt=22,max=Math.max(...data.map(d=>d[valKey]),1);
+  const bw=Math.min(90,(w-pl*2)/data.length*0.6),gap=(w-pl*2)/data.length;
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px">`;
+  data.forEach((d,i)=>{const bh=(h-pb-pt)*Math.max(d[valKey],0)/max;const x=pl+gap*i+(gap-bw)/2,y=h-pb-bh;
+    s+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="4" fill="${color}"/><text x="${x+bw/2}" y="${y-6}" text-anchor="middle">${fmt(d[valKey])}</text><text class="m" x="${x+bw/2}" y="${h-8}" text-anchor="middle">${esc(d[labelKey])}</text>`;});
+  return s+'</svg>';
+}
+function hbar(items){
+  const max=Math.max(...items.map(i=>Math.abs(i.v)),1);
+  return items.map(i=>`<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><div style="width:38%;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(i.l)}">${esc(i.l)}</div><div style="flex:1;background:var(--soft);border-radius:4px;height:16px"><div style="width:${Math.max(1,Math.abs(i.v)/max*100)}%;height:100%;background:${i.c||'var(--brand2)'};border-radius:4px"></div></div><div style="width:110px;text-align:right;font-size:12px">${i.t}</div></div>`).join('');
+}
+function renderDataWarnings(A){
+  const b=[];
+  if(A.W.badDate.length)b.push(`${fmt(A.W.badDate.length)} dòng DETAIL không đọc được ngày - đã bỏ qua (vd giá trị: "${esc(A.W.badDate[0].dr)}"), tổng tiền ${fmt(A.W.badDate.reduce((a,r)=>a+r.amt,0))}đ.`);
+  if(A.W.outRange)b.push(`${fmt(A.W.outRange)} dòng nằm ngoài khoảng ${dLabel(A.from)} - ${dLabel(A.to)} (${Object.entries(A.W.outRangeDays).map(([d,n])=>dLabel(d)+': '+fmt(n)).join(', ')}) - không tính vào doanh thu sảnh.`);
+  const want=[];for(let d=new Date(A.from+'T00:00:00');d<=new Date(A.to+'T00:00:00');d.setDate(d.getDate()+1))want.push(d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()));
+  const miss=want.filter(d=>!A.daily.find(x=>x.day===d&&x.net!==0));
+  const out=[];
+  if(miss.length)out.push(`<div class="alert w">Chưa có doanh thu POS ${esc(A.POS)} cho ngày: <b>${miss.map(dLabel).join(', ')}</b> - nạp thêm file DETAIL ngày đó (chọn cùng lúc nhiều file).</div>`);
+  if(b.length)out.push(`<div class="alert ${A.W.badDate.length?'b':'w'}"><b>Cảnh báo dữ liệu</b><ul>${b.map(x=>'<li>'+x+'</li>').join('')}</ul></div>`);
+  return out.join('');
+}
+function render(A){
+  let n=0,h='';const T=A.T;
+  h+=renderDataWarnings(A);
+  // 1. Overview
+  h+=`<div class="card"><h2><span class="no">${++n}</span>Tổng quan Sảnh ${esc(A.name)} (POS ${esc(A.POS)}) ${dLabel(A.from)} - ${dLabel(A.to)}</h2><div class="grid g4">
+   <div class="kpi"><div class="l">Net Sales sảnh</div><div class="v">${fmt(T.net)}đ</div><div class="s">${pct(T.store?T.net/T.store:0)} DT toàn cửa hàng</div></div>
+   <div class="kpi"><div class="l">Khách (hoá đơn)</div><div class="v">${fmt(T.cust)}</div><div class="s">AOV ${fmt(T.cust?T.net/T.cust:0)}đ</div></div>
+   <div class="kpi"><div class="l">Số lượng bán</div><div class="v">${fmt(T.qty)}</div><div class="s">${fmt(A.sku.length)} mã hàng</div></div>
+   <div class="kpi"><div class="l">DT/m²/ngày sảnh</div><div class="v">${A.area?fmt(T.net/A.area/A.nDays)+'đ':'-'}</div><div class="s">${A.area?A.area+' m² · '+A.nDays+' ngày':'Nhập diện tích sảnh'}</div></div>
+   <div class="kpi"><div class="l">Chi phí thuê sảnh</div><div class="v">${fmt(A.rent)}đ</div><div class="s">${A.rent?'':'Cửa hàng không mất phí'}</div></div>
+  </div></div>`;
+  // 2. Daily
+  h+=`<div class="card"><h2><span class="no">${++n}</span>Doanh thu theo ngày</h2><div class="grid g3" style="align-items:center"><div>${barChart(A.daily.map(d=>({...d,lb:dLabel(d.day)})),'net','lb','var(--brand)')}</div>
+  <div class="tw"><table><tr><th class="t">Ngày</th><th>Net Sales</th><th>Khách</th><th>AOV</th><th>SL</th><th>% DT CH</th></tr>
+  ${A.daily.map(d=>`<tr><td class="t">${dLabel(d.day)}</td><td>${fmt(d.net)}</td><td>${fmt(d.cust)}</td><td>${fmt(d.aov)}</td><td>${fmt(d.qty)}</td><td>${pct(d.share)}</td></tr>`).join('')}
+  <tr class="tot"><td class="t">Tổng</td><td>${fmt(T.net)}</td><td>${fmt(T.cust)}</td><td>${fmt(T.cust?T.net/T.cust:0)}</td><td>${fmt(T.qty)}</td><td>${pct(T.store?T.net/T.store:0)}</td></tr></table></div></div></div>`;
+  // 3. Layers
+  if(A.layers.length){
+    h+=`<div class="card"><h2><span class="no">${++n}</span>Hiệu quả mang hàng xuống sảnh theo CAT ngành hàng (Layer 1)</h2>
+    <div class="formula">Chỉ số tương đối = (DT ngành tại sảnh / DT ngành tại quầy) ÷ trung vị các ngành đang bày ở sảnh. ≥1.3 = hiệu quả cao · 0.6-1.3 = trung bình · &lt;0.6 = thấp. So tương đối vì sảnh nhỏ nên mật độ DT luôn cao hơn quầy.</div>
+    <div class="tw"><table><tr><th class="t">CAT / Ngành</th><th>DT sảnh</th><th>% DT sảnh</th><th>SL</th><th>DT cùng ngành tại quầy</th>${A.layers[0].dS!=null?'<th>DT/m²/ngày sảnh</th><th>DT/m²/ngày quầy</th>':''}<th>Chỉ số</th><th>Đánh giá</th></tr>
+    ${A.layers.map(l=>`<tr><td class="t">${esc(l.name)}</td><td>${fmt(l.net)}</td><td>${pct(l.share)}</td><td>${fmt(l.qty)}</td><td>${fmt(l.quay)}</td>${l.dS!=null?`<td>${fmt(l.dS)}</td><td>${fmt(l.dQ)}</td>`:''}<td>${fmtD(l.rel,2)}</td><td>${l.rate==='g'?'<span class="tag g">Cao</span>':l.rate==='w'?'<span class="tag w">Trung bình</span>':l.rate==='b'?'<span class="tag b">Thấp</span>':'<span class="tag w">Chỉ bán ở sảnh</span>'}</td></tr>`).join('')}
+    </table></div><div style="margin-top:10px">${hbar(A.layers.slice(0,12).map(l=>({l:l.name,v:l.net,t:fmt(l.net)+'đ'})))}</div></div>`;
+  }
+  // NCC
+  {const SU=A.sups||[],known=SU.filter(x=>x.rate!=='u');
+  if(!known.length)h+=`<div class="alert w">Chưa có thông tin <b>NCC</b>: file DETAIL và file tồn kho chưa có cột Supplier / Vendor / NCC (mã hoặc tên). Xuất lại file có cột NCC rồi nạp lại để xem đánh giá theo nhà cung cấp.</div>`;
+  else{const RT={g:'<span class="tag g">Cao</span>',w:'<span class="tag w">Trung bình</span>',b:'<span class="tag b">Thấp</span>',n:'<span class="tag w">Chỉ bán ở sảnh</span>',u:'-'};
+    const hasG=SU.some(x=>x.gpPct!=null);
+    h+=`<div class="card"><h2><span class="no">${++n}</span>Đánh giá hiệu quả chạy sảnh theo Nhà cung cấp (NCC)</h2>
+    <div class="formula"><b>Điểm tổng</b> = trung bình 3 chỉ số (mỗi chỉ số tối đa 3): <b>Đóng góp DT</b> = % DT sảnh ÷ mức trung bình mỗi NCC · <b>DT/mã</b> = DT/mã ÷ trung vị các NCC · <b>Sức kéo vs quầy</b> = (DT sảnh / DT cùng NCC tại quầy) ÷ trung vị. Điểm ≥1.3 = Cao · 0.6-1.3 = Trung bình · &lt;0.6 = Thấp.</div>
+    <div class="grid g4" style="margin-bottom:10px">
+      <div class="kpi"><div class="l">Số NCC tại sảnh</div><div class="v">${fmt(known.length)}</div></div>
+      <div class="kpi hl"><div class="l">NCC hiệu quả cao</div><div class="v">${fmt(known.filter(x=>x.rate==='g').length)}</div></div>
+      <div class="kpi neg"><div class="l">NCC hiệu quả thấp</div><div class="v">${fmt(known.filter(x=>x.rate==='b').length)}</div></div>
+      <div class="kpi"><div class="l">NCC dẫn đầu DT</div><div class="v" style="font-size:16px">${esc(known[0].name)}</div><div class="s">${fmt(known[0].net)}đ · ${pct(known[0].share)}</div></div></div>
+    <div class="tw" style="max-height:520px;overflow:auto"><table><tr><th>#</th><th class="t">Mã NCC</th><th class="t">Tên NCC</th><th>Số mã</th><th>SL</th><th>DT sảnh</th><th>% DT sảnh</th><th>DT/mã</th><th>DT cùng NCC tại quầy</th><th>Đóng góp DT</th><th>DT/mã (chỉ số)</th><th>Sức kéo vs quầy</th><th>Điểm tổng</th>${hasG?'<th>GP%</th><th>LN gộp</th>':''}<th>Đánh giá</th><th class="t">Mã bán chạy nhất</th><th class="t">Đề xuất</th></tr>
+    ${SU.map((x,i)=>`<tr><td>${i+1}</td><td class="t"><b>${esc(x.code||'-')}</b></td><td class="t">${x.rate==='u'?esc(x.name):x.nm?esc(x.nm):'<span class="tag w">Chưa có tên</span>'}</td><td>${fmt(x.n)}</td><td>${fmt(x.qty)}</td><td>${fmt(x.net)}</td><td>${pct(x.share)}</td><td>${fmt(x.perSku)}</td><td>${fmt(x.quay)}</td><td>${fmtD(x.iShare,2)}</td><td>${fmtD(x.iSku,2)}</td><td>${fmtD(x.iRel,2)}</td><td><b>${fmtD(x.score,2)}</b></td>${hasG?`<td>${x.gpPct!=null?pct(x.gpPct):'-'}</td><td>${x.gpEst!=null?fmt(x.gpEst):'-'}</td>`:''}<td>${RT[x.rate]}</td><td class="t">${esc(x.top)}</td><td class="t">${esc(x.act)}</td></tr>`).join('')}
+    </table></div><div style="margin-top:10px">${hbar(known.slice(0,12).map(x=>({l:x.name,v:x.net,t:fmt(x.net)+'đ',c:x.rate==='g'?'var(--good)':x.rate==='b'?'var(--bad)':'var(--brand2)'})))}</div>
+    ${SU.find(x=>x.rate==='u')?`<div class="note">${fmt(SU.find(x=>x.rate==='u').n)} mã chưa xác định NCC (${fmt(SU.find(x=>x.rate==='u').net)}đ) - không tính vào xếp hạng.</div>`:''}</div>`;}}
+  // 4. GP
+  if(A.gp){
+    h+=`<div class="card"><h2><span class="no">${++n}</span>Lãi gộp sảnh (GP%)</h2>
+    ${A.gp.cov<0.6?`<div class="alert b">Độ phủ khớp mã chỉ ${pct(A.gp.cov)} - GP% chưa đại diện, cần file tồn kho đầy đủ hơn.</div>`:''}
+    <div class="grid g4"><div class="kpi"><div class="l">GP% (phần đã khớp mã)</div><div class="v">${pct(A.gp.gpPct)}</div></div>
+    <div class="kpi"><div class="l">Độ phủ khớp mã</div><div class="v">${pct(A.gp.cov)}</div><div class="s">${fmt(T.mNet)}đ / ${fmt(T.net)}đ</div></div>
+    <div class="kpi"><div class="l">Lãi gộp ước tính toàn sảnh</div><div class="v">${fmt(A.gp.est)}đ</div><div class="s">GP% × Net Sales</div></div></div>
+    <div class="note">Cột giá vốn đang dùng: <b>${esc(A.gp.macCol)}</b>${A.gp.stockCol?` · Cột tồn: <b>${esc(A.gp.stockCol)}</b>`:' · Không thấy cột tồn kho'} · ${fmt(A.gp.nomatch)} mã không có trong file tồn kho.</div>
+    <div class="note">Giá vốn = <b>M.A.C</b> cho mọi mã có M.A.C, kể cả hàng ký gửi tồn âm${A.gp.ckNet?` · ${fmt(A.gp.ckNet)}đ DT của NCC ký gửi tính theo <b>GP% hợp đồng</b> (nhập ở Danh mục NCC)`:''}.</div>
+    ${(()=>{const sm=A.from?A.from.slice(0,4)+A.from.slice(5,7):'',ms=A.gp.months||[];return ms.length&&sm&&!ms.includes(sm)?`<div class="alert w" style="margin-top:8px">File tồn kho là tháng <b>${ms.map(x=>x.slice(4)+'/'+x.slice(0,4)).join(', ')}</b>, sảnh chạy tháng <b>${sm.slice(4)+'/'+sm.slice(0,4)}</b>: M.A.C là giá vốn bình quân đến cuối tháng tồn kho. Giá nhập/ký gửi thay đổi trong tháng sảnh sẽ làm GP% lệch - nên nạp file tồn kho cùng tháng với sảnh.</div>`:'';})()}
+    ${A.gp.negN?`<div class="note">Đã tính GP% cho <b>${fmt(A.gp.negN)} mã tồn âm (ký gửi)</b> · ${fmt(A.gp.negNet)}đ DT - M.A.C của mã tồn âm có thể chưa cập nhật giá nhập mới, nên đối chiếu bảng lệch bên dưới.</div>`:''}
+    ${A.gp.sysPct!=null?`<div class="grid g4" style="margin-top:10px"><div class="kpi"><div class="l">GP% dashboard (M.A.C${A.gp.ckNet?" + HĐ ký gửi":""})</div><div class="v">${pct(A.gp.gpPct)}</div></div>
+      <div class="kpi"><div class="l">GP% hệ thống (${esc(A.gp.gpCol||'G.P.%(COGS)')})</div><div class="v">${pct(A.gp.sysPct)}</div><div class="s">bình quân theo DT sảnh · phủ ${pct(A.gp.sysCov)}</div></div>
+      <div class="kpi ${Math.abs(A.gp.gpPct-A.gp.sysPct)>0.03?'neg':'hl'}"><div class="l">Chênh lệch</div><div class="v">${fmtD((A.gp.gpPct-A.gp.sysPct)*100,1)} điểm</div><div class="s">${Math.abs(A.gp.gpPct-A.gp.sysPct)>0.03?'Lệch nhiều - do giá bán sảnh khác giá quầy hoặc M.A.C chưa cập nhật':'Khớp - GP% đáng tin cậy'}</div></div></div>`:''}
+    ${A.gp.diffs&&A.gp.diffs.length?`<details style="margin-top:10px"><summary style="cursor:pointer"><b>${fmt(A.gp.diffs.length)} mã có GP% theo M.A.C lệch &gt; 5 điểm so với GP% hệ thống</b></summary>
+      <div class="tw" style="max-height:320px;overflow:auto;margin-top:6px"><table><tr><th class="t">Barcode</th><th class="t">Tên hàng</th><th class="t">Mã NCC</th><th>SL</th><th>Net Sales</th><th>Giá bán/SP</th><th>M.A.C/SP</th><th>Tồn</th><th>GP% M.A.C</th><th>GP% hệ thống</th><th class="t">Gợi ý</th></tr>
+      ${A.gp.diffs.map(s=>{const gm=(s.net-s.cost)/s.net;return`<tr><td class="t">${esc(s.bc)}</td><td class="t">${esc(s.name)}</td><td class="t">${esc(s.supC||'')}</td><td>${fmt(s.qty)}</td><td>${fmt(s.net)}</td><td>${fmt(s.up)}</td><td>${fmt(s.mac)}</td><td>${s.stock==null?'-':fmt(s.stock)}</td><td>${pct(gm)}</td><td>${pct(s.gpSys)}</td><td class="t">${gm<s.gpSys?'Giá bán sảnh thấp hơn quầy (KM) hoặc M.A.C tăng':'Giá bán sảnh cao hơn hoặc M.A.C cũ thấp'}${s.stock!=null&&s.stock<0?' · tồn âm':''}</td></tr>`;}).join('')}</table></div></details>`:''}
+    ${A.gp.excl.length?`<div class="alert w" style="margin-top:10px"><b>${fmt(A.gp.excl.length)} mã cần lưu ý</b>:<ul>${Object.entries(A.gp.byWhy).map(([w,v])=>`<li>${A.gp.RS[w]}: ${fmt(v.n)} mã · ${fmt(v.net)}đ</li>`).join('')}</ul></div>
+    <div class="tw" style="max-height:320px;overflow:auto"><table><tr><th class="t">Barcode</th><th class="t">Tên hàng</th><th class="t">CAT / Ngành</th><th>SL</th><th>Net Sales</th><th>Giá bán/SP</th><th>M.A.C/SP</th><th>Tồn</th><th class="t">Trạng thái</th></tr>
+    ${A.gp.excl.map(s=>`<tr><td class="t">${esc(s.bc)}</td><td class="t">${esc(s.name)}</td><td class="t">${esc(s.l1)}</td><td>${fmt(s.qty)}</td><td>${fmt(s.net)}</td><td>${fmt(s.up)}</td><td>${fmt(s.mac)}</td><td>${s.stock==null?'-':fmt(s.stock)}</td><td class="t">${A.gp.RS[s.gpWhy]}</td></tr>`).join('')}</table></div>`:''}
+    </div>`;
+  }
+  // 5. Verdict
+  {const gpLine=A.gp?` Lãi gộp ước tính ${fmt(A.gp.est)}đ (GP% ${pct(A.gp.gpPct)}).`:'';
+    const best=A.layers.filter(l=>l.rate==='g').map(l=>l.name);
+    h+=`<div class="card"><h2><span class="no">${++n}</span>Kết luận hiệu quả đợt sảnh</h2>
+    <div class="verdict alert g">Sảnh ${esc(A.name)} mang về <b>${fmt(T.net)}đ</b> trong ${A.nDays} ngày (${pct(T.store?T.net/T.store:0)} DT toàn cửa hàng), ${fmt(T.cust)} khách, AOV ${fmt(T.cust?T.net/T.cust:0)}đ, ${A.rent?'chi phí thuê '+fmt(A.rent)+'đ':'không tốn tiền thuê'}.${gpLine}</div>
+    ${best.length?`<div class="note">Ngành hiệu quả cao tại sảnh: ${best.map(esc).join(', ')} - ưu tiên mang xuống sảnh đợt sau.</div>`:''}</div>`;}
+  // 6. SKU
+  h+=`<div class="card"><h2><span class="no">${++n}</span>Danh sách mã hàng bán tại Sảnh</h2>
+  <div class="row" style="margin-bottom:8px"><input id="skuQ" placeholder="Tìm tên / barcode / CAT / NCC" style="max-width:320px"><button class="btn ghost sm" id="skuCsv">Xuất CSV</button><span class="sub" id="skuSum"></span></div>
+  <div class="tw" style="max-height:480px;overflow:auto"><table id="skuTbl"></table></div></div>`;
+  $('sanhOut').innerHTML=h;
+  const drawSku=()=>{const q=norm($('skuQ').value);const list=A.sku.filter(s=>!q||norm(s.name+s.bc+s.l1+(s.sup||'')).includes(q));
+    const tn=list.reduce((a,s)=>a+s.net,0),tq=list.reduce((a,s)=>a+s.qty,0);
+    $('skuSum').textContent=`${fmt(list.length)} mã · ${fmt(tq)} SP · ${fmt(tn)}đ`+(Math.abs(A.sku.reduce((a,s)=>a+s.net,0)-T.net)>1?' (lệch tổng!)':'');
+    $('skuTbl').innerHTML=`<tr><th class="t">#</th><th class="t">Barcode</th><th class="t">Tên hàng</th><th class="t">CAT / Ngành</th><th class="t">Mã NCC</th><th class="t">Tên NCC</th><th>SL</th><th>Net Sales</th><th>% DT sảnh</th>${A.gp?'<th>GP%</th>':''}</tr>`+
+      list.map((s,i)=>`<tr><td class="t">${i+1}</td><td class="t">${esc(s.bc)}</td><td class="t">${esc(s.name)}</td><td class="t">${esc(s.l1)}</td><td class="t">${esc(s.supC||'')}</td><td class="t">${s.supN?esc(s.supN):(s.supC?'<span class="tag w">Chưa có tên</span>':'<span class="tag b">Chưa có NCC</span>')}</td><td>${fmt(s.qty)}</td><td>${fmt(s.net)}</td><td>${pct(T.net?s.net/T.net:0)}</td>${A.gp?`<td>${s.cost!=null&&s.net?pct((s.net-s.cost)/s.net)+(s.src==='ck'?' <span class="tag g" title="GP% theo hợp đồng ký gửi">HĐ</span>':s.gpWhy==='neg'?' <span class="tag w" title="Tồn âm - hàng ký gửi">KG</span>':s.gpWhy==='abn'?' <span class="tag b" title="M.A.C > 150% giá bán">!</span>':''):`<span class="sub" title="${esc(A.gp.RS[s.gpWhy]||'')}">${s.gpWhy==='neg'?'-':s.gpWhy==='mac0'?'Không có M.A.C':'-'}</span>`}</td>`:''}</tr>`).join('');};
+  $('skuQ').oninput=drawSku;drawSku();
+  $('skuCsv').onclick=()=>{const rows=[['Barcode','Item Name','CAT / Layer1','Mã NCC','Tên NCC','QTY','Net Sales']].concat(A.sku.map(s=>[s.bc,s.name,s.l1,s.supC||'',s.supN||'',s.qty,Math.round(s.net)]));
+    const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='SKU_Sanh_'+strip(A.name).replace(/\W+/g,'_')+'_'+A.from+'_'+A.to+'.csv';a.click();};
+}
+function dRange(f,t){if(!f||!t)return'';const[fy,fm,fd]=f.split('-'),[ty,tm,td]=t.split('-');
+  const fs=fd+'/'+fm,ts=td+'/'+tm+'/'+ty;return f===t?ts:(+td-+fd===1&&fm===tm&&fy===ty?fs+' & '+ts:fs+(fy!==ty?'/'+fy:'')+' - '+ts);}
+function updateTitle(){
+  if(ARCH_VIEW){const A=ARCH_VIEW.A;$('pageTitle').innerHTML='Doanh Thu <span>Sảnh '+esc(A.name)+'</span> - '+dRange(A.from,A.to)+' <span class="tag w" style="vertical-align:middle">Đã kết thúc</span>';document.title='Doanh Thu Sảnh '+A.name;return;}
+  if(ACTIVE==='all'||!SANHS.find(x=>x.id===ACTIVE)){
+    const ds=(window.__ALL||[]).flatMap(A=>[A.from,A.to]).filter(Boolean).sort();
+    $('pageTitle').innerHTML='Doanh Thu <span>Các Sảnh</span> - Tổng hợp '+SANHS.length+' sảnh'+(ds.length?' · '+dRange(ds[0],ds[ds.length-1]):'');
+    document.title='Doanh Thu Các Sảnh';return;}
+  const sc=SANHS.find(x=>x.id===ACTIVE),A=(window.__ALL||[]).find(a=>a.id===ACTIVE);
+  const name=(sc.name||'').trim()||'...',dt=dRange(sc.from||(A&&A.from)||'',sc.to||(A&&A.to)||'');
+  $('pageTitle').innerHTML='Doanh Thu <span>Sảnh '+esc(name)+'</span>'+(dt?' - '+dt:'');
+  document.title='Doanh Thu Sảnh '+name;
+}
+/* ================= Tổng hợp nhiều sảnh ================= */
+function overlaps(ALL){const o=[];for(let i=0;i<ALL.length;i++)for(let j=i+1;j<ALL.length;j++){const a=ALL[i],b=ALL[j];
+  if(a.POS===b.POS&&a.from<=b.to&&b.from<=a.to)o.push(`${esc(a.name)} và ${esc(b.name)} cùng POS ${esc(a.POS)} và trùng ngày - doanh thu bị đếm 2 lần`);}return o;}
+const nameOf=(A,i)=>A.name==='(chưa đặt tên)'?'Sảnh '+(i+1):A.name;
+function renderAll(ALL){
+  let h='',n=0;const ov=overlaps(ALL);
+  if(ov.length)h+=`<div class="alert b"><b>Trùng sảnh</b><ul>${ov.map(x=>'<li>'+x+'</li>').join('')}</ul></div>`;
+  const bad=ALL.reduce((a,A)=>a+A.W.badDate.length,0);
+  if(bad)h+=`<div class="alert b">${fmt(bad/ALL.length)} dòng DETAIL không đọc được ngày - mở từng sảnh để xem chi tiết.</div>`;
+  const empty=ALL.filter(A=>!A.T.net);if(empty.length)h+=`<div class="alert w">Chưa có doanh thu: ${empty.map((A,i)=>esc(A.name)+' (POS '+esc(A.POS)+')').join(', ')} - kiểm tra POS/ngày hoặc nạp thêm DETAIL.</div>`;
+  const tot=ALL.reduce((a,A)=>({net:a.net+A.T.net,cust:a.cust+A.T.cust,qty:a.qty+A.T.qty,rent:a.rent+A.rent,gp:a.gp+(A.gp?A.gp.est:0)}),{net:0,cust:0,qty:0,rent:0,gp:0});
+  const hasGP=ALL.some(A=>A.gp),hasA=ALL.some(A=>A.area);
+  const dens=A=>A.area?A.T.net/A.area/A.nDays:null;
+  const rk=[...ALL].sort((a,b)=>hasA?((dens(b)??-1)-(dens(a)??-1)):(b.T.net-a.T.net));
+  h+=`<div class="card"><h2><span class="no">${++n}</span>Tổng quan ${ALL.length} sảnh</h2><div class="grid g4">
+   <div class="kpi"><div class="l">Tổng Net Sales các sảnh</div><div class="v">${fmt(tot.net)}đ</div></div>
+   <div class="kpi"><div class="l">Tổng khách</div><div class="v">${fmt(tot.cust)}</div><div class="s">AOV ${fmt(tot.cust?tot.net/tot.cust:0)}đ</div></div>
+   <div class="kpi"><div class="l">Tổng số lượng</div><div class="v">${fmt(tot.qty)}</div></div>
+   <div class="kpi"><div class="l">Tổng tiền thuê</div><div class="v">${fmt(tot.rent)}đ</div></div>
+   ${hasGP?`<div class="kpi ${tot.gp-tot.rent>=0?'hl':'neg'}"><div class="l">LN gộp sau thuê</div><div class="v">${fmt(tot.gp-tot.rent)}đ</div><div class="s">LN gộp ${fmt(tot.gp)}đ</div></div>`:''}
+  </div></div>`;
+  h+=`<div class="card"><h2><span class="no">${++n}</span>So sánh hiệu quả các sảnh</h2><div class="tw"><table>
+   <tr><th>Hạng</th><th class="t">Sảnh</th><th>POS</th><th class="t">Thời gian</th><th>Ngày</th><th>Net Sales</th><th>% DT CH</th><th>Khách</th><th>AOV</th><th>SL</th><th>DT/ngày</th><th>DT/m²/ngày</th><th>Thuê</th>${hasGP?'<th>GP%</th><th>LN gộp</th><th>LN gộp sau thuê</th>':''}<th></th></tr>
+   ${rk.map((A,i)=>`<tr><td><span class="rk">${i+1}</span></td><td class="t"><b>${esc(A.name)}</b></td><td>${esc(A.POS)}</td><td class="t">${dRange(A.from,A.to)}</td><td>${A.nDays}</td><td>${fmt(A.T.net)}</td><td>${pct(A.T.store?A.T.net/A.T.store:0)}</td><td>${fmt(A.T.cust)}</td><td>${fmt(A.T.cust?A.T.net/A.T.cust:0)}</td><td>${fmt(A.T.qty)}</td><td>${fmt(A.T.net/A.nDays)}</td><td>${A.area?fmt(dens(A)):'-'}</td><td>${fmt(A.rent)}</td>${hasGP?`<td>${A.gp?pct(A.gp.gpPct):'-'}</td><td>${A.gp?fmt(A.gp.est):'-'}</td><td>${A.gp?fmt(A.gp.est-A.rent):'-'}</td>`:''}<td><button class="btn ghost sm" data-go="${A.id}">Xem</button></td></tr>`).join('')}
+   <tr class="tot"><td></td><td class="t">Tổng</td><td></td><td></td><td></td><td>${fmt(tot.net)}</td><td></td><td>${fmt(tot.cust)}</td><td>${fmt(tot.cust?tot.net/tot.cust:0)}</td><td>${fmt(tot.qty)}</td><td></td><td></td><td>${fmt(tot.rent)}</td>${hasGP?`<td></td><td>${fmt(tot.gp)}</td><td>${fmt(tot.gp-tot.rent)}</td>`:''}<td></td></tr>
+  </table></div><div class="note">Xếp hạng theo ${hasA?'DT/m²/ngày (sảnh chưa nhập diện tích xếp cuối)':'Net Sales - nhập diện tích để xếp theo DT/m²/ngày'}.</div>
+  <div style="margin-top:12px">${hbar(rk.map(A=>({l:A.name,v:A.T.net,t:fmt(A.T.net)+'đ'})))}</div></div>`;
+  const days=[...new Set(ALL.flatMap(A=>A.daily.map(d=>d.day)))].sort();
+  if(days.length){h+=`<div class="card"><h2><span class="no">${++n}</span>Doanh thu theo ngày từng sảnh</h2><div class="tw"><table>
+   <tr><th class="t">Ngày</th>${ALL.map(A=>`<th>${esc(A.name)}</th>`).join('')}<th>Tổng</th></tr>
+   ${days.map(d=>{const v=ALL.map(A=>A.daily.find(x=>x.day===d));return`<tr><td class="t">${dLabel(d)}</td>${v.map(x=>`<td>${x?fmt(x.net):'-'}</td>`).join('')}<td><b>${fmt(v.reduce((a,x)=>a+(x?x.net:0),0))}</b></td></tr>`;}).join('')}
+   <tr class="tot"><td class="t">Tổng</td>${ALL.map(A=>`<td>${fmt(A.T.net)}</td>`).join('')}<td>${fmt(tot.net)}</td></tr></table></div></div>`;}
+  const cats={};ALL.forEach(A=>A.layers.forEach(l=>{(cats[l.name]||(cats[l.name]={}))[A.id]=l;}));
+  const ck=Object.keys(cats).sort((a,b)=>Object.values(cats[b]).reduce((s,l)=>s+l.net,0)-Object.values(cats[a]).reduce((s,l)=>s+l.net,0));
+  if(ck.length){h+=`<div class="card"><h2><span class="no">${++n}</span>CAT ngành hàng theo từng sảnh</h2><div class="tw" style="max-height:480px;overflow:auto"><table>
+   <tr><th class="t">CAT / Ngành</th>${ALL.map(A=>`<th>${esc(A.name)}</th>`).join('')}<th>Tổng</th></tr>
+   ${ck.map(k=>`<tr><td class="t">${esc(k)}</td>${ALL.map(A=>{const l=cats[k][A.id];return`<td>${l?fmt(l.net)+(l.rate==='g'?' <span class="tag g">Cao</span>':l.rate==='b'?' <span class="tag b">Thấp</span>':''):'-'}</td>`;}).join('')}<td><b>${fmt(Object.values(cats[k]).reduce((s,l)=>s+l.net,0))}</b></td></tr>`).join('')}
+   </table></div><div class="note">Nhãn Cao/Thấp = chỉ số hiệu quả tương đối của ngành trong từng sảnh (xem chi tiết ở tab sảnh).</div></div>`;}
+  const sp={};ALL.forEach(A=>(A.sups||[]).forEach(x=>{if(x.rate==='u')return;(sp[x.name]||(sp[x.name]={}))[A.id]=x;}));
+  const sk=Object.keys(sp).sort((a,b)=>Object.values(sp[b]).reduce((s,l)=>s+l.net,0)-Object.values(sp[a]).reduce((s,l)=>s+l.net,0));
+  if(sk.length){h+=`<div class="card"><h2><span class="no">${++n}</span>NCC theo từng sảnh</h2><div class="tw" style="max-height:480px;overflow:auto"><table>
+   <tr><th class="t">NCC</th>${ALL.map(A=>`<th>${esc(A.name)}</th>`).join('')}<th>Tổng</th><th>Số sảnh tham gia</th></tr>
+   ${sk.map(k=>`<tr><td class="t">${esc(k)}</td>${ALL.map(A=>{const l=sp[k][A.id];return`<td>${l?fmt(l.net)+(l.rate==='g'?' <span class="tag g">Cao</span>':l.rate==='b'?' <span class="tag b">Thấp</span>':''):'-'}</td>`;}).join('')}<td><b>${fmt(Object.values(sp[k]).reduce((s,l)=>s+l.net,0))}</b></td><td>${Object.keys(sp[k]).length}</td></tr>`).join('')}
+   </table></div><div class="note">NCC có nhãn Cao ở nhiều sảnh = đối tác nên ưu tiên mời cho các đợt sảnh tiếp theo.</div></div>`;}
+  if(rk.length&&tot.net){const b=rk[0];h+=`<div class="card"><h2><span class="no">${++n}</span>Kết luận</h2><div class="verdict alert g">${ALL.length} sảnh mang về <b>${fmt(tot.net)}đ</b>, ${fmt(tot.cust)} khách. Sảnh hiệu quả nhất: <b>${esc(b.name)}</b> - ${fmt(b.T.net)}đ${b.area?`, ${fmt(dens(b))}đ/m²/ngày`:''}.</div></div>`;}
+  const tq=ALL.reduce((a,A)=>a+A.sku.length,0);
+  h+=`<div class="card"><h2><span class="no">${++n}</span>Chi tiết sản phẩm bán tại các sảnh</h2>
+   <div class="row" style="margin-bottom:8px"><select id="allSkuS" style="max-width:200px"><option value="">Tất cả sảnh (${fmt(tq)} dòng)</option>${ALL.map(A=>`<option value="${A.id}">${esc(A.name)} (${fmt(A.sku.length)} mã)</option>`).join('')}</select>
+   <input id="allSkuQ" placeholder="Tìm tên / barcode / CAT / NCC" style="max-width:300px"><span class="sub" id="allSkuSum"></span></div>
+   <div class="tw" style="max-height:520px;overflow:auto"><table id="allSkuTbl"></table></div></div>`;
+  $('sanhOut').innerHTML=h;
+  $('sanhOut').querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>{ACTIVE=x.dataset.go;saveSanhs();showTab();});
+  const rowsAll=ALL.flatMap(A=>A.sku.map(s=>({A,s})));const hasGPa=ALL.some(A=>A.gp);
+  const drawAll=()=>{const q=norm($('allSkuQ').value),sid=$('allSkuS').value;
+    const L=rowsAll.filter(x=>(!sid||x.A.id===sid)&&(!q||norm(x.s.name+x.s.bc+x.s.l1+(x.s.sup||'')).includes(q))).sort((a,b)=>b.s.net-a.s.net);
+    $('allSkuSum').textContent=`${fmt(L.length)} dòng · ${fmt(L.reduce((a,x)=>a+x.s.qty,0))} SP · ${fmt(L.reduce((a,x)=>a+x.s.net,0))}đ`;
+    $('allSkuTbl').innerHTML=`<tr><th>#</th><th class="t">Sảnh</th><th class="t">Barcode</th><th class="t">Tên hàng</th><th class="t">CAT / Ngành</th><th class="t">Mã NCC</th><th class="t">Tên NCC</th><th>SL</th><th>Net Sales</th><th>% DT sảnh</th>${hasGPa?'<th>GP%</th>':''}</tr>`+
+      L.slice(0,3000).map((x,i)=>{const s=x.s;return`<tr><td>${i+1}</td><td class="t">${esc(x.A.name)}</td><td class="t">${esc(s.bc)}</td><td class="t">${esc(s.name)}</td><td class="t">${esc(s.l1)}</td><td class="t">${esc(s.supC||'')}</td><td class="t">${esc(s.supN||'')}</td><td>${fmt(s.qty)}</td><td>${fmt(s.net)}</td><td>${pct(x.A.T.net?s.net/x.A.T.net:0)}</td>${hasGPa?`<td>${s.cost!=null&&s.net?pct((s.net-s.cost)/s.net):'-'}</td>`:''}</tr>`;}).join('')+
+      (L.length>3000?`<tr><td class="t sub" colspan="11">Đang hiện 3.000 dòng đầu - lọc theo sảnh/từ khoá hoặc xuất Excel để xem đủ.</td></tr>`:'');};
+  $('allSkuQ').oninput=drawAll;$('allSkuS').onchange=drawAll;drawAll();
+}
+function drawTabs(){
+  const ALL=window.__ALL||[];
+  const want=['all'].concat(ALL.map(A=>A.id)).join('|')+'#'+ALL.map(A=>A.name).join('|');
+  if($('tabs').dataset.sig===want){$('tabs').querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===ACTIVE));return;}
+  $('tabs').dataset.sig=want;
+  $('tabs').innerHTML=`<button class="tab ${ACTIVE==='all'?'on':''}" data-t="all">Tổng hợp</button>`+ALL.map(A=>`<button class="tab ${ACTIVE===A.id?'on':''}" data-t="${A.id}">${esc(A.name)}</button>`).join('');
+  $('tabs').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACTIVE=b.dataset.t;saveSanhs();showTab();});
+}
+function safeRender(A){
+  try{render(A);}catch(e){console.error(e);
+    $('sanhOut').innerHTML=`<div class="alert b">Có lỗi khi hiển thị một phần báo cáo (${esc(e.message)}) - vẫn hiện danh sách sản phẩm bên dưới. Hãy gửi lại thông báo này để sửa.</div>
+      <div class="card"><h2>Danh sách mã hàng bán tại Sảnh ${esc(A.name)}</h2><div class="tw" style="max-height:520px;overflow:auto"><table>
+      <tr><th>#</th><th class="t">Barcode</th><th class="t">Tên hàng</th><th class="t">CAT / Ngành</th><th class="t">Mã NCC</th><th class="t">Tên NCC</th><th>SL</th><th>Net Sales</th></tr>
+      ${A.sku.map((s,i)=>`<tr><td>${i+1}</td><td class="t">${esc(s.bc)}</td><td class="t">${esc(s.name)}</td><td class="t">${esc(s.l1)}</td><td class="t">${esc(s.supC||'')}</td><td class="t">${esc(s.supN||'')}</td><td>${fmt(s.qty)}</td><td>${fmt(s.net)}</td></tr>`).join('')}</table></div></div>`;}
+}
+function showTab(){
+  const ALL=window.__ALL||[];if(ACTIVE!=='all'&&!ALL.find(A=>A.id===ACTIVE))ACTIVE='all';
+  drawTabs();
+  if(ACTIVE==='all'){window.__A=null;try{renderAll(ALL);}catch(e){console.error(e);$('sanhOut').innerHTML=`<div class="alert b">Lỗi hiển thị tab Tổng hợp: ${esc(e.message)}</div>`;}}
+  else{const A=ALL.find(x=>x.id===ACTIVE);window.__A=A;safeRender(A);}
+  updateTitle();window.scrollTo({top:Math.min(window.scrollY,$('out').offsetTop-10)});
+}
+/* ================= Export báo cáo (.csv / .xlsx) ================= */
+function buildReport(A){
+  const T=A.T,P=v=>({v,s:'p'}),H=a=>a.map(v=>({v,s:'h'})),B=v=>({v,s:'b'});
+  const rate={g:'Cao',w:'Trung bình',b:'Thấp',n:'Chỉ bán ở sảnh'};
+  const best=A.layers.filter(l=>l.rate==='g').map(l=>l.name);
+  const sum=[[{v:'BÁO CÁO DOANH THU SẢNH '+A.name.toUpperCase(),s:'b'}],['Kohnan Parc Mall - Store 1016'],[],
+    H(['Chỉ tiêu','Giá trị']),
+    ['Tên sảnh',A.name],['Mã POS sảnh',A.POS],['Từ ngày',dLabel(A.from)+(A.from?'/'+A.from.slice(0,4):'')],['Đến ngày',dLabel(A.to)+(A.to?'/'+A.to.slice(0,4):'')],['Số ngày có doanh thu',A.nDays],
+    ['Net Sales sảnh (đ)',Math.round(T.net)],['% DT toàn cửa hàng',P(T.store?T.net/T.store:0)],['DT toàn cửa hàng cùng kỳ (đ)',Math.round(T.store)],
+    ['Khách (hoá đơn)',T.cust],['AOV (đ)',Math.round(T.cust?T.net/T.cust:0)],['Số lượng bán',T.qty],['Số mã hàng',A.sku.length],
+    ['Diện tích sảnh (m²)',A.area||''],['DT/m²/ngày sảnh (đ)',A.area?Math.round(T.net/A.area/A.nDays):''],['Tiền thuê sảnh (đ)',A.rent]];
+  if(A.gp)sum.push(['GP% (phần khớp mã)',P(A.gp.gpPct)],['Độ phủ khớp mã',P(A.gp.cov)],['Lãi gộp ước tính (đ)',Math.round(A.gp.est)],['Lãi gộp sau thuê (đ)',Math.round(A.gp.est-A.rent)]);
+  sum.push([],[B('Kết luận')],[`Sảnh ${A.name} mang về ${fmt(T.net)}đ trong ${A.nDays} ngày (${pct(T.store?T.net/T.store:0)} DT toàn cửa hàng), ${fmt(T.cust)} khách, AOV ${fmt(T.cust?T.net/T.cust:0)}đ, ${A.rent?'chi phí thuê '+fmt(A.rent)+'đ':'không tốn tiền thuê'}.`+(A.gp?` Lãi gộp ước tính ${fmt(A.gp.est)}đ (GP% ${pct(A.gp.gpPct)}).`:'')]);
+  if(best.length)sum.push([`Ngành hiệu quả cao tại sảnh: ${best.join(', ')} - ưu tiên mang xuống sảnh đợt sau.`]);
+  const day=[H(['Ngày','Net Sales (đ)','Khách','AOV (đ)','Số lượng','DT toàn CH (đ)','% DT CH'])].concat(
+    A.daily.map(d=>[dLabel(d.day)+'/'+d.day.slice(0,4),Math.round(d.net),d.cust,Math.round(d.aov),d.qty,Math.round(d.store),P(d.share)]),
+    [[B('Tổng'),{v:Math.round(T.net),s:'bn'},{v:T.cust,s:'bn'},{v:Math.round(T.cust?T.net/T.cust:0),s:'bn'},{v:T.qty,s:'bn'},{v:Math.round(T.store),s:'bn'},{v:T.store?T.net/T.store:0,s:'bp'}]]);
+  const hasD=true;
+  const lay=[H(['CAT / Ngành (Layer 1)','DT sảnh (đ)','% DT sảnh','Số lượng','DT cùng ngành tại quầy (đ)'].concat(hasD?['DT/m²/ngày sảnh','DT/m²/ngày quầy']:[],['Chỉ số tương đối','Đánh giá']))].concat(
+    A.layers.map(l=>[l.name,Math.round(l.net),P(l.share),l.qty,Math.round(l.quay)].concat(hasD?[l.dS==null?'':Math.round(l.dS),l.dQ==null?'':Math.round(l.dQ)]:[],[l.rel==null?'':Math.round(l.rel*100)/100,rate[l.rate]])));
+  lay.push([],['Chỉ số tương đối = (DT ngành tại sảnh / DT ngành tại quầy) ÷ trung vị các ngành ở sảnh. ≥1.3 Cao · 0.6-1.3 Trung bình · <0.6 Thấp.']);
+  const sku=[H(['#','Barcode','Tên hàng','CAT / Ngành','Mã NCC','Tên NCC','Số lượng','Net Sales (đ)','% DT sảnh'].concat(A.gp?['Giá vốn (đ)','GP%','Nguồn giá vốn','GP% hệ thống']:[]))].concat(
+    A.sku.map((s,i)=>[i+1,s.bc,s.name,s.l1,s.supC||'',s.supN||'',s.qty,Math.round(s.net),P(T.net?s.net/T.net:0)].concat(A.gp?[s.cost!=null?Math.round(s.cost):'',s.cost!=null&&s.net?P((s.net-s.cost)/s.net):'',s.src==='ck'?'HĐ ký gửi':s.src==='mac'?(s.gpWhy==='neg'?'M.A.C (tồn âm)':'M.A.C'):'',s.gpSys!=null?P(s.gpSys):'']:[])));
+  const ex=A.gp?[H(['Barcode','Tên hàng','CAT / Ngành','Mã NCC','Tên NCC','Số lượng','Net Sales (đ)','Giá bán/SP (đ)','M.A.C/SP (đ)','Tồn','Trạng thái GP%'])].concat(
+    A.gp.excl.map(s=>[s.bc,s.name,s.l1,s.supC||'',s.supN||'',s.qty,Math.round(s.net),Math.round(s.up||0),Math.round(s.mac||0),s.stock==null?'':s.stock,A.gp.RS[s.gpWhy]])):null;
+  const SU=A.sups||[],hasG=SU.some(x=>x.gpPct!=null),RTX={g:'Cao',w:'Trung bình',b:'Thấp',n:'Chỉ bán ở sảnh',u:''};
+  const sup=[H(['#','Mã NCC','Tên NCC','Số mã','Số lượng','DT sảnh (đ)','% DT sảnh','DT/mã (đ)','DT cùng NCC tại quầy (đ)','Đóng góp DT','DT/mã (chỉ số)','Sức kéo vs quầy','Điểm tổng'].concat(hasG?['GP%','LN gộp (đ)']:[],['Đánh giá','Mã bán chạy nhất','Đề xuất']))].concat(
+    SU.map((x,i)=>[i+1,x.rate==='u'?'':(x.code||''),x.rate==='u'?x.name:(x.nm||''),x.n,x.qty,Math.round(x.net),P(x.share),Math.round(x.perSku),Math.round(x.quay)].concat([x.iShare,x.iSku,x.iRel,x.score].map(v=>v==null?'':Math.round(v*100)/100)).concat(hasG?[x.gpPct!=null?P(x.gpPct):'',x.gpEst!=null?Math.round(x.gpEst):'']:[],[RTX[x.rate],x.top,x.act])));
+  const sd=[H(['Ngày','Barcode','Tên hàng','CAT / Ngành','Mã NCC','Tên NCC','Số lượng','Net Sales (đ)'])].concat(
+    A.skuDay.map(x=>[dLabel(x.day)+'/'+x.day.slice(0,4),x.bc,x.name,x.l1,x.supC||'',x.supN||'',x.qty,Math.round(x.net)]));
+  return[{name:'Tong quan',w:[34,60],rows:sum},{name:'Theo ngay',w:[14,16,10,12,12,18,10],rows:day},
+    {name:'Theo nganh',w:[30,16,12,10,22,16,16,14,14],rows:lay},{name:'Theo NCC',w:[5,12,34,8,10,16,10,14,20,12,12,12,10,10,14,14,36,40],rows:sup},{name:'Ma hang',w:[6,16,40,24,12,30,10,16,10,14,10],rows:sku},
+    {name:'Chi tiet ngay-ma hang',w:[14,16,40,24,12,30,10,16],rows:sd}].concat(ex?[{name:'Luu y GP',w:[16,40,24,12,30,10,16,14,14,10,44],rows:ex}]:[]);
+}
+function dl(blob,fn){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+const repName=A=>'BaoCao_Sanh_'+strip(A.name).replace(/\W+/g,'_')+'_'+A.from+'_'+A.to;
+function buildAll(ALL){
+  const H=a=>a.map(v=>({v,s:'h'})),P=v=>({v,s:'p'}),B=v=>({v,s:'b'}),hasGP=ALL.some(A=>A.gp);
+  const t={net:0,cust:0,qty:0,rent:0,gp:0,store:0};
+  ALL.forEach(A=>{t.net+=A.T.net;t.cust+=A.T.cust;t.qty+=A.T.qty;t.rent+=A.rent;t.gp+=A.gp?A.gp.est:0;});
+  const dt=x=>dLabel(x)+(x?'/'+x.slice(0,4):'');
+  const M=[['POS',A=>A.POS,''],['Từ ngày',A=>dt(A.from),''],['Đến ngày',A=>dt(A.to),''],['Số ngày',A=>A.nDays,''],
+    ['Net Sales (đ)',A=>Math.round(A.T.net),Math.round(t.net)],['% DT CH',A=>P(A.T.store?A.T.net/A.T.store:0),''],
+    ['Khách',A=>A.T.cust,t.cust],['AOV (đ)',A=>Math.round(A.T.cust?A.T.net/A.T.cust:0),Math.round(t.cust?t.net/t.cust:0)],
+    ['Số lượng',A=>A.T.qty,t.qty],['Số mã',A=>A.sku.length,''],['DT/ngày (đ)',A=>Math.round(A.T.net/A.nDays),''],
+    ['Diện tích (m²)',A=>A.area||'',''],['DT/m²/ngày (đ)',A=>A.area?Math.round(A.T.net/A.area/A.nDays):'',''],['Tiền thuê (đ)',A=>A.rent,t.rent]];
+  if(hasGP)M.push(['GP%',A=>A.gp?P(A.gp.gpPct):'',''],['LN gộp ước tính (đ)',A=>A.gp?Math.round(A.gp.est):'',Math.round(t.gp)],['LN gộp sau thuê (đ)',A=>A.gp?Math.round(A.gp.est-A.rent):'',Math.round(t.gp-t.rent)]);
+  const multi=ALL.length>1;
+  const sum=[[B('BÁO CÁO TỔNG HỢP DOANH THU CÁC SẢNH')],['Kohnan Parc Mall - Store 1016'],[],
+    H(['Chỉ tiêu'].concat(ALL.map(A=>A.name),multi?['Tổng']:[]))];
+  M.forEach(([lb,f,tv])=>{const r=[B(lb)].concat(ALL.map(f));if(multi)r.push(tv===''?'':(typeof tv==='number'?{v:tv,s:'bn'}:tv));sum.push(r);});
+  const ov=overlaps(ALL);if(ov.length){sum.push([],[B('Cảnh báo')]);ov.forEach(x=>sum.push([x.replace(/&amp;/g,'&')]));}
+  const reps=ALL.map(A=>({A,sh:buildReport(A)}));
+  sum.push([],[B('Kết luận từng sảnh')]);
+  reps.forEach(r=>{const tq=r.sh[0].rows;const i=tq.findIndex(x=>x[0]&&x[0].v==='Kết luận');if(i>-1)tq.slice(i+1).forEach(x=>sum.push(x));});
+  const out=[{name:'Tong hop',w:[24].concat(ALL.map(()=>18),[18]),rows:sum}];
+  const names=reps[0].sh.map(x=>x.name).filter(x=>x!=='Tong quan');
+  names.forEach(nm=>{const src=reps.map(r=>({A:r.A,sh:r.sh.find(x=>x.name===nm)})).filter(x=>x.sh);if(!src.length)return;
+    const rows=[[{v:'Sảnh',s:'h'}].concat(src[0].sh.rows[0])];
+    src.forEach(x=>x.sh.rows.slice(1).filter(r=>r.length>1).forEach(r=>rows.push([x.A.name].concat(r))));
+    out.push({name:nm,w:[18].concat(src[0].sh.w),rows});});
+  return out;
+}
+function getExport(){
+  if(ARCH_VIEW)return{sheets:buildReport(ARCH_VIEW.A),name:repName(ARCH_VIEW.A)};
+  const ALL=window.__ALL;if(!ALL||!ALL.length)return null;
+  if(ARCH_VIEW)return{sheets:buildReport(ARCH_VIEW.A),name:repName(ARCH_VIEW.A)};
+  if(ACTIVE!=='all'&&window.__A)return{sheets:buildReport(__A),name:repName(__A)};
+  const d=new Date();return{sheets:buildAll(ALL),name:'BaoCao_TongHop_'+ALL.length+'_Sanh_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())};
+}
+function exportCSV(ext){
+  const E=(ext&&ext.sheets)?ext:getExport();if(!E){alert('Hãy nạp DETAIL và bấm Phân tích trước.');return;}
+  const cell=c=>{let v=(c&&typeof c==='object')?c.v:c;if(c&&typeof c==='object'&&/p/.test(c.s))v=Math.round(v*1000)/10+'%';return'"'+String(v??'').replace(/"/g,'""')+'"';};
+  const out=[];E.sheets.forEach(sh=>{out.push('"=== '+sh.name.toUpperCase()+' ==="');sh.rows.forEach(r=>out.push(r.map(cell).join(',')));out.push('');});
+  dl(new Blob(['﻿'+out.join('\r\n')],{type:'text/csv;charset=utf-8'}),E.name+'.csv');
+}
+/* Minimal XLSX writer (no external library) */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=t[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0;};})();
+function zip(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  for(const f of files){const name=enc.encode(f.name),data=enc.encode(f.data),crc=CRC(data);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,0,true);
+    h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(h.buffer),name,data);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);
+    c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,name.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),name);off+=30+name.length+data.length;}
+  const cs=cen.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function exportXLSX(ext){
+  const E=(ext&&ext.sheets)?ext:getExport();if(!E){alert('Hãy nạp DETAIL và bấm Phân tích trước.');return;}
+  const sheets=E.sheets,x=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'');
+  const col=i=>{let s='';i++;while(i){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;};
+  const SID={h:1,b:2,p:3,bn:4,bp:5,n:6};
+  const sheetXml=sh=>{let r='';sh.rows.forEach((row,ri)=>{r+=`<row r="${ri+1}">`;row.forEach((c,ci)=>{let v=c,s='';if(c&&typeof c==='object'){v=c.v;s=c.s;}
+      if(v===''||v==null)return;const ref=col(ci)+(ri+1);
+      if(typeof v==='number'&&isFinite(v))r+=`<c r="${ref}" s="${SID[s||'n']}"><v>${v}</v></c>`;
+      else r+=`<c r="${ref}" t="inlineStr"${s?` s="${SID[s]}"`:''}><is><t xml:space="preserve">${x(v)}</t></is></c>`;});r+='</row>';});
+    return`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><cols>${sh.w.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${r}</sheetData></worksheet>`;};
+  const files=[
+   {name:'[Content_Types].xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`},
+   {name:'_rels/.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+   {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${x(s.name.slice(0,31))}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`},
+   {name:'xl/_rels/workbook.xml.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+   {name:'xl/styles.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="0.0%"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD6001C"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="7"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="3" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1"/><xf numFmtId="164" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1"/><xf numFmtId="3" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`}
+  ].concat(sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:sheetXml(s)})));
+  dl(zip(files),E.name+'.xlsx');
+}
+function run(){
+  if(!S.detail){$('status').textContent='Chưa nạp DETAIL.';return;}
+  try{if(ARCH_VIEW){ARCH_VIEW=null;$('out').innerHTML='';}
+    if(!$('tabs'))$('out').innerHTML='<div class="tabs" id="tabs"></div><div id="sanhOut"></div>';
+    window.__ALL=SANHS.map(sc=>analyze(sc));
+    window.__ALL.forEach((A,i)=>A.name=nameOf(A,i));
+    showTab();drawSupEditor();$('status').textContent='Đã phân tích '+SANHS.length+' sảnh · '+fmt(S.detail.rows.length)+' dòng DETAIL.';idbSet('cfg',getCfg());}
+  catch(e){console.error(e);$('status').textContent='Lỗi: '+e.message;}
+}
+
+/* ================= Init ================= */
+$('fDetail').onchange=e=>loadFiles(e.target,'detail');
+$('fInv').onchange=e=>loadFiles(e.target,'inv');
+$('fSup').onchange=e=>loadFiles(e.target,'sup');
+$('btnRun').onclick=run;
+$('btnAdd').onclick=()=>{SANHS.push(newSanh());saveSanhs();drawSanhTbl();updateTitle();};
+$('btnCsv').onclick=()=>exportCSV();
+$('btnXlsx').onclick=()=>exportXLSX();
+$('archQ').oninput=drawArchive;
+$('archXlsx').onclick=()=>archExport('xlsx');
+$('archCsv').onclick=()=>archExport('csv');
+$('archBackup').onclick=()=>{if(!ARCHIVE.length){alert('Chưa có sảnh nào được lưu.');return;}const d=new Date();
+  dl(new Blob([JSON.stringify({type:'kohnan_sanh_archive',v:1,items:ARCHIVE})],{type:'application/json'}),'SaoLuu_SanhDaKetThuc_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.json');};
+$('archImport').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.type!=='kohnan_sanh_archive')throw new Error('Không phải file sao lưu sảnh.');
+  let n=0;j.items.forEach(x=>{if(!ARCHIVE.find(a=>a.id===x.id)){ARCHIVE.push(x);n++;}});ARCHIVE.sort((a,b)=>b.savedAt<a.savedAt?-1:1);saveArchive();drawArchive();$('status').textContent='Đã nạp '+n+' sảnh từ file sao lưu.';}
+  catch(err){alert(err.message);}e.target.value='';};
+$('btnClear').onclick=async()=>{await idbSet('data',null);window.__ALL=null;S.detail=S.inv=null;S.names={detail:'',inv:''};showNames();$('out').innerHTML='';$('status').textContent='Đã xoá.';};
+CFG_IDS.forEach(id=>{$(id).addEventListener('change',()=>idbSet('cfg',getCfg()));$(id).addEventListener('input',updateTitle);});
+$('btnTheme').onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('sanhTheme',r.dataset.theme);}catch(e){}};
+try{const t=localStorage.getItem('sanhTheme');if(t)document.documentElement.dataset.theme=t;}catch(e){}
+(async()=>{const cfg=await idbGet('cfg');setCfg(cfg);
+  const sv=await idbGet('sanhs');
+  if(sv&&sv.list&&sv.list.length){SANHS=sv.list;ACTIVE=sv.active||'all';}
+  else if(cfg&&cfg.cfgPos){const x=newSanh();Object.assign(x,{name:cfg.cfgName||'',pos:cfg.cfgPos,from:cfg.cfgFrom||'',to:cfg.cfgTo||'',rent:cfg.cfgRent||'0',area:cfg.cfgArea||''});SANHS=[x];}
+  else SANHS=[newSanh()];
+  SM=Object.assign({names:{},bcs:{},master:{},masterName:'',ck:{}},(await idbGet('supmap'))||{});
+  drawSanhTbl();ARCHIVE=(await idbGet('archive'))||[];drawArchive();updateTitle();const d=await idbGet('data');
+  if(d){S.detail=d.detail||null;S.inv=d.inv||null;S.names=d.names||S.names;showNames();if(S.detail)run();}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế Hoạch Push Sale Remos Tháng 09/2026 Giai Đoạn 2 (220 Chai) - Team Admin Kohnan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .custom-card {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .custom-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+        .tab-btn.active {
+            background-color: #0d9488;
+            color: #ffffff;
+            border-color: #0d9488;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #ffffff !important; }
+            .custom-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3.5 px-4 md:px-8 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <span class="p-2.5 bg-emerald-600 text-white rounded-xl font-black text-xl tracking-wider shadow-sm">REMOS</span>
+                <div>
+                    <h1 class="text-lg md:text-xl font-black text-slate-900 tracking-tight text-center md:text-left">
+                        STRATEGY DASHBOARD: PUSH SALE THÁNG 9 (GIAI ĐOẠN 2)
+                    </h1>
+                    <p class="text-[11px] text-emerald-700 font-bold text-center md:text-left uppercase tracking-wider">
+                        🛡️ Bảo Vệ 10 Tiếng • An Tâm Mùa Mưa • 220 Chai Giai Đoạn 2
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap justify-center">
+                <div class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    🎯 Target: 220 Chai
+                </div>
+                <div class="text-xs font-bold text-amber-800 bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-200">
+                    🛍️ Kohnan Day 5/9 & 20/9 (Giảm 5%)
+                </div>
+                <button onclick="window.print()" class="no-print bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md transition flex items-center gap-2">
+                    🖨️ In / PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="mb-8 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold uppercase tracking-wider mb-3">
+                🌿 Chăm Sóc Ân Cần • Bảo Vệ Gia Đình & Bé Yêu (Tháng 09/2026 - Giai Đoạn 2)
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">
+                Chiến Lược Push Sale: <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600">Xịt Chống Muỗi Remos (220 Chai)</span>
+            </h2>
+
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white p-5 rounded-2xl shadow-md border border-emerald-500 mt-4 leading-relaxed">
+                <p class="text-base md:text-lg font-black tracking-wide text-amber-300 mb-1">
+                    💚 GIAI ĐOẠN 2: TĂNG TARGET TỪ 140 LÊN 220 CHAI - ĐỒNG HÀNH BẢO VỆ SỨC KHỎE!
+                </p>
+                <p class="text-xs md:text-sm font-medium text-emerald-50">
+                    Mùa mưa ngâu đạt đỉnh điểm, Giai Đoạn 2 nâng mục tiêu lên <strong>220 Chai Remos</strong> để đáp ứng nhu cầu gia đình bảo vệ khỏi muỗi 10 tiếng. Lời nhắc nhở ân cần về 2 hương thơm tinh tế (Lavender & Sả Chanh) cùng sự tư vấn chân thành sẽ giúp Team Admin vượt mục tiêu!
+                </p>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+            <div class="custom-card border-t-4 border-emerald-600 bg-gradient-to-br from-white to-emerald-50">
+                <p class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Mục Tiêu Giai Đoạn 2</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-emerald-700">220</span>
+                    <span class="ml-2 text-emerald-700 font-bold">Chai</span>
+                </div>
+                <p class="mt-3 text-xs text-emerald-800 font-medium border-t border-emerald-100 pt-2">📊 Tăng từ 140 - Giai Đoạn 2 Tháng 9</p>
+            </div>
+
+            <div class="custom-card border-t-4 border-cyan-600 bg-gradient-to-br from-white to-cyan-50">
+                <p class="text-xs font-bold text-cyan-800 uppercase tracking-wider">Chai Nhỏ (70ml)</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-cyan-700">39K</span>
+                </div>
+                <p class="mt-3 text-xs text-cyan-800 font-medium border-t border-cyan-100 pt-2">🎒 Nhỏ gọn 70ml - Vừa vặn cặp sách / túi xách</p>
+            </div>
+
+            <div class="custom-card border-t-4 border-teal-600 bg-gradient-to-br from-white to-teal-50">
+                <p class="text-xs font-bold text-teal-800 uppercase tracking-wider">Chai Lớn (150ml)</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-teal-700">69K</span>
+                </div>
+                <p class="mt-3 text-xs text-teal-800 font-medium border-t border-teal-100 pt-2">🏡 Dung tích 150ml - Bảo vệ cả nhà 10 tiếng</p>
+            </div>
+
+            <div class="custom-card border-t-4 border-amber-500 bg-gradient-to-br from-white to-amber-50">
+                <p class="text-xs font-bold text-amber-800 uppercase tracking-wider">Kohnan Day (5 & 20/9)</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-amber-600">-5%</span>
+                    <span class="ml-2 text-xs font-bold text-amber-800">TẤT CẢ SẢN PHẨM</span>
+                </div>
+                <p class="mt-3 text-xs text-amber-800 font-medium border-t border-amber-100 pt-2">🔥 Chai 70ml: 37K • Chai 150ml: 66K</p>
+            </div>
+        </section>
+
+        <div class="flex flex-wrap gap-2 mb-8 no-print border-b border-slate-200 pb-4">
+            <button onclick="switchTab('strategy')" id="tab-strategy" class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition">
+                💡 Chiến Lược & Bảng Giá
+            </button>
+            <button onclick="switchTab('scripts')" id="tab-scripts" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition">
+                🗣️ Kịch Bản Tư Vấn Ân Cần (POS)
+            </button>
+            <button onclick="switchTab('objections')" id="tab-objections" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition">
+                🛡️ Cẩm Nang Biến Từ Chối Thành Đơn (3S)
+            </button>
+            <button onclick="switchTab('table')" id="tab-table" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition">
+                📊 Bảng Target Chi Tiết (220 Chai)
+            </button>
+            <button onclick="switchTab('calculator')" id="tab-calculator" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition">
+                🧮 Máy Tính Giá POS
+            </button>
+        </div>
+
+        <div id="section-strategy" class="tab-content space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Pillar 1 -->
+                <div class="custom-card border-t-4 border-cyan-600 bg-gradient-to-b from-cyan-50/40 to-white">
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center text-2xl font-black mb-3 shadow-md">
+                        🎒
+                    </div>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Trọng Tâm 1</span>
+                    <h3 class="text-lg font-black text-slate-900 mt-2 mb-1">Cặp Sách Đến Trường (70ml)</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                        Dòng <strong>chai nhỏ 70ml</strong> nhỏ gọn bỏ gọn balo học sinh. Bảo vệ bé xua muỗi suốt 10 tiếng giờ học và vui chơi.
+                    </p>
+                    <div class="bg-cyan-50 p-3 rounded-xl border border-cyan-200 text-xs font-bold text-cyan-900">
+                        ⚡ <strong>Câu tư vấn chuẩn:</strong> "Chai 70ml nhỏ gọn bỏ cặp cho bé đi học an toàn!"
+                    </div>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div class="custom-card border-t-4 border-teal-600 bg-gradient-to-b from-teal-50/40 to-white">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center text-2xl font-black mb-3 shadow-md">
+                        🌧️
+                    </div>
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Trọng Tâm 2</span>
+                    <h3 class="text-lg font-black text-slate-900 mt-2 mb-1">Mùa Mưa An Tâm (150ml)</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                        Tháng 9 mưa nhiều muỗi xuất hiện. Dòng <strong>chai lớn 150ml</strong> bảo vệ cả gia đình xua muỗi liên tục 10 tiếng.
+                    </p>
+                    <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs font-bold text-teal-900">
+                        ⚡ <strong>Câu tư vấn chuẩn:</strong> "Bảo vệ cả nhà xua muỗi 10 tiếng liên tục!"
+                    </div>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="custom-card border-t-4 border-emerald-600 bg-gradient-to-b from-emerald-50/40 to-white">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl font-black mb-3 shadow-md">
+                        🏷️
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Trọng Tâm 3</span>
+                    <h3 class="text-lg font-black text-slate-900 mt-2 mb-1">Giá Khuyến Mãi Cực Hấp Dẫn</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                        Giá khuyến mãi giai đoạn 2 cực tốt: Chai 70ml từ 45k xuống 39k (giảm 6k), Chai 150ml từ 75k xuống 69k (giảm 6k) - Dễ báo giá cho khách hàng!
+                    </p>
+                    <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900">
+                        ⚡ <strong>Câu tư vấn chuẩn:</strong> "Chai 70ml chỉ 39k thôi - Giảm sâu cực hấp dẫn ạ!"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Breakdown Banner -->
+            <div class="custom-card border-2 border-emerald-500 bg-gradient-to-r from-emerald-50/30 via-white to-teal-50/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+                    <div>
+                        <span class="bg-emerald-600 text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">🏷️ BẢNG GIÁ KHUYẾN MÃI THÁNG 9</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-1">Cơ Cấu Giá Chuẩn Remos (70ml & 150ml)</h3>
+                    </div>
+                    <span class="text-xs font-bold bg-amber-100 text-amber-900 px-3 py-1.5 rounded-lg border border-amber-300">
+                        ⚡ Kohnan Day (5/9 & 20/9): Giá giảm thêm 5% làm tròn cực dễ báo giá
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                        <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-1">Chai Nhỏ 70ml - Giá Khuyến Mãi</div>
+                        <div class="text-3xl font-black text-slate-900">39.000đ</div>
+                        <div class="text-xs text-emerald-600 font-bold mt-2">Giảm từ 45.000đ - Dễ mang theo</div>
+                        <div class="mt-3 text-[11px] bg-slate-100 p-2 rounded text-slate-700">Kohnan Day: <strong>37.000đ</strong> (Giảm thêm 5%)</div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                        <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-1">Chai Lớn 150ml - Giá Khuyến Mãi</div>
+                        <div class="text-3xl font-black text-slate-900">69.000đ</div>
+                        <div class="text-xs text-teal-600 font-bold mt-2">Giảm từ 75.000đ - Bảo vệ cả nhà</div>
+                        <div class="mt-3 text-[11px] bg-slate-100 p-2 rounded text-slate-700">Kohnan Day: <strong>66.000đ</strong> (Giảm thêm 5%)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-scripts" class="tab-content hidden space-y-8">
+            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex items-center gap-3">
+                <span class="text-3xl">🌿</span>
+                <p class="text-xs text-emerald-950 font-medium leading-relaxed">
+                    <strong>Tư vấn nhân văn & ân cần:</strong> Mở lời tự nhiên trong <strong>5 - 10 giây</strong>. Nhấn mạnh tác dụng <strong>bảo vệ xua muỗi 10 tiếng</strong> và <strong>2 lựa chọn hương thơm (Lavender dịu nhẹ & Sả Chanh tươi mát)</strong>. Tránh gây áp lực cho khách hàng!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Script 1: School Kids Protection (Human-Centric & Caring) -->
+                <div class="bg-white rounded-2xl border-2 border-cyan-400 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-2xl">🎒</span>
+                            <span class="bg-cyan-100 text-cyan-900 font-extrabold text-xs px-3 py-1 rounded-full uppercase">Kịch Bản 1: Đón Năm Học Mới (Chăm Sóc Bé)</span>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-base mb-2">Lời Nhắc Ân Cần Cho Gia Đình Có Con Nhỏ</h4>
+                        <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-200 text-xs text-cyan-950 font-semibold italic leading-relaxed mb-4">
+                            "Dạ chị ơi, mùa mưa này bé đi học chị chuẩn bị sẵn 1 chai xịt Remos 70ml nhỏ gọn bỏ cặp cho bé nha! Sản phẩm giúp xua muỗi an toàn suốt <strong>10 tiếng</strong>, bên em có 2 mùi là **Lavender dịu nhẹ** và **Sả Chanh tươi mát** cực kỳ dễ chịu ạ!"
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-3 rounded-lg text-[11px] text-slate-600">
+                        💡 <strong>Gợi ý chốt nhẹ:</strong> "Chị lấy luôn 1 chai 70ml giá khuyến mãi chỉ 39k thôi ạ!"
+                    </div>
+                </div>
+
+                <!-- Script 2: Family Rainy Season Protection -->
+                <div class="bg-white rounded-2xl border-2 border-teal-400 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-2xl">🌧️</span>
+                            <span class="bg-teal-100 text-teal-900 font-extrabold text-xs px-3 py-1 rounded-full uppercase">Kịch Bản 2: Mùa Mưa Bảo Vệ Gia Đình</span>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-base mb-2">Chăm Sóc Sức Khỏe Gia Đình Chu Đáo</h4>
+                        <div class="bg-teal-50 p-4 rounded-xl border border-teal-200 text-xs text-teal-950 font-semibold italic leading-relaxed mb-4">
+                            "Dạ dạo này mùa mưa nhiều muỗi, anh/chị lấy thêm chai Remos lớn 150ml xua muỗi **10 tiếng liên tục** cho cả nhà nhé! Chiết xuất thiên nhiên dịu nhẹ với 2 mùi **Lavender nhẹ nhàng** hoặc **Sả Chanh thư thái** rất thích ạ!"
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-3 rounded-lg text-[11px] text-slate-600">
+                        💡 <strong>Gợi ý chốt nhẹ:</strong> "Anh/chị lấy luôn 1 chai lớn 150ml giá khuyến mãi 69k để bảo vệ cả nhà suốt mùa mưa ạ!"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Script: Kohnan Day (Rounded figures) -->
+            <div class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white rounded-2xl p-6 shadow-md border-2 border-emerald-500">
+                <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <span class="bg-amber-400 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase">🔥 KỊCH BẢN KOHNAN DAY (5/9 & 20/9)</span>
+                    <span class="text-xs font-bold text-emerald-100">ƯU ĐÃI LÀM TRÒN DỄ BÁO GIÁ</span>
+                </div>
+                <div class="text-xs md:text-sm font-bold italic bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20 mb-3 leading-relaxed">
+                    "Anh/chị ơi, hôm nay Ngày Hội Kohnan Day sản phẩm Remos được giảm giá ưu đãi: Chai 70ml làm tròn còn **37.000đ**, chai lớn 150ml làm tròn còn **66.000đ** thôi ạ! Anh/chị lấy kèm xua muỗi 10 tiếng đợt này giá cực tốt luôn ạ!"
+                </div>
+            </div>
+
+            <!-- Pitching Tips -->
+            <div class="custom-card border-t-4 border-amber-500">
+                <h3 class="text-lg font-black text-slate-900 mb-3 flex items-center gap-2">
+                    <span>💡</span> 3 ĐIỂM CHẠM TỰ NHIÊN TẠI QUẦY THU NGÂN (POS)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="font-bold text-emerald-700 block mb-1">1. Đặt Trưng Bày Đôi Mùi Hương</span>
+                        <p class="text-slate-600">Xếp chai 70ml & 150ml cả 2 mùi Lavender & Sả Chanh ngay tầm mắt khách tại máy quét.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="font-bold text-emerald-700 block mb-1">2. Nhấn Mạnh "Bảo Vệ 10 Tiếng"</span>
+                        <p class="text-slate-600">Giới thiệu ngắn gọn lợi ích cốt lõi: An toàn, xua muỗi 10 tiếng, hương dịu nhẹ không hắc.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="font-bold text-emerald-700 block mb-1">3. Báo Ngay Mức Tiết Kiệm</span>
+                        <p class="text-slate-600">Đọc rõ mức giá khuyến mãi: "Chai 70ml chỉ 39k, chai 150ml 69k - Giảm sâu cực hấp dẫn ạ!"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-objections" class="tab-content hidden space-y-8">
+            <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-6 rounded-2xl shadow-lg">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-black uppercase tracking-wider mb-2">
+                    🛡️ CẨM NANG XỬ LÝ TỪ CHỐI THỰC CHIẾN (100% REMOS)
+                </div>
+                <h3 class="text-2xl font-black text-white">Bí Kíp Biến Từ Chối Thành Đơn Hàng Tại POS</h3>
+                <p class="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
+                    Từ chối không phải là thất bại! Đó là lúc khách hàng cần thêm sự an tâm. Áp dụng chuẩn quy tắc <strong>3S: Smile (Mỉm cười) ➔ Sympathize (Đồng cảm) ➔ Solve & Suggest (Giải quyết & Gợi ý chốt)</strong>.
+                </p>
+            </div>
+
+            <!-- 3S Principle Banner -->
+            <div class="bg-gradient-to-r from-emerald-50 via-slate-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 shadow-sm">
+                <h4 class="text-xs font-black uppercase tracking-wider text-emerald-900 mb-3 flex items-center gap-2">
+                    <span>⚡</span> QUY TẮC VÀNG 3S XỬ LÝ TRONG 10 GIÂY
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-white p-3.5 rounded-xl border border-emerald-100">
+                        <span class="font-black text-emerald-600 block mb-1">1. SMILE (Mỉm cười)</span>
+                        <p class="text-slate-600">Giữ thái độ cởi mở, tươi cười. Tuyệt đối không cau có khi khách từ chối.</p>
+                    </div>
+                    <div class="bg-white p-3.5 rounded-xl border border-emerald-100">
+                        <span class="font-black text-emerald-600 block mb-1">2. SYMPATHIZE (Đồng cảm)</span>
+                        <p class="text-slate-600">Mở đầu ân cần: <em>"Dạ em hiểu ạ...", "Dạ đúng rồi anh/chị..."</em> để xóa khoảng cách.</p>
+                    </div>
+                    <div class="bg-white p-3.5 rounded-xl border border-emerald-100">
+                        <span class="font-black text-emerald-600 block mb-1">3. SOLVE & SUGGEST (Giải quyết & Chốt)</span>
+                        <p class="text-slate-600">Nêu bật điểm 10 tiếng & 2 mùi hương, kết thúc bằng câu gợi ý lựa chọn nhẹ nhàng.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objection Scenarios for Remos -->
+            <div class="custom-card border-t-4 border-emerald-600">
+                <h3 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
+                    <span>🦟</span> 5 TÌNH HUỐNG TỪ CHỐI REMOS THƯỜNG GẶP & CÁCH ỨNG PHÓ
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Situation 1 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-400 transition">
+                        <div class="flex items-start gap-2 mb-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 1</span>
+                            <h4 class="font-bold text-sm text-slate-900">"Nhà anh/chị không có muỗi, ít khi bị muỗi cắn."</h4>
+                        </div>
+                        <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-emerald-900">💬 Smile & Sympathize:</strong><br>"Dạ nhà mình sạch sẽ ít muỗi thì thích quá ạ!"</p>
+                            <p><strong class="text-emerald-900">💡 Solve (Hướng ra không gian ngoài):</strong><br>"Tuy nhiên dạo này mùa mưa muỗi nhiều, khi bé đi học ở trường hay gia đình đi cà phê sân vườn, công viên muỗi rất dễ cắn. Chai Remos xịt xua muỗi bảo vệ <strong>liên tục 10 tiếng</strong>."</p>
+                            <p><strong class="text-emerald-900">🎯 Suggest (Chốt nhẹ):</strong><br>"Anh/chị lấy 1 chai nhỏ 70ml bỏ sẵn cốp xe hay túi xách phòng khi ra ngoài cần dùng ngay nha!"</p>
+                        </div>
+                    </div>
+
+                    <!-- Situation 2 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-400 transition">
+                        <div class="flex items-start gap-2 mb-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 2</span>
+                            <h4 class="font-bold text-sm text-slate-900">"Bé nhà chị còn nhỏ, sợ hóa chất bị kích ứng da."</h4>
+                        </div>
+                        <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-emerald-900">💬 Smile & Sympathize:</strong><br>"Dạ em hiểu tâm lý lo cho làn da của bé của chị ạ!"</p>
+                            <p><strong class="text-emerald-900">💡 Solve (Gợi ý mẹo an toàn):</strong><br>"Remos đạt chuẩn an toàn y tế cho bé từ 4 tuổi. Nếu da bé nhạy cảm, chị chỉ cần xịt nhẹ lên gấu quần, cổ tay áo hay cặp sách của bé là đã duy trì hiệu quả xua muỗi 10 tiếng mà không lo chạm trực tiếp vào da bé ạ."</p>
+                            <p><strong class="text-emerald-900">🎯 Suggest (Chốt nhẹ):</strong><br>"Chị chọn mùi Lavender dịu nhẹ hay Sả Chanh tươi mát cho bé ạ?"</p>
+                        </div>
+                    </div>
+
+                    <!-- Situation 3 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-400 transition">
+                        <div class="flex items-start gap-2 mb-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 3</span>
+                            <h4 class="font-bold text-sm text-slate-900">"Sợ mùi xịt muỗi hắc khó chịu."</h4>
+                        </div>
+                        <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-emerald-900">💬 Smile & Sympathize:</strong><br>"Dạ chị yên tâm, Remos hoàn toàn không bị hắc mùi hóa chất như các loại xịt côn trùng thông thường đâu ạ!"</p>
+                            <p><strong class="text-emerald-900">💡 Solve (Nhấn mạnh 2 mùi hương):</strong><br>"Sản phẩm chiết xuất tinh dầu tự nhiên rất dễ chịu. Bên em có 2 mùi cho chị chọn: Dòng Lavender thơm dịu thư thái như nước hoa, còn Sả Chanh rất sảng khoái mát mẻ ạ."</p>
+                            <p><strong class="text-emerald-900">🎯 Suggest (Chốt nhẹ):</strong><br>"Chị thích mùi Sả Chanh tươi mát hay Lavender dịu nhẹ này hơn ạ?"</p>
+                        </div>
+                    </div>
+
+                    <!-- Situation 4 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-400 transition">
+                        <div class="flex items-start gap-2 mb-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 4</span>
+                            <h4 class="font-bold text-sm text-slate-900">"Ở nhà chị có sẵn chai xịt muỗi rồi."</h4>
+                        </div>
+                        <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-emerald-900">💬 Smile & Sympathize:</strong><br>"Dạ tuyệt vời quá, nhà mình luôn chủ động bảo vệ sức khỏe ạ!"</p>
+                            <p><strong class="text-emerald-900">💡 Solve (Tính di động & Hạn dùng):</strong><br>"Dạ chai ở nhà mình hay để cố định. Chai Remos 70ml này rất nhỏ xinh, chị nên để thêm 1 chai sẵn trong túi xách hoặc cốp xe. Đưa bé đi chơi hay ra ngoài đột xuất là có xịt bảo vệ 10 tiếng ngay, hạn dùng dài tận 3 năm lận."</p>
+                            <p><strong class="text-emerald-900">🎯 Suggest (Chốt nhẹ):</strong><br>"Chị lấy thêm 1 chai 70ml để cốp xe phòng thân luôn nha chị!"</p>
+                        </div>
+                    </div>
+
+                    <!-- Situation 5 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-400 transition md:col-span-2">
+                        <div class="flex items-start gap-2 mb-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 5</span>
+                            <h4 class="font-bold text-sm text-slate-900">"Thôi để lần sau mua / Giá 39k chị thấy chưa cần thiết."</h4>
+                        </div>
+                        <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-emerald-900">💬 Smile & Sympathize:</strong><br>"Dạ em hiểu ạ, mua đồ dùng gia đình cần tính toán hợp lý."</p>
+                            <p><strong class="text-emerald-900">💡 Solve (Nêu giá trị phòng bệnh cao điểm):</strong><br>"Tuy nhiên tháng 9 mùa mưa ngâu là đỉnh điểm muỗi sinh sản dễ gây sốt xuất huyết. Chỉ 39k cho chai 70ml xịt được hàng trăm lần xua muỗi 10 tiếng, tính ra chưa tới 1k mỗi ngày để đổi lấy sự an tâm cho bé và gia đình ạ."</p>
+                            <p><strong class="text-emerald-900">🎯 Suggest (Chốt nhẹ):</strong><br>"Em lấy luôn 1 chai Lavender hoặc Sả Chanh kèm hóa đơn đợt này cho mình luôn nha chị!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-table" class="tab-content hidden space-y-8">
+            <div class="custom-card border-t-4 border-emerald-600 bg-gradient-to-b from-emerald-50/10 to-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+                    <div>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">📊 BẢNG PHÂN BỔ TARGET GIAI ĐOẠN 2 (TỔNG 220 CHAI)</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-1">Phân Chia Chỉ Tiêu & Quotas Chi Tiết Team Admin - Giai Đoạn 2</h3>
+                        <p class="text-xs text-slate-500 mt-1">📌 <em>Căn cứ số ca thực tế: Full-Time (~24 ca/tháng, trọng số Ngày thường T2-T5 x1, Thứ Sáu (T6) x1.5 — Cuối Tuần/Ngày Lễ/Kohnan Day x2.2), Part-Time (Tối đa 12 ca / 79h/tháng — chia đều theo trung bình ca, không phân biệt loại ngày). Ngày Lễ (1/9 & 2/9) tính chỉ tiêu ngang bằng Cuối Tuần.</em></p>
+                    </div>
+                    <div class="text-xs bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-amber-900 font-bold">
+                        ⏱️ Quy định Part-time: Làm tối đa <strong>79 tiếng / 12 ngày / 1 tháng</strong>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3.5 rounded-tl-lg">Họ Và Tên Nhân Viên</th>
+                                <th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+                                <th class="p-3.5 text-center bg-emerald-50 text-emerald-900">Target G2 (Chai)</th>
+                                <th class="p-3.5 text-center">Ca T2-T5 (Thứ Hai-Năm)</th>
+                                <th class="p-3.5 text-center bg-cyan-50 text-cyan-900">Ca T6 (Thứ Sáu)</th>
+                                <th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần & Ngày Lễ</th>
+                                <th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Kohnan Day (5 & 20/9)</th>
+                                <th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Nguyễn Lê Minh Thư</td>
+                                <td class="p-3.5 text-center">CS Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">53</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">1.0 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">1.5 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">2.2 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">2.2 chai / ca</td>
+                                <td class="p-3.5">Chủ lực quầy Cashier traffic cao, chốt chai 70ml đi học</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Lê Uyên Nhi</td>
+                                <td class="p-3.5 text-center">SC Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">44</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">0.8 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">1.2 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.9 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.9 chai / ca</td>
+                                <td class="p-3.5">Tư vấn chéo chu đáo ngay khi tính tiền đơn gia đình</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Võ Đặng Tú Quyên</td>
+                                <td class="p-3.5 text-center">Admin Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">24</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">0.5 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">0.75 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.0 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.0 chai / ca</td>
+                                <td class="p-3.5">Duy trì tỷ lệ chốt đơn ổn định trong ca trực hành chính</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Tăng Quế Nhi</td>
+                                <td class="p-3.5 text-center">Admin Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">24</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">0.5 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">0.75 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.0 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.0 chai / ca</td>
+                                <td class="p-3.5">Đảm bảo trưng bày chai 70ml ngay vị trí chạm mắt</td>
+                            </tr>
+                            <tr class="bg-blue-50/20">
+                                <td class="p-3.5 font-bold text-slate-900">Phan Thị Thùy Dương</td>
+                                <td class="p-3.5 text-center font-semibold text-blue-700">Cashier PT <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">20</td>
+                                <td colspan="3" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~1.7 chai / ca trực quầy</td>
+                                <td class="p-3.5 font-bold text-indigo-700">PT (Tối đa 79h/12 ngày): Tập trung ca cao điểm</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Phan Thị Chúc Linh</td>
+                                <td class="p-3.5 text-center">Admin Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">17</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">0.3 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">0.45 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 chai / ca</td>
+                                <td class="p-3.5">Mở lời nhanh kịch bản 10s "sắm chai nhỏ 70ml đi học"</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-slate-900">Dương Xuân Hoàng Ngân</td>
+                                <td class="p-3.5 text-center">Admin Chief Full-Time <br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">17</td>
+                                <td class="p-3.5 text-center font-bold text-slate-700">0.3 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-cyan-700 bg-cyan-50/30">0.45 chai / ca</td>
+                                <td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 chai / ca</td>
+                                <td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 chai / ca</td>
+                                <td class="p-3.5 text-emerald-700 font-bold">Giám sát & đôn đốc kịch bản 3S toàn team</td>
+                            </tr>
+                            <tr class="bg-blue-50/20">
+                                <td class="p-3.5 font-bold text-slate-900">Trình Quách Vy</td>
+                                <td class="p-3.5 text-center font-semibold text-blue-700">Cashier PT <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">11</td>
+                                <td colspan="3" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.9 chai / ca trực quầy</td>
+                                <td class="p-3.5 font-bold text-indigo-700">PT (Tối đa 79h/12 ngày): Hỗ trợ chốt quầy giờ bận</td>
+                            </tr>
+                            <tr class="bg-blue-50/20">
+                                <td class="p-3.5 font-bold text-slate-900">Võ Thanh Thảo</td>
+                                <td class="p-3.5 text-center font-semibold text-blue-700">Cashier PT <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+                                <td class="p-3.5 text-center font-black text-emerald-700 bg-emerald-50/30 text-base">10</td>
+                                <td colspan="3" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.8 chai / ca trực quầy</td>
+                                <td class="p-3.5 font-bold text-indigo-700">PT (Tối đa 79h/12 ngày): Mua kèm nhanh tại POS</td>
+                            </tr>
+                            <tr class="bg-emerald-900 text-white font-black text-sm">
+                                <td class="p-4 uppercase rounded-bl-xl" colspan="2">TỔNG MỤC TIÊU REMOS GIAI ĐOẠN 2</td>
+                                <td class="p-4 text-center text-amber-300 text-lg">220 Chai</td>
+                                <td class="p-4 text-center font-normal italic rounded-br-xl" colspan="5">Bảo vệ 10 tiếng • 2 Mùi hương lựa chọn • Hệ số T6 = 1.5 • Quyết tâm đạt 100% KPI</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Target Distribution Chart -->
+            <div class="custom-card">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Tỷ Lệ Phân Bổ Target Giai Đoạn 2 (Tổng 220 Chai)</h3>
+                <p class="text-xs text-slate-500 mb-4">Biểu đồ chỉ tiêu từng nhân viên trong Team Admin Tháng 9 Giai Đoạn 2</p>
+                <div class="h-64">
+                    <canvas id="staffChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-calculator" class="tab-content hidden space-y-8">
+            <div class="custom-card border-2 border-emerald-500 bg-gradient-to-b from-emerald-50/20 to-white">
+                <div class="mb-6 text-center md:text-left">
+                    <span class="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">🧮 CÔNG CỤ TÍNH GIÁ NHANH TẠI QUẦY POS</span>
+                    <h3 class="text-2xl font-black text-slate-900 mt-2">Bảng Tính Giá & Mức Tiết Kiệm Khuyến Mãi</h3>
+                    <p class="text-xs text-slate-500 mt-1">Cashier nhập số lượng chai để đọc nhanh giá ưu đãi làm tròn cho khách hàng</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Calculator Inputs -->
+                    <div class="space-y-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-900 text-sm border-b pb-2">1. Chọn Số Lượng Mua:</h4>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Chai Nhỏ 70ml (Khuyến mãi 39k):</label>
+                            <input type="number" id="calc-small" value="1" min="0" oninput="calculateSavings()" class="w-full p-2.5 rounded-lg border border-slate-300 font-bold text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Chai Lớn 150ml (Khuyến mãi 69k):</label>
+                            <input type="number" id="calc-large" value="0" min="0" oninput="calculateSavings()" class="w-full p-2.5 rounded-lg border border-slate-300 font-bold text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="calc-kohnan" onchange="calculateSavings()" class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="calc-kohnan" class="text-xs font-bold text-red-600 cursor-pointer">🔥 Áp dụng Ngày Kohnan Day (Giảm 5% làm tròn)</label>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Output -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between shadow-lg">
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Kết Quả Báo Giá Khách Hàng</span>
+                            <div class="mt-4 space-y-3">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-400">Giá gốc mua lẻ:</span>
+                                    <span id="out-original" class="font-bold line-through text-slate-400">90.000đ</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-300">Giá thanh toán khuyến mãi:</span>
+                                    <span id="out-final" class="text-2xl font-black text-amber-400">82.000đ</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs border-t border-slate-800 pt-2">
+                                    <span class="text-emerald-400 font-bold">Khách tiết kiệm được:</span>
+                                    <span id="out-saved" class="text-base font-black text-emerald-400">8.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="calc-pitch-box" class="mt-6 bg-slate-800 p-3 rounded-xl border border-slate-700 text-xs italic text-slate-300">
+                            Nhập số lượng chai để xem giá tư vấn nhanh.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'table' && !window.staffChartRendered) {
+                renderStaffChart();
+                window.staffChartRendered = true;
+            }
+        }
+
+        function calculateSavings() {
+            const smallQty = parseInt(document.getElementById('calc-small').value) || 0;
+            const largeQty = parseInt(document.getElementById('calc-large').value) || 0;
+            const isKohnan = document.getElementById('calc-kohnan').checked;
+
+            // Original prices before discount
+            const smallPriceOrig = 45000;
+            const largePriceOrig = 75000;
+
+            // Discounted prices (khuyến mãi)
+            const smallPrice = 39000;
+            const largePrice = 69000;
+
+            // Kohnan Day prices (thêm giảm 5%)
+            const smallPriceKohnan = 37000;
+            const largePriceKohnan = 66000;
+
+            // Calculate original (before discount)
+            const origTotal = (smallQty * smallPriceOrig) + (largeQty * largePriceOrig);
+
+            // Calculate final price
+            let finalTotal = 0;
+            if (isKohnan) {
+                finalTotal = (smallQty * smallPriceKohnan) + (largeQty * largePriceKohnan);
+            } else {
+                finalTotal = (smallQty * smallPrice) + (largeQty * largePrice);
+            }
+
+            const saved = origTotal - finalTotal;
+
+            document.getElementById('out-original').innerText = origTotal.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('out-final').innerText = finalTotal.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('out-saved').innerText = (saved > 0 ? saved.toLocaleString('vi-VN') : 0) + 'đ';
+
+            let pitch = "";
+            if (finalTotal > 0) {
+                pitch = `"Tổng tiền cho ${smallQty + largeQty} chai là **${finalTotal.toLocaleString('vi-VN')}đ**, khách tiết kiệm **${saved.toLocaleString('vi-VN')}đ**${isKohnan ? ' (giá Kohnan Day giảm thêm 5%)' : ''} ạ!"`;
+            } else {
+                pitch = "Nhập số lượng chai để xem giá tư vấn nhanh.";
+            }
+            document.getElementById('calc-pitch-box').innerHTML = pitch;
+        }
+
+        function renderStaffChart() {
+            const ctx = document.getElementById('staffChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Thư', 'U.Nhi', 'Quyên', 'Q.Nhi', 'Dương (PT)', 'Linh', 'Ngân', 'Vy (PT)', 'Thảo (PT)'],
+                    datasets: [{
+                        label: 'Target Giai Đoạn 2 (220 Chai)',
+                        data: [53, 44, 24, 24, 20, 17, 17, 11, 10],
+                        backgroundColor: [
+                            '#059669', '#0d9488', '#0284c7', '#0284c7',
+                            '#6366f1', '#0284c7', '#0284c7', '#8b5cf6', '#8b5cf6'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Target: ${context.raw} Chai Remos`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            calculateSavings();
+        };
+    </script>
+</body>
+</html>

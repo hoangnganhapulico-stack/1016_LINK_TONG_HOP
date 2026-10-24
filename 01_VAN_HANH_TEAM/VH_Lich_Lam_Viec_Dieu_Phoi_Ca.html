@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lịch Làm Việc — Store 1016</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  color-scheme:light;
+  --navy:#0039a6;--kred:#e8082c;--bg:#f2f5fb;--ink:#16202c;--ink2:#465364;
+  --line:#e3e7ec;--blue-soft:#e8f0fa;--kred-soft:#fde7eb;--card-line:#e1e7f2;
+  --ok:#1f8a4c;--ok-soft:#e3f4ea;--warn:#f5b800;--warn-soft:#fff5d6;
+  --bad:#d63b2f;--bad-soft:#fde7eb;
+  --off:#8a97a0;--off-soft:#e7ebea;
+  --leave:#b9821f;--leave-soft:#f8ecd4;
+  --night:#4a4ec1;--night-soft:#e4e4fa;
+  --panel:#fff;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;overflow-x:hidden;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px));}
+h1,h2,h3{margin:0;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+
+/* ===== HERO ===== */
+.hero{background:#fff;border-bottom:1px solid var(--card-line);}
+.hero .wrap{display:flex;align-items:flex-end;gap:24px;padding-top:24px;padding-bottom:0;}
+.hero-main{flex:1;min-width:0;padding-bottom:24px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:.04em;}
+.brand-sep{color:var(--line);font-size:18px;}
+.brand-sub{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--ink2);}
+.group-tag{display:inline-block;margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--kred);}
+h1{margin:6px 0 0;color:var(--navy);font-size:clamp(24px,3.6vw,36px);font-weight:800;line-height:1.15;}
+h1 small{display:block;font-size:.56em;font-weight:700;opacity:.8;margin-top:3px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.chip{background:var(--blue-soft);color:var(--navy);font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;}
+.chip.red{background:var(--kred-soft);color:var(--kred);}
+.mascot{width:150px;height:auto;flex:none;align-self:flex-end;}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:0;z-index:20;background:var(--navy);}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:46px;overflow-x:auto;scrollbar-width:none;}
+.nav-logo{background:#fff;border-radius:6px;padding:3px 8px;font-weight:800;font-size:11px;color:var(--navy);letter-spacing:.04em;white-space:nowrap;flex:none;}
+.nav a{color:#fff;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;opacity:.85;}
+.nav a:hover{opacity:1;}
+
+/* ===== TOOLBAR ===== */
+.toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;padding:14px 0 10px;}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:20px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-primary{background:var(--navy);color:#fff;}
+.btn-kred{background:var(--kred);color:#fff;}
+.btn-ghost{background:#fff;color:var(--navy);border:2px solid var(--navy);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+
+/* ===== DROPZONE ===== */
+.dropzone{border:2px dashed var(--card-line);border-radius:14px;background:#fff;padding:40px 20px;text-align:center;cursor:pointer;transition:.15s;margin-bottom:16px;}
+.dropzone:hover,.dropzone.drag{border-color:var(--navy);background:var(--blue-soft);}
+.dropzone .dz-ico{font-size:28px;color:var(--navy);}
+.dropzone .dz-lbl{font-size:15px;font-weight:700;color:var(--ink);margin-top:8px;}
+.dropzone .dz-sub{font-size:13px;color:var(--ink2);margin-top:4px;}
+
+/* ===== CONTROLS ===== */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--card-line);border-radius:12px;padding:12px;margin-bottom:14px;}
+.navbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);border-radius:8px;background:#fff;color:var(--navy);font-weight:700;}
+.navbtn:disabled{border-color:var(--line);color:var(--off);cursor:not-allowed;}
+.date-label{font-size:16px;font-weight:700;color:var(--navy);}
+input[type=date]{border:1px solid var(--card-line);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--bg);color:var(--ink);color-scheme:light;}
+.search-wrap{position:relative;flex:1 1 200px;}
+.search-wrap input{width:100%;padding:8px 10px 8px 30px;border:1px solid var(--card-line);border-radius:8px;font-size:13px;background:var(--bg);color:var(--ink);}
+.search-wrap svg{position:absolute;left:9px;top:9px;color:var(--ink2);}
+
+/* ===== META ===== */
+.meta{font-size:12px;color:var(--ink2);margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.meta .dot{color:var(--line);}
+
+/* ===== DAY HEADER ===== */
+.day-head{background:#fff;border:1px solid var(--card-line);border-radius:12px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.day-num{font-size:52px;font-weight:800;color:var(--navy);line-height:1;}
+.day-info{text-align:right;}
+.day-weekday{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--kred);}
+.day-monthyr{font-size:14px;color:var(--ink2);}
+.day-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px;}
+.day-badge{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:6px;padding:3px 8px;}
+.day-badge.weekend{background:var(--night-soft,#e4e4fa);color:var(--night);}
+.day-badge.mid{background:var(--blue-soft);color:var(--navy);}
+.day-badge.holiday{background:var(--kred-soft);color:var(--kred);}
+
+/* ===== NOTE BANNER ===== */
+.note-banner{display:flex;align-items:flex-start;gap:10px;background:var(--leave-soft);border:1px solid var(--leave);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:13.5px;color:#7a5810;}
+.note-banner b{font-weight:700;}
+
+/* ===== STATS ===== */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px;}
+.stat{background:#fff;border:1px solid var(--card-line);border-radius:10px;padding:14px 16px;border-top:4px solid var(--accent,var(--navy));}
+.stat .v{font-size:26px;font-weight:800;color:var(--navy);line-height:1.1;}
+.stat .l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);margin-top:2px;}
+
+/* ===== TARGET STRIP ===== */
+.target-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px;}
+.target-card{background:#fff;border:1px solid var(--card-line);border-radius:12px;padding:14px 16px;}
+.target-card .tl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);}
+.target-card .tv{font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;}
+.target-card.pretax{border-left:4px solid var(--navy);}
+.target-card.posttax{border-left:4px solid var(--kred);}
+
+/* ===== SM BOX ===== */
+.sm-box{margin-bottom:14px;}
+
+/* ===== TEAMS ===== */
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+@media(max-width:720px){.teams{grid-template-columns:1fr;}}
+.team-card{background:#fff;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;}
+.team-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--card-line);}
+.team-name{font-weight:800;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);}
+.team-count{font-size:12px;color:var(--ink2);}
+.team-body{padding:10px 16px 14px;}
+
+.shift-group-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin:12px 0 7px;padding-top:10px;border-top:1px solid var(--line);}
+.shift-group:first-child .shift-group-head{border-top:none;padding-top:0;margin-top:0;}
+.shift-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+.emp-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid transparent;border-radius:10px;padding:9px 11px;margin-bottom:7px;}
+.emp-row.active{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset;}
+.emp-time{font-size:12px;font-weight:600;min-width:90px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+.emp-time.off{color:var(--off);}
+.emp-time .short-b{display:inline-block;margin-left:4px;background:var(--leave-soft);color:var(--leave);border-radius:5px;padding:1px 4px;font-size:9px;font-weight:700;}
+.emp-info{flex:1;min-width:0;}
+.emp-name{font-weight:700;font-size:13.5px;color:var(--ink);}
+.emp-pos{font-size:11px;color:var(--ink2);}
+.active-pill{display:inline-flex;align-items:center;gap:4px;color:var(--ok);font-size:10px;font-weight:700;margin-top:2px;}
+.active-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.phone-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--card-line);background:#fff;color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.phone-btn:hover{color:var(--navy);border-color:var(--navy);}
+.phone-pop{position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--card-line);border-radius:10px;box-shadow:0 8px 20px rgba(0,57,166,.12);padding:6px;z-index:20;min-width:160px;}
+.phone-pop a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--ink);text-decoration:none;white-space:nowrap;}
+.phone-pop a:hover{background:var(--blue-soft);}
+.emp-actions{flex-shrink:0;position:relative;}
+.empty-msg{padding:24px;text-align:center;color:var(--ink2);font-size:13px;}
+
+/* ===== PUSH SALE ===== */
+.push-card{background:#fff;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.push-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--card-line);}
+.push-title{font-weight:800;font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);}
+.push-sub{font-size:12px;color:var(--ink2);margin-top:2px;}
+.push-daytype{font-size:11px;font-weight:700;border-radius:999px;padding:4px 12px;background:var(--off-soft);color:var(--off);}
+.push-daytype.dt1{background:var(--blue-soft);color:var(--navy);}
+.push-daytype.dt2{background:var(--leave-soft);color:var(--leave);}
+.push-daytype.dt3{background:var(--kred);color:#fff;}
+.push-table-wrap{overflow-x:auto;padding:0 16px 14px;}
+.push-table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px;}
+.push-table th{text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--navy);padding:9px 8px;white-space:nowrap;}
+.push-table th:first-child,.push-table th:nth-child(2){text-align:left;}
+.push-table th .u{display:block;font-weight:500;text-transform:none;letter-spacing:0;font-size:10px;opacity:.8;}
+.push-table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.push-table tbody tr:nth-child(even) td{background:#fafbfc;}
+.push-table tbody tr.active td{background:var(--ok-soft);}
+.push-table tfoot td{border-bottom:none;background:var(--blue-soft);font-weight:700;}
+.q-val{font-size:18px;font-weight:800;color:var(--navy);text-align:center;}
+.q-hint{font-size:10px;color:var(--ink2);text-align:center;margin-top:1px;}
+.q-none{color:var(--off);text-align:center;}
+
+/* ===== TASK SECTION ===== */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px;flex-wrap:wrap;gap:10px;}
+.sec-title{display:flex;align-items:center;gap:10px;}
+.sec-num{width:34px;height:34px;border-radius:50%;background:var(--kred);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;flex:none;}
+.sec-label{font-size:20px;font-weight:800;color:var(--navy);}
+
+.add-task-form{display:flex;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid var(--card-line);border-radius:12px;padding:12px;margin-bottom:10px;}
+.add-task-form input[type=text]{flex:2 1 200px;border:1px solid var(--card-line);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--bg);color:var(--ink);}
+.add-task-form select{flex:1 1 140px;border:1px solid var(--card-line);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--bg);color:var(--ink);}
+
+.task-list{background:#fff;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-top:1px solid var(--line);}
+.task-row:first-child{border-top:none;}
+.task-row.done .task-title{text-decoration:line-through;color:var(--ink2);}
+.task-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--card-line);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);}
+.task-check.checked{background:var(--ok);border-color:var(--ok);color:#fff;}
+.task-body{flex:1;min-width:0;}
+.task-title{font-size:13.5px;font-weight:600;color:var(--ink);}
+.task-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;}
+.assignee-pill{background:var(--blue-soft);color:var(--navy);border-radius:999px;padding:2px 9px;font-weight:600;}
+.task-del{background:none;border:none;color:var(--off);padding:4px;border-radius:6px;}
+.task-del:hover{background:var(--kred-soft);color:var(--kred);}
+
+/* ===== BANNERS ===== */
+.banner{display:flex;align-items:flex-start;gap:10px;border-radius:10px;padding:11px 14px;font-size:13.5px;margin-bottom:12px;}
+.banner.warn{background:var(--kred-soft);border:1px solid var(--kred);color:#8a1a1a;}
+.banner.info{background:var(--blue-soft);border:1px solid var(--navy);color:var(--navy);}
+.banner.ok{background:var(--ok-soft);border:1px solid var(--ok);color:#155030;}
+.banner button{background:none;border:none;color:inherit;font-size:16px;flex-shrink:0;padding:0;}
+
+/* ===== GSHEET NOTE ===== */
+.gsheet-tip{background:var(--blue-soft);border:1px solid var(--navy);border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--navy);}
+.gsheet-tip a{color:var(--kred);font-weight:700;}
+
+@media(max-width:640px){
+  .hero .wrap{flex-direction:column;align-items:flex-start;gap:0;}
+  .mascot{width:110px;align-self:flex-end;}
+  h1{font-size:22px;}
+}
+@media print{
+  .no-print{display:none !important;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-main">
+      <div class="brand">
+        <span class="brand-logo">KOHNAN</span>
+        <span class="brand-sep">|</span>
+        <span class="brand-sub">STORE 1016 · PARC MALL</span>
+      </div>
+      <div class="group-tag">📅 LỊCH LÀM VIỆC</div>
+      <h1>Điều phối ca trực<small>Dashboard lịch nhân viên tháng 10/2026</small></h1>
+      <div class="chips">
+        <span class="chip">22 nhân viên</span>
+        <span class="chip">SM · Admin · CS &amp; SC · Sale</span>
+        <span class="chip red">T10/2026</span>
+        <span class="chip">Push Sale Target</span>
+      </div>
+    </div>
+    <img class="mascot no-print" src="https://i.imgur.com/placeholder.png"
+      onerror="this.style.display='none'"
+      alt="Kotan" />
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap">
+    <div class="nav-logo">KOHNAN 1016</div>
+    <a href="#schedule">📋 Lịch ca</a>
+    <a href="#push">🎯 Push Sale</a>
+    <a href="#tasks">✅ Công việc</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="wrap" style="padding-top:16px;padding-bottom:60px;">
+
+  <div class="toolbar no-print">
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ In trang</button>
+    <button class="btn btn-ghost btn-sm" id="btnReset">🗑️ Xóa dữ liệu</button>
+    <button class="btn btn-primary btn-sm" id="btnPickFile">⬆️ Tải file lịch ca (.xlsx)</button>
+  </div>
+
+  <div id="metaBar" class="meta"></div>
+  <div id="taskBanner"></div>
+
+  <!-- DROPZONE (ẩn khi đã có dữ liệu) -->
+  <div id="dropzone" class="dropzone no-print">
+    <div class="dz-ico">⬆️</div>
+    <div class="dz-lbl">Kéo thả hoặc bấm để tải file lịch ca (.xlsx)</div>
+    <div class="dz-sub">Dữ liệu lưu trong trình duyệt — lần sau mở không cần tải lại<br>
+      <b>Dữ liệu tháng 10/2026 đã nhúng sẵn</b> — bấm vào để cập nhật từ file mới hơn</div>
+  </div>
+
+  <div class="gsheet-tip no-print" id="gsheetTip">
+    💡 <b>Google Sheets:</b> File lịch từ
+    <a href="https://docs.google.com/spreadsheets/d/1s1Lz3igrehwS2Waa7KKShjkeF5h_JXia/edit?gid=1762028686" target="_blank">link này</a>
+    — tải về định dạng .xlsx rồi bấm <b>Tải file lịch ca</b> để cập nhật. Dữ liệu T10/2026 đã được nhúng sẵn trong trang.
+  </div>
+
+  <!-- SCHEDULE APP -->
+  <div id="scheduleApp">
+
+    <section id="schedule">
+      <!-- Controls -->
+      <div class="controls no-print">
+        <button class="navbtn" id="prevDay">‹</button>
+        <div style="flex:1;min-width:120px;">
+          <div class="date-label" id="dateLabel">—</div>
+        </div>
+        <input type="date" id="datePicker" />
+        <button class="btn btn-ghost btn-sm" id="btnToday">Hôm nay</button>
+        <button class="navbtn" id="nextDay">›</button>
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="searchBox" placeholder="Tìm tên nhân viên..." />
+        </div>
+      </div>
+
+      <!-- Day header -->
+      <div class="day-head">
+        <div class="day-num" id="dayNum">—</div>
+        <div class="day-info">
+          <div class="day-weekday" id="dayWeekday">—</div>
+          <div class="day-monthyr" id="dayMonthYr">—</div>
+          <div class="day-badges" id="dayBadges"></div>
+        </div>
+      </div>
+
+      <!-- Note banner -->
+      <div id="noteBanner"></div>
+
+      <!-- Target strip -->
+      <div id="targetStrip" style="display:none;" class="target-strip"></div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- SM -->
+      <div id="smBox" class="sm-box"></div>
+    </section>
+
+    <!-- Push Sale -->
+    <section id="push">
+      <div id="pushBox"></div>
+    </section>
+
+    <!-- Teams -->
+    <div class="teams" id="teamsBox"></div>
+
+  </div><!-- /scheduleApp -->
+
+  <!-- TASKS -->
+  <section id="tasks">
+    <div class="sec-head">
+      <div class="sec-title">
+        <div class="sec-num">✓</div>
+        <div class="sec-label">Công việc hôm nay</div>
+      </div>
+      <button class="btn btn-ghost btn-sm no-print" id="btnPickTasks">⬆️ Tải file công việc</button>
+    </div>
+    <div id="taskSubBanner"></div>
+    <div class="add-task-form no-print">
+      <input type="text" id="newTaskTitle" placeholder="Nhập việc cần làm hôm nay..." />
+      <select id="newTaskAssignee"><option value="">— Chưa phân công —</option></select>
+      <button class="btn btn-primary" id="btnAddTask">+ Thêm</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+  </section>
+
+</main>
+
+<input type="file" id="scheduleFile" accept=".xlsx,.xls" style="display:none" />
+<input type="file" id="taskFile" accept=".xlsx,.xls,.csv" style="display:none" />
+
+<script>
+/* ===== DATA T10/2026 (trích từ file Excel) ===== */
+const BUILTIN_MONTH = "2026-10";
+const BUILTIN_NOTES = {"1":"CƯ DÂN TOPAZ ELITE","3":"SET UP SẢNH PET","4":"DỌN SẢNH PET","5":"GIẢM 5%","6":"NHẬN NOHHI","10":"SETUP SẢNH TẦNG 1","11":"CHẠY SẢNH","12":"CHẠY SẢNH","13":"CHẠY SẢNH · học training","14":"CHẠY SẢNH","15":"CHẠY SẢNH","16":"CHẠY SẢNH","17":"CHẠY SẢNH","18":"CHẠY SẢNH","19":"CHẠY SẢNH","20":"CHẠY SẢNH · GIẢM 5%","21":"CHẠY SẢNH","22":"CHẠY SẢNH · TRAINING ONLINE","23":"CHẠY SẢNH · TRAINING ONLINE","24":"CHẠY SẢNH","25":"CHẠY SẢNH","26":"CHẠY SẢNH · ÔN TẬP ONLINE","27":"DỌN SẢNH","28":"HỌC TRAINING TẠI 1001"};
+const BUILTIN_STAFF = [
+{"name":"NGUYỄN HOÀNG DŨNG","pos":"SM","phone":"","shifts":{"1":"10:30 ~ 18:30","2":"10:30 ~ 18:30","3":"OFF","4":"10:30 ~ 18:30","5":"12:00 ~ 20:00","6":"12:00 ~ 20:00","7":"18:00 ~ 22:00","8":"10:30 ~ 18:30","9":"OFF","10":"10:30 ~ 18:30","11":"14:30 ~ 22:30","12":"12:00 ~ 20:00","13":"12:00 ~ 20:00","14":"OFF","15":"18:30 ~ 22:30","16":"12:00 ~ 20:00","17":"12:00 ~ 20:00","18":"10:30 ~ 18:30"}},
+{"name":"Dương Xuân Hoàng Ngân","pos":"Admin Chief","phone":"0908341971","shifts":{"1":"14:30 ~ 22:30","2":"14:30 ~ 18:30","3":"AL","4":"14:30 ~ 22:30","5":"09:00 ~ 17:00","6":"09:00 ~ 13:00","7":"09:00 ~ 17:00","8":"OFF","9":"09:00 ~ 17:00","10":"07:30 ~ 15:30","11":"07:30 ~ 15:30","12":"OFF","13":"14:30 ~ 22:30","14":"14:30 ~ 22:30","15":"14:30 ~ 18:30","16":"14:30 ~ 22:30","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"07:30 ~ 15:30","20":"07:30 ~ 15:30","21":"07:30 ~ 15:30","22":"OFF","23":"09:00 ~ 17:00","24":"08:00 ~ 12:00","25":"07:30 ~ 15:30","26":"14:30 ~ 22:30","27":"14:30 ~ 22:30","28":"OFF","29":"14:30 ~ 22:30","30":"09:00 ~ 13:00","31":"14:30 ~ 22:30"}},
+{"name":"VÕ ĐẶNG TÚ QUYÊN","pos":"Admin","phone":"0902305684","shifts":{"1":"18:30 ~ 22:30","2":"14:30 ~ 22:30","3":"14:30 ~ 22:30","4":"14:30 ~ 22:30","5":"OFF","6":"13:00 ~ 17:00","7":"AL","8":"SL","9":"AL","10":"07:30 ~ 15:30","11":"08:00 ~ 16:00","12":"14:30 ~ 22:30","13":"OFF","14":"14:30 ~ 22:30","15":"18:30 ~ 22:30","16":"14:30 ~ 22:30","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"11:00 ~ 15:00","20":"09:00 ~ 17:00","21":"OFF","22":"07:30 ~ 15:30","23":"07:30 ~ 15:30","24":"07:30 ~ 15:30","25":"14:30 ~ 22:30","26":"14:30 ~ 22:30","27":"OFF","28":"14:30 ~ 22:30","29":"14:30 ~ 18:30","30":"14:30 ~ 22:30","31":"14:30 ~ 22:30"}},
+{"name":"NGUYỄN LÊ MINH THƯ","pos":"CS","phone":"0937688146","shifts":{"1":"14:30 ~ 22:30","2":"18:30 ~ 22:30","3":"14:30 ~ 22:30","4":"AL","5":"09:00 ~ 17:00","6":"13:00 ~ 17:00","7":"OFF","8":"07:30 ~ 15:30","9":"09:00 ~ 17:00","10":"14:30 ~ 22:30","11":"08:00 ~ 16:00","12":"14:30 ~ 22:30","13":"14:30 ~ 22:30","14":"OFF","15":"14:30 ~ 22:30","16":"AL-1/2","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"10:30 ~ 18:30","20":"09:00 ~ 17:00","21":"09:00 ~ 17:00","22":"09:00 ~ 13:00","23":"OFF","24":"14:30 ~ 22:30","25":"08:00 ~ 16:00","26":"OFF","27":"14:30 ~ 22:30","28":"14:30 ~ 18:30","29":"18:30 ~ 22:30","30":"14:30 ~ 22:30","31":"14:30 ~ 22:30"}},
+{"name":"NGUYỄN NGỌC PHỤNG","pos":"Admin","phone":"0777702154","shifts":{"1":"09:00 ~ 16:00","2":"09:00 ~ 16:00","3":"08:00 ~ 15:00","4":"08:00 ~ 15:00","5":"OFF","6":"09:00 ~ 13:00","7":"09:00 ~ 16:00","8":"09:00 ~ 16:00","9":"09:00 ~ 16:00","10":"AL","11":"AL","12":"09:00 ~ 16:00","13":"08:30 ~ 16:30","14":"09:00 ~ 16:00","15":"09:00 ~ 16:00","16":"09:00 ~ 16:00","17":"OFF","18":"AL-1/2","19":"OFF","20":"AL-1/2","21":"AL","22":"09:00 ~ 16:00","23":"11:00 ~ 18:00","24":"08:00 ~ 15:00","25":"11:30 ~ 18:30","26":"OFF","27":"11:00 ~ 15:00","28":"09:00 ~ 17:00","29":"09:00 ~ 17:00","30":"09:00 ~ 17:00","31":"08:00 ~ 15:00"}},
+{"name":"TĂNG QUẾ NHI","pos":"Admin","phone":"0909989041","shifts":{"1":"OFF","2":"09:00 ~ 17:00","3":"14:30 ~ 22:30","4":"08:00 ~ 16:00","5":"OFF","6":"14:30 ~ 18:30","7":"14:30 ~ 22:30","8":"14:30 ~ 22:30","9":"14:30 ~ 22:30","10":"14:30 ~ 22:30","11":"14:30 ~ 22:30","12":"07:30 ~ 15:30","13":"AL-1/2","14":"OFF","15":"09:00 ~ 17:00","16":"14:30 ~ 22:30","17":"07:30 ~ 15:30","18":"07:30 ~ 15:30","19":"14:30 ~ 22:30","20":"14:30 ~ 22:30","21":"14:30 ~ 22:30","22":"18:30 ~ 22:30","23":"OFF","24":"14:30 ~ 22:30","25":"14:30 ~ 22:30","26":"07:30 ~ 15:30","27":"AL-1/2","28":"AL","29":"OFF","30":"09:00 ~ 17:00","31":"08:00 ~ 16:00"}},
+{"name":"PHAN THỊ CHÚC LINH","pos":"Admin","phone":"0972568403","shifts":{"1":"09:00 ~ 17:00","2":"09:00 ~ 13:00","3":"08:00 ~ 16:00","4":"14:30 ~ 22:30","5":"14:30 ~ 22:30","6":"14:30 ~ 22:30","7":"14:30 ~ 22:30","8":"14:30 ~ 22:30","9":"AL-1/2","10":"OFF","11":"14:30 ~ 22:30","12":"OFF","13":"07:30 ~ 11:30","14":"07:30 ~ 15:30","15":"07:30 ~ 15:30","16":"07:30 ~ 15:30","17":"08:00 ~ 16:00","18":"08:00 ~ 16:00","19":"14:30 ~ 22:30","20":"14:30 ~ 22:30","21":"14:30 ~ 22:30","22":"14:30 ~ 22:30","23":"14:30 ~ 22:30","24":"OFF","25":"18:30 ~ 22:30","26":"09:00 ~ 17:00","27":"07:30 ~ 11:30","28":"09:00 ~ 17:00","29":"09:00 ~ 17:00","30":"OFF","31":"AL"}},
+{"name":"LÊ UYÊN NHI","pos":"SC","phone":"0398694642","shifts":{"1":"09:00 ~ 17:00","2":"13:00 ~ 17:00","3":"08:00 ~ 16:00","4":"08:00 ~ 16:00","5":"14:30 ~ 22:30","6":"18:30 ~ 22:30","7":"OFF","8":"14:30 ~ 22:30","9":"14:30 ~ 22:30","10":"14:30 ~ 22:30","11":"14:30 ~ 22:30","12":"14:30 ~ 22:30","13":"13:00 ~ 17:00","14":"OFF","15":"09:00 ~ 17:00","16":"09:00 ~ 17:00","17":"08:00 ~ 16:00","18":"08:00 ~ 16:00","19":"18:30 ~ 22:30","20":"14:30 ~ 22:30","21":"OFF","22":"14:30 ~ 22:30","23":"14:30 ~ 22:30","24":"14:30 ~ 22:30","25":"14:30 ~ 22:30","26":"OFF","27":"09:00 ~ 17:00","28":"14:30 ~ 18:30","29":"09:00 ~ 17:00","30":"OFF","31":"08:00 ~ 16:00"}},
+{"name":"PHAN THỊ THÙY DƯƠNG","pos":"Cashier PT","phone":"","shifts":{"1":"OFF","2":"18:00 ~ 22:00","3":"15:00 ~ 22:00","4":"14:00 ~ 22:00","5":"OFF","6":"18:00 ~ 22:00","7":"OFF","8":"OFF","9":"18:00 ~ 22:00","10":"14:00 ~ 22:00","11":"14:00 ~ 22:00","12":"OFF","13":"18:00 ~ 22:00","14":"OFF","15":"OFF","16":"18:00 ~ 22:00","17":"14:00 ~ 22:00","18":"OFF","19":"OFF","20":"18:00 ~ 22:00","21":"OFF","22":"OFF","23":"OFF","24":"OFF","25":"OFF","26":"OFF","27":"18:00 ~ 22:00","28":"OFF","29":"OFF","30":"18:00 ~ 22:00","31":"14:00 ~ 22:00"}},
+{"name":"VÕ THANH THẢO","pos":"Cashier PT","phone":"0342744021","shifts":{"1":"OFF","2":"OFF","3":"OFF","4":"OFF","5":"OFF","6":"09:00 ~ 17:00","7":"OFF","8":"OFF","9":"OFF","10":"OFF","11":"OFF","12":"09:00 ~ 17:00","13":"09:00 ~ 17:00","14":"09:00 ~ 17:00","15":"OFF","16":"09:00 ~ 17:00","17":"OFF","18":"OFF","19":"09:00 ~ 17:00","20":"09:00 ~ 17:00","21":"14:30 ~ 18:30","22":"OFF","23":"09:00 ~ 16:00","24":"OFF","25":"OFF","26":"09:00 ~ 13:00","27":"09:00 ~ 17:00","28":"OFF","29":"OFF","30":"OFF","31":"OFF"}},
+{"name":"TRÌNH QUÁCH VY","pos":"Cashier PT","phone":"","shifts":{"1":"18:30 ~ 22:30","2":"OFF","3":"08:00 ~ 16:00","4":"08:00 ~ 16:00","5":"OFF","6":"OFF","7":"18:00 ~ 22:00","8":"OFF","9":"OFF","10":"08:00 ~ 16:00","11":"08:00 ~ 16:00","12":"OFF","13":"OFF","14":"OFF","15":"18:00 ~ 22:00","16":"OFF","17":"08:00 ~ 16:00","18":"08:00 ~ 16:00","19":"OFF","20":"OFF","21":"18:00 ~ 22:00","22":"OFF","23":"OFF","24":"09:00 ~ 17:00","25":"OFF","26":"OFF","27":"OFF","28":"OFF","29":"OFF","30":"OFF","31":"08:00 ~ 16:00"}},
+{"name":"NGUYỄN VIỆT HƯƠNG NHƯ","pos":"Cafe Pet","phone":"","shifts":{"1":"17:00 ~ 21:00","2":"14:30 ~ 22:30","3":"09:00 ~ 17:00","4":"14:30 ~ 22:30","5":"09:00 ~ 17:00","6":"10:30 ~ 18:30","7":"OFF","8":"14:30 ~ 18:30","9":"13:00 ~ 21:00","10":"08:00 ~ 16:00","11":"14:30 ~ 22:30","12":"OFF","13":"14:30 ~ 22:30","14":"14:30 ~ 22:30","15":"14:30 ~ 18:30","16":"14:30 ~ 22:30","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"09:00 ~ 17:00","20":"OFF","21":"09:00 ~ 17:00","22":"14:30 ~ 18:30","23":"14:30 ~ 22:30","24":"08:00 ~ 16:00","25":"08:00 ~ 16:00","26":"14:30 ~ 22:30","27":"14:30 ~ 22:30","28":"14:30 ~ 22:30","29":"18:30 ~ 22:30","30":"OFF"}},
+{"name":"NGUYỄN NGỌC ĐÀI TRANG","pos":"Cafe Pet","phone":"","shifts":{"1":"14:30 ~ 22:30","2":"14:30 ~ 18:30","3":"AL","4":"14:30 ~ 22:30","7":"08:00 ~ 16:00","8":"OFF","9":"09:00 ~ 17:00","10":"08:00 ~ 16:00","11":"08:00 ~ 16:00","12":"OFF","13":"14:30 ~ 22:30","14":"14:30 ~ 22:30","15":"14:30 ~ 18:30","16":"09:00 ~ 17:00","17":"08:00 ~ 16:00","18":"14:30 ~ 22:30","19":"09:00 ~ 17:00","20":"UP-1/2","21":"OFF","22":"09:00 ~ 17:00","23":"09:00 ~ 17:00","24":"08:00 ~ 16:00","25":"07:30 ~ 15:30","26":"14:30 ~ 22:30","27":"14:30 ~ 22:30","28":"OFF","29":"14:30 ~ 22:30","30":"09:00 ~ 13:00"}},
+{"name":"LÊ QUỐC PHÚ","pos":"Sale Chief","phone":"0365013623","shifts":{"1":"09:00 ~ 17:00","2":"09:00 ~ 17:00","3":"06:00 ~ 14:00","4":"08:00 ~ 16:00","5":"14:30 ~ 22:30","6":"12:00 ~ 20:00","7":"OFF","8":"14:30 ~ 22:30","9":"14:30 ~ 22:30","10":"12:00 ~ 16:00","11":"14:30 ~ 22:30","12":"09:00 ~ 17:00","13":"09:00 ~ 17:00","14":"09:00 ~ 17:00","15":"OFF","16":"AL-1/2","17":"AL","18":"AL","19":"AL","20":"14:30 ~ 22:30","21":"14:30 ~ 22:30","22":"14:30 ~ 22:30","23":"10:00 ~ 18:00","24":"08:00 ~ 12:00","25":"OFF","26":"OFF","27":"09:00 ~ 17:00","28":"14:30 ~ 22:30","29":"09:00 ~ 17:00","30":"09:00 ~ 13:00","31":"08:00 ~ 16:00"}},
+{"name":"NGUYỄN QUỐC BẢO","pos":"Sale Senior","phone":"0339473200","shifts":{"1":"14:30 ~ 22:30","2":"18:30 ~ 22:30","3":"14:30 ~ 22:30","4":"14:30 ~ 22:30","5":"09:00 ~ 17:00","6":"OFF","7":"09:00 ~ 17:00","8":"09:00 ~ 17:00","9":"09:00 ~ 13:00","10":"08:00 ~ 16:00","11":"08:00 ~ 16:00","12":"14:30 ~ 22:30","13":"14:30 ~ 22:30","14":"OFF","15":"18:30 ~ 22:30","16":"14:30 ~ 22:30","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"09:00 ~ 17:00","20":"OFF","21":"07:30 ~ 15:30","22":"14:30 ~ 22:30","23":"08:00 ~ 12:00","24":"14:30 ~ 22:30","25":"08:00 ~ 16:00","26":"09:00 ~ 17:00","27":"14:30 ~ 22:30","28":"14:30 ~ 22:30","29":"OFF","30":"AL-1/2","31":"AL"}},
+{"name":"NGUYỄN THỊ KIM NGÂN","pos":"Sale Staff","phone":"0346479449","shifts":{"1":"09:00 ~ 17:00","2":"09:00 ~ 17:00","3":"08:00 ~ 12:00","4":"OFF","5":"AL-1/2","6":"14:30 ~ 22:30","7":"14:30 ~ 22:30","8":"OFF","9":"14:30 ~ 22:30","10":"14:30 ~ 22:30","11":"14:30 ~ 22:30","12":"OFF","13":"09:00 ~ 17:00","14":"12:00 ~ 20:00","15":"09:00 ~ 17:00","16":"09:00 ~ 13:00","17":"08:00 ~ 16:00","18":"08:00 ~ 16:00","19":"14:30 ~ 22:30","20":"14:30 ~ 22:30","21":"OFF","22":"AL-1/2","23":"14:30 ~ 22:30","24":"14:30 ~ 22:30","25":"14:30 ~ 22:30","26":"OFF","27":"09:00 ~ 17:00","28":"09:00 ~ 17:00","29":"12:00 ~ 20:00","30":"12:00 ~ 20:00","31":"08:00 ~ 16:00"}},
+{"name":"NGUYỄN TƯỜNG VI","pos":"Sale Senior","phone":"0908274328","shifts":{"1":"14:30 ~ 22:30","2":"OFF","3":"14:30 ~ 22:30","4":"18:30 ~ 22:30","5":"09:00 ~ 17:00","6":"09:00 ~ 17:00","7":"09:00 ~ 13:00","8":"OFF","9":"09:00 ~ 17:00","10":"13:00 ~ 21:00","11":"08:00 ~ 16:00","12":"14:30 ~ 22:30","13":"14:30 ~ 22:30","14":"14:30 ~ 22:30","15":"OFF","16":"AL-1/2","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"OFF","20":"09:00 ~ 17:00","21":"07:30 ~ 11:30","22":"09:00 ~ 17:00","23":"09:00 ~ 17:00","24":"08:00 ~ 16:00","25":"12:00 ~ 20:00","26":"14:30 ~ 22:30","27":"OFF","28":"AL-1/2","29":"14:30 ~ 22:30","30":"14:30 ~ 22:30","31":"14:30 ~ 22:30"}},
+{"name":"NGUYỄN DUY THANH","pos":"Sale Senior","phone":"0901442294","shifts":{"1":"OFF","2":"09:00 ~ 17:00","3":"08:00 ~ 16:00","4":"08:00 ~ 16:00","5":"14:30 ~ 22:30","6":"18:30 ~ 22:30","7":"OFF","8":"14:30 ~ 22:30","9":"14:30 ~ 22:30","10":"14:30 ~ 22:30","11":"14:30 ~ 22:30","12":"09:00 ~ 17:00","13":"OFF","14":"09:00 ~ 13:00","15":"09:00 ~ 17:00","16":"09:00 ~ 17:00","17":"12:00 ~ 20:00","18":"12:00 ~ 20:00","19":"14:30 ~ 22:30","20":"14:30 ~ 22:30","21":"14:30 ~ 22:30","22":"AL-1/2","23":"14:30 ~ 22:30","24":"OFF","25":"14:30 ~ 22:30","26":"09:00 ~ 17:00","27":"09:00 ~ 17:00","28":"OFF","29":"09:00 ~ 13:00","30":"09:00 ~ 17:00","31":"08:00 ~ 16:00"}},
+{"name":"TRẦN QUỲNH ANH","pos":"Sale Staff","phone":"0374822881","shifts":{"1":"14:30 ~ 22:30","2":"14:30 ~ 22:30","3":"14:30 ~ 22:30","4":"14:30 ~ 22:30","5":"OFF","6":"09:00 ~ 17:00","7":"09:00 ~ 17:00","8":"07:30 ~ 11:30","9":"09:00 ~ 17:00","10":"08:00 ~ 16:00","11":"08:00 ~ 16:00","12":"18:30 ~ 22:30","13":"14:30 ~ 22:30","14":"14:30 ~ 22:30","15":"14:30 ~ 22:30","16":"14:30 ~ 22:30","17":"08:00 ~ 16:00","18":"OFF","19":"09:00 ~ 17:00","20":"09:00 ~ 13:00","21":"09:00 ~ 17:00","22":"07:30 ~ 15:30","23":"OFF","24":"14:30 ~ 22:30","25":"08:00 ~ 16:00","26":"14:30 ~ 22:30","27":"14:30 ~ 22:30","28":"09:00 ~ 13:00","29":"OFF","30":"14:30 ~ 22:30","31":"14:30 ~ 22:30"}},
+{"name":"NGÔ VĂN KHÔI","pos":"Sale Senior","phone":"0707955326","shifts":{"1":"09:00 ~ 17:00","2":"09:00 ~ 13:00","3":"08:00 ~ 16:00","4":"08:00 ~ 16:00","5":"14:30 ~ 22:30","6":"14:30 ~ 22:30","7":"14:30 ~ 22:30","8":"14:30 ~ 22:30","9":"AL-1/2","10":"08:00 ~ 16:00","11":"OFF","12":"14:30 ~ 22:30","13":"09:00 ~ 17:00","14":"14:30 ~ 22:30","15":"09:00 ~ 13:00","16":"OFF","17":"08:00 ~ 16:00","18":"08:00 ~ 16:00","19":"14:30 ~ 22:30","20":"OFF","21":"14:30 ~ 22:30","22":"14:30 ~ 22:30","23":"18:30 ~ 22:30","24":"AL","25":"14:30 ~ 22:30","26":"09:00 ~ 17:00","27":"09:00 ~ 17:00","28":"09:00 ~ 13:00","29":"09:00 ~ 17:00","30":"09:00 ~ 17:00","31":"OFF"}},
+{"name":"HUỲNH THUẬN ĐÔNG","pos":"Sale Staff","phone":"0923046952","shifts":{"1":"OFF","2":"14:30 ~ 22:30","3":"14:30 ~ 22:30","4":"14:30 ~ 22:30","5":"09:00 ~ 17:00","6":"09:00 ~ 17:00","7":"09:00 ~ 17:00","8":"09:00 ~ 17:00","9":"09:00 ~ 13:00","10":"OFF","11":"AL","12":"AL","13":"AL-1/2","14":"OFF","15":"14:30 ~ 22:30","16":"14:30 ~ 22:30","17":"14:30 ~ 22:30","18":"14:30 ~ 22:30","19":"OFF","20":"09:00 ~ 17:00","21":"09:00 ~ 13:00","22":"09:00 ~ 17:00","23":"08:00 ~ 16:00","24":"08:00 ~ 16:00","25":"08:00 ~ 16:00","26":"14:30 ~ 22:30","27":"18:30 ~ 22:30","28":"14:30 ~ 22:30","29":"14:30 ~ 22:30","30":"OFF","31":"14:30 ~ 22:30"}},
+{"name":"ĐỖ THỊ HỒNG PHƯƠNG","pos":"Sale Senior","phone":"0707756808","shifts":{"1":"09:00 ~ 17:00","2":"OFF","3":"06:00 ~ 14:00","4":"08:00 ~ 12:00","5":"14:30 ~ 22:30","6":"14:30 ~ 22:30","7":"14:30 ~ 22:30","8":"18:30 ~ 22:30","9":"OFF","10":"14:30 ~ 22:30","11":"14:30 ~ 22:30","12":"09:00 ~ 17:00","13":"09:00 ~ 17:00","14":"09:00 ~ 17:00","15":"12:00 ~ 16:00","16":"09:00 ~ 17:00","17":"OFF","18":"08:00 ~ 16:00","19":"09:00 ~ 17:00","20":"09:00 ~ 17:00","21":"OFF","22":"AL-1/2","23":"AL","24":"AL","25":"AL","26":"AL","27":"AL","28":"AL-1/2","29":"OFF","30":"14:30 ~ 22:30","31":"14:30 ~ 22:30"}}
+];
+
+/* ===== UTILS ===== */
+const $ = s => document.querySelector(s);
+const WD = ["Chủ Nhật","Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy"];
+const MN = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6","Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"];
+function pad2(n){return String(n).padStart(2,"0");}
+function todayIso(){const d=new Date();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function looksLikeDateSerial(v){return typeof v==="number"&&v>36526&&v<73415;}
+function excelSerialToIso(s){const d=new Date(Math.floor(s-25569)*86400000);return`${d.getUTCFullYear()}-${pad2(d.getUTCMonth()+1)}-${pad2(d.getUTCDate())}`;}
+
+/* ===== SHIFT CLASSIFY ===== */
+function classifyShift(raw){
+  const s=String(raw||"").trim(), u=s.toUpperCase();
+  const m=s.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})/);
+  if(m){
+    const sh=parseInt(m[1])+parseInt(m[2])/60;
+    const eh0=parseInt(m[3])+parseInt(m[4])/60;
+    const over=eh0<=sh, eh=over?eh0+24:eh0;
+    let bk="day"; if(sh<6.5||over) bk="night"; else if(sh>=13.5) bk="evening";
+    return{kind:"shift",label:s,startH:sh,endH:eh,overnight:over,bucket:bk};
+  }
+  if(u.includes("OFF")||u==="WO") return{kind:"off",label:s||"OFF"};
+  if(u.startsWith("AL")||u.includes("NGHỈ PHÉP")) return{kind:"leave",label:s||"AL"};
+  if(u==="PH") return{kind:"leave",label:"Lễ (PH)"};
+  if(u.startsWith("SL")) return{kind:"sick",label:s};
+  if(u.startsWith("UP")) return{kind:"swap",label:s};
+  return{kind:"note",label:s};
+}
+const BK={
+  night:{color:"var(--night)",soft:"var(--night-soft,#e4e4fa)",icon:"🌙",name:"Ca đêm"},
+  day:{color:"var(--ok)",soft:"var(--ok-soft)",icon:"☀️",name:"Ca sáng"},
+  evening:{color:"var(--kred)",soft:"var(--kred-soft)",icon:"🌇",name:"Ca chiều"},
+};
+const SM_NAMES=["nguyen hoang dung"];
+function normName(s){return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/gi,"d").toLowerCase().replace(/\s+/g," ").trim();}
+function teamOf(pos,name){
+  if(/^(sm|store manager)\b/i.test(pos)) return "SM";
+  if(name&&SM_NAMES.includes(normName(name))) return "SM";
+  if(/sale/i.test(pos)) return "SALES";
+  return "ADMIN";
+}
+function nowH(){const d=new Date();return d.getHours()+d.getMinutes()/60;}
+function isActiveNow(c,iso){if(iso!==todayIso()) return false;const h=nowH();return c.overnight?(h>=c.startH||h<c.endH-24):(h>=c.startH&&h<c.endH);}
+function shortBadge(c){const dur=c.endH-c.startH;return dur>0&&dur<7.5?`<span class="short-b">${Math.round(dur)}h</span>`:""; }
+function formatPhone(raw){let d=String(raw||"").replace(/\D/g,"");if(d.length===9)d="0"+d;return/^0\d{9}$/.test(d)?d:null;}
+
+/* ===== STATE ===== */
+const SCHEMA_V=8;
+let scheduleData=null, fileMeta=null, selectedDate=null, searchTerm="", tasksStore={};
+
+/* ===== SCHEDULE DATA from built-in ===== */
+function buildBuiltinData(){
+  const dates={};
+  BUILTIN_STAFF.forEach(emp=>{
+    Object.entries(emp.shifts).forEach(([day,raw])=>{
+      const iso=`${BUILTIN_MONTH}-${pad2(parseInt(day))}`;
+      if(!dates[iso]) dates[iso]=[];
+      dates[iso].push({name:emp.name,pos:emp.pos,phone:emp.phone,raw});
+    });
+  });
+  const notes={};
+  Object.entries(BUILTIN_NOTES).forEach(([day,txt])=>{
+    notes[`${BUILTIN_MONTH}-${pad2(parseInt(day))}`]=txt;
+  });
+  return{dates,notes,budget:{},sheetsUsed:1,sheetCount:1,hasPhoneBook:true,fileName:"Dữ liệu nhúng T10/2026"};
+}
+
+/* ===== EXCEL PARSER ===== */
+function parseWorkbook(wb){
+  const dates={}, notes={};
+  let sheetsUsed=0;
+  const phoneMap={};
+  // try to get phone book
+  wb.SheetNames.forEach(sn=>{
+    const ws=wb.Sheets[sn];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+    if(!aoa||aoa.length<2) return;
+    const h=(aoa[0]||[]).map(c=>String(c||"").toLowerCase());
+    const hasCode=h.some(x=>x.includes("mã nhân viên")||x.includes("ee code"));
+    const hasPhone=h.some(x=>x.includes("điện thoại")&&!x.includes("người thân"));
+    if(!hasCode||!hasPhone) return;
+    const codeC=h.findIndex(x=>x.includes("mã nhân viên")||x.includes("ee code"));
+    const phoneC=h.findIndex(x=>x.includes("điện thoại")&&!x.includes("người thân"));
+    const nameC=h.findIndex(x=>x.includes("tên"));
+    for(let r=1;r<aoa.length;r++){
+      const row=aoa[r];if(!row) continue;
+      const code=row[codeC], phone=row[phoneC], name=nameC>=0?row[nameC]:null;
+      if(!code||!phone) continue;
+      let digits=String(typeof phone==="number"?Math.round(phone):phone).replace(/\D/g,"");
+      if(digits.length===9) digits="0"+digits;
+      if(/^0\d{9}$/.test(digits)){
+        if(code) phoneMap[String(Math.round(Number(code)))||String(code)]=digits;
+        if(name) phoneMap[normName(String(name))]=digits;
+      }
+    }
+  });
+  wb.SheetNames.forEach(sn=>{
+    const ws=wb.Sheets[sn];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+    if(!aoa||aoa.length<3) return;
+    let drIdx=-1, maxCnt=0;
+    for(let r=0;r<Math.min(aoa.length,20);r++){
+      const row=aoa[r];if(!row) continue;
+      let cnt=0;
+      for(let c=4;c<row.length;c++) if(looksLikeDateSerial(row[c])) cnt++;
+      if(cnt>maxCnt){maxCnt=cnt;drIdx=r;}
+    }
+    if(drIdx===-1||maxCnt<5) return;
+    const dr=aoa[drIdx], cdm={};
+    for(let c=4;c<dr.length;c++) if(looksLikeDateSerial(dr[c])) cdm[c]=excelSerialToIso(dr[c]);
+    if(drIdx>0){
+      const nr=aoa[drIdx-1];
+      Object.entries(cdm).forEach(([c,iso])=>{const v=nr[c];if(v&&String(v).trim()) notes[iso]=String(v).trim().replace(/\n/g," · ");});
+    }
+    let saw=false;
+    for(let r=drIdx+1;r<aoa.length;r++){
+      const row=aoa[r];if(!row) continue;
+      const name=row[2], pos=row[3], code=row[1];
+      if(!name||!String(name).trim()) continue;
+      if(["ADMIN","SALES","SC","TOTAL","SM","CAFE PET","CS & SC"].includes(String(name).trim().toUpperCase())) continue;
+      if(typeof row[0]!=="number") continue;
+      saw=true;
+      const codeStr=code?String(Math.round(Number(code))||code).trim():"";
+      const phone=phoneMap[codeStr]||phoneMap[normName(String(name))]||"";
+      Object.entries(cdm).forEach(([c,iso])=>{
+        const v=row[c];if(v===null||v===undefined||v==="") return;
+        if(!dates[iso]) dates[iso]=[];
+        const raw=String(v).trim();
+        const key=String(code)+"__"+String(name);
+        const ei=dates[iso].findIndex(e=>e._key===key);
+        const rec={name:String(name).trim(),pos:String(pos||"").trim(),raw,phone,_key:key};
+        if(ei===-1) dates[iso].push(rec); else dates[iso][ei]=rec;
+      });
+    }
+    if(saw) sheetsUsed++;
+  });
+  return{dates,notes,budget:{},sheetsUsed,sheetCount:wb.SheetNames.length,hasPhoneBook:Object.keys(phoneMap).length>0};
+}
+
+/* ===== PERSISTENCE ===== */
+function safeLS(){try{return window.localStorage;}catch(e){return null;}}
+function loadPersisted(){
+  const ls=safeLS();if(!ls) return;
+  try{
+    const raw=ls.getItem("khn16-sched");
+    if(raw){const p=JSON.parse(raw);if(p.v===SCHEMA_V){scheduleData=p.data;fileMeta={name:p.fn,updatedAt:p.at};}}
+  }catch(e){}
+  try{const rt=ls.getItem("khn16-tasks");if(rt) tasksStore=JSON.parse(rt);}catch(e){}
+}
+function persistSchedule(){const ls=safeLS();if(!ls||!scheduleData) return;try{ls.setItem("khn16-sched",JSON.stringify({data:scheduleData,fn:fileMeta.name,at:fileMeta.updatedAt,v:SCHEMA_V}));}catch(e){}}
+function persistTasks(){const ls=safeLS();if(!ls) return;try{ls.setItem("khn16-tasks",JSON.stringify(tasksStore));}catch(e){}}
+
+/* ===== AVAILABLE DATES ===== */
+function availDates(){return scheduleData?Object.keys(scheduleData.dates).sort():[];}
+function pickDefault(){
+  const all=availDates(); if(!all.length) return;
+  const t=todayIso();
+  selectedDate=all.includes(t)?t:all[all.length-1];
+}
+function formatVi(iso){const d=new Date(iso+"T00:00:00");return`${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;}
+function formatVnd(n){return typeof n==="number"?new Intl.NumberFormat("vi-VN").format(Math.round(n))+"đ":"—";}
+
+const FIXED_HOL={"01-01":"Tết Dương lịch","04-30":"Giải phóng miền Nam","05-01":"Quốc tế Lao động","09-02":"Quốc khánh"};
+function dayTags(iso){
+  const d=new Date(iso+"T00:00:00"),tags=[],dow=d.getDay(),day=d.getDate();
+  if(dow===0||dow===6) tags.push({cls:"weekend",label:"Cuối tuần"});
+  if(day===5||day===20) tags.push({cls:"mid",label:`Ngày ${day}`});
+  const mmdd=`${pad2(d.getMonth()+1)}-${pad2(day)}`;
+  if(FIXED_HOL[mmdd]) tags.push({cls:"holiday",label:FIXED_HOL[mmdd]});
+  return tags;
+}
+
+/* ===== RENDER ===== */
+function renderMeta(){
+  const el=$("#metaBar"); if(!fileMeta){el.innerHTML="";return;}
+  el.innerHTML=`<span>Nguồn: <b>${esc(fileMeta.name)}</b></span><span class="dot">·</span><span>Cập nhật: ${new Date(fileMeta.updatedAt).toLocaleString("vi-VN")}</span><span class="dot">·</span><span>${scheduleData.sheetsUsed}/${scheduleData.sheetCount} sheet đọc được</span>`;
+}
+
+function renderControls(){
+  const all=availDates(); const mn=all[0],mx=all[all.length-1];
+  $("#prevDay").disabled=selectedDate===mn; $("#nextDay").disabled=selectedDate===mx;
+  $("#datePicker").min=mn; $("#datePicker").max=mx; $("#datePicker").value=selectedDate||"";
+  const d=selectedDate?new Date(selectedDate+"T00:00:00"):null;
+  if(d){
+    $("#dateLabel").textContent=`${WD[d.getDay()]}, ${d.getDate()} ${MN[d.getMonth()]} ${d.getFullYear()}`;
+    $("#dayNum").textContent=pad2(d.getDate());
+    $("#dayWeekday").textContent=WD[d.getDay()];
+    $("#dayMonthYr").textContent=`${MN[d.getMonth()]} ${d.getFullYear()}`;
+    const tags=dayTags(selectedDate);
+    $("#dayBadges").innerHTML=tags.map(t=>`<span class="day-badge ${t.cls}">${esc(t.label)}</span>`).join("");
+  }
+}
+
+function renderNote(){
+  const el=$("#noteBanner");
+  const note=scheduleData&&scheduleData.notes?scheduleData.notes[selectedDate]:null;
+  el.innerHTML=note?`<div class="note-banner">📌 <div><b>Hôm nay:</b> ${esc(note)}</div></div>`:"";
+}
+
+function renderStats(){
+  const recs=(scheduleData&&selectedDate)?scheduleData.dates[selectedDate]||[]:[];
+  const s={day:0,evening:0,night:0,off:0,leave:0,total:recs.length};
+  recs.forEach(r=>{const c=classifyShift(r.raw);if(c.kind==="shift")s[c.bucket]++;else if(c.kind==="off"||c.kind==="sick")s.off++;else if(c.kind==="leave")s.leave++;});
+  const cards=[["Ca sáng",s.day,"var(--ok)"],["Ca chiều",s.evening,"var(--kred)"],["Nghỉ",s.off+s.leave,"var(--off)"],["Tổng NV",s.total,"var(--navy)"]];
+  if(s.night>0) cards.splice(2,0,["Ca đêm",s.night,"var(--night)"]);
+  $("#statsRow").innerHTML=cards.map(([l,v,a])=>`<div class="stat" style="--accent:${a}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+}
+
+function empRowHtml(r,c,isOff){
+  const active=!isOff&&isActiveNow(c,selectedDate);
+  const tHtml=isOff?`<div class="emp-time off">${esc(c.label)}</div>`:`<div class="emp-time">${esc(c.label)}${shortBadge(c)}</div>`;
+  const phone=formatPhone(r.phone);
+  const act=phone?`<div class="emp-actions"><button class="phone-btn no-print" data-ph="${esc(phone)}" title="${esc(r.name)}">☎</button></div>`:"";
+  return`<div class="emp-row${active?" active":""}">
+    ${tHtml}
+    <div class="emp-info">
+      <div class="emp-name">${esc(r.name)}</div>
+      <div class="emp-pos">${esc(r.pos)}</div>
+      ${active?`<div class="active-pill"><span class="dot"></span>Đang làm</div>`:""}
+    </div>${act}
+  </div>`;
+}
+
+function buildTeamCard(title,list){
+  if(!list.length) return`<div class="team-card"><div class="team-head"><div class="team-name">${title}</div><div class="team-count">0</div></div><div class="team-body"><div class="empty-msg">Không có dữ liệu.</div></div></div>`;
+  const g={day:[],evening:[],night:[],off:[]};
+  let q=searchTerm.trim().toLowerCase();
+  let filtered=list.filter(r=>!q||r.name.toLowerCase().includes(q));
+  filtered.forEach(r=>{const c=classifyShift(r.raw);if(c.kind==="shift")g[c.bucket].push({r,c});else g.off.push({r,c});});
+  let body="";
+  [["day","Ca sáng"],["evening","Ca chiều/tối"],["night","Ca đêm"]].forEach(([k,lbl])=>{
+    if(!g[k].length) return;
+    const meta=BK[k];
+    body+=`<div class="shift-group"><div class="shift-group-head"><span class="shift-dot" style="background:${meta.color}"></span>${lbl} · ${g[k].length}</div>${g[k].map(({r,c})=>empRowHtml(r,c,false)).join("")}</div>`;
+  });
+  if(g.off.length) body+=`<div class="shift-group"><div class="shift-group-head"><span class="shift-dot" style="background:var(--off)"></span>Nghỉ · ${g.off.length}</div>${g.off.map(({r,c})=>empRowHtml(r,c,true)).join("")}</div>`;
+  return`<div class="team-card"><div class="team-head"><div class="team-name">${title}</div><div class="team-count">${filtered.length} người</div></div><div class="team-body">${body||'<div class="empty-msg">Không tìm thấy.</div>'}</div></div>`;
+}
+
+function renderTeams(){
+  const recs=(scheduleData&&selectedDate)?scheduleData.dates[selectedDate]||[]:[];
+  const sm=recs.filter(r=>teamOf(r.pos,r.name)==="SM");
+  const admin=recs.filter(r=>teamOf(r.pos,r.name)==="ADMIN");
+  const sale=recs.filter(r=>teamOf(r.pos,r.name)==="SALES");
+  $("#smBox").innerHTML=sm.length?buildTeamCard("Quản lý cửa hàng — SM",sm):"";
+  $("#teamsBox").innerHTML=buildTeamCard("Team Admin",admin)+buildTeamCard("Team Sale",sale);
+}
+
+/* ===== PUSH SALE ===== */
+const PUSH_T={
+  "2026-10":{
+    title:"Push Sale T10/2026",kohnanDays:["10-05","10-20"],
+    products:[{key:"sua",label:"Sữa tắm ON",unit:"chai",icon:"🧴"},{key:"kem",label:"Kem dưỡng tay",unit:"tuýp",icon:"🤲"},{key:"son",label:"Son dưỡng môi",unit:"thỏi",icon:"💋"}],
+    people:[
+      {name:"NGUYỄN LÊ MINH THƯ",role:"CS - FT",sua:{m:150,d:[4.1,6.2,9.1,9.1]},kem:{m:23,d:[0.6,1.0,1.4,1.4]},son:{m:23,d:[0.6,1.0,1.4,1.4]}},
+      {name:"LÊ UYÊN NHI",role:"SC - FT",sua:{m:125,d:[3.5,5.2,7.6,7.6]},kem:{m:18,d:[0.5,0.7,1.1,1.1]},son:{m:18,d:[0.5,0.7,1.1,1.1]}},
+      {name:"VÕ ĐẶNG TÚ QUYÊN",role:"Admin - FT",sua:{m:100,d:[2.8,4.1,6.1,6.1]},kem:{m:12,d:[0.3,0.5,0.7,0.7]},son:{m:12,d:[0.3,0.5,0.7,0.7]}},
+      {name:"TĂNG QUẾ NHI",role:"Admin - FT",sua:{m:85,d:[2.4,3.5,5.2,5.2]},kem:{m:11,d:[0.3,0.5,0.7,0.7]},son:{m:11,d:[0.3,0.5,0.7,0.7]}},
+      {name:"PHAN THỊ CHÚC LINH",role:"Admin - FT",sua:{m:85,d:[2.4,3.5,5.2,5.2]},kem:{m:11,d:[0.3,0.5,0.7,0.7]},son:{m:11,d:[0.3,0.5,0.7,0.7]}},
+      {name:"NGUYỄN NGỌC PHỤNG",role:"Admin - FT",sua:{m:80,d:[2.2,3.3,4.9,4.9]},kem:{m:11,d:[0.3,0.5,0.7,0.7]},son:{m:11,d:[0.3,0.5,0.7,0.7]}},
+      {name:"Dương Xuân Hoàng Ngân",role:"Admin Chief - FT",sua:{m:50,d:[1.4,2.1,3.0,3.0]},kem:{m:8,d:[0.2,0.3,0.5,0.5]},son:{m:8,d:[0.2,0.3,0.5,0.5]}},
+      {name:"PHAN THỊ THÙY DƯƠNG",role:"Cashier - PT",sua:{m:50,f:4.2},kem:{m:8,f:0.7},son:{m:8,f:0.7}},
+      {name:"TRÌNH QUÁCH VY",role:"Cashier - PT",sua:{m:35,f:2.9},kem:{m:8,f:0.7},son:{m:8,f:0.7}},
+      {name:"VÕ THANH THẢO",role:"Cashier - PT",sua:{m:20,f:1.7},kem:{m:5,f:0.4},son:{m:5,f:0.4}},
+      {name:"NGUYỄN VIỆT HƯƠNG NHƯ",role:"Cafe Pet - FT",sua:{m:20,d:[0.6,0.8,1.2,1.2]},kem:{m:5,d:[0.1,0.2,0.3,0.3]},son:{m:5,d:[0.1,0.2,0.3,0.3]}},
+    ]
+  }
+};
+const DT_LABELS=["Ngày thường (T2-T5)","Thứ 6","Cuối tuần & lễ","Kohnan Day"];
+function pushDayType(iso,cfg){
+  const d=new Date(iso+"T00:00:00");
+  const mmdd=`${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  if(cfg.kohnanDays.includes(mmdd)) return 3;
+  const dow=d.getDay();
+  if(dow===0||dow===6||dayTags(iso).some(t=>t.cls==="holiday")) return 2;
+  if(dow===5) return 1;
+  return 0;
+}
+function pushQty(spec,dt){return spec?(typeof spec.f==="number"?spec.f:spec.d[dt]):null;}
+function fmtQ(v){return Number.isInteger(v)?String(v):v.toFixed(1);}
+
+function renderPush(){
+  const box=$("#pushBox");
+  if(!scheduleData||!selectedDate){box.innerHTML="";return;}
+  const cfg=PUSH_T[selectedDate.slice(0,7)];
+  if(!cfg){box.innerHTML=`<div class="push-card"><div style="padding:16px;color:var(--ink2);font-size:13px;">Chưa có bảng push sale cho tháng này.</div></div>`;return;}
+  const dt=pushDayType(selectedDate,cfg);
+  const idx={};cfg.people.forEach(p=>{idx[normName(p.name)]=p;});
+  const working=(scheduleData.dates[selectedDate]||[])
+    .filter(r=>teamOf(r.pos,r.name)==="ADMIN")
+    .map(r=>({r,c:classifyShift(r.raw)}))
+    .filter(x=>x.c.kind==="shift")
+    .sort((a,b)=>a.c.startH-b.c.startH);
+  if(!working.length){box.innerHTML=`<div class="push-card"><div class="push-head"><div><div class="push-title">Target Push Sale - Team Admin</div><div class="push-sub">${esc(cfg.title)}</div></div></div><div style="padding:14px 16px;color:var(--ink2);font-size:13px;">Hôm nay không có ai Team Admin trong ca.</div></div>`;return;}
+  const totals=cfg.products.map(()=>0);
+  const cellHtml=(spec,i)=>{
+    const v=pushQty(spec,dt);
+    if(v===null) return`<td><div class="q-none">—</div></td>`;
+    totals[i]+=v;
+    return`<td><div class="q-val">${fmtQ(v)}</div></td>`;
+  };
+  const dtCls=dt===0?"":dt===1?" dt1":dt===2?" dt2":" dt3";
+  let rows="";
+  working.forEach(({r,c})=>{
+    const p=idx[normName(r.name)];
+    const active=isActiveNow(c,selectedDate);
+    rows+=`<tr class="${active?"active":""}"><td><div class="emp-name">${esc(r.name)}</div><div class="emp-pos">${esc(p?p.role:r.pos)}</div></td><td style="font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap;">${esc(c.label)}${active?`<div class="active-pill"><span class="dot"></span>Đang làm</div>`:""}</td>${cfg.products.map((_,i)=>cellHtml(p?p[cfg.products[i].key]:null,i)).join("")}</tr>`;
+  });
+  const thead=cfg.products.map(p=>`<th>${p.icon} ${esc(p.label)}<span class="u">${p.unit}</span></th>`).join("");
+  const tfoot=cfg.products.map((p,i)=>`<td><div class="q-val">${Math.round(totals[i])}</div><div class="q-hint">${p.unit}</div></td>`).join("");
+  box.innerHTML=`<div class="push-card"><div class="push-head"><div><div class="push-title">🎯 Target Push Sale hôm nay — Team Admin</div><div class="push-sub">${esc(cfg.title)}</div></div><span class="push-daytype${dtCls}">${DT_LABELS[dt]}</span></div><div class="push-table-wrap"><table class="push-table"><thead><tr><th>Nhân viên</th><th>Ca</th>${thead}</tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="2" style="font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;">Tổng team</td>${tfoot}</tr></tfoot></table></div></div>`;
+}
+
+/* ===== TASKS ===== */
+function onShiftNames(){const recs=scheduleData&&selectedDate?(scheduleData.dates[selectedDate]||[]):[];return recs.filter(r=>classifyShift(r.raw).kind==="shift").map(r=>r.name);}
+function renderAssigneeOpts(){
+  const sel=$("#newTaskAssignee"),cur=sel.value,names=onShiftNames();
+  sel.innerHTML=`<option value="">— Chưa phân công —</option>`+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+  if(names.includes(cur)) sel.value=cur;
+}
+function renderTasks(){
+  const list=selectedDate?tasksStore[selectedDate]||[]:[];
+  const el=$("#taskList");
+  if(!list.length){el.innerHTML=`<div class="empty-msg">Chưa có việc nào. Thêm ở khung phía trên.</div>`;return;}
+  el.innerHTML=list.map(t=>`<div class="task-row${t.done?" done":""}">
+    <button class="task-check${t.done?" checked":""}" data-id="${t.id}" data-action="toggle">${t.done?"✓":""}</button>
+    <div class="task-body"><div class="task-title">${esc(t.title)}</div><div class="task-sub">${t.assignee?`<span class="assignee-pill">👤 ${esc(t.assignee)}</span>`:"<span>Chưa phân công</span>"}${t.source?`<span>· ${esc(t.source)}</span>`:""}</div></div>
+    <button class="task-del no-print" data-id="${t.id}" data-action="delete">✕</button>
+  </div>`).join("");
+}
+function addTask(title,assignee,src){
+  if(!selectedDate) return;
+  if(!tasksStore[selectedDate]) tasksStore[selectedDate]=[];
+  tasksStore[selectedDate].push({id:"t"+Date.now()+Math.random().toString(36).slice(2),title,assignee:assignee||"",done:false,source:src||""});
+  persistTasks(); renderTasks();
+}
+function parseTaskWb(wb){
+  let added=0;
+  wb.SheetNames.forEach(sn=>{
+    const ws=wb.Sheets[sn];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+    if(!aoa||aoa.length<2) return;
+    let hi=-1;
+    for(let r=0;r<Math.min(aoa.length,10);r++){if((aoa[r]||[]).filter(c=>typeof c==="string"&&c.trim()).length>=2){hi=r;break;}}
+    if(hi===-1) return;
+    const h=aoa[hi].map(c=>String(c||"").toLowerCase());
+    const findC=kw=>h.findIndex(x=>kw.some(k=>x.includes(k)));
+    const tC=findC(["công việc","nội dung","title","task"]);
+    const aC=findC(["phụ trách","người","assignee","nhân viên"]);
+    const dC=findC(["ngày","date"]);
+    if(tC===-1) return;
+    for(let r=hi+1;r<aoa.length;r++){
+      const row=aoa[r];if(!row) continue;
+      const title=row[tC];if(typeof title!=="string"||!title.trim()) continue;
+      let iso=selectedDate;
+      if(dC!==-1&&looksLikeDateSerial(row[dC])) iso=excelSerialToIso(row[dC]);
+      const assignee=aC!==-1?String(row[aC]||"").trim():"";
+      if(!tasksStore[iso]) tasksStore[iso]=[];
+      tasksStore[iso].push({id:"t"+Date.now()+Math.random().toString(36).slice(2),title:title.trim(),assignee,done:false,source:sn});
+      added++;
+    }
+  });
+  return added;
+}
+
+/* ===== BANNER ===== */
+function showBanner(el,type,html){
+  el.innerHTML=`<div class="banner ${type}"><div style="flex:1">${html}</div><button onclick="this.closest('.banner').remove()">✕</button></div>`;
+}
+
+/* ===== RENDER ALL ===== */
+function renderAll(){
+  renderMeta();
+  if(!scheduleData){
+    $("#dropzone").style.display="";
+    return;
+  }
+  $("#dropzone").style.display="none";
+  $("#gsheetTip").style.display="none";
+  renderControls();
+  renderNote();
+  renderStats();
+  renderPush();
+  renderTeams();
+  renderAssigneeOpts();
+  renderTasks();
+}
+
+/* ===== WIRE EVENTS ===== */
+function wireEvents(){
+  const sf=$("#scheduleFile"), tf=$("#taskFile");
+  $("#btnPickFile").onclick=()=>sf.click();
+  $("#btnReset").onclick=()=>{
+    const ls=safeLS();if(ls){ls.removeItem("khn16-sched");ls.removeItem("khn16-tasks");}
+    scheduleData=buildBuiltinData(); fileMeta={name:"Dữ liệu nhúng T10/2026",updatedAt:new Date().toISOString()};
+    tasksStore={}; pickDefault(); renderAll();
+    showBanner($("#taskBanner"),"info","Đã xóa dữ liệu lưu. Đang hiển thị dữ liệu nhúng T10/2026.");
+  };
+  $("#dropzone").onclick=()=>sf.click();
+  ["dragover","dragenter"].forEach(ev=>$("#dropzone").addEventListener(ev,e=>{e.preventDefault();$("#dropzone").classList.add("drag");}));
+  ["dragleave","drop"].forEach(ev=>$("#dropzone").addEventListener(ev,e=>{if(ev==="drop"){e.preventDefault();if(e.dataTransfer.files.length)handleScheduleFile(e.dataTransfer.files[0]);}$("#dropzone").classList.remove("drag");}));
+  sf.addEventListener("change",e=>{if(e.target.files.length)handleScheduleFile(e.target.files[0]);});
+  $("#btnPickTasks").onclick=()=>tf.click();
+  tf.addEventListener("change",e=>{if(e.target.files.length)handleTaskFile(e.target.files[0]);});
+  $("#prevDay").onclick=()=>shiftDay(-1);
+  $("#nextDay").onclick=()=>shiftDay(1);
+  $("#btnToday").onclick=()=>{const t=todayIso();if(availDates().includes(t)){selectedDate=t;renderAll();}else showBanner($("#taskBanner"),"warn",`Hôm nay (${t}) không có trong dữ liệu lịch.`);};
+  $("#datePicker").addEventListener("change",e=>{if(e.target.value){selectedDate=e.target.value;renderAll();}});
+  $("#searchBox").addEventListener("input",e=>{searchTerm=e.target.value;renderStats();renderTeams();});
+  $("#btnAddTask").onclick=()=>{const t=$("#newTaskTitle");const v=t.value.trim();if(v){addTask(v,$("#newTaskAssignee").value,"Thủ công");t.value="";}};
+  $("#newTaskTitle").addEventListener("keydown",e=>{if(e.key==="Enter")$("#btnAddTask").click();});
+  $("#taskList").addEventListener("click",e=>{
+    const btn=e.target.closest("[data-action]");if(!btn) return;
+    const id=btn.dataset.id,list=tasksStore[selectedDate]||[];
+    if(btn.dataset.action==="toggle"){const t=list.find(x=>x.id===id);if(t)t.done=!t.done;}
+    else if(btn.dataset.action==="delete") tasksStore[selectedDate]=list.filter(x=>x.id!==id);
+    persistTasks(); renderTasks();
+  });
+  ["#smBox","#teamsBox"].forEach(sel=>{
+    document.querySelector(sel).addEventListener("click",e=>{
+      const btn=e.target.closest("[data-ph]");
+      document.querySelectorAll(".phone-pop").forEach(p=>p.remove());
+      if(btn){const ph=btn.dataset.ph;const wrap=btn.closest(".emp-actions");wrap.insertAdjacentHTML("beforeend",`<div class="phone-pop"><a href="tel:+84${ph.slice(1)}">📞 Gọi — ${esc(ph)}</a><a href="https://zalo.me/${ph}" target="_blank">💬 Zalo</a></div>`);e.stopPropagation();}
+    });
+  });
+  document.addEventListener("click",e=>{if(!e.target.closest("[data-ph]")&&!e.target.closest(".phone-pop"))document.querySelectorAll(".phone-pop").forEach(p=>p.remove());});
+}
+
+function shiftDay(d){const all=availDates();const i=all.indexOf(selectedDate);const n=i+d;if(n>=0&&n<all.length){selectedDate=all[n];renderAll();}}
+
+function handleScheduleFile(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:"array"});
+      const result=parseWorkbook(wb);
+      if(!Object.keys(result.dates).length){showBanner($("#taskBanner"),"warn","Không tìm thấy dữ liệu lịch hợp lệ trong file.");return;}
+      scheduleData=result; fileMeta={name:file.name,updatedAt:new Date().toISOString()};
+      persistSchedule(); pickDefault(); renderAll();
+      showBanner($("#taskBanner"),"ok",`Đã tải lịch từ <b>${esc(file.name)}</b> — ${Object.keys(result.dates).length} ngày.`);
+    }catch(err){showBanner($("#taskBanner"),"warn","Lỗi đọc file: "+esc(err.message));}
+  };
+  r.readAsArrayBuffer(file);
+}
+function handleTaskFile(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:"array"});
+      const added=parseTaskWb(wb); persistTasks(); renderTasks();
+      if(!added) showBanner($("#taskSubBanner"),"warn","Không đọc được việc nào — file cần cột 'Công việc/Nội dung'.");
+      else showBanner($("#taskSubBanner"),"ok",`Đã thêm ${added} việc từ file <b>${esc(file.name)}</b>.`);
+    }catch(err){showBanner($("#taskSubBanner"),"warn","Lỗi đọc file công việc: "+esc(err.message));}
+  };
+  r.readAsArrayBuffer(file);
+}
+
+/* ===== BOOT ===== */
+loadPersisted();
+if(!scheduleData){
+  scheduleData=buildBuiltinData();
+  fileMeta={name:"Dữ liệu nhúng T10/2026",updatedAt:new Date().toISOString()};
+}
+pickDefault();
+wireEvents();
+renderAll();
+setInterval(()=>{if(scheduleData&&selectedDate===todayIso()){renderStats();renderPush();renderTeams();}},30000);
+</script>
+</body>
+</html>

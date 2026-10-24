@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiến Lược Push Sale Tháng 10 - Sữa Tắm ON: The Body, Kem Dưỡng Tay, Son Dưỡng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .custom-card {
+            background: #ffffff; border-radius: 1.25rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0; transition: all 0.3s ease;
+        }
+        .custom-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04); }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; height: 260px; }
+        .tab-btn { transition: all .2s ease; }
+        .tab-btn[aria-selected="true"].t-otb { background:#e11d48; color:#fff; border-color:#e11d48; }
+        .tab-btn[aria-selected="true"].t-kem { background:#0369a1; color:#fff; border-color:#0369a1; }
+        .tab-btn[aria-selected="true"].t-son { background:#15803d; color:#fff; border-color:#15803d; }
+        .print-title { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #ffffff !important; }
+            nav { position: static !important; }
+            .custom-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+            .tab-panel { display: block !important; break-inside: avoid; margin-bottom: 1.5rem; }
+            .print-title { display: block; }
+            body[data-print] nav, body[data-print] main > *:not(.pt-area) { display: none !important; }
+            body[data-print] .pt-head { display: block !important; margin-bottom: 10px; }
+            body[data-print] .custom-card { padding: 0.75rem; border: none !important; }
+            body[data-print] .p-3\.5, body[data-print] .p-3 { padding: 6px 8px !important; }
+            body[data-print] table { font-size: 11px; }
+            body[data-print="sum"] #pt-detail { display: none !important; }
+            body[data-print="otb"] #pt-summary, body[data-print="kem"] #pt-summary, body[data-print="son"] #pt-summary { display: none !important; }
+            body[data-print="otb"] .tab-panel:not(#panel-otb), body[data-print="kem"] .tab-panel:not(#panel-kem), body[data-print="son"] .tab-panel:not(#panel-son) { display: none !important; }
+            body[data-print="all"] #pt-detail .tab-panel { break-before: page; }
+            body[data-print] tr { break-inside: avoid; }
+            body[data-print] table { width: 100%; border-collapse: collapse; }
+            body[data-print] th, body[data-print] td { padding: 3px 5px !important; border-bottom: 1px solid #e2e8f0; font-size: 10px; line-height: 1.25; }
+            body[data-print] section { margin-bottom: 0 !important; }
+            body[data-print] #pt-detail .custom-card > div:first-child { display: none !important; }
+            body[data-print] .print-title { margin: 6px 0 4px; }
+            body[data-print] .custom-card, body[data-print] .tab-panel { break-inside: auto !important; }
+            body[data-print] .tab-panel { margin-bottom: 0 !important; }
+        }
+        .pt-head { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 py-4 px-6 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <span class="p-2 bg-rose-600 text-white rounded-xl font-black text-xl tracking-wider">POS</span>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight text-center md:text-left">TEAM ADMIN PUSH SALES DASHBOARD</h1>
+                    <p class="text-[11px] text-slate-500 font-bold text-center md:text-left uppercase tracking-wider">Kế Hoạch Push Sale Tháng 10 • Sữa Tắm 99K • Kem Tay 49K • Son Dưỡng 39K</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <div class="text-xs font-semibold text-rose-700 bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-200 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    Ngày Phụ Nữ Việt Nam 20/10
+                </div>
+                <button onclick="window.print()" class="no-print bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md transition flex items-center gap-2">
+                    🖨️ In / Export PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="mb-8 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-extrabold uppercase tracking-wider mb-3">
+                🔥 Chiến Dịch Trọng Tâm Tháng 10
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">
+                Chiến Lược Push Sale: <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-sky-600 to-green-600">Bộ 3 Chăm Sóc Cơ Thể Mùa Thu Đông</span>
+            </h2>
+            <p class="text-base md:text-lg text-slate-600 max-w-4xl leading-relaxed">
+                Sữa tắm <strong class="text-rose-600">ON: The Body 99K</strong> tiếp tục là trục chính, kết hợp 2 sản phẩm mới bán kèm tại quầy: <strong class="text-sky-700">Kem dưỡng tay Hatomugi 89K ➡️ 49K</strong> và <strong class="text-green-700">Son dưỡng môi Menturm 39K</strong>. Mùa hanh khô + Ngày Phụ nữ 20/10 là thời điểm vàng để chốt <strong class="text-slate-900">bộ quà 3 món chỉ 187K</strong>. Đội hình 11 người, chào đón 2 thành viên mới <strong class="text-violet-700">Nguyễn Ngọc Phụng (Admin)</strong> và <strong class="text-violet-700">Nguyễn Việt Hương Như (Cafe Pet)</strong>.
+            </p>
+        </header>
+
+        <!-- KPI -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div class="custom-card border-t-4 border-rose-500 bg-gradient-to-br from-white to-rose-50">
+                <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Sữa Tắm ON: The Body</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-rose-600">800</span>
+                    <span class="ml-2 text-slate-500 font-bold">Chai</span>
+                </div>
+                <p class="mt-3 text-xs text-rose-700 font-bold border-t border-rose-100 pt-2">99K <span class="line-through text-slate-400 font-semibold">198K</span> • 79.200.000đ</p>
+            </div>
+            <div class="custom-card border-t-4 border-sky-600 bg-gradient-to-br from-white to-sky-50">
+                <p class="text-xs font-bold text-sky-700 uppercase tracking-wider">Kem Dưỡng Tay Hatomugi</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-sky-700">120</span>
+                    <span class="ml-2 text-slate-500 font-bold">Tuýp</span>
+                </div>
+                <p class="mt-3 text-xs text-sky-800 font-bold border-t border-sky-100 pt-2">49K <span class="line-through text-slate-400 font-semibold">89K</span> • 5.880.000đ</p>
+            </div>
+            <div class="custom-card border-t-4 border-green-600 bg-gradient-to-br from-white to-green-50">
+                <p class="text-xs font-bold text-green-700 uppercase tracking-wider">Son Dưỡng Môi Menturm</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-green-700">120</span>
+                    <span class="ml-2 text-slate-500 font-bold">Thỏi</span>
+                </div>
+                <p class="mt-3 text-xs text-green-800 font-bold border-t border-green-100 pt-2">39K • 4.680.000đ</p>
+            </div>
+            <div class="custom-card border-t-4 border-teal-500">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Doanh Thu Dự Kiến</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-3xl font-black text-teal-600">89.760.000đ</span>
+                </div>
+                <p class="mt-3 text-xs text-teal-700 font-semibold border-t border-slate-100 pt-2">Tổng 3 nhóm sản phẩm tháng 10</p>
+            </div>
+        </section>
+
+        <!-- Nhịp bán toàn team -->
+        <section class="custom-card mb-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                <h3 class="text-lg font-black text-slate-900">⏱️ Nhịp Bán Toàn Team Mỗi Ngày (Lịch 31 Ngày Tháng 10)</h3>
+                <span class="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-1 rounded-md border border-amber-300">🛍️ Kohnan Day: 5/10 & 20/10 • 🎉 Ngày Lễ: 20/10</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                            <th class="p-3 text-left">Sản phẩm</th>
+                            <th class="p-3 text-center">Ngày thường (T2-T5)</th>
+                            <th class="p-3 text-center bg-orange-50 text-orange-900">Thứ 6</th>
+                            <th class="p-3 text-center bg-amber-50 text-amber-900">Cuối tuần / Lễ / Kohnan Day</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-semibold">
+                        <tr><td class="p-3 text-rose-700">🧴 Sữa tắm ON: The Body</td><td class="p-3 text-center">17.1 chai / ngày</td><td class="p-3 text-center text-orange-800 bg-orange-50/40">25.7 chai / ngày</td><td class="p-3 text-center text-amber-800 bg-amber-50/40">37.7 chai / ngày</td></tr>
+                        <tr><td class="p-3 text-sky-700">🤲 Kem dưỡng tay Hatomugi</td><td class="p-3 text-center">2.6 tuýp / ngày</td><td class="p-3 text-center text-orange-800 bg-orange-50/40">3.9 tuýp / ngày</td><td class="p-3 text-center text-amber-800 bg-amber-50/40">5.7 tuýp / ngày</td></tr>
+                        <tr><td class="p-3 text-green-700">💋 Son dưỡng môi Menturm</td><td class="p-3 text-center">2.6 thỏi / ngày</td><td class="p-3 text-center text-orange-800 bg-orange-50/40">3.9 thỏi / ngày</td><td class="p-3 text-center text-amber-800 bg-amber-50/40">5.7 thỏi / ngày</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Nhận diện sản phẩm -->
+        <section class="mb-10">
+            <h3 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2"><span>🛍️</span> BẢNG NHẬN DIỆN 3 NHÓM SẢN PHẨM PUSH SALE</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- OTB -->
+                <div class="custom-card border-2 border-rose-300 bg-gradient-to-b from-rose-50/60 to-white relative overflow-hidden ring-2 ring-rose-200">
+                    <div class="absolute top-0 right-0 bg-rose-600 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">🔥 Trục Chính - 800 Chai</div>
+                    <h4 class="text-lg font-black text-slate-900 mt-3 mb-1">Sữa Tắm Nước Hoa ON: The Body</h4>
+                    <p class="text-xs font-bold text-rose-600 mb-3">LG Hàn Quốc • Chai lớn • 99K (từ 198K, giảm 50%)</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-start gap-2 text-xs text-slate-700"><span class="w-3 h-3 mt-0.5 rounded-full bg-emerald-500 shrink-0"></span><span><strong>Xanh Lá - Lily & Honeysuckle:</strong> hoa ly, kim ngân - thanh nhẹ, dùng hằng ngày</span></div>
+                        <div class="flex items-start gap-2 text-xs text-slate-700"><span class="w-3 h-3 mt-0.5 rounded-full bg-sky-500 shrink-0"></span><span><strong>Xanh Dương - Herbal Scent:</strong> thảo mộc mát, cả nhà nam nữ dùng chung</span></div>
+                        <div class="flex items-start gap-2 text-xs text-slate-700"><span class="w-3 h-3 mt-0.5 rounded-full bg-pink-500 shrink-0"></span><span><strong>Hồng - Peony & Musk:</strong> mẫu đơn, xạ hương, có dầu Argan - ngọt ngào, hợp làm quà 20/10</span></div>
+                    </div>
+                    <div class="bg-rose-100/70 p-2.5 rounded-lg border border-rose-200 text-[11px] text-rose-900 font-medium">
+                        👉 <strong>Key Push:</strong> "3 mùi đều đủ hàng chị ơi, chị thích hương hoa nhẹ, thảo mộc mát hay ngọt ngào quyến rũ để em lấy đúng mùi cho chị!"
+                    </div>
+                </div>
+                <!-- Kem tay -->
+                <div class="custom-card border-2 border-sky-300 bg-gradient-to-b from-sky-50/60 to-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-sky-700 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">✨ Sản Phẩm Mới - 120 Tuýp</div>
+                    <h4 class="text-lg font-black text-slate-900 mt-3 mb-1">Kem Dưỡng Da Tay Hatomugi</h4>
+                    <p class="text-xs font-bold text-sky-700 mb-3">Reihaku Nhật Bản • 65g • 49K (từ 89K, tiết kiệm 40K)</p>
+                    <ul class="text-xs text-slate-600 space-y-2 mb-4">
+                        <li>• <strong>Thành phần:</strong> Chiết xuất hạt ý dĩ (Hatomugi) tự nhiên.</li>
+                        <li>• <strong>Công dụng:</strong> Dưỡng ẩm sâu, da tay mềm mịn, không khô ráp; bảo vệ da tay.</li>
+                        <li>• <strong>Điểm cộng:</strong> Thấm nhanh, không nhờn rít - thoa xong cầm điện thoại, làm việc liền.</li>
+                        <li>• <strong>Khách mục tiêu:</strong> Dân văn phòng, nội trợ hay rửa tay/rửa chén, khách mua quà 20/10.</li>
+                    </ul>
+                    <div class="bg-sky-100/70 p-2.5 rounded-lg border border-sky-200 text-[11px] text-sky-900 font-medium">
+                        👉 <strong>Key Push:</strong> "Trời hanh khô tay dễ nứt lắm chị, kem tay Nhật hạt ý dĩ này thấm nhanh không nhờn, đang giảm từ 89K còn 49K thôi ạ!"
+                    </div>
+                </div>
+                <!-- Son -->
+                <div class="custom-card border-2 border-green-300 bg-gradient-to-b from-green-50/60 to-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-700 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">✨ Sản Phẩm Mới - 120 Thỏi</div>
+                    <h4 class="text-lg font-black text-slate-900 mt-3 mb-1">Son Dưỡng Môi Menturm</h4>
+                    <p class="text-xs font-bold text-green-700 mb-3">Omi Brotherhood Nhật Bản • Medicated Stick • 39K</p>
+                    <ul class="text-xs text-slate-600 space-y-2 mb-4">
+                        <li>• <strong>Công dụng:</strong> Dưỡng ẩm sâu, môi mềm mịn, bảo vệ môi khỏi khô nứt nẻ.</li>
+                        <li>• <strong>Thành phần:</strong> An toàn, dịu nhẹ, phù hợp mọi loại da.</li>
+                        <li>• <strong>Điểm cộng:</strong> Nhỏ gọn, bỏ túi mang theo mọi lúc; không màu nên cả nam và nữ đều dùng.</li>
+                        <li>• <strong>Khách mục tiêu:</strong> Mọi khách tại quầy - món mua kèm giá nhỏ, quyết định trong 5 giây.</li>
+                    </ul>
+                    <div class="bg-green-100/70 p-2.5 rounded-lg border border-green-200 text-[11px] text-green-900 font-medium">
+                        👉 <strong>Key Push:</strong> "Son dưỡng Nhật Menturm chỉ 39K, nhỏ gọn bỏ túi, mùa này môi khô nứt dùng là mềm liền, anh chị lấy thêm 1 thỏi nha!"
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Thanh in bảng target -->
+        <section class="no-print mb-4 pt-area">
+            <div class="flex flex-wrap items-center gap-2 bg-slate-900 text-white rounded-2xl px-4 py-3">
+                <span class="text-xs font-black uppercase tracking-wider mr-1">🖨️ In riêng bảng target:</span>
+                <button onclick="printTarget('all')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">Tất cả bảng target</button>
+                <button onclick="printTarget('sum')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">Bảng gộp 3 sản phẩm</button>
+                <button onclick="printTarget('otb')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">🧴 Sữa tắm</button>
+                <button onclick="printTarget('kem')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">🤲 Kem tay</button>
+                <button onclick="printTarget('son')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">💋 Son dưỡng</button>
+            </div>
+        </section>
+
+        <div class="pt-area pt-head">
+            <h2 class="text-xl font-black text-slate-900">BẢNG TARGET PUSH SALE THÁNG 10/2026 - TEAM ADMIN</h2>
+            <p class="text-xs text-slate-600 font-semibold">Kohnan Parc Mall - Store 1016 • Sữa tắm ON: The Body 800 chai • Kem dưỡng tay 120 tuýp • Son dưỡng môi 120 thỏi • Kohnan Day 5/10 & 20/10</p>
+        </div>
+
+        <!-- Tổng chỉ tiêu theo người -->
+        <section class="mb-10 pt-area" id="pt-summary">
+            <div class="custom-card border-t-4 border-slate-800">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-2">
+                    <div>
+                        <span class="bg-slate-100 text-slate-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">👥 TỔNG CHỈ TIÊU THÁNG 10 THEO NHÂN VIÊN</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-2">Bảng Chỉ Tiêu Gộp 3 Sản Phẩm</h3>
+                        <p class="text-xs text-slate-500 mt-1">📌 <em>Tổng: 800 chai sữa tắm • 120 tuýp kem tay • 120 thỏi son dưỡng.</em></p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3 rounded-tl-lg">Họ Và Tên</th>
+                                <th class="p-3 text-center">Chức Danh</th>
+                                <th class="p-3 text-center bg-rose-50 text-rose-900">🧴 Sữa Tắm (Chai)</th>
+                                <th class="p-3 text-center bg-sky-50 text-sky-900">🤲 Kem Tay (Tuýp)</th>
+                                <th class="p-3 text-center bg-green-50 text-green-900">💋 Son Dưỡng (Thỏi)</th>
+                                <th class="p-3 text-right rounded-tr-lg">Doanh Thu Mục Tiêu</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                            <tr><td class="p-3 font-bold">Nguyễn Lê Minh Thư</td><td class="p-3 text-center text-slate-600">CS - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">150</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">23</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">23</td><td class="p-3 text-right font-bold text-slate-900">16.874.000đ</td></tr><tr><td class="p-3 font-bold">Lê Uyên Nhi</td><td class="p-3 text-center text-slate-600">SC - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">125</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">18</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">18</td><td class="p-3 text-right font-bold text-slate-900">13.959.000đ</td></tr><tr><td class="p-3 font-bold">Võ Đặng Tú Quyên</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">100</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">12</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">12</td><td class="p-3 text-right font-bold text-slate-900">10.956.000đ</td></tr><tr><td class="p-3 font-bold">Tăng Quế Nhi</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">85</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">11</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">11</td><td class="p-3 text-right font-bold text-slate-900">9.383.000đ</td></tr><tr><td class="p-3 font-bold">Phan Thị Chúc Linh</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">85</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">11</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">11</td><td class="p-3 text-right font-bold text-slate-900">9.383.000đ</td></tr><tr><td class="p-3 font-bold">Nguyễn Ngọc Phụng <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span></td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">80</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">11</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">11</td><td class="p-3 text-right font-bold text-slate-900">8.888.000đ</td></tr><tr><td class="p-3 font-bold">Dương Xuân Hoàng Ngân</td><td class="p-3 text-center text-slate-600">Admin Chief - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">50</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">8</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">8</td><td class="p-3 text-right font-bold text-slate-900">5.654.000đ</td></tr><tr><td class="p-3 font-bold">Phan Thị Thùy Dương</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">50</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">8</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">8</td><td class="p-3 text-right font-bold text-slate-900">5.654.000đ</td></tr><tr><td class="p-3 font-bold">Trình Quách Vy</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">35</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">8</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">8</td><td class="p-3 text-right font-bold text-slate-900">4.169.000đ</td></tr><tr><td class="p-3 font-bold">Võ Thanh Thảo</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">20</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">5</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">5</td><td class="p-3 text-right font-bold text-slate-900">2.420.000đ</td></tr><tr><td class="p-3 font-bold">Nguyễn Việt Hương Như <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span></td><td class="p-3 text-center text-slate-600">Cafe Pet - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">20</td><td class="p-3 text-center font-black text-sky-700 bg-sky-50/40">5</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">5</td><td class="p-3 text-right font-bold text-slate-900">2.420.000đ</td></tr><tr class="bg-slate-900 text-white font-black"><td class="p-3.5 uppercase rounded-bl-lg" colspan="2">Tổng Team Admin (11 người)</td><td class="p-3.5 text-center text-rose-300">800</td><td class="p-3.5 text-center text-sky-300">120</td><td class="p-3.5 text-center text-green-300">120</td><td class="p-3.5 text-right text-yellow-300 rounded-br-lg">89.760.000đ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bảng chi tiết theo ca -->
+        <section class="mb-10 pt-area" id="pt-detail">
+            <div class="custom-card border-t-4 border-rose-600 bg-gradient-to-b from-rose-50/20 to-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
+                    <div>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">📊 BẢNG PHÂN BỔ CHỈ TIÊU THEO CA LÀM VIỆC</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-2">Chỉ Tiêu Chi Tiết Từng Nhân Viên</h3>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-1 rounded-md border border-amber-300 shrink-0">🛍️ Kohnan Day: 5/10 & 20/10 (Giảm thêm 5%) • 🎉 Ngày Lễ: 20/10</span>
+                </div>
+
+                <div class="no-print flex flex-wrap gap-2 mb-5" role="tablist">
+                    <button class="tab-btn t-otb border-2 border-rose-200 text-rose-700 text-xs font-black px-4 py-2 rounded-xl" role="tab" aria-selected="true" data-tab="otb">🧴 Sữa Tắm ON: The Body (800)</button>
+                    <button class="tab-btn t-kem border-2 border-sky-200 text-sky-700 text-xs font-black px-4 py-2 rounded-xl" role="tab" aria-selected="false" data-tab="kem">🤲 Kem Dưỡng Tay (120)</button>
+                    <button class="tab-btn t-son border-2 border-green-200 text-green-700 text-xs font-black px-4 py-2 rounded-xl" role="tab" aria-selected="false" data-tab="son">💋 Son Dưỡng Môi (120)</button>
+                </div>
+
+                <div class="tab-panel" id="panel-otb">
+                    <h4 class="print-title text-base font-black text-rose-700 mb-2">🧴 Sữa Tắm ON: The Body - 800 chai</h4>
+                    <div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead><tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+<th class="p-3.5 rounded-tl-lg">Họ Và Tên</th>
+<th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+<th class="p-3.5 text-center bg-rose-50 text-rose-900">Target T10 (Chai)</th>
+<th class="p-3.5 text-center">Ca Ngày Thường (T2-T5)</th>
+<th class="p-3.5 text-center bg-orange-50 text-orange-900">Ca Thứ 6</th>
+<th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần & Ngày Lễ (T7-CN, 20/10)</th>
+<th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Kohnan Day (5/10 & 20/10)</th>
+<th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Lê Minh Thư</td>
+<td class="p-3.5 text-center">CS Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">150</td>
+<td class="p-3.5 text-center font-bold text-slate-700">4.1 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">6.2 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">9.1 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">9.1 chai / ca</td>
+<td class="p-3.5">Mời 100% bill thanh toán tại quầy POS</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Lê Uyên Nhi</td>
+<td class="p-3.5 text-center">SC Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">125</td>
+<td class="p-3.5 text-center font-bold text-slate-700">3.5 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">5.2 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">7.6 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">7.6 chai / ca</td>
+<td class="p-3.5">Chốt Combo 2 chai 2 mùi tại quầy SC</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Võ Đặng Tú Quyên</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">100</td>
+<td class="p-3.5 text-center font-bold text-slate-700">2.8 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">4.1 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">6.1 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">6.1 chai / ca</td>
+<td class="p-3.5">Tập trung chốt Combo 2 chai/ca</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Tăng Quế Nhi</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">85</td>
+<td class="p-3.5 text-center font-bold text-slate-700">2.4 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">3.5 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">5.2 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">5.2 chai / ca</td>
+<td class="p-3.5">Tận dụng giờ cao điểm (Peak hour) tại POS</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Phan Thị Chúc Linh</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">85</td>
+<td class="p-3.5 text-center font-bold text-slate-700">2.4 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">3.5 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">5.2 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">5.2 chai / ca</td>
+<td class="p-3.5">Hỗ trợ fill hàng & mở lời 10s tại POS</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Ngọc Phụng</td>
+<td class="p-3.5 text-center">Admin Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">80</td>
+<td class="p-3.5 text-center font-bold text-slate-700">2.2 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">3.3 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">4.9 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">4.9 chai / ca</td>
+<td class="p-3.5">Thuộc kịch bản 3 bước trong tuần đầu</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Dương Xuân Hoàng Ngân</td>
+<td class="p-3.5 text-center">Admin Chief Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">50</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.4 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">2.1 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">3.0 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">3.0 chai / ca</td>
+<td class="p-3.5">Đào tạo & theo sát nhịp quầy POS</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Phan Thị Thùy Dương</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">50</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~4.2 chai / ca trực quầy</td>
+<td class="p-3.5">Tận dụng tối đa các ca trực quầy chính</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Trình Quách Vy</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">35</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~2.9 chai / ca trực quầy</td>
+<td class="p-3.5">Nhóm PT hỗ trợ tăng cường</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Võ Thanh Thảo</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">20</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~1.7 chai / ca trực quầy</td>
+<td class="p-3.5">Nhóm PT hỗ trợ tăng cường</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Việt Hương Như</td>
+<td class="p-3.5 text-center">Cafe Pet Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">20</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.6 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.8 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.2 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.2 chai / ca</td>
+<td class="p-3.5">Thuộc kịch bản 3 bước trong tuần đầu</td>
+</tr>
+<tr class="bg-rose-900 text-white font-black text-sm">
+<td class="p-4 uppercase rounded-bl-lg" colspan="2">Tổng mục tiêu tháng 10</td>
+<td class="p-4 text-center text-yellow-300 text-base">800 chai</td>
+<td class="p-4 text-center font-normal italic rounded-br-lg" colspan="5">Doanh thu dự kiến 79.200.000đ (800 x 99.000đ)</td>
+</tr>
+</tbody></table></div>
+                </div>
+                <div class="tab-panel hidden" id="panel-kem">
+                    <h4 class="print-title text-base font-black text-sky-700 mb-2">🤲 Kem Dưỡng Tay Hatomugi - 120 tuýp</h4>
+                    <div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead><tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+<th class="p-3.5 rounded-tl-lg">Họ Và Tên</th>
+<th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+<th class="p-3.5 text-center bg-sky-50 text-sky-900">Target T10 (Tuýp)</th>
+<th class="p-3.5 text-center">Ca Ngày Thường (T2-T5)</th>
+<th class="p-3.5 text-center bg-orange-50 text-orange-900">Ca Thứ 6</th>
+<th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần & Ngày Lễ (T7-CN, 20/10)</th>
+<th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Kohnan Day (5/10 & 20/10)</th>
+<th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Lê Minh Thư</td>
+<td class="p-3.5 text-center">CS Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">23</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.6 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.0 tuýp / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.4 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.4 tuýp / ca</td>
+<td class="p-3.5">Gợi ý kem tay cho mọi bill có sữa tắm</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Lê Uyên Nhi</td>
+<td class="p-3.5 text-center">SC Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">18</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.7 tuýp / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.1 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.1 tuýp / ca</td>
+<td class="p-3.5">Tư vấn kem tay cho khách đổi trả/bảo hành</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Võ Đặng Tú Quyên</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">12</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 tuýp / ca</td>
+<td class="p-3.5">Đề xuất bộ đôi Kem tay + Son 88.000đ</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Tăng Quế Nhi</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 tuýp / ca</td>
+<td class="p-3.5">Mô tả cảm giác thấm nhanh, không nhờn khi mời</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Phan Thị Chúc Linh</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 tuýp / ca</td>
+<td class="p-3.5">Mở lời kem tay khi khách mua sữa tắm</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Ngọc Phụng</td>
+<td class="p-3.5 text-center">Admin Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 tuýp / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 tuýp / ca</td>
+<td class="p-3.5">Mở lời kem tay khi khách mua sữa tắm</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Dương Xuân Hoàng Ngân</td>
+<td class="p-3.5 text-center">Admin Chief Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">8</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.2 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 5 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.5 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td>
+<td class="p-3.5">Kèm cặp 2 bạn mới Phụng & Như</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Phan Thị Thùy Dương</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">8</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.7 tuýp / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td>
+<td class="p-3.5">Mời kem tay mọi bill có hóa mỹ phẩm</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Trình Quách Vy</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">8</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.7 tuýp / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td>
+<td class="p-3.5">Mời kem tay mọi bill có hóa mỹ phẩm</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Võ Thanh Thảo</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">5</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.4 tuýp / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 2 ca</span></td>
+<td class="p-3.5">Mời kem tay mọi bill có hóa mỹ phẩm</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Việt Hương Như</td>
+<td class="p-3.5 text-center">Cafe Pet Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-sky-700 bg-sky-50/40 text-base">5</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.1 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 7 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.2 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 5 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.3 tuýp / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 tuýp mỗi 3 ca</span></td>
+<td class="p-3.5">Mở lời kem tay khi khách mua sữa tắm</td>
+</tr>
+<tr class="bg-blue-900 text-white font-black text-sm">
+<td class="p-4 uppercase rounded-bl-lg" colspan="2">Tổng mục tiêu tháng 10</td>
+<td class="p-4 text-center text-yellow-300 text-base">120 tuýp</td>
+<td class="p-4 text-center font-normal italic rounded-br-lg" colspan="5">Doanh thu dự kiến 5.880.000đ (120 x 49.000đ)</td>
+</tr>
+</tbody></table></div>
+                </div>
+                <div class="tab-panel hidden" id="panel-son">
+                    <h4 class="print-title text-base font-black text-green-700 mb-2">💋 Son Dưỡng Môi Menturm - 120 thỏi</h4>
+                    <div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead><tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+<th class="p-3.5 rounded-tl-lg">Họ Và Tên</th>
+<th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+<th class="p-3.5 text-center bg-green-50 text-green-900">Target T10 (Thỏi)</th>
+<th class="p-3.5 text-center">Ca Ngày Thường (T2-T5)</th>
+<th class="p-3.5 text-center bg-orange-50 text-orange-900">Ca Thứ 6</th>
+<th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần & Ngày Lễ (T7-CN, 20/10)</th>
+<th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Kohnan Day (5/10 & 20/10)</th>
+<th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Lê Minh Thư</td>
+<td class="p-3.5 text-center">CS Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">23</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.6 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.0 thỏi / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.4 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.4 thỏi / ca</td>
+<td class="p-3.5">Đặt rổ son cạnh máy POS, mời khi thối tiền</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Lê Uyên Nhi</td>
+<td class="p-3.5 text-center">SC Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">18</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.7 thỏi / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.1 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.1 thỏi / ca</td>
+<td class="p-3.5">Mời son dưỡng khách nam mua quà 20/10</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Võ Đặng Tú Quyên</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">12</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca</td>
+<td class="p-3.5">Chốt kèm khi khách mua kem tay</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Tăng Quế Nhi</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca</td>
+<td class="p-3.5">Chốt kèm khi khách mua kem tay</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Phan Thị Chúc Linh</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca</td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Ngọc Phụng</td>
+<td class="p-3.5 text-center">Admin Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca</td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr><tr>
+<td class="p-3.5 font-bold">Dương Xuân Hoàng Ngân</td>
+<td class="p-3.5 text-center">Admin Chief Full-Time<br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">8</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.2 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 5 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Rà tồn & fill rổ son mỗi đầu ca</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Phan Thị Thùy Dương</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">8</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.7 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Trình Quách Vy</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">8</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.7 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr><tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Võ Thanh Thảo</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(12 ca / 79h)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">5</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.4 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr><tr class="bg-violet-50/40">
+<td class="p-3.5 font-bold">Nguyễn Việt Hương Như</td>
+<td class="p-3.5 text-center">Cafe Pet Full-Time <span class="ml-1 bg-violet-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">MỚI</span><br><span class="text-[10px] text-slate-500">(24 ca/tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">5</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.1 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 7 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.2 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 5 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr>
+<tr class="bg-green-900 text-white font-black text-sm">
+<td class="p-4 uppercase rounded-bl-lg" colspan="2">Tổng mục tiêu tháng 10</td>
+<td class="p-4 text-center text-yellow-300 text-base">120 thỏi</td>
+<td class="p-4 text-center font-normal italic rounded-br-lg" colspan="5">Doanh thu dự kiến 4.680.000đ (120 x 39.000đ)</td>
+</tr>
+</tbody></table></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mindset + 3 bước -->
+        <section class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-rose-600 to-pink-700 rounded-[2rem] p-7 text-white shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">💡</span>
+                        <h3 class="text-2xl font-bold">Tư Duy Push Sale T10</h3>
+                    </div>
+                    <p class="text-base leading-relaxed font-light mb-4">
+                        Sữa tắm mở lời, kem tay & son dưỡng chốt kèm. Giúp khách nhận ra: <strong>"Mùa hanh khô cần đủ bộ chăm sóc từ đầu đến tay, và 20/10 là dịp tặng quà ý nghĩa mà chưa tới 200K!"</strong>
+                    </p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/20 text-xs">
+                    ⚡ <strong>Tối ưu tốc độ:</strong> Rổ kem tay + son dưỡng đặt sát máy POS, trong tầm tay khách. Mời đúng 1 câu khi đưa bill.
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-white rounded-[2rem] border-2 border-rose-500 p-7 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">⚡</span>
+                    <h3 class="text-2xl font-bold text-rose-900 uppercase tracking-tight">KỊCH BẢN PUSH SALE 3 BƯỚC (30 GIÂY TẠI QUẦY POS)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                        <span class="inline-block bg-rose-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 1: CHUẨN BỊ</span>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            <strong>Fill hàng đầy quầy POS:</strong> Xếp đủ 3 màu sữa tắm. Rổ kem tay + son dưỡng đặt cạnh máy POS. Cầm sẵn 1 chai sữa tắm trên tay khi tính tiền.
+                        </p>
+                    </div>
+                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                        <span class="inline-block bg-amber-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 2: MỞ LỜI CỰC MẠNH</span>
+                        <p class="text-xs text-slate-700 leading-relaxed italic">
+                            "Dạ chị ơi, sữa tắm nước hoa <strong>ON: The Body Hàn Quốc</strong> bên em đang giảm 50% từ <strong>198K chỉ còn 99K</strong>, 3 mùi đều đủ hàng, chị lấy 1 chai nha!"
+                        </p>
+                    </div>
+                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                        <span class="inline-block bg-emerald-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 3: CHỐT KÈM KEM TAY / SON</span>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Dù khách mua hay từ chối sữa tắm: <i>"Mùa này hanh khô, chị lấy thêm kem tay Nhật 49K (từ 89K) hoặc son dưỡng Menturm 39K bỏ túi nha chị!"</i>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cẩm nang từ chối -->
+        <section class="mb-10">
+            <div class="custom-card border-t-4 border-indigo-600 bg-gradient-to-b from-indigo-50/30 to-white">
+                <div class="flex items-center justify-between mb-6 border-b border-indigo-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🛡️</span>
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-900">CẨM NANG BÍ KÍP: BIẾN TỪ CHỐI THÀNH ĐƠN HÀNG</h3>
+                            <p class="text-xs text-indigo-700 font-bold">Bộ kịch bản phản hồi thực chiến 10 giây cho Thu ngân / Admin khi khách từ chối tại quầy</p>
+                        </div>
+                    </div>
+                    <span class="hidden md:inline-block px-3.5 py-1.5 bg-indigo-100 text-indigo-900 text-xs font-black rounded-full uppercase tracking-wider">Quy tắc vàng 3S</span>
+                </div>
+
+                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 rounded-xl mb-6 shadow-sm">
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2"><span>⚡</span> ÁP DỤNG QUY TẮC 3S TRONG TỪNG CÂU TRẢ LỜI:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">1. Smile (Mỉm cười):</strong> Luôn giữ thái độ thân thiện, vui vẻ dù khách đồng ý hay từ chối.</div>
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">2. Sympathize (Đồng cảm):</strong> Lắng nghe & gật đầu: <em>"Dạ em hiểu ạ...", "Dạ đúng rồi chị..."</em></div>
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">3. Solve & Suggest (Giải quyết & Chốt):</strong> Đưa lý do mua quá hời & chốt nhanh gọn.</div>
+                    </div>
+                </div>
+
+                <p class="text-sm font-black text-rose-700 mb-3">🧴 SỮA TẮM ON: THE BODY</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 1</span><h4 class="font-bold text-sm text-slate-900">"Nhà chị còn nhiều sữa tắm lắm, chưa dùng hết."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ em hiểu ạ, sữa tắm là đồ thiết yếu nên nhà mình hay có sẵn."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Hạn dài + Tiết kiệm):</strong><br>"Đợt này giảm đúng <strong>50% (198K còn 99K, tiết kiệm 99.000đ)</strong>, hạn dùng tận <strong>3 năm</strong>. Mua sẵn 1 chai để dành vừa hời vừa không lỡ đợt giá tốt ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Em lấy 1 chai mùi chị thích để sẵn cho chị dùng dần nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 2</span><h4 class="font-bold text-sm text-slate-900">"Giảm sâu 99K có phải hàng gần hết hạn không em?"</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Khẳng định uy tín:</strong><br>"Dạ chị yên tâm 100% ạ! Đây là chương trình tri ân của tập đoàn LG Hàn Quốc."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp chứng minh:</strong><br>"Hàng mới, date còn dài tận 3 năm. Chị kiểm tra hạn dưới đáy chai thoải mái ạ. Thơm sang như nước hoa luôn chị."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy 1 chai dùng thử là thích ngay, chỉ 99K thôi ạ!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 3</span><h4 class="font-bold text-sm text-slate-900">"Chai lớn nặng quá, chị đi xe máy mang về bất tiện."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm & Hỗ trợ:</strong><br>"Dạ chai lớn xách thì hơi đằm thật ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp:</strong><br>"Nhưng mua 1 lần dùng mấy tháng, siêu tiết kiệm. Em bỏ vào túi có quai thật gọn để chị treo xe hoặc bỏ cốp nhẹ nhàng ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Em bọc gọn vào túi cho chị mang về dễ dàng nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 4</span><h4 class="font-bold text-sm text-slate-900">"Chị quen dùng hãng khác rồi / Da chị nhạy cảm."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm chuyên nghiệp:</strong><br>"Dạ chăm sóc da thì chị em mình cẩn thận là rất đúng ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Thành phần an toàn):</strong><br>"ON: The Body là dòng cao cấp của LG Hàn Quốc, có tinh dầu Argan và thảo mộc tự nhiên dịu nhẹ, dưỡng ẩm không khô da, hương lưu lâu như nước hoa ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy chai Xanh Dương thảo mộc dịu nhẹ về trải nghiệm thử là mê luôn ạ!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition md:col-span-2">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 5</span><h4 class="font-bold text-sm text-slate-900">"Để lần sau chị ghé mua / Hôm nay chị mang ít tiền."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đòn bẩy Urgency:</strong><br>"Dạ vâng ạ! Giá 99K chỉ áp dụng trong đợt tri ân này, hết đợt là về lại giá gốc 198.000đ đó chị."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp hỗ trợ thanh toán:</strong><br>"Bên em có quét QR, chuyển khoản, quẹt thẻ siêu nhanh. Nếu hôm nay chị chưa tiện lấy sữa tắm thì lấy trước thỏi son dưỡng 39K mùa này dùng liền nha chị."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Sẵn tiện ghé quầy mình chốt luôn cho hời chị nhen!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-sm font-black text-sky-700 mb-3">🤲 KEM DƯỠNG TAY & 💋 SON DƯỠNG MÔI</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-sky-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-sky-100 text-sky-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 6</span><h4 class="font-bold text-sm text-slate-900">"Kem tay chị thấy nhờn rít, khó chịu lắm."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ đúng rồi chị, nhiều loại kem tay bóng nhờn, cầm gì cũng dính."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp:</strong><br>"Hatomugi của Nhật thấm nhanh, không nhờn rít, thoa xong cầm điện thoại, gõ phím liền. Chiết xuất hạt ý dĩ tự nhiên nên dịu nhẹ lắm ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Đang giảm từ 89K còn 49K, chị lấy 1 tuýp để bàn làm việc nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-sky-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-sky-100 text-sky-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 7</span><h4 class="font-bold text-sm text-slate-900">"Tay chị có khô đâu, chưa cần."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ da tay chị đẹp vậy là chị giữ gìn kỹ rồi ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Phòng hơn chữa + Quà tặng):</strong><br>"Từ giờ tới cuối năm trời hanh khô, rửa tay, rửa chén nhiều là da nứt liền. Còn nếu chưa cần, chị mua tặng mẹ, tặng chị em dịp 20/10 cũng rất ý nghĩa ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chỉ 49K mà có món quà Nhật xinh xắn, em gói luôn cho chị nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-green-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-green-100 text-green-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 8</span><h4 class="font-bold text-sm text-slate-900">"Anh là con trai, dùng son làm gì." (khách nam)</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ em hiểu ạ, nghe chữ son là anh ngại liền."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp:</strong><br>"Đây là son dưỡng không màu, mát bạc hà, chuyên trị môi khô nứt. Nam nữ đều dùng, đi xe máy gió nhiều càng cần ạ. Hoặc anh mua tặng bạn gái, vợ dịp 20/10 cũng rất tinh tế."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"39K thôi anh, em bỏ thêm 1 thỏi vào bill nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-green-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-green-100 text-green-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 9</span><h4 class="font-bold text-sm text-slate-900">"Chị có son dưỡng rồi."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ chị chăm môi kỹ quá ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Thêm 1 thỏi dự phòng):</strong><br>"Son dưỡng hay để quên lắm chị, nhiều khách lấy thêm 1 thỏi để túi xách, 1 thỏi để xe hoặc bàn làm việc. Menturm Nhật nhỏ gọn, chỉ 39K."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy thêm 1 thỏi để dự phòng nha, lúc nào cũng có sẵn!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Combo + Kohnan Day -->
+        <section class="mb-10">
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 rounded-[2rem] border-2 border-amber-400 p-8 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🎯</span>
+                        <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tight">KỊCH BẢN CHỐT COMBO</h3>
+                    </div>
+                    <div class="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl shadow-md flex items-center gap-2">🔥 BÍ KÍP KOHNAN DAY (5/10 & 20/10 - GIẢM THÊM 5%)</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gradient-to-r from-red-600 to-rose-700 text-white p-4 rounded-2xl shadow-sm border border-red-500">
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-yellow-300 mb-1">📢 Kohnan Day 5/10 (Thứ 2):</p>
+                        <p class="text-xs italic leading-relaxed">
+                            "Chị ơi, duy nhất hôm nay <strong>Kohnan Day giảm thêm 5%</strong>! Sữa tắm 99K còn <strong>chưa tới 95K</strong>, kem tay còn <strong>khoảng 46.5K</strong>, son dưỡng còn <strong>khoảng 37K</strong>. Chị lấy luôn <strong>Combo 2 chai 2 mùi</strong> kèm 1 thỏi son dưỡng cho hời nha!"
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-r from-pink-600 to-fuchsia-700 text-white p-4 rounded-2xl shadow-sm border border-pink-500">
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-yellow-300 mb-1">💐 Ngày Phụ Nữ + Kohnan Day 20/10 (Thứ 3):</p>
+                        <p class="text-xs italic leading-relaxed">
+                            "Anh ơi, hôm nay 20/10 lại trùng Kohnan Day giảm thêm 5%! <strong>Bộ quà 3 món</strong> sữa tắm nước hoa Hàn + kem tay Nhật + son dưỡng Nhật chỉ còn <strong>khoảng 178K</strong>. Em gói gọn gàng để anh tặng mẹ, tặng vợ hoặc bạn gái liền nha!"
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-rose-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Combo 2 Chai = 198.000đ</span>
+                                <span class="text-xs font-bold text-rose-700">2 chai = giá 1 chai gốc</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Combo Sữa Tắm 2 Mùi</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Bình thường 1 chai đã 198K, hôm nay chị lấy <strong>2 chai 2 mùi</strong> (Xanh Lá hoa ly + Hồng mẫu đơn, hoặc thêm Xanh Dương thảo mộc cho anh nhà) tổng cũng chỉ <strong>198K</strong>, tính ra mua 1 tặng 1 ạ!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Lý do mua:</strong> Đổi mùi mỗi ngày, cả nhà dùng chung.</li>
+                            <li>✔️ <strong>3 mùi đều đủ hàng:</strong> tự tin mời combo bất kỳ cặp mùi nào.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-sky-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-sky-700 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Bộ Đôi Thu Đông = 88.000đ</span>
+                                <span class="text-xs font-bold text-sky-700">Kem tay + Son dưỡng</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Bộ Đôi Chống Hanh Khô</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Mùa này da tay với môi khô nhanh nhất chị ạ. Chị lấy <strong>bộ đôi kem tay Hatomugi + son dưỡng Menturm</strong>, hàng Nhật cả 2, tổng chỉ <strong>88K</strong>, bỏ túi xách dùng cả mùa luôn!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Lý do mua:</strong> Món nhỏ, giá dưới 100K, quyết định nhanh tại quầy.</li>
+                            <li>✔️ <strong>Mời cho:</strong> mọi bill hóa mỹ phẩm, khách văn phòng.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-pink-300 shadow-sm flex flex-col justify-between ring-2 ring-pink-200">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-pink-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Bộ Quà 20/10 = 187.000đ</span>
+                                <span class="text-xs font-bold text-pink-700">Dưới 200K</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Bộ Quà Tặng Phái Đẹp 3 Món</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Anh đang tìm quà 20/10 phải không ạ? <strong>Sữa tắm nước hoa Hàn màu Hồng + kem tay Nhật + son dưỡng Nhật</strong>, đủ bộ chăm sóc từ đầu đến tay, chỉ <strong>187K</strong>. Em gói đẹp để anh tặng liền nha!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Khách mục tiêu:</strong> Khách nam mua quà (quyết định trong 3 phút).</li>
+                            <li>✔️ <strong>Cao điểm:</strong> 17-18/10 (cuối tuần trước lễ) và 20/10.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="custom-card">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Cơ Cấu Doanh Thu Mục Tiêu T10 (89.760.000đ)</h3>
+                <p class="text-xs text-slate-500 mb-4">Sữa tắm là trục doanh thu, kem tay & son dưỡng là món bán kèm tăng giá trị bill</p>
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+            </div>
+            <div class="custom-card">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Phân Bổ Target 3 Mùi Sữa Tắm T10 (800 Chai)</h3>
+                <p class="text-xs text-slate-500 mb-4">3 mùi đều đủ hàng - phân bổ đều theo nhu cầu khách</p>
+                <div class="chart-container"><canvas id="variantChart"></canvas></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function printTarget(which) {
+            document.body.setAttribute('data-print', which);
+            if (!document.getElementById('pt-page')) {
+                const st = document.createElement('style');
+                st.id = 'pt-page';
+                st.textContent = '@page { size: A4 landscape; margin: 10mm; }';
+                document.head.appendChild(st);
+            }
+            setTimeout(() => window.print(), 50);
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            window.addEventListener('afterprint', () => {
+                document.body.removeAttribute('data-print');
+                const pg = document.getElementById('pt-page'); if (pg) pg.remove();
+            });
+
+            // Tabs
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.addEventListener('click', () => {
+                btns.forEach(b => b.setAttribute('aria-selected', 'false'));
+                btn.setAttribute('aria-selected', 'true');
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById('panel-' + btn.dataset.tab).classList.remove('hidden');
+            }));
+
+            if (typeof Chart === 'undefined') return;
+            if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+            const legend = { position: 'bottom', labels: { font: { family: 'Inter', size: 11, weight: 'bold' }, padding: 14 } };
+
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sữa tắm ON: The Body (79.200.000đ)', 'Kem dưỡng tay (5.880.000đ)', 'Son dưỡng môi (4.680.000đ)'],
+                    datasets: [{ data: [79200000, 5880000, 4680000], backgroundColor: ['#e11d48', '#0369a1', '#15803d'], hoverOffset: 6, borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend,
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => Math.round(v / ctx.dataset.data.reduce((a, b) => a + b, 0) * 100) + '%' } } }
+            });
+
+            new Chart(document.getElementById('variantChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Xanh Lá: Lily & Honeysuckle', 'Xanh Dương: Herbal Scent', 'Hồng: Peony & Musk'],
+                    datasets: [{ data: [267, 267, 266], backgroundColor: ['#10b981', '#0284c7', '#ec4899'], hoverOffset: 6, borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend,
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: v => v + ' chai' } } }
+            });
+        });
+    </script>
+</body>
+</html>

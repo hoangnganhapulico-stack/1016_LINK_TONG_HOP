@@ -1,0 +1,520 @@
+<title>Cẩm Nang Phân Tích Đa Tháng</title>
+<style>
+  :root{
+    color-scheme: light;
+    --paper:      #faf7f0;
+    --paper-2:    #f3efe4;
+    --ink:        #221f1b;
+    --ink-soft:   #6e6355;
+    --ink-faint:  #948a78;
+    --rule:       #e3dbc9;
+    --rule-strong:#d3c8ae;
+    --accent:     #2b4570;
+    --accent-ink: #ffffff;
+    --accent-wash:#e9edf4;
+    --accent-soft:#5a729c;
+    --good:       #2f7d4f;
+    --good-wash:  #e7f3ea;
+    --amber:      #a8720f;
+    --amber-wash: #fbf0dd;
+    --critical:   #a83a3a;
+    --critical-wash:#fbeae7;
+    --shadow: 0 1px 2px rgba(34,31,27,0.05), 0 10px 28px -16px rgba(34,31,27,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --paper:      #1b1915;
+      --paper-2:    #232019;
+      --ink:        #f2ede1;
+      --ink-soft:   #c2b7a2;
+      --ink-faint:  #8d8270;
+      --rule:       #3a3527;
+      --rule-strong:#4a4432;
+      --accent:     #8fa6d1;
+      --accent-ink: #14202f;
+      --accent-wash:#232c3c;
+      --accent-soft:#6f88b4;
+      --good:       #6fbf8e;
+      --good-wash:  #17281d;
+      --amber:      #e0ab52;
+      --amber-wash: #302408;
+      --critical:   #e0817c;
+      --critical-wash:#301715;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -16px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --paper:      #1b1915;
+    --paper-2:    #232019;
+    --ink:        #f2ede1;
+    --ink-soft:   #c2b7a2;
+    --ink-faint:  #8d8270;
+    --rule:       #3a3527;
+    --rule-strong:#4a4432;
+    --accent:     #8fa6d1;
+    --accent-ink: #14202f;
+    --accent-wash:#232c3c;
+    --accent-soft:#6f88b4;
+    --good:       #6fbf8e;
+    --good-wash:  #17281d;
+    --amber:      #e0ab52;
+    --amber-wash: #302408;
+    --critical:   #e0817c;
+    --critical-wash:#301715;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -16px rgba(0,0,0,0.6);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Be Vietnam Pro', system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  ::selection{ background:var(--accent-wash); color:var(--ink); }
+  h1,h2,h3,h4{ font-family:'Spectral', Georgia, 'Times New Roman', serif; font-weight:650; text-wrap:balance; color:var(--ink); margin:0; }
+  p{ margin:0; }
+  a{ color:var(--accent); }
+  .num{ font-variant-numeric:tabular-nums; }
+
+  .top-chip-nav{
+    position:sticky; top:0; z-index:40;
+    background:color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--rule);
+  }
+  .chip-inner{
+    max-width:760px; margin:0 auto; padding:12px 24px;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .chip-inner .mark{ font-family:'Spectral',serif; font-weight:700; font-size:13.5px; color:var(--accent); margin-right:6px; white-space:nowrap; }
+  .chip-inner a{
+    font-size:12px; color:var(--ink-soft); text-decoration:none; padding:5px 10px;
+    border-radius:99px; border:1px solid transparent; white-space:nowrap;
+  }
+  .chip-inner a:hover{ background:var(--accent-wash); color:var(--accent); border-color:var(--rule); }
+
+  .wrap{ max-width:760px; margin:0 auto; padding:0 24px 96px; }
+
+  header.hero{ padding:56px 0 40px; border-bottom:1px solid var(--rule); }
+  .eyebrow{
+    font-size:11.5px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:14px; display:block;
+  }
+  header.hero h1{ font-size:36px; line-height:1.15; letter-spacing:-0.01em; }
+  header.hero .sub{ margin-top:16px; font-size:16px; color:var(--ink-soft); max-width:58ch; line-height:1.65; }
+  .hero-meta{
+    margin-top:24px; padding-top:20px; border-top:1px dashed var(--rule-strong);
+    display:flex; gap:24px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-faint);
+  }
+  .hero-meta b{ color:var(--ink-soft); font-weight:600; }
+
+  section.sec{ padding:48px 0; border-bottom:1px solid var(--rule); }
+  section.sec:last-of-type{ border-bottom:none; }
+  .sec-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:20px; }
+  .sec-num{
+    font-family:'Spectral',serif; font-weight:700; font-size:14px; color:var(--accent);
+    flex:none; width:28px; text-align:right;
+  }
+  .sec-head h2{ font-size:23px; letter-spacing:-0.005em; }
+  .sec-body{ padding-left:42px; }
+  .sec-body > p{ font-size:15px; color:var(--ink-soft); max-width:62ch; margin-bottom:16px; }
+  .sec-body > p:last-child{ margin-bottom:0; }
+  .sec-body h3{ font-size:15.5px; margin:28px 0 10px; color:var(--ink); }
+  .sec-body h3:first-child{ margin-top:0; }
+
+  .lede{ font-size:16px; color:var(--ink); max-width:62ch; }
+  .lede b{ color:var(--accent); font-weight:600; }
+
+  /* ---------- Comparison split ---------- */
+  .split{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; }
+  @media (max-width:640px){ .split{ grid-template-columns:1fr; } }
+  .split-card{
+    background:var(--paper-2); border:1px solid var(--rule); border-radius:12px; padding:20px 22px;
+  }
+  .split-card .tag{
+    font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:10px; display:block;
+  }
+  .split-card.month .tag{ color:var(--ink-faint); }
+  .split-card.multi{ background:var(--accent-wash); border-color:color-mix(in srgb, var(--accent) 30%, var(--rule)); }
+  .split-card.multi .tag{ color:var(--accent); }
+  .split-card ul{ margin:0; padding-left:18px; font-size:13.5px; color:var(--ink-soft); line-height:1.7; }
+  .split-card li{ margin-bottom:4px; }
+  .split-card li b{ color:var(--ink); font-weight:600; }
+
+  /* ---------- Tables ---------- */
+  .table-scroll{ overflow-x:auto; margin-top:8px; border:1px solid var(--rule); border-radius:12px; background:var(--paper-2); }
+  table.ref{ width:100%; border-collapse:collapse; font-size:13px; min-width:640px; table-layout:fixed; }
+  table.ref th{
+    text-align:left; font-size:10.5px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--ink-faint); padding:11px 14px; border-bottom:1px solid var(--rule-strong);
+    background:var(--paper); position:sticky; top:0;
+  }
+  table.ref td{ padding:12px 14px; border-bottom:1px solid var(--rule); vertical-align:top; color:var(--ink-soft); }
+  table.ref tr:last-child td{ border-bottom:none; }
+  table.ref td.metric{ color:var(--ink); font-weight:600; }
+  table.ref .dir{
+    display:inline-flex; align-items:center; gap:5px; font-weight:700; font-size:12px; margin-bottom:3px;
+  }
+  table.ref .dir.up{ color:var(--critical); }
+  table.ref .dir.down{ color:var(--good); }
+  table.ref .action{ color:var(--ink); }
+
+  /* ---------- Callout / lesson cards ---------- */
+  .lessons{ display:flex; flex-direction:column; gap:14px; margin-top:8px; }
+  .lesson{
+    display:grid; grid-template-columns:34px 1fr; gap:16px; align-items:start;
+    padding:16px 18px 16px 4px; border-top:1px solid var(--rule);
+  }
+  .lesson:first-child{ border-top:none; }
+  .lesson .n{ font-family:'Spectral',serif; font-weight:700; font-size:18px; color:var(--rule-strong); text-align:right; padding-top:1px; }
+  .lesson .body h4{ font-size:14.5px; margin-bottom:5px; }
+  .lesson .body p{ font-size:13.5px; color:var(--ink-soft); line-height:1.65; }
+
+  /* ---------- Scenario callout ---------- */
+  .scenario{
+    margin-top:20px; border:1px solid var(--rule); border-left:3px solid var(--accent);
+    border-radius:0 12px 12px 0; padding:18px 22px; background:var(--paper-2);
+  }
+  .scenario .label{
+    font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:10px; display:block;
+  }
+  .scenario p{ font-size:13.5px; color:var(--ink-soft); margin-bottom:10px; }
+  .scenario p:last-child{ margin-bottom:0; }
+  .scenario .verdict{ font-size:13.5px; color:var(--ink); }
+  .scenario .verdict b{ color:var(--accent); }
+
+  /* ---------- Routine steps ---------- */
+  .routine{ counter-reset:step; margin-top:8px; }
+  .step{
+    counter-increment:step; display:grid; grid-template-columns:30px 1fr; gap:16px;
+    padding:16px 0; border-top:1px solid var(--rule);
+  }
+  .step:first-child{ border-top:none; }
+  .step::before{
+    content:counter(step); font-family:'Spectral',serif; font-weight:700; font-size:13px;
+    color:var(--accent-ink); background:var(--accent); width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .step h4{ font-size:14.5px; margin-bottom:4px; }
+  .step p{ font-size:13.5px; color:var(--ink-soft); line-height:1.65; }
+  .step .when{
+    display:inline-block; font-size:11px; font-weight:700; color:var(--accent);
+    background:var(--accent-wash); padding:2px 9px; border-radius:99px; margin-bottom:6px;
+  }
+
+  .checklist{ margin-top:24px; background:var(--paper-2); border:1px solid var(--rule); border-radius:12px; padding:20px 22px; }
+  .checklist .tag{ font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px; display:block; }
+  .checklist ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .checklist li{ display:flex; gap:10px; align-items:flex-start; font-size:13.5px; color:var(--ink); }
+  .checklist li::before{
+    content:''; width:15px; height:15px; border-radius:4px; border:1.5px solid var(--rule-strong);
+    flex:none; margin-top:2px;
+  }
+
+  .pill-freq{ font-size:11px; font-weight:600; color:var(--ink-faint); }
+
+  footer.foot{
+    margin-top:56px; padding-top:20px; border-top:1px solid var(--rule);
+    font-size:12px; color:var(--ink-faint); line-height:1.6;
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+
+<div class="top-chip-nav">
+  <div class="chip-inner">
+    <span class="mark">Cẩm nang · 1016</span>
+    <a href="#sec-1">Khác biệt</a>
+    <a href="#sec-2">10 chỉ số</a>
+    <a href="#sec-3">So sánh 2 kỳ</a>
+    <a href="#sec-4">Kinh nghiệm</a>
+    <a href="#sec-5">Quy trình</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Kohnan Parc Mall · Store 1016</span>
+    <h1>Cẩm Nang Phân Tích Đa Tháng</h1>
+    <p class="sub">Hướng dẫn đọc và ứng dụng dashboard "Xu Hướng Tồn Kho Đa Tháng" vào việc quản lý — không lặp lại những gì bảng 1 tháng đã làm tốt, mà tập trung vào thứ chỉ nhìn thấy được khi xếp nhiều tháng cạnh nhau: xu hướng, quán tính, và những vấn đề âm ỉ mà một bức ảnh chụp nhanh không thể lộ ra.</p>
+    <div class="hero-meta">
+      <span><b>Đi cùng với</b> Dashboard tồn kho 1016 (bản 1 tháng) và Dashboard xu hướng đa tháng</span>
+      <span><b>Dùng cho</b> báo cáo Inventory PLU hàng tháng</span>
+    </div>
+  </header>
+
+  <section class="sec" id="sec-1">
+    <div class="sec-head"><span class="sec-num">01</span><h2>1 tháng biết gì, đa tháng biết thêm gì</h2></div>
+    <div class="sec-body">
+      <p class="lede">Bảng 1 tháng trả lời câu hỏi <b>"tháng này đang đứng ở đâu"</b> — một bức ảnh chụp nhanh, chi tiết tới từng mã hàng. Bảng đa tháng trả lời câu hỏi khác hẳn: <b>"mọi thứ đang đi theo hướng nào"</b>. Hai câu hỏi này cần hai công cụ khác nhau vì một điểm dữ liệu không bao giờ cho biết nó đang tăng hay giảm — phải có ít nhất hai điểm mới vẽ được một đường.</p>
+
+      <div class="split">
+        <div class="split-card month">
+          <span class="tag">Bảng 1 tháng — chẩn đoán hiện trạng</span>
+          <ul>
+            <li><b>Đúng ở đâu:</b> tại sao mã X đang tồn nhiều, mã Y bán chậm, NCC Z có vấn đề gì</li>
+            <li><b>Độ sâu:</b> từng SKU, từng NCC, có bộ lọc/sắp xếp/xuất file</li>
+            <li><b>Giới hạn:</b> không biết tình trạng này mới xuất hiện tháng này hay đã kéo dài — vì chỉ có 1 điểm dữ liệu</li>
+          </ul>
+        </div>
+        <div class="split-card multi">
+          <span class="tag">Bảng đa tháng — phát hiện xu hướng</span>
+          <ul>
+            <li><b>Đúng ở đâu:</b> vấn đề đang xấu dần, tốt dần, hay chỉ là nhiễu của một tháng</li>
+            <li><b>Độ sâu:</b> chỉ số tổng hợp toàn cửa hàng theo từng tháng + đối chiếu 2 kỳ theo mã hàng</li>
+            <li><b>Giới hạn:</b> không đi sâu "vì sao" — phát hiện xu hướng xong vẫn cần quay lại bảng 1 tháng để tra chi tiết</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin-top:20px;">Nói ngắn gọn: <b style="color:var(--ink)">bảng 1 tháng để TRA CỨU, bảng đa tháng để PHÁT HIỆN</b>. Một tình huống cụ thể sẽ cho thấy sự khác biệt rõ nhất — hàng tồn chưa bán được (dead stock) ở mức 4.000 SKU. Nhìn một mình con số này trong bảng 1 tháng, không thể biết đây là bình thường hay đáng lo. Nhưng nếu bảng đa tháng cho thấy con số này là 3.200 → 3.600 → 4.000 qua ba tháng liên tiếp, đó không còn là một con số — đó là một cửa hàng đang tích luỹ hàng chết nhanh hơn khả năng xử lý, và cần hành động trước khi nó trở thành vấn đề tài chính thật sự.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="sec-2">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Bảng tra cứu 10 chỉ số xu hướng</h2></div>
+    <div class="sec-body">
+      <p>Đây là bảng phân tích chi tiết cho từng biểu đồ trong mục "Xu hướng theo tháng" của dashboard — dùng để tra nhanh khi thấy một đường biểu đồ đi lên hoặc đi xuống, không cần nhớ thuộc lòng.</p>
+
+      <div class="table-scroll">
+        <table class="ref">
+          <thead><tr>
+            <th style="width:19%">Chỉ số</th>
+            <th style="width:27%">Khi đường biểu đồ đi lên</th>
+            <th style="width:27%">Khi đường biểu đồ đi xuống</th>
+            <th style="width:20%">Hành động gợi ý</th>
+            <th style="width:7%">Xem</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="metric">Giá trị tồn cuối kỳ</td>
+              <td><span class="dir up">▲ Vốn ứ đọng</span>Vốn đang nằm trong kho tăng nhanh hơn khả năng bán ra.</td>
+              <td><span class="dir down">▼ Vốn giải phóng</span>Đang bán nhanh hơn nhập, hoặc đang chủ động xả hàng.</td>
+              <td class="action">Đối chiếu với xu hướng doanh thu bên cạnh — tồn tăng mà doanh thu đứng yên là dấu hiệu rõ nhất của nhập hàng quá tay.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">Doanh thu trong kỳ</td>
+              <td><span class="dir down" style="color:var(--good)">▲ Tích cực</span>Cần xem có đến từ khuyến mãi/giảm giá không, vì doanh thu tăng kèm GP% giảm là dấu hiệu đang "mua doanh thu".</td>
+              <td><span class="dir up" style="color:var(--critical)">▼ Cảnh báo</span>Kiểm tra có phải mùa vụ (off-season) hay là mất khách thật sự — so cùng kỳ năm trước nếu có đủ dữ liệu.</td>
+              <td class="action">Luôn đọc cùng GP% — doanh thu một mình không nói lên cửa hàng đang lời hay lỗ.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">GP% bình quân</td>
+              <td><span class="dir up" style="color:var(--good)">▲ Tốt</span>Biên lợi nhuận đang cải thiện — cơ cấu ngành hàng hoặc giá bán đang đi đúng hướng.</td>
+              <td><span class="dir up" style="color:var(--critical)">▼ Cảnh báo</span>Chiết khấu/khuyến mãi đang ăn vào lợi nhuận, hoặc cơ cấu hàng bán dịch chuyển sang nhóm biên thấp.</td>
+              <td class="action">Giảm 2-3 điểm % trong 1 tháng vẫn có thể là nhiễu; giảm liên tục 3 tháng là xu hướng cần xử lý ở cấp danh mục hàng.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">TOD gộp toàn cửa hàng</td>
+              <td><span class="dir up">▲ Quay vòng chậm dần</span>Vốn nằm trong kho ngày càng lâu so với tốc độ bán — nghiêm trọng hơn nhiều so với TOD cao đột biến một tháng.</td>
+              <td><span class="dir down">▼ Quay vòng nhanh dần</span>Hàng đang luân chuyển tốt hơn — kiểm tra không phải do thiếu hàng (out-of-stock) gây tồn thấp giả tạo.</td>
+              <td class="action">Đây là chỉ số quan trọng nhất trong cả bảng — một xu hướng TOD tăng đều 3 tháng đáng lo hơn nhiều so với một tháng TOD cao bất thường.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">SL &amp; giá trị hàng tồn chưa bán được</td>
+              <td><span class="dir up">▲ Tích luỹ hàng chết</span>Nhiều mã hơn đang rơi vào trạng thái có tồn nhưng không bán được trong kỳ.</td>
+              <td><span class="dir down">▼ Đang xử lý tốt</span>Các đợt đẩy hàng/khuyến mãi trước đó đang có tác dụng.</td>
+              <td class="action">Nếu tăng liên tục, quay lại bảng 1 tháng để lọc đúng danh sách mã đang dead stock và lên kế hoạch xử lý theo NCC.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">SL mã tồn kho âm</td>
+              <td><span class="dir up">▲ Cần rà kiểm kê</span>Sai lệch giữa hệ thống và thực tế đang tăng — nguy cơ thất thoát/quét nhầm nhiều hơn.</td>
+              <td><span class="dir down">▼ Kiểm soát tốt</span>Quy trình nhập/kiểm kê đang chính xác hơn.</td>
+              <td class="action">Một con số dao động nhẹ quanh mức nền là bình thường; một xu hướng tăng đều là dấu hiệu quy trình tại quầy cần rà soát lại.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">SL mã bán vượt tồn</td>
+              <td><span class="dir up">▲ Dữ liệu nhập chậm</span>Hệ thống ghi nhận bán nhiều hơn số có sẵn — thường do cập nhật nhập hàng bị trễ so với bán ra.</td>
+              <td><span class="dir down">▼ Dữ liệu đồng bộ tốt</span>Nhập hàng đang được cập nhật kịp thời vào hệ thống.</td>
+              <td class="action">Nếu số này tăng đều, vấn đề nằm ở QUY TRÌNH nhập liệu, không nằm ở tồn kho thật — khác hẳn hướng xử lý của tồn kho âm.</td>
+              <td class="pill-freq">Hàng tháng</td>
+            </tr>
+            <tr>
+              <td class="metric">SL &amp; giá trị mã ngừng KD còn tồn</td>
+              <td><span class="dir up">▲ Thanh lý chưa kịp</span>Tốc độ MD ngừng kinh doanh mã hàng đang nhanh hơn tốc độ cửa hàng thanh lý hết tồn.</td>
+              <td><span class="dir down">▼ Thanh lý hiệu quả</span>Cửa hàng đang giải phóng vốn ở nhóm này tốt.</td>
+              <td class="action">Đây là vốn gần như chắc chắn không quay lại bằng doanh số — một xu hướng tăng nên được ưu tiên xử lý trước cả dead stock thường.</td>
+              <td class="pill-freq">Hàng quý</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="sec-3">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Ứng dụng mục "So sánh 2 kỳ"</h2></div>
+    <div class="sec-body">
+      <p>Mục này đối chiếu từng mã hàng giữa hai tháng đã chọn — đây là nơi bảng đa tháng đi sâu nhất, gần với bảng 1 tháng nhất, nhưng vẫn giữ đúng vai trò "phát hiện" chứ không "chẩn đoán": nó chỉ ra MÃ NÀO đáng chú ý, còn TẠI SAO vẫn cần tra lại ở bảng 1 tháng hoặc hỏi trực tiếp bộ phận liên quan.</p>
+
+      <h3>Cách đọc 4 bảng đối chiếu</h3>
+      <div class="table-scroll">
+        <table class="ref">
+          <thead><tr><th style="width:26%">Bảng</th><th>Câu hỏi nó trả lời</th><th style="width:30%">Việc nên làm tiếp theo</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="metric">Top mã tăng giá trị tồn kho</td>
+              <td class="action">Vốn đang dồn vào những mã nào nhanh nhất?</td>
+              <td>Kiểm tra mã đó có đang bán tương xứng không (mở bảng 1 tháng, so SL bán với SL nhập) — nếu không, đây là ứng viên giảm đặt hàng tháng sau.</td>
+            </tr>
+            <tr>
+              <td class="metric">Top mã giảm giá trị tồn kho</td>
+              <td class="action">Mã nào đang được giải phóng vốn nhanh nhất?</td>
+              <td>Nếu giảm vì bán tốt — ghi nhận, cân nhắc nhập bù. Nếu giảm vì hết hàng không bổ sung — kiểm tra có bị thiếu hàng ngoài ý muốn không.</td>
+            </tr>
+            <tr>
+              <td class="metric">Mã mới xuất hiện ở kỳ sau</td>
+              <td class="action">Mã nào lần đầu có mặt trong dữ liệu tháng này?</td>
+              <td>Phần lớn là hàng mới nhập thật — nhưng cũng nên đối chiếu tên hàng nếu nghi ngờ đổi barcode/gộp mã (đã lưu ý trong hướng dẫn của dashboard).</td>
+            </tr>
+            <tr>
+              <td class="metric">Mã biến mất khỏi kỳ sau</td>
+              <td class="action">Mã nào có tồn tháng trước nhưng không còn xuất hiện?</td>
+              <td>Có thể là bán hết không nhập lại (bình thường), hoặc ngừng kinh doanh, hoặc lỗi barcode — nên rà nhanh nếu danh sách này dài bất thường.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="scenario">
+        <span class="label">Ví dụ minh hoạ (số liệu giả định, không phải dữ liệu thật của cửa hàng)</span>
+        <p>Chọn so sánh Tháng 06/2026 → Tháng 07/2026. Bảng "Top mã tăng giá trị tồn kho" cho thấy một mã ốc vít của một NCC cụ thể tăng tồn thêm 42 triệu đồng, đứng đầu danh sách suốt 2 tháng liên tiếp. Bảng KPI tổng hợp cùng lúc cho thấy doanh thu của toàn cửa hàng không đổi.</p>
+        <p class="verdict">→ Đây là tín hiệu để <b>giảm số lượng đặt hàng tiếp theo với NCC đó cho mã này</b>, hoặc chủ động trao đổi với NCC về chương trình đẩy hàng — thay vì chờ đến khi nó lọt vào danh sách "hàng tồn chưa bán được" của bảng 1 tháng, lúc đó vốn đã ứ đọng lâu hơn cần thiết.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="sec-4">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Kinh nghiệm rút ra khi đọc dữ liệu nhiều kỳ</h2></div>
+    <div class="sec-body">
+      <p>Đây là những nguyên tắc chung khi làm việc với dữ liệu theo chuỗi thời gian, áp dụng riêng cho bối cảnh bán lẻ ngành hàng gia dụng/DIY như Kohnan — nên đọc kỹ trước khi đưa ra bất kỳ kết luận nào chỉ dựa vào biểu đồ xu hướng.</p>
+
+      <div class="lessons">
+        <div class="lesson">
+          <span class="n">1</span>
+          <div class="body">
+            <h4>Cần tối thiểu 3 điểm dữ liệu mới nên tin một xu hướng</h4>
+            <p>Hai tháng chỉ vẽ được một đường thẳng nối hai điểm — không đủ để phân biệt xu hướng thật với biến động ngẫu nhiên. Với dưới 3 kỳ đã lưu, nên coi mọi thay đổi là "cần theo dõi thêm" chứ chưa phải "kết luận".</p>
+          </div>
+        </div>
+        <div class="lesson">
+          <span class="n">2</span>
+          <div class="body">
+            <h4>Phân biệt mùa vụ với xu hướng thật</h4>
+            <p>Ngành hàng gia dụng/DIY có tính mùa vụ (ví dụ nhu cầu sửa chữa, làm vườn tăng vào một số thời điểm trong năm). Một tháng doanh thu giảm có thể chỉ là quy luật lặp lại hàng năm, không phải dấu hiệu xấu đi thật sự — cần tích luỹ đủ dữ liệu qua nhiều năm mới tách bạch được hai điều này.</p>
+          </div>
+        </div>
+        <div class="lesson">
+          <span class="n">3</span>
+          <div class="body">
+            <h4>Luôn đối chiếu số lượng với giá trị</h4>
+            <p>Tồn kho tăng về giá trị nhưng giảm về số lượng thường là do giá vốn hàng nhập tăng, không phải nhập quá tay. Ngược lại, số lượng tăng nhưng giá trị đứng yên có thể là dấu hiệu đang nhập hàng giá rẻ/kém chất lượng hơn. Hai chiều đọc này dẫn tới hai hành động hoàn toàn khác nhau.</p>
+          </div>
+        </div>
+        <div class="lesson">
+          <span class="n">4</span>
+          <div class="body">
+            <h4>Một tháng bất thường chưa phải là tín hiệu để hành động</h4>
+            <p>Sai số kiểm kê, nhập liệu trễ, hoặc một đợt khuyến mãi ngắn hạn đều có thể tạo ra một điểm dữ liệu lệch hẳn khỏi xu hướng chung. Nguyên tắc an toàn: chờ xác nhận ở kỳ kế tiếp trước khi thay đổi quyết định đặt hàng hay nhân sự dựa trên một tháng duy nhất.</p>
+          </div>
+        </div>
+        <div class="lesson">
+          <span class="n">5</span>
+          <div class="body">
+            <h4>Đối chiếu theo Barcode có giới hạn thật sự</h4>
+            <p>Việc so khớp một mã hàng giữa hai tháng dựa hoàn toàn vào barcode giống hệt nhau. Nếu cửa hàng đổi mã, gộp/tách SKU, hoặc một file xuất báo cáo bị lỗi thiếu dòng, kết quả "mã mới xuất hiện"/"mã biến mất" sẽ bị sai lệch — nên xem đây là gợi ý để rà soát bằng tên hàng, không phải kết luận cuối cùng.</p>
+          </div>
+        </div>
+        <div class="lesson">
+          <span class="n">6</span>
+          <div class="body">
+            <h4>Xu hướng đều đặn quan trọng hơn đỉnh điểm bất thường</h4>
+            <p>Một chỉ số tăng chậm nhưng đều đặn qua 4-5 tháng thường nguy hiểm hơn một tháng tăng vọt rồi trở lại bình thường — vì nó cho thấy một nguyên nhân gốc chưa được xử lý, đang âm ỉ tích luỹ, thay vì một sự cố nhất thời đã qua.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="sec-5">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Quy trình vận hành hàng tháng</h2></div>
+    <div class="sec-body">
+      <p>Một quy trình gợi ý để việc cập nhật và đọc 2 dashboard trở thành thói quen đều đặn, thay vì chỉ làm khi có vấn đề phát sinh.</p>
+
+      <div class="routine">
+        <div class="step">
+          <div>
+            <span class="when">Đầu mỗi tháng</span>
+            <h4>Xuất báo cáo Inventory PLU từ POS</h4>
+            <p>Xuất từ đầu tháng đến ngày hiện tại, định dạng .xlsx, .xls hoặc .csv đều được — cả 2 dashboard đều nhận như nhau.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="when">Bước 1</span>
+            <h4>Nhập vào dashboard 1 tháng trước</h4>
+            <p>Xem tổng quan KPI, các cảnh báo tự động (hàng ngừng KD còn tồn, tồn âm, dead stock), bảng top TOD cao và mục đánh giá NCC — xử lý các việc cần làm ngay trong tháng.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="when">Bước 2</span>
+            <h4>Nhập cùng file vào dashboard đa tháng</h4>
+            <p>Xác nhận đúng tháng/năm khi được hỏi rồi lưu — dữ liệu tháng này được thêm vào, không mất các tháng trước.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="when">Bước 3</span>
+            <h4>Lướt nhanh 10 biểu đồ xu hướng</h4>
+            <p>Chỉ cần nhìn hướng đi (lên/xuống/đi ngang) của từng đường — dùng bảng tra cứu ở mục 2 để biết đường nào đáng chú ý ngay, đường nào có thể bỏ qua.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="when">Bước 4</span>
+            <h4>Mở mục "So sánh 2 kỳ" với tháng liền trước</h4>
+            <p>Đọc 4 bảng đối chiếu — ghi lại (giấy hoặc ghi chú riêng) 2-3 mã/NCC đáng chú ý nhất để theo dõi tiếp trong tháng.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="when">Cuối mỗi quý</span>
+            <h4>Rà soát các xu hướng kéo dài</h4>
+            <p>Xem lại 3 tháng gần nhất: chỉ số nào tăng/giảm đều cả 3 tháng liên tiếp — đây là danh sách ưu tiên xử lý ở cấp quyết định (đàm phán NCC, điều chỉnh đặt hàng, thanh lý theo đợt), không phải việc xử lý lắt nhắt hàng ngày.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="checklist">
+        <span class="tag">Checklist 5 phút — mỗi lần nhập dữ liệu xong</span>
+        <ul>
+          <li>TOD gộp toàn cửa hàng đang tăng, giảm hay đi ngang so với 2 tháng trước?</li>
+          <li>Giá trị tồn cuối kỳ có tăng nhanh hơn doanh thu không?</li>
+          <li>Danh sách "top mã tăng tồn kho" có mã nào lặp lại từ tháng trước không?</li>
+          <li>Hàng ngừng KD còn tồn (SL &amp; giá trị) có đang giảm sau các đợt thanh lý không?</li>
+          <li>GP% bình quân có giảm liên tục không — nếu có, kiểm tra ngay có phải do khuyến mãi</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    Cẩm nang này là tài liệu tham khảo đi cùng hai công cụ "Bảng điều khiển tồn kho 1016" và "Xu hướng tồn kho đa tháng" — không thay thế cho việc kiểm tra thực tế tại quầy/kho. Các số liệu ví dụ trong mục 03 là số liệu minh hoạ, không phải dữ liệu thật của cửa hàng.
+  </footer>
+
+</div>

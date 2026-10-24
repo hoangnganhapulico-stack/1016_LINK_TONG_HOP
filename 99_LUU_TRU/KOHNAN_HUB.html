@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KOHNAN HUB – 1016</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* TOKENS */
+:root{
+  --bg-start:#dbeafe;--bg-end:#fef9c3;
+  --surface:rgba(255,255,255,0.88);--surface-2:rgba(255,255,255,0.65);
+  --border:rgba(255,255,255,0.85);--border-2:rgba(14,116,144,0.10);
+  --shadow:0 8px 32px rgba(14,116,144,0.13),0 1px 4px rgba(14,116,144,0.08);
+  --shadow-h:0 16px 48px rgba(14,116,144,0.22),0 2px 8px rgba(14,116,144,0.12);
+  --radius:20px;--radius-sm:12px;--radius-xs:8px;
+  --accent:#0284c7;
+  --text:#0f172a;--text-sub:#334155;--text-muted:#64748b;
+  --success:#16a34a;--warn:#d97706;--danger:#dc2626;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  --g0-bg:rgba(14,165,233,0.07);--g0-ac:#0ea5e9;--g0-lb:#0369a1;
+  --g1a-bg:rgba(139,92,246,0.08);--g1a-ac:#8b5cf6;--g1a-lb:#6d28d9;
+  --g1b-bg:rgba(236,72,153,0.08);--g1b-ac:#ec4899;--g1b-lb:#be185d;
+  --g2-bg:rgba(16,185,129,0.07);--g2-ac:#10b981;--g2-lb:#065f46;
+  --g3-bg:rgba(245,158,11,0.08);--g3-ac:#f59e0b;--g3-lb:#92400e;
+}
+[data-theme="dark"]{
+  --bg-start:#0b1523;--bg-end:#140e00;
+  --surface:rgba(15,23,42,0.85);--surface-2:rgba(15,23,42,0.60);
+  --border:rgba(56,189,248,0.12);--border-2:rgba(56,189,248,0.06);
+  --shadow:0 8px 32px rgba(0,0,0,0.45);--shadow-h:0 16px 48px rgba(0,0,0,0.60);
+  --accent:#38bdf8;--text:#e2f4ff;--text-sub:#94a3b8;--text-muted:#475569;
+  --g0-bg:rgba(56,189,248,0.08);--g0-ac:#38bdf8;--g0-lb:#7dd3fc;
+  --g1a-bg:rgba(167,139,250,0.10);--g1a-ac:#a78bfa;--g1a-lb:#c4b5fd;
+  --g1b-bg:rgba(244,114,182,0.10);--g1b-ac:#f472b6;--g1b-lb:#fbcfe8;
+  --g2-bg:rgba(52,211,153,0.08);--g2-ac:#34d399;--g2-lb:#6ee7b7;
+  --g3-bg:rgba(251,191,36,0.08);--g3-ac:#fbbf24;--g3-lb:#fde68a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);color:var(--text);min-height:100vh;
+  background:linear-gradient(135deg,var(--bg-start) 0%,var(--bg-end) 100%);
+  background-attachment:fixed;padding:0 16px 60px;overflow-x:hidden;position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 600px 400px at 10% 15%,rgba(56,189,248,0.18) 0%,transparent 70%),
+    radial-gradient(ellipse 500px 400px at 90% 85%,rgba(245,158,11,0.14) 0%,transparent 70%);
+}
+.page{max-width:1000px;margin:0 auto;position:relative;z-index:1;}
+
+/* HEADER */
+header{padding:48px 0 32px;text-align:center;}
+.logo-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--surface);border:1.5px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:999px;padding:9px 24px;margin-bottom:18px;box-shadow:var(--shadow);
+}
+.logo-icon{font-size:22px;}.logo-name{font-weight:800;font-size:15px;letter-spacing:.06em;color:var(--accent);}
+h1{
+  font-size:clamp(28px,6vw,46px);font-weight:800;line-height:1.1;
+  background:linear-gradient(135deg,var(--accent) 0%,#f59e0b 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header-sub{margin-top:8px;font-size:13px;color:var(--text-muted);font-weight:500;}
+
+/* TOP BAR */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  background:var(--surface);border:1.5px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:var(--radius);padding:12px 18px;margin-bottom:20px;box-shadow:var(--shadow);
+}
+.status-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.status-chip{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:999px;padding:5px 14px 5px 10px;font-size:12px;font-weight:600;
+}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.chip-dot.sale{background:var(--g2-ac);}.chip-dot.tonkho{background:var(--g0-ac);}
+.chip-label{color:var(--text-muted);}.chip-val{color:var(--text);font-family:var(--mono);font-size:11px;}
+.bar-right{display:flex;gap:8px;align-items:center;}
+.icon-btn{
+  background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-sm);
+  padding:7px 13px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-sub);
+  display:inline-flex;align-items:center;gap:6px;transition:all .18s;font-family:var(--font);
+}
+.icon-btn:hover{background:var(--surface);transform:translateY(-1px);}
+.icon-btn.danger{color:var(--danger);border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.06);}
+.icon-btn.danger:hover{background:rgba(220,38,38,.12);}
+
+/* UPLOAD ROW */
+.upload-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:540px){.upload-row{grid-template-columns:1fr;}}
+.upload-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:var(--radius);padding:18px 18px 14px;box-shadow:var(--shadow);
+  transition:border-color .2s,box-shadow .2s;
+}
+.upload-card.loaded-sale{border-color:var(--g2-ac);box-shadow:0 0 0 3px rgba(16,185,129,.08),var(--shadow);}
+.upload-card.loaded-tonkho{border-color:var(--g0-ac);box-shadow:0 0 0 3px rgba(14,165,233,.08),var(--shadow);}
+.uc-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.uc-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.uc-icon.sale-ic{background:rgba(16,185,129,.12);}.uc-icon.tonkho-ic{background:rgba(14,165,233,.12);}
+.uc-title{font-size:13px;font-weight:700;color:var(--text);}
+.uc-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.upload-zone{
+  border:2px dashed var(--border-2);border-radius:var(--radius-sm);
+  padding:14px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--g2-ac);background:rgba(16,185,129,.05);}
+.upload-zone.tonkho-zone:hover,.upload-zone.tonkho-zone.drag-over{border-color:var(--g0-ac);background:rgba(14,165,233,.05);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+.uz-icon{font-size:22px;margin-bottom:5px;}.uz-text{font-size:12px;font-weight:600;color:var(--text-sub);}
+.uz-hint{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.loaded-info{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--radius-xs);padding:7px 12px;margin-top:10px;
+}
+.li-file{font-size:11px;font-weight:600;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.li-count{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--g2-ac);white-space:nowrap;flex-shrink:0;margin-left:8px;}
+.li-count.tk{color:var(--g0-ac);}
+.li-clear{background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:0 0 0 8px;flex-shrink:0;}
+
+/* GROUP CARDS */
+.group{
+  background:var(--surface);border:1.5px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;
+}
+.group-head{display:flex;align-items:center;gap:10px;padding:16px 20px 14px;border-bottom:1px solid var(--border-2);}
+.gh-stripe{width:4px;height:28px;border-radius:99px;flex-shrink:0;}
+.gh-title{font-size:15px;font-weight:800;flex:1;letter-spacing:.01em;}
+.gh-badge{font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;flex-shrink:0;}
+.group-body{padding:16px 16px 14px;}
+
+/* FILE GRID */
+.file-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:660px){.file-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:380px){.file-grid{grid-template-columns:1fr;}}
+
+.fc{
+  display:flex;flex-direction:column;padding:13px 13px 11px;border-radius:14px;
+  border:1.5px solid transparent;cursor:pointer;text-align:left;
+  font-family:var(--font);background:transparent;transition:all .18s ease;
+}
+.fc:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.12);}
+.fc:active{transform:translateY(0);}
+.fc-num{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:7px;width:fit-content;
+}
+.fc-name{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.35;flex:1;}
+.fc-tag{
+  display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:999px;margin-top:7px;width:fit-content;
+}
+.tag-sale{background:rgba(16,185,129,.12);color:#065f46;}
+.tag-tonkho{background:rgba(14,165,233,.12);color:#0369a1;}
+[data-theme="dark"] .tag-sale{background:rgba(52,211,153,.15);color:#6ee7b7;}
+[data-theme="dark"] .tag-tonkho{background:rgba(56,189,248,.15);color:#7dd3fc;}
+
+/* G0 */
+.g0 .gh-stripe{background:var(--g0-ac);}.g0 .gh-title{color:var(--g0-lb);}
+.g0 .gh-badge{background:var(--g0-bg);color:var(--g0-ac);}
+.g0 .fc{background:var(--g0-bg);border-color:rgba(14,165,233,.12);}
+.g0 .fc:hover{background:rgba(14,165,233,.14);border-color:var(--g0-ac);}
+.g0 .fc-num{background:rgba(14,165,233,.15);color:var(--g0-ac);}
+/* G1A */
+.g1a .gh-stripe{background:var(--g1a-ac);}.g1a .gh-title{color:var(--g1a-lb);}
+.g1a .gh-badge{background:var(--g1a-bg);color:var(--g1a-ac);}
+.g1a .fc{background:var(--g1a-bg);border-color:rgba(139,92,246,.12);}
+.g1a .fc:hover{background:rgba(139,92,246,.16);border-color:var(--g1a-ac);}
+.g1a .fc-num{background:rgba(139,92,246,.15);color:var(--g1a-ac);}
+/* G1B */
+.g1b .gh-stripe{background:var(--g1b-ac);}.g1b .gh-title{color:var(--g1b-lb);}
+.g1b .gh-badge{background:var(--g1b-bg);color:var(--g1b-ac);}
+.g1b .fc{background:var(--g1b-bg);border-color:rgba(236,72,153,.12);}
+.g1b .fc:hover{background:rgba(236,72,153,.16);border-color:var(--g1b-ac);}
+.g1b .fc-num{background:rgba(236,72,153,.15);color:var(--g1b-ac);}
+/* G1S (support docs) */
+.g1s .gh-stripe{background:#94a3b8;}.g1s .gh-title{color:var(--text-muted);}
+.g1s .gh-badge{background:rgba(100,116,139,.10);color:var(--text-muted);}
+.g1s .fc{background:rgba(100,116,139,.06);border-color:rgba(100,116,139,.12);}
+.g1s .fc:hover{background:rgba(100,116,139,.12);border-color:rgba(100,116,139,.4);}
+.g1s .fc-num{background:rgba(100,116,139,.12);color:var(--text-muted);}
+/* G2 */
+.g2 .gh-stripe{background:var(--g2-ac);}.g2 .gh-title{color:var(--g2-lb);}
+.g2 .gh-badge{background:var(--g2-bg);color:var(--g2-ac);}
+.g2 .fc{background:var(--g2-bg);border-color:rgba(16,185,129,.12);}
+.g2 .fc:hover{background:rgba(16,185,129,.16);border-color:var(--g2-ac);}
+.g2 .fc-num{background:rgba(16,185,129,.15);color:var(--g2-ac);}
+/* G3 */
+.g3 .gh-stripe{background:var(--g3-ac);}.g3 .gh-title{color:var(--g3-lb);}
+.g3 .gh-badge{background:var(--g3-bg);color:var(--g3-ac);}
+.g3 .fc{background:var(--g3-bg);border-color:rgba(245,158,11,.12);}
+.g3 .fc:hover{background:rgba(245,158,11,.16);border-color:var(--g3-ac);}
+.g3 .fc-num{background:rgba(245,158,11,.15);color:var(--g3-ac);}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:rgba(15,23,42,0.92);color:#f8fafc;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:10px 22px;border-radius:999px;font-size:13px;font-weight:600;
+  pointer-events:none;opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.28);
+}
+#toast.warn{background:rgba(217,119,6,.95);}
+#toast.ok{background:rgba(22,163,74,.95);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{text-align:center;padding:28px 0 8px;font-size:12px;color:var(--text-muted);}
+.brand{font-weight:800;color:var(--accent);letter-spacing:.04em;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-pill">
+    <span class="logo-icon">🏪</span>
+    <span class="logo-name">KOHNAN 1016</span>
+  </div>
+  <h1>LINK TỔNG HỢP</h1>
+  <p class="header-sub">Trung tâm điều phối dữ liệu &amp; công cụ vận hành</p>
+</header>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="status-row">
+    <div class="status-chip">
+      <span class="chip-dot sale"></span>
+      <span class="chip-label">Sale</span>
+      <span class="chip-val" id="sale-count">Chưa có</span>
+    </div>
+    <div class="status-chip">
+      <span class="chip-dot tonkho"></span>
+      <span class="chip-label">Tồn kho</span>
+      <span class="chip-val" id="tonkho-count">Chưa có</span>
+    </div>
+  </div>
+  <div class="bar-right">
+    <button class="icon-btn danger" onclick="clearAll()">🗑 Xoá tất cả</button>
+    <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+  </div>
+</div>
+
+<!-- UPLOAD ZONES -->
+<div class="upload-row">
+  <div class="upload-card" id="card-sale">
+    <div class="uc-header">
+      <div class="uc-icon sale-ic">📊</div>
+      <div><div class="uc-title">Dữ liệu SALE</div><div class="uc-sub">Chọn file CSV hoặc XLSX</div></div>
+    </div>
+    <div class="upload-zone" id="zone-sale"
+         ondragover="onDragOver(event,'sale')" ondragleave="onDragLeave('sale')"
+         ondrop="onDrop(event,'sale')">
+      <input type="file" accept=".csv,.xlsx,.xls" multiple onchange="onFileSelect(event,'sale')">
+      <div class="uz-icon">⬆️</div>
+      <div class="uz-text">Nhấn để chọn file (có thể chọn nhiều)</div>
+      <div class="uz-hint">.CSV &nbsp;·&nbsp; .XLSX &nbsp;·&nbsp; .XLS</div>
+    </div>
+    <div class="loaded-info" id="info-sale" style="display:none;">
+      <span class="li-file" id="fname-sale"></span>
+      <span class="li-count" id="rows-sale">0 dòng</span>
+      <button class="li-clear" onclick="clearZone('sale')">✕</button>
+    </div>
+  </div>
+
+  <div class="upload-card" id="card-tonkho">
+    <div class="uc-header">
+      <div class="uc-icon tonkho-ic">📦</div>
+      <div><div class="uc-title">Dữ liệu TỒN KHO</div><div class="uc-sub">Chọn file CSV hoặc XLSX</div></div>
+    </div>
+    <div class="upload-zone tonkho-zone" id="zone-tonkho"
+         ondragover="onDragOver(event,'tonkho')" ondragleave="onDragLeave('tonkho')"
+         ondrop="onDrop(event,'tonkho')">
+      <input type="file" accept=".csv,.xlsx,.xls" multiple onchange="onFileSelect(event,'tonkho')">
+      <div class="uz-icon">⬆️</div>
+      <div class="uz-text">Nhấn để chọn file (có thể chọn nhiều)</div>
+      <div class="uz-hint">.CSV &nbsp;·&nbsp; .XLSX &nbsp;·&nbsp; .XLS</div>
+    </div>
+    <div class="loaded-info" id="info-tonkho" style="display:none;">
+      <span class="li-file" id="fname-tonkho"></span>
+      <span class="li-count tk" id="rows-tonkho">0 dòng</span>
+      <button class="li-clear" onclick="clearZone('tonkho')">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 0 -->
+<div class="group g0">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">🔧 CÔNG CỤ &amp; HÀNH CHÍNH</div>
+    <div class="gh-badge">5 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('0.1CHECK_TON.html','tonkho')">
+        <span class="fc-num">0.1</span><span class="fc-name">CHECK TỒN</span>
+        <span class="fc-tag tag-tonkho">📦 Tồn kho</span>
+      </button>
+      <button class="fc" onclick="openTool('0.2Kohnan Xin Hang Mien Nam.html','')">
+        <span class="fc-num">0.2</span><span class="fc-name">XIN HÀNG MIỀN NAM</span>
+      </button>
+      <button class="fc" onclick="openTool('0.3.1SỔ TAY SC.html','')">
+        <span class="fc-num">0.3.1</span><span class="fc-name">SỔ TAY SC</span>
+      </button>
+      <button class="fc" onclick="openTool('0.3.2HƯỚNG DẪN CÁCH ĐO HUYẾT ÁP.html','')">
+        <span class="fc-num">0.3.2</span><span class="fc-name">HƯỚNG DẪN ĐO HUYẾT ÁP</span>
+      </button>
+      <button class="fc" onclick="openTool('0.4Điền CCCD nhân viên KOHNAN 1016.html','')">
+        <span class="fc-num">0.4</span><span class="fc-name">ĐIỀN CCCD NHÂN VIÊN</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 1A: GIAI ĐOẠN 1 -->
+<div class="group g1a">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">🎯 PUSH SALE THÁNG 9 – GIAI ĐOẠN 1</div>
+    <div class="gh-badge">3 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('1.1.1PUSH SALE THÁNG 9 - GĐ1.html','sale')">
+        <span class="fc-num">1.1.1</span><span class="fc-name">PUSH SALE THÁNG 9 – GĐ1</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('1.2.1CHIEN_LUOC_PUSH_SALE_THANG_9_SUA_TAM_HAN_QUOC_600_CHAI.html','sale')">
+        <span class="fc-num">1.2.1</span><span class="fc-name">SỮA TẮM HÀN QUỐC 600 CHAI</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('1.2.2.CHIEN_LUOC_PUSH_SALE_THANG_9_XIT_CHONG_MUOI_140_CHAI.html','sale')">
+        <span class="fc-num">1.2.2</span><span class="fc-name">XỊT CHỐNG MUỖI 140 CHAI</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 1B: GIAI ĐOẠN 2 -->
+<div class="group g1b">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">🚀 PUSH SALE THÁNG 9 – GIAI ĐOẠN 2</div>
+    <div class="gh-badge">3 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('1.1.2PUSH SALE THÁNG 9 - GĐ2.html','sale')">
+        <span class="fc-num">1.1.2</span><span class="fc-name">PUSH SALE THÁNG 9 – GĐ2</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('1.3.1CHIẾN LƯỢC PUSH SALE THÁNG 9 GĐ2 - 220 CHAI REMOS.html','sale')">
+        <span class="fc-num">1.3.1</span><span class="fc-name">220 CHAI REMOS</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('1.3.2CHIẾN LƯỢC PUSH SALE THÁNG 9 GĐ2 - 1000 CHAI SỮA TẮM.html','sale')">
+        <span class="fc-num">1.3.2</span><span class="fc-name">1000 CHAI SỮA TẮM</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 1S: TÀI LIỆU HỖ TRỢ -->
+<div class="group g1s">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">📄 TÀI LIỆU HỖ TRỢ BÁN HÀNG</div>
+    <div class="gh-badge">2 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('1.4.1gioi_thieu_sua_tam.html','')">
+        <span class="fc-num">1.4.1</span><span class="fc-name">GIỚI THIỆU SỮA TẮM</span>
+      </button>
+      <button class="fc" onclick="openTool('1.4.2BANG_GIA_BAN_SUA_TAM_THANG9.html','')">
+        <span class="fc-num">1.4.2</span><span class="fc-name">BẢNG GIÁ SỮA TẮM T9</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 2 -->
+<div class="group g2">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">📈 DASHBOARD &amp; PHÂN TÍCH</div>
+    <div class="gh-badge">8 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('2.1Dashboard_So_Sanh_He_Thong_1016.html','sale')">
+        <span class="fc-num">2.1</span><span class="fc-name">SO SÁNH HỆ THỐNG</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.2Dashboard_Sale_1016.html','sale')">
+        <span class="fc-num">2.2</span><span class="fc-name">DASHBOARD SALE 1016</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.3.1Dashboard_Doanh_Thu_Sanh_Trung_Thu.html','sale')">
+        <span class="fc-num">2.3.1</span><span class="fc-name">DOANH THU TRUNG THU</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.3.2Dashboard_Doanh_Thu_Sanh_KISSME.html','sale')">
+        <span class="fc-num">2.3.2</span><span class="fc-name">DOANH THU KISSME</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.4.1Dashboard_Ton_Kho_1016.html','tonkho')">
+        <span class="fc-num">2.4.1</span><span class="fc-name">TỒN KHO 1016</span>
+        <span class="fc-tag tag-tonkho">📦 Tồn kho</span>
+      </button>
+      <button class="fc" onclick="openTool('2.4.2PhanTichDonHang_Tool.html','sale')">
+        <span class="fc-num">2.4.2</span><span class="fc-name">PHÂN TÍCH ĐƠN HÀNG</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.5Adashboard-da-thang.html','sale')">
+        <span class="fc-num">2.5A</span><span class="fc-name">DASHBOARD ĐA THÁNG</span>
+        <span class="fc-tag tag-sale">📊 Sale</span>
+      </button>
+      <button class="fc" onclick="openTool('2.5Bcam-nang-da-thang.html','')">
+        <span class="fc-num">2.5B</span><span class="fc-name">CẨM NANG ĐA THÁNG</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP 3 -->
+<div class="group g3">
+  <div class="group-head">
+    <div class="gh-stripe"></div>
+    <div class="gh-title">🗓 KẾ HOẠCH &amp; CHẤM CÔNG</div>
+    <div class="gh-badge">2 files</div>
+  </div>
+  <div class="group-body">
+    <div class="file-grid">
+      <button class="fc" onclick="openTool('3.1Ke hoach Working Hours - Work Task.html','')">
+        <span class="fc-num">3.1</span><span class="fc-name">KẾ HOẠCH WORKING HOURS</span>
+      </button>
+      <button class="fc" onclick="openTool('3.2Check_Ca_Cham_Cong.html','')">
+        <span class="fc-num">3.2</span><span class="fc-name">CHECK CA CHẤM CÔNG</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer><span class="brand">KOHNAN HUB</span> · Store 1016 · Cập nhật 09/2026</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* IndexedDB */
+var DB='kohnan_hub',DV=1,ST='kv',_db=null;
+function dbO(cb){if(_db){cb(_db);return;}var r=indexedDB.open(DB,DV);r.onupgradeneeded=function(e){e.target.result.createObjectStore(ST);};r.onsuccess=function(e){_db=e.target.result;cb(_db);};r.onerror=function(){cb(null);};}
+function dbSet(k,v,cb){dbO(function(d){if(!d){if(cb)cb();return;}d.transaction(ST,'readwrite').objectStore(ST).put(v,k).onsuccess=function(){if(cb)cb();};});}
+function dbGet(k,cb){dbO(function(d){if(!d){cb(null);return;}var r=d.transaction(ST,'readonly').objectStore(ST).get(k);r.onsuccess=function(e){cb(e.target.result||null);};r.onerror=function(){cb(null);};});}
+function dbDel(k,cb){dbO(function(d){if(!d){if(cb)cb();return;}d.transaction(ST,'readwrite').objectStore(ST).delete(k).onsuccess=function(){if(cb)cb();};});}
+
+/* Toast */
+var _tt=null;
+function toast(msg,type){var el=document.getElementById('toast');el.textContent=msg;el.className='show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(function(){el.className='';},2800);}
+
+/* Parse file */
+var _store={sale:null,tonkho:null};
+function parseFile(file,cb){
+  var name=file.name.toLowerCase();var reader=new FileReader();
+  if(name.endsWith('.csv')){
+    reader.onload=function(e){var t=e.target.result;var rows=t.split('\n').filter(function(l){return l.trim();});cb({text:t,rows:rows.length,filename:file.name});};
+    reader.readAsText(file,'UTF-8');
+  } else {
+    reader.onload=function(e){
+      try{var wb=XLSX.read(e.target.result,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var csv=XLSX.utils.sheet_to_csv(ws);var rows=csv.split('\n').filter(function(l){return l.trim();});cb({text:csv,rows:rows.length,filename:file.name});}
+      catch(err){toast('Lỗi đọc file XLSX','warn');cb(null);}
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+function parseMultiple(files,cb){
+  var all=[],names=[],done=0,total=files.length;
+  if(!total){cb(null);return;}
+  for(var i=0;i<total;i++){(function(file){
+    parseFile(file,function(r){
+      done++;
+      if(r){all=all.concat(r.text.split('\n').filter(function(l){return l.trim();}));names.push(file.name);}
+      if(done===total){
+        if(!all.length){cb(null);return;}
+        cb({text:all.join('\n'),rows:all.length,filename:names.join(', ')});
+      }
+    });
+  })(files[i]);}
+}
+function onFileSelect(evt,zone){
+  var files=evt.target.files;if(!files||!files.length)return;
+  parseMultiple(files,function(r){if(!r)return;_store[zone]=r;applyZone(zone,r);dbSet('data_'+zone,r,function(){toast('✅ Đã tải '+files.length+' file ('+r.rows+' dòng)','ok');});});
+}
+function onDragOver(evt,zone){evt.preventDefault();document.getElementById('zone-'+zone).classList.add('drag-over');}
+function onDragLeave(zone){document.getElementById('zone-'+zone).classList.remove('drag-over');}
+function onDrop(evt,zone){
+  evt.preventDefault();onDragLeave(zone);
+  var files=evt.dataTransfer.files;if(!files||!files.length)return;
+  parseMultiple(files,function(r){if(!r)return;_store[zone]=r;applyZone(zone,r);dbSet('data_'+zone,r,function(){toast('✅ Đã tải '+files.length+' file ('+r.rows+' dòng)','ok');});});
+}
+
+function applyZone(zone,r){
+  var sale=zone==='sale';
+  document.getElementById('fname-'+zone).textContent=r.filename;
+  document.getElementById('rows-'+zone).textContent=r.rows+' dòng';
+  document.getElementById('info-'+zone).style.display='flex';
+  var card=document.getElementById('card-'+zone);
+  card.classList.add(sale?'loaded-sale':'loaded-tonkho');
+  document.getElementById(sale?'sale-count':'tonkho-count').textContent=r.rows+' dòng';
+}
+function clearZone(zone){
+  var sale=zone==='sale';
+  document.getElementById('info-'+zone).style.display='none';
+  document.getElementById('card-'+zone).classList.remove('loaded-sale','loaded-tonkho');
+  document.getElementById(sale?'sale-count':'tonkho-count').textContent='Chưa có';
+  _store[zone]=null;
+  dbDel('data_'+zone,function(){toast('Đã xoá dữ liệu '+zone);});
+}
+function clearAll(){if(!confirm('Xoá toàn bộ dữ liệu sale và tồn kho?'))return;clearZone('sale');clearZone('tonkho');}
+
+/* Open tool */
+function openTool(filename,dataType){
+  var safe=filename.replace(/&/g,'%26');
+  var w=window.open(safe,filename.replace(/[^a-zA-Z0-9]/g,'_'));
+  if(!w){toast('Trình duyệt chặn popup - vui lòng cho phép','warn');return;}
+  if(!dataType)return;
+  setTimeout(function(){
+    try{
+      if((dataType==='sale'||dataType==='both')&&_store.sale)w.postMessage({type:'kohnan_hub_data_sale',data:_store.sale.text},'*');
+      if((dataType==='tonkho'||dataType==='both')&&_store.tonkho)w.postMessage({type:'kohnan_hub_data_tonkho',data:_store.tonkho.text},'*');
+    }catch(e){}
+  },1500);
+}
+
+/* Dark mode */
+function toggleTheme(){var h=document.documentElement;var n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);try{localStorage.setItem('kh_t',n);}catch(e){}}
+(function(){var t='';try{t=localStorage.getItem('kh_t')||'';}catch(e){}if(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t);})();
+
+/* Init */
+window.addEventListener('load',function(){
+  dbGet('data_sale',function(r){if(r){_store.sale=r;applyZone('sale',r);}
+  dbGet('data_tonkho',function(r2){if(r2){_store.tonkho=r2;applyZone('tonkho',r2);}});});
+});
+</script>
+</body>
+</html>

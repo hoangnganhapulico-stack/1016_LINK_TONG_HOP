@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lộ Trình Quản Lý Cửa Hàng</title>
+<style>
+:root{
+  --blue:#0b4f91;--blue-soft:#e8f0fa;--orange:#e8590c;--orange-soft:#fff1e8;
+  --green:#1f9d55;--bg:#f5f7fb;--card:#ffffff;--text:#1d2533;--muted:#5b6678;--line:#dde3ec;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --blue:#6fa8e8;--blue-soft:#16263b;--orange:#ff8a4c;--orange-soft:#2e1d12;
+    --green:#4cc38a;--bg:#0f141c;--card:#18202b;--text:#e6ebf2;--muted:#9aa6b8;--line:#2a3442;
+  }
+}
+:root[data-theme="dark"]{
+  --blue:#6fa8e8;--blue-soft:#16263b;--orange:#ff8a4c;--orange-soft:#2e1d12;
+  --green:#4cc38a;--bg:#0f141c;--card:#18202b;--text:#e6ebf2;--muted:#9aa6b8;--line:#2a3442;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;font-size:15px}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+header{background:var(--blue);color:#fff;border-radius:14px;padding:22px 20px;position:relative;overflow:hidden}
+:root[data-theme="dark"] header{background:#0b3a6b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header{background:#0b3a6b}}
+header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--orange)}
+header h1{margin:0 0 4px;font-size:22px;letter-spacing:.3px}
+header p{margin:0;opacity:.9;font-size:14px}
+.prog{margin-top:14px;background:rgba(255,255,255,.25);border-radius:99px;height:10px;overflow:hidden}
+.prog span{display:block;height:100%;width:0;background:var(--orange);transition:width .3s}
+.progtxt{font-size:13px;margin-top:6px;opacity:.95}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.toolbar button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+.toolbar button:hover{border-color:var(--blue)}
+.timeline{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
+.timeline a{flex:0 0 auto;text-decoration:none;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;min-width:118px}
+.timeline a b{display:block;color:var(--blue);font-size:13px}
+.timeline a.now{border-color:var(--orange);background:var(--orange-soft)}
+.timeline a.done b{color:var(--green)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden}
+.card.now{border:2px solid var(--orange)}
+.chead{display:flex;align-items:flex-start;gap:12px;padding:16px 16px 12px;cursor:pointer}
+.num{flex:0 0 auto;width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.card.now .num{background:var(--orange)}
+.chead h2{margin:0;font-size:17px;color:var(--blue)}
+.meta{font-size:13px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.badge.now{background:var(--orange);color:#fff}
+.badge.done{background:var(--green);color:#fff}
+.cbody{padding:0 16px 16px}
+.card.collapsed .cbody{display:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+.box{border-radius:10px;padding:12px 14px}
+.box h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.learn{background:var(--blue-soft)}
+.learn h3{color:var(--blue)}
+.do{background:var(--orange-soft)}
+.do h3{color:var(--orange)}
+.box ul{margin:0;padding-left:18px}
+.box li{margin:3px 0}
+.tasks{list-style:none;padding:0!important}
+.tasks li{display:flex;gap:8px;align-items:flex-start}
+.tasks input{margin-top:4px;accent-color:var(--orange);width:16px;height:16px;flex:0 0 auto}
+.tasks label{cursor:pointer}
+.tasks input:checked + label{text-decoration:line-through;color:var(--muted)}
+.out{margin-top:12px;border-left:4px solid var(--green);background:var(--bg);padding:10px 12px;border-radius:6px;font-size:14px}
+.out b{color:var(--green)}
+.src{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--blue-soft);color:var(--blue)}
+.section-title{font-size:18px;color:var(--blue);margin:26px 0 10px;border-bottom:3px solid var(--orange);padding-bottom:6px}
+.rhythm{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:700px){.rhythm{grid-template-columns:1fr}}
+.rhythm .box{background:var(--card);border:1px solid var(--line)}
+.rhythm h3{color:var(--blue)}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
+@media print{.toolbar,.timeline{display:none}.card.collapsed .cbody{display:block}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Lộ Trình Học & Áp Dụng "Store Management Mindset"</h1>
+  <p>12 tuần · 13/10/2026 - 03/01/2027 · 6 mốc · Mỗi mốc: Học → Làm → Đầu ra</p>
+  <div class="prog"><span id="bar"></span></div>
+  <div class="progtxt" id="ptxt">0% hoàn thành</div>
+</header>
+
+<div class="toolbar">
+  <button onclick="toggleAll(false)">Mở tất cả</button>
+  <button onclick="toggleAll(true)">Thu gọn tất cả</button>
+  <button onclick="jumpNow()">Đến mốc hiện tại</button>
+  <button onclick="window.print()">In / Lưu PDF</button>
+  <button onclick="resetAll()">Xóa đánh dấu</button>
+</div>
+
+<nav class="timeline" id="tl"></nav>
+
+<div id="phases"></div>
+
+<h2 class="section-title">Nhịp duy trì sau lộ trình</h2>
+<div class="rhythm">
+  <div class="box"><h3>Hằng ngày</h3><ul>
+    <li>Đi sàn kiểm 4 mục Store Condition, sửa ngay tại chỗ</li>
+    <li>Đứng sàn tối thiểu 15 phút/ca, ghi 1-2 ý kiến khách</li>
+    <li>Kiểm top hàng bán chạy không để trống kệ</li>
+    <li>Khen ngay 1 hành động tốt của nhân viên</li>
+  </ul></div>
+  <div class="box"><h3>Hằng tuần</h3><ul>
+    <li>Cập nhật bảng 5 chỉ số, tìm 1 bất thường</li>
+    <li>Áp dụng Quan sát - Phân tích 3 Hiện - Phán đoán cho bất thường đó</li>
+    <li>1 buổi OJT ngắn cho 1 nhân viên</li>
+    <li>Chuyển ý kiến khách cần hỗ trợ cho AM/MD</li>
+  </ul></div>
+  <div class="box"><h3>Hằng tháng</h3><ul>
+    <li>Chạy PDCA 4 bước: Ngân sách - Nhân sự - Lợi nhuận - Kinh doanh</li>
+    <li>Làm mới 1 khu trưng bày theo 5 nguyên tắc</li>
+    <li>Khảo sát 1 đối thủ, mang về 1 điểm tốt</li>
+    <li>Rà dấu hiệu BPS của cả team, trò chuyện 1-1</li>
+  </ul></div>
+</div>
+
+<footer>Nguồn: Store Management Mindset - HR Department, Kohnan Vietnam, 09/2026</footer>
+</div>
+
+<script>
+const PHASES = [
+{
+  id:"m1", title:"Tư duy nền: Vai trò, Sứ mệnh, Nghĩa vụ & Trách nhiệm",
+  start:"2026-10-13", end:"2026-10-19", week:"Tuần 1",
+  src:"Mở đầu, Chương 1 (Sứ mệnh & Thách thức), Chương 3 (Nghĩa vụ - Trách nhiệm)",
+  learn:[
+    "Quản lý là <b>chức năng + trách nhiệm</b>, không phải vị trí quyền lực",
+    "Sứ mệnh <b>Doanh nghiệp bán lẻ nền tảng No.1</b>: khách cần gì cho cuộc sống hằng ngày là nghĩ đến Kohnan",
+    "3 bước biến khách thành <b>FAN</b>: Trải nghiệm hài lòng → Fan → Niềm tin",
+    "<b>Nghĩa vụ</b> = thực hiện 100% Manual, sơ đồ kệ, lịch trình của văn phòng",
+    "<b>Trách nhiệm</b> = tự ra quyết định (quy định riêng, đào tạo, điều chỉnh ca) để thay đổi con số",
+    "9 vấn đề hiện tại của cửa hàng (QSC, khu bán hàng, thiết bị, hết hàng bán chạy, phụ thuộc KM, HI, số liệu, nghỉ việc/OJT, chỉ làm thao tác)"
+  ],
+  tasks:[
+    "Liệt kê công việc của team thành 2 cột: Nghĩa vụ / Trách nhiệm",
+    "Chấm điểm 1-5 cho 9 vấn đề tại cửa hàng mình (đi sàn quan sát thực tế)",
+    "Chọn 3 vấn đề điểm thấp nhất làm trọng tâm cho 12 tuần",
+    "Viết 1 câu mục tiêu chung của team: làm vì điều gì, vì ai",
+    "Chia sẻ câu mục tiêu với team trong buổi giao ca"
+  ],
+  out:"Bảng tự chẩn đoán 9 vấn đề + 3 vấn đề trọng tâm + câu mục tiêu team"
+},
+{
+  id:"m2", title:"Hiện diện tại sàn & Trạng thái cửa hàng lý tưởng",
+  start:"2026-10-20", end:"2026-11-02", week:"Tuần 2-3",
+  src:"Chương 1 (Hiện diện tại khu bán hàng), Chương 4 (Store Condition)",
+  learn:[
+    "Nhu cầu thật của khách <b>không nằm trong máy tính</b>, phải đứng sàn mới thấy",
+    "Quy trình ý kiến khách: Quan sát → Trò chuyện → Xử lý ngay / Chuyển AM, MD",
+    "4 mục Store Condition kiểm hằng ngày: <b>Chào hỏi - tư vấn</b>, <b>Hết hàng</b>, <b>Vệ sinh 5S</b>, <b>Sắp xếp gọn gàng</b>",
+    "Dưới tiêu chuẩn là hướng dẫn sửa <b>ngay tại chỗ</b>"
+  ],
+  tasks:[
+    "Lập checklist 4 mục Store Condition (dạng tick nhanh trên giấy/điện thoại)",
+    "Mỗi ngày đi sàn đầu ca và giữa ca, sửa ngay lỗi phát hiện",
+    "Mỗi ca đứng sàn tối thiểu 15 phút, ghi lại câu nói thật của khách",
+    "Lập sổ ý kiến khách: Nội dung / Xử lý tại cửa hàng / Chuyển AM-MD",
+    "Huấn luyện team chào hỏi khách 100% và giới thiệu được 3 sản phẩm PB",
+    "Cuối mỗi tuần tổng hợp: 3 ý kiến khách nổi bật + hành động đã làm"
+  ],
+  out:"Checklist Store Condition chạy hằng ngày + Sổ ý kiến khách 2 tuần"
+},
+{
+  id:"m3", title:"Kiểm soát số liệu kinh doanh: 5 chỉ số",
+  start:"2026-11-03", end:"2026-11-16", week:"Tuần 4-5",
+  src:"Chương 2 (Kiểm soát dữ liệu), Chương 3 (Kỹ năng Quan sát - Phân tích - Phán đoán)",
+  learn:[
+    "<b>Doanh số</b> = Số khách × Giá trị đơn hàng; mất hàng bán chạy = mất doanh số",
+    "<b>Vòng quay tồn kho</b>: đặt đúng hàng bán chạy, xử lý sớm hàng bán chậm",
+    "<b>Năng suất giờ công</b>: lợi nhuận gộp/1 nhân viên/1 giờ, tối ưu ca, bỏ thao tác thừa",
+    "<b>Basket size</b>: giá trị trung bình mỗi lần mua, tăng bằng cross-sell & tư vấn",
+    "<b>Lợi nhuận gộp</b>: giảm giảm giá, hao hụt, đẩy hàng trọng điểm",
+    "Hàng <b>In line nên chiếm 70%</b> doanh số, không phụ thuộc khuyến mãi",
+    "3 Hiện: <b>Hiện trường - Hiện vật - Hiện thực</b> để tìm đúng nguyên nhân"
+  ],
+  tasks:[
+    "Dựng bảng theo dõi tuần cho 5 chỉ số từ dữ liệu POS",
+    "Tách doanh số In line và Khuyến mãi, tính tỷ trọng In line hiện tại",
+    "Lập danh sách Top 30 hàng bán chạy, kiểm tồn mỗi ngày",
+    "Lập danh sách hàng bán chậm/không bán, đề xuất hướng xử lý",
+    "Chọn 1 bất thường trong số liệu, kiểm chứng tại sàn theo 3 Hiện",
+    "Ra quyết định cụ thể: Ai - Làm gì - Đến khi nào"
+  ],
+  out:"Bảng 5 chỉ số tuần + Top 30 bán chạy + Danh sách hàng chậm + 1 phân tích 3 Hiện"
+},
+{
+  id:"m4", title:"Kiểm soát khu vực bán hàng: 5 nguyên tắc trưng bày",
+  start:"2026-11-17", end:"2026-11-30", week:"Tuần 6-7",
+  src:"Chương 3 (Phân vai Văn phòng - Cửa hàng), Chương 4 (Đề xuất giải pháp, HI, 5 nguyên tắc)",
+  learn:[
+    "Cửa hàng được quyền <b>điều chỉnh</b>: bàn/đầu kệ khuyến mãi, mức độ trưng bày, facing theo số bán",
+    "Từ <b>bán đơn lẻ</b> sang <b>đề xuất giải pháp</b>: trưng mẫu sử dụng để khách hình dung tại nhà",
+    "HI: biến <b>mua theo mục đích</b> thành <b>mua theo đề xuất</b> qua trưng bày liên kết",
+    "5 nguyên tắc: <b>(1) Chủ đề</b> - Cho ai, gì, để làm gì · <b>(2) Chọn SP</b> - chính + bán kèm · <b>(3) Sắp xếp</b> - facing, POP thống nhất · <b>(4) Mẫu sử dụng</b> · <b>(5) An toàn</b>",
+    "Quản lý trưng bày bằng <b>số liệu</b> (số bán, số facing), không lấy thiếu kệ làm lý do"
+  ],
+  tasks:[
+    "Chọn 1 đầu kệ/bàn khuyến mãi làm khu thử nghiệm",
+    "Ghi số bán 2 tuần trước khi thay đổi (mốc so sánh)",
+    "Đặt chủ đề theo nhu cầu khách (ví dụ: sửa chỗ rò rỉ nước, dọn nhà cuối năm)",
+    "Chọn sản phẩm chính + ít nhất 2 sản phẩm bán kèm, mở rộng facing hàng muốn bán",
+    "Đặt mẫu sử dụng thật, POP cùng vị trí, kiểm tra an toàn kệ và mẫu",
+    "Huấn luyện team câu giới thiệu theo chủ đề, gắn với Push Sale tháng 12"
+  ],
+  out:"1 khu trưng bày theo 5 nguyên tắc + số bán trước/sau để so sánh"
+},
+{
+  id:"m5", title:"Quản lý con người: Đánh giá, OJT, Khen & Nhắc",
+  start:"2026-12-01", end:"2026-12-14", week:"Tuần 8-9",
+  src:"Chương 5 (Quản lý tổ chức & Đào tạo nhân sự)",
+  learn:[
+    "Đào tạo chỉ thành công khi nhân viên <b>hiểu - làm - tự làm được</b>",
+    "3 yếu tố tổ chức: <b>Mục tiêu chung</b>, <b>Tinh thần đóng góp</b>, <b>Chia sẻ thông tin</b>",
+    "Môi trường: <b>Vui vẻ</b> (công bằng, cảm ơn) · <b>Nghiêm khắc</b> (đạt / không đạt) · <b>Phát triển</b>",
+    "3 loại năng lực: Thiếu động lực → giao mục tiêu, đánh giá đúng · Thiếu kỹ năng → cho làm, theo dõi, giao dần · Thiếu kiến thức → Manual, bước nhỏ",
+    "Khen: <b>ngay lúc đó</b>, khen cả quá trình, <b>trước tập thể</b>",
+    "Nhắc: <b>bình tĩnh</b>, so với Manual, <b>1-1</b>, chỉ 1 lỗi hiện tại, không so sánh, kết bằng kỳ vọng",
+    "Lắng nghe chủ động, mô hình cửa sổ Johari, không áp đặt cách làm"
+  ],
+  tasks:[
+    "Lập bản đồ năng lực từng nhân viên: Kiến thức / Kỹ năng / Động lực",
+    "Xếp mỗi người vào 1 trong 3 loại, chọn cách huấn luyện tương ứng",
+    "Lên lịch OJT: mỗi người 1 kỹ năng trọng tâm trong 2 tuần",
+    "Mỗi ngày khen cụ thể ít nhất 1 hành động tốt, chia sẻ trong nhóm team",
+    "Thực hiện nhắc nhở đúng quy tắc 1-1 khi có lỗi",
+    "Trò chuyện 1-1 với từng người: khó khăn, mong muốn, góp ý cho quản lý"
+  ],
+  out:"Bản đồ năng lực cả team + Lịch OJT + Ghi chú 1-1"
+},
+{
+  id:"m6", title:"Đối thủ & Marketing khu vực: Cross-SWOT",
+  start:"2026-12-15", end:"2026-12-28", week:"Tuần 10-11",
+  src:"Chương 6 (Chiến lược đối thủ & Marketing khu vực)",
+  learn:[
+    "6 nguyên tắc doanh số: Khách mới · Giảm khách rời bỏ · Giữ khách trung thành · Tăng tần suất · Tăng số món · Tăng giá trị đơn",
+    "Hiểu thị trường khu vực cấp 1-2-3, lối sống, độ tuổi, nghề nghiệp của khách",
+    "Khảo sát đối thủ từ <b>góc nhìn khách hàng</b>, tìm điểm họ làm tốt ngoài giá, mang điểm tốt về",
+    "Khảo sát khu bán hàng: diện tích, layout, sơ đồ kệ, trưng bày, dịch vụ",
+    "Cross-SWOT: <b>Tấn công</b> (Mạnh × Cơ hội) · <b>Khác biệt</b> (Mạnh × Thách thức) · <b>Cải thiện</b> (Yếu × Cơ hội) · <b>Phòng thủ</b> (Yếu × Thách thức)"
+  ],
+  tasks:[
+    "Ghi đặc điểm khách khu vực (ngày thường / cuối tuần, nhóm khách chính)",
+    "Khảo sát 1 đối thủ gần nhất, ghi 3 điểm họ làm tốt ngoài giá",
+    "Điền bảng Cross-SWOT cho cửa hàng mình",
+    "Chọn 3 hành động: mỗi hành động gắn với 1 trong 6 nguyên tắc doanh số",
+    "Triển khai ít nhất 1 hành động ngay trong mùa cao điểm cuối năm"
+  ],
+  out:"Bảng Cross-SWOT 1 trang + Báo cáo khảo sát đối thủ + 3 hành động"
+},
+{
+  id:"m7", title:"Sức khỏe tinh thần & Kế hoạch PDCA tháng mới",
+  start:"2026-12-29", end:"2027-01-03", week:"Tuần 12",
+  src:"Chương 7 (Quản lý sức khỏe tinh thần), Chương 2 (Chu trình lập kế hoạch lợi nhuận)",
+  learn:[
+    "Dấu hiệu BPS: <b>Thể chất</b> (mệt, trang phục lôi thôi) · <b>Tâm lý</b> (cáu gắt, giảm tập trung) · <b>Hành vi</b> (đi trễ, lỗi tăng, ít báo cáo)",
+    "4 hành động: <b>Quan sát</b> - <b>Trò chuyện</b> - <b>Lắng nghe</b> - <b>Hành động</b>",
+    "Tự chăm sóc 3R: Rest, Relaxation, Recreation · 3C: Cognition, Control, Communication",
+    "PDCA 4 bước: <b>Lập ngân sách</b> → <b>Kế hoạch nhân sự</b> → <b>Kế hoạch lợi nhuận</b> → <b>Kế hoạch kinh doanh</b> (ai, khi nào, bán gì)"
+  ],
+  tasks:[
+    "Ghi trạng thái 'bình thường' của từng nhân viên để nhận ra khi khác thường",
+    "Rà dấu hiệu BPS của team sau cao điểm cuối năm, trò chuyện với người có dấu hiệu",
+    "Chọn 1 việc 3R và 1 việc 3C cho bản thân, làm đều mỗi tuần",
+    "So sánh 9 vấn đề với điểm chấm ở Tuần 1, ghi tiến bộ",
+    "Lập kế hoạch tháng 01/2027 theo PDCA 4 bước",
+    "Trình bày kết quả 12 tuần và kế hoạch tháng mới với team / AM"
+  ],
+  out:"Bảng so sánh trước/sau 12 tuần + Kế hoạch hành động tháng 01/2027"
+}
+];
+
+const KEY="smm_roadmap_v1";
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+let state=load();
+
+function fmt(d){const [y,m,dd]=d.split("-");return dd+"/"+m}
+function status(p){
+  const t=new Date();t.setHours(0,0,0,0);
+  const s=new Date(p.start+"T00:00:00"),e=new Date(p.end+"T23:59:59");
+  if(t>=s&&t<=e)return"now";if(t>e)return"done";return"next";
+}
+
+function render(){
+  const tl=document.getElementById("tl"),ph=document.getElementById("phases");
+  tl.innerHTML="";ph.innerHTML="";
+  PHASES.forEach((p,i)=>{
+    const st=status(p);
+    const a=document.createElement("a");
+    a.href="#"+p.id;a.className=st==="now"?"now":(st==="done"?"done":"");
+    a.innerHTML="<b>Mốc "+(i+1)+"</b>"+fmt(p.start)+" - "+fmt(p.end);
+    tl.appendChild(a);
+
+    const c=document.createElement("section");
+    c.className="card"+(st==="now"?" now":"")+(st!=="now"?" collapsed":"");
+    c.id=p.id;
+    const badge=st==="now"?'<span class="badge now">ĐANG THỰC HIỆN</span>':(st==="done"?'<span class="badge done">ĐÃ QUA</span>':"");
+    c.innerHTML=`
+      <div class="chead" onclick="this.parentNode.classList.toggle('collapsed')">
+        <div class="num">${i+1}</div>
+        <div><h2>${p.title}${badge}</h2>
+        <div class="meta">${p.week} · ${fmt(p.start)} - ${fmt(p.end)} · <span id="cnt-${p.id}"></span></div></div>
+      </div>
+      <div class="cbody">
+        <div class="grid">
+          <div class="box learn"><h3>Cần học</h3><ul>${p.learn.map(x=>"<li>"+x+"</li>").join("")}</ul></div>
+          <div class="box do"><h3>Cần làm tại cửa hàng</h3><ul class="tasks">${p.tasks.map((x,j)=>{
+            const k=p.id+"_"+j;
+            return `<li><input type="checkbox" id="${k}" ${state[k]?"checked":""} onchange="tick('${k}',this.checked)"><label for="${k}">${x}</label></li>`}).join("")}</ul></div>
+        </div>
+        <div class="out"><b>Đầu ra mốc này:</b> ${p.out}</div>
+        <div class="src">Tham chiếu tài liệu: ${p.src}</div>
+      </div>`;
+    ph.appendChild(c);
+  });
+  updateProgress();
+}
+function tick(k,v){state[k]=v;save(state);updateProgress()}
+function updateProgress(){
+  let total=0,done=0;
+  PHASES.forEach(p=>{
+    let d=0;p.tasks.forEach((_,j)=>{if(state[p.id+"_"+j])d++});
+    total+=p.tasks.length;done+=d;
+    const el=document.getElementById("cnt-"+p.id);if(el)el.textContent=d+"/"+p.tasks.length+" việc";
+  });
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById("bar").style.width=pct+"%";
+  document.getElementById("ptxt").textContent=pct+"% hoàn thành ("+done+"/"+total+" việc)";
+}
+function toggleAll(col){document.querySelectorAll(".card").forEach(c=>c.classList.toggle("collapsed",col))}
+function jumpNow(){const n=document.querySelector(".card.now")||document.querySelector(".card");n.classList.remove("collapsed");n.scrollIntoView({behavior:"smooth"})}
+function resetAll(){if(confirm("Xóa toàn bộ đánh dấu?")){state={};save(state);render()}}
+render();
+</script>
+</body>
+</html>

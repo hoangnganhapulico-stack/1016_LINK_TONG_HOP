@@ -1,0 +1,444 @@
+<title>Kế hoạch T10 Team Admin 1016</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one reading column; header band with the month goal, then sections from "why" to "who does what" to "how we say it" */
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --ink:#15211d; --muted:#5b6a64; --line:#dbe3df;
+  --brand:#0f5c4a; --brand-soft:#e3f0eb; --amber:#b86a00; --amber-soft:#fbefd9;
+  --good:#1d7a3a; --warn:#a15c00; --bad:#b3261e; --bad-soft:#fbe4e2;
+  --font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --surface:#17201d; --ink:#e6eeea; --muted:#9db0a8; --line:#2a3833;
+  --brand:#5cc4a6; --brand-soft:#1b3029; --amber:#f0a83c; --amber-soft:#33281a;
+  --good:#5fcf80; --warn:#f0a83c; --bad:#ff8a80; --bad-soft:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --surface:#17201d; --ink:#e6eeea; --muted:#9db0a8; --line:#2a3833;
+  --brand:#5cc4a6; --brand-soft:#1b3029; --amber:#f0a83c; --amber-soft:#33281a;
+  --good:#5fcf80; --warn:#f0a83c; --bad:#ff8a80; --bad-soft:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 64px;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:clamp(24px,4.4vw,36px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.muted{color:var(--muted)}
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;flex-direction:column;gap:6px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+
+/* header */
+header{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:end}
+header .lead{display:flex;flex-direction:column;gap:10px}
+.goal{background:var(--brand);color:#fff;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:6px}
+:root[data-theme="dark"] .goal{color:#0f1513}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .goal{color:#0f1513}}
+.goal .big{font-size:34px;font-weight:800;line-height:1.1}
+.goal small{opacity:.85;font-size:13px}
+@media(max-width:760px){header{grid-template-columns:1fr}}
+
+/* stat grid */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.stat .v{font-size:22px;font-weight:700}
+.stat .l{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.t-good{background:var(--brand-soft);color:var(--good)}
+.t-bad{background:var(--bad-soft);color:var(--bad)}
+.t-warn{background:var(--amber-soft);color:var(--warn)}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* tables */
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+td.r,th.r{text-align:right}
+tr:last-child td{border-bottom:0}
+tfoot td{font-weight:700;background:var(--brand-soft)}
+
+/* levers */
+.levers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lever{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.lever .impact{font-size:13px;font-weight:600;color:var(--amber)}
+.lever .who{font-size:12px;color:var(--muted)}
+@media(max-width:760px){.levers{grid-template-columns:1fr}}
+
+/* tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.panel{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.panel>*{min-width:0}
+@media(max-width:820px){.panel{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.timeline{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .time{font-weight:700;color:var(--brand);font-size:13px}
+.step ul{margin:0;padding-left:18px}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.kpi{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kpi:last-child{border-bottom:0}
+.kpi b{white-space:nowrap}
+.script{background:var(--amber-soft);border-radius:8px;padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.script q{quotes:none;font-style:italic}
+.dont{background:var(--bad-soft);border-radius:8px;padding:12px 14px;font-size:14px}
+
+/* communication */
+.comm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.comm>*{min-width:0}
+@media(max-width:820px){.comm{grid-template-columns:1fr}}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.three .n{background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.three .n .v{font-size:30px;font-weight:800;color:var(--brand)}
+@media(max-width:640px){.three{grid-template-columns:1fr}}
+ol.agenda{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+/* calc */
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.calc label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+.calc input{font:inherit;font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:700px){.calc,.out{grid-template-columns:1fr}}
+.foot{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.tab{transition:background .15s,color .15s}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="lead">
+    <span class="eyebrow">Store 1016 · Parc Mall · Team Admin</span>
+    <h1>Kế hoạch tháng 10: đạt Budget và bù phần thiếu tháng 9</h1>
+    <p class="muted">Tháng 9 đạt 97.8% budget, còn thiếu 84 triệu. Tháng 10 Team Admin nhận mục tiêu gộp: Budget T10 + 84 triệu. Trang này gồm con số, giải pháp, việc của từng vị trí và cách triển khai cho team.</p>
+  </div>
+  <div class="goal">
+    <small>Mục tiêu T10 (chưa VAT)</small>
+    <div class="big num">3,546 triệu</div>
+    <small class="num">= Budget 3,462 tr + bù T9 84 tr · đã có 01-04/10: 615 tr (107.7%)</small>
+  </div>
+</header>
+
+<!-- 1 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">1 · Tháng 9 nói gì</span>
+    <h2>Giỏ hàng tốt, thiếu khách ban ngày</h2>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="l">Số SP/bill (UPT)</span><span class="v num">4.36</span><span class="tag t-good">Cao nhất Area</span></div>
+    <div class="stat"><span class="l">Giá trị TB/bill (ATV)</span><span class="v num">301k</span><span class="tag t-good">+4.2% so với Area</span></div>
+    <div class="stat"><span class="l">Bill/ngày</span><span class="v num">457</span><span class="tag t-bad">Bằng 61% của 1001</span></div>
+    <div class="stat"><span class="l">Doanh thu sau 19h</span><span class="v num">39.2%</span><span class="tag t-warn">Ban ngày vắng</span></div>
+    <div class="stat"><span class="l">CAT6 Interior</span><span class="v num">21.9%</span><span class="tag t-bad">1001: 28% · 1003: 26%</span></div>
+    <div class="stat"><span class="l">Bill 1 dòng hàng</span><span class="v num">38.3%</span><span class="tag t-good">Thấp nhất Area</span></div>
+    <div class="stat"><span class="l">Bill hủy</span><span class="v num">50 / 30.8 tr</span><span class="tag t-bad">0.75% DT · gấp 3.5 lần 1001</span></div>
+    <div class="stat"><span class="l">TB ngày T2-T6</span><span class="v num">87 tr</span><span class="tag t-warn">Ngày 10/09 chỉ 48 tr</span></div>
+  </div>
+  <p>Ba việc Team Admin tác động được trực tiếp: <b>giữ giỏ hàng ở mức cao</b> tại quầy, <b>đủ hàng và đúng giá</b> cho nhóm hàng bán chạy, và <b>kiểm soát quầy</b> (tốc độ giờ cao điểm, bill hủy).</p>
+</section>
+
+<!-- 2 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">2 · Con số của tháng 10</span>
+    <h2>Cần 2,932 triệu trong 27 ngày còn lại (05-31/10)</h2>
+  </div>
+  <p class="muted">Số trên POS là doanh thu có VAT, nên chỉ tiêu cho team được đổi sang số POS (hệ số 1.079 theo T9). Tỷ lệ cuối tuần / ngày thường giữ như T9 (2.56 lần). Mức phấn đấu cao hơn mức tối thiểu khoảng 7% để có dư phòng.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Loại ngày</th><th class="r">Số ngày</th><th class="r">Tối thiểu (POS)</th><th class="r">Phấn đấu (POS)</th><th class="r">T9 thực tế (POS)</th></tr></thead>
+      <tbody>
+        <tr><td>Thứ 2 - Thứ 6</td><td class="r">20</td><td class="r">84 tr/ngày</td><td class="r"><b>90 tr/ngày</b></td><td class="r">87 tr/ngày</td></tr>
+        <tr><td>Thứ 7, Chủ nhật</td><td class="r">7</td><td class="r">214 tr/ngày</td><td class="r"><b>225 tr/ngày</b></td><td class="r">224 tr/ngày</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mốc theo tuần (lũy kế để báo cáo)</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Tuần</th><th>Ngày</th><th class="r">Tối thiểu (POS)</th><th class="r">Phấn đấu (POS)</th><th>Điểm nhấn</th></tr></thead>
+      <tbody>
+        <tr><td>Tuần 1</td><td>05-11/10</td><td class="r">844 tr</td><td class="r">900 tr</td><td>Họp triển khai, chạy brief đầu ca từ 07/10</td></tr>
+        <tr><td>Tuần 2</td><td>12-18/10</td><td class="r">844 tr</td><td class="r">900 tr</td><td>Chuẩn bị hàng quà tặng 20/10 xong trước Thứ 6 16/10</td></tr>
+        <tr><td>Tuần 3</td><td>19-25/10</td><td class="r">844 tr</td><td class="r">900 tr</td><td>20/10 (Thứ 3): gợi ý quà tặng tại quầy cả ngày</td></tr>
+        <tr><td>Tuần 4</td><td>26-31/10</td><td class="r">631 tr</td><td class="r">675 tr</td><td>Rà tồn, chốt số; 31/10 Thứ 7 là ngày cuối để bù</td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="2">Tổng 05-31/10</td><td class="r">3,163 tr</td><td class="r">3,375 tr</td><td>POS 3,163 tr ≈ 2,932 tr chưa VAT</td></tr></tfoot>
+    </table>
+  </div>
+
+  <h3>Chia chỉ tiêu ngày theo khung giờ (theo tỷ trọng T9)</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Khung giờ</th><th class="r">Tỷ trọng</th><th class="r">Ngày thường (90 tr)</th><th class="r">Cuối tuần (225 tr)</th><th>Mốc kiểm tra POS</th></tr></thead>
+      <tbody>
+        <tr><td>09h - 13h</td><td class="r">19.5%</td><td class="r">18 tr</td><td class="r">44 tr</td><td>13h</td></tr>
+        <tr><td>13h - 18h</td><td class="r">33.3%</td><td class="r">30 tr</td><td class="r">75 tr</td><td>18h (lũy kế 48 tr / 119 tr)</td></tr>
+        <tr><td>18h - 22h</td><td class="r">47.2%</td><td class="r">42 tr</td><td class="r">106 tr</td><td>20h và 22h</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 3 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">3 · Giải pháp từ công việc Team Admin</span>
+    <h2>6 đòn bẩy, mỗi đòn bẩy có người chịu trách nhiệm</h2>
+  </div>
+  <div class="levers">
+    <div class="lever">
+      <h3>1. Mỗi khách một câu gợi ý tại quầy</h3>
+      <p>Thu ngân/SC gợi ý 1 món cạnh quầy hoặc món Push Sale cho mọi bill. Ưu tiên khách mua 1 món. Hàng gợi ý là hàng nhỏ, bán chạy: khăn ướt SB, bông tẩy trang SB, khăn giấy Luala, nước hoa xả vải OTB.</p>
+      <span class="impact">Mục tiêu: bill 1 dòng từ 38.3% xuống 33%</span>
+      <span class="who">Thu ngân/SC · Trưởng ca theo dõi</span>
+    </div>
+    <div class="lever">
+      <h3>2. Push Sale T10 chào 100% khách</h3>
+      <p>Sản phẩm Push Sale đặt ngay tầm mắt tại quầy, thu ngân chào đúng câu thoại đã thống nhất. Trưởng ca cập nhật số bán Push Sale theo ca.</p>
+      <span class="impact">Mục tiêu: đạt 100% chỉ tiêu Push Sale từng ca</span>
+      <span class="who">Thu ngân/SC · Trưởng ca</span>
+    </div>
+    <div class="lever">
+      <h3>3. Kéo khách ban ngày bằng Voucher Topaz Elite</h3>
+      <p>Nhận diện cư dân Topaz Elite tại quầy, hướng dẫn quét QR đăng ký ưu đãi 5%. Mời khách quay lại khung 10h-17h ngày thường (vắng, thanh toán nhanh).</p>
+      <span class="impact">Mỗi 10% lượt khách tăng thêm ≈ +427 tr/tháng</span>
+      <span class="who">Thu ngân/SC · Trưởng ca đếm số khách đăng ký mỗi ca</span>
+    </div>
+    <div class="lever">
+      <h3>4. Đủ hàng CAT6 và Top 15 sản phẩm</h3>
+      <p>Hàng chăn/mền/gối, Push Sale và Top 15 được nhận, kiểm và đưa ra kệ trong ngày. Hàng cho cuối tuần xong trước Thứ 6. Báo hàng sắp hết mỗi sáng.</p>
+      <span class="impact">CAT6 lên 26% ≈ +168 tr/tháng</span>
+      <span class="who">Admin nhận hàng · Trưởng ca kiểm tra</span>
+    </div>
+    <div class="lever">
+      <h3>5. Không mất khách giờ 18h-22h</h3>
+      <p>47% doanh thu ngày rơi vào 18h-22h, riêng 20h-21h là 15.3%. Mở tối đa quầy, không quá 3 khách chờ mỗi quầy, mọi việc giấy tờ, nhận hàng, đổi giá xong trước 18h.</p>
+      <span class="impact">Giữ trọn ~42 tr/tối ngày thường, ~106 tr/tối cuối tuần</span>
+      <span class="who">Trưởng ca điều phối · cả team</span>
+    </div>
+    <div class="lever">
+      <h3>6. Bill hủy về dưới 0.25%</h3>
+      <p>Quét đúng ngay từ đầu, đọc lại số lượng và tổng tiền trước khi chốt. Mọi bill hủy/trả ghi lý do và có Trưởng ca duyệt.</p>
+      <span class="impact">Từ 30.8 tr xuống ≤ 9 tr/tháng</span>
+      <span class="who">Thu ngân/SC · Trưởng ca duyệt</span>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">4 · Việc của từng vị trí</span>
+    <h2>Làm gì, lúc nào, đo bằng gì</h2>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Vị trí">
+    <button class="tab" role="tab" id="tab-sc" aria-controls="p-sc" aria-selected="true">Thu ngân / SC</button>
+    <button class="tab" role="tab" id="tab-nh" aria-controls="p-nh" aria-selected="false">Admin nhận hàng</button>
+    <button class="tab" role="tab" id="tab-tc" aria-controls="p-tc" aria-selected="false">Trưởng ca</button>
+  </div>
+
+  <!-- SC -->
+  <div class="panel" id="p-sc" role="tabpanel" aria-labelledby="tab-sc">
+    <div class="card">
+      <h3>Trong ca</h3>
+      <div class="timeline">
+        <div class="step"><span class="time">Đầu ca</span><ul><li>Nghe brief 5 phút: chỉ tiêu ca, món Push Sale, câu gợi ý của ngày.</li><li>Kiểm tra ụ quầy: đủ hàng gợi ý, giá đúng, Push Sale ở tầm mắt, mã QR Topaz Elite đặt trước quầy.</li></ul></div>
+        <div class="step"><span class="time">Mỗi khách</span><ul><li>Chào, quét hàng, gợi ý 1 món (ưu tiên khách mua 1 món).</li><li>Hỏi khách có phải cư dân Topaz Elite, hướng dẫn quét QR.</li><li>Đọc lại số lượng và tổng tiền trước khi chốt.</li></ul></div>
+        <div class="step"><span class="time">10h - 17h</span><ul><li>Lúc vắng: châm hàng ụ quầy, lau quầy, đánh dấu món gợi ý sắp hết báo Trưởng ca.</li><li>Mời khách quay lại khung ban ngày.</li></ul></div>
+        <div class="step"><span class="time">18h - 22h</span><ul><li>Ở quầy 100%, không rời quầy khi còn khách chờ.</li><li>Quá 3 khách chờ: báo ngay Trưởng ca mở thêm quầy.</li><li>Vẫn gợi ý 1 món nhưng ngắn gọn, không làm chậm hàng.</li></ul></div>
+        <div class="step"><span class="time">Cuối ca</span><ul><li>Báo số bill hủy/trả và lý do cho Trưởng ca.</li><li>Báo số khách đăng ký Topaz Elite và số Push Sale bán được.</li></ul></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Đo bằng gì</h3>
+      <div>
+        <div class="kpi"><span>Bill 1 dòng hàng</span><b class="num">≤ 33%</b></div>
+        <div class="kpi"><span>Push Sale theo ca</span><b>100% chỉ tiêu</b></div>
+        <div class="kpi"><span>Bill hủy không lý do</span><b class="num">0</b></div>
+        <div class="kpi"><span>Khách chờ mỗi quầy</span><b class="num">≤ 3</b></div>
+      </div>
+      <div class="script">
+        <b>Câu gợi ý mẫu</b>
+        <q>Chị ơi, khăn ướt SB đang bán chạy nhất tuần này, chị lấy thêm 1 gói dùng dần không ạ?</q>
+        <q>Anh/chị ở Topaz Elite phải không ạ? Anh/chị quét mã này nhận ưu đãi 5% cho lần sau nhé.</q>
+        <q>Ban ngày cửa hàng vắng, thanh toán nhanh lắm, anh/chị ghé buổi sáng cho tiện ạ.</q>
+      </div>
+      <div class="dont"><b>Không làm:</b> hủy bill không báo Trưởng ca; bỏ qua câu gợi ý khi quầy vắng.</div>
+    </div>
+  </div>
+
+  <!-- Nhan hang -->
+  <div class="panel" id="p-nh" role="tabpanel" aria-labelledby="tab-nh" hidden>
+    <div class="card">
+      <h3>Trong ca</h3>
+      <div class="timeline">
+        <div class="step"><span class="time">Đầu ca</span><ul><li>Rà danh sách hàng sắp hết: CAT6 chăn/mền/gối, Top 15, Push Sale, hàng gợi ý ở quầy.</li><li>Gửi danh sách cho SM/Trưởng ca trước 10h.</li></ul></div>
+        <div class="step"><span class="time">09h - 16h</span><ul><li>Hẹn NCC giao trong khung này, không nhận hàng sau 18h.</li><li>Thứ tự xử lý: Push Sale → CAT6 → Top 15 → hàng khác.</li><li>Kiểm đếm, nhập hệ thống ngay khi nhận.</li></ul></div>
+        <div class="step"><span class="time">Trước 17h</span><ul><li>Hàng ưu tiên đã nhận phải ra kệ trong ngày.</li><li>Hàng mới hoặc đổi giá: đối chiếu giá POS và bảng giá, báo in bảng giá/POP.</li></ul></div>
+        <div class="step"><span class="time">Thứ 5 - Thứ 6</span><ul><li>Toàn bộ hàng bán cuối tuần nhận xong trước 14h Thứ 6.</li><li>Tuần 2: hàng quà tặng 20/10 xong trước 16/10.</li></ul></div>
+        <div class="step"><span class="time">Cuối ca</span><ul><li>Báo hàng chưa về, hàng thiếu so với đơn, hàng hư hỏng.</li></ul></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Đo bằng gì</h3>
+      <div>
+        <div class="kpi"><span>Danh sách hàng sắp hết</span><b>Gửi trước 10h mỗi ngày</b></div>
+        <div class="kpi"><span>Hàng ưu tiên ra kệ</span><b>Trong ngày nhận</b></div>
+        <div class="kpi"><span>Nhận hàng sau 18h</span><b class="num">0 lần</b></div>
+        <div class="kpi"><span>Hàng cuối tuần</span><b>Xong trước 14h Thứ 6</b></div>
+        <div class="kpi"><span>Sai giá POS/bảng giá</span><b class="num">0</b></div>
+      </div>
+      <div class="script">
+        <b>Vì sao việc này ra doanh số</b>
+        <span>CAT6 của 1016 chỉ 21.9% trong khi 1001 là 28%. Kệ chăn/mền/gối trống một ngày là mất khách ngay ngày đó. Nâng CAT6 lên 26% ≈ +168 tr/tháng.</span>
+      </div>
+      <div class="dont"><b>Không làm:</b> để hàng Push Sale nằm kho qua đêm; nhận hàng chiếm người ở quầy giờ 18h-22h.</div>
+    </div>
+  </div>
+
+  <!-- Truong ca -->
+  <div class="panel" id="p-tc" role="tabpanel" aria-labelledby="tab-tc" hidden>
+    <div class="card">
+      <h3>Trong ca</h3>
+      <div class="timeline">
+        <div class="step"><span class="time">Đầu ca</span><ul><li>Brief 5 phút (kịch bản ở mục 5).</li><li>Phân quầy, phân người châm ụ quầy, kiểm tra Push Sale và mã QR ở quầy.</li></ul></div>
+        <div class="step"><span class="time">13h · 18h · 20h · 22h</span><ul><li>Xem doanh số POS, báo nhóm Zalo team: số đạt / chỉ tiêu mốc.</li><li>Thiếu so với mốc: tăng đọc loa, nhắc thu ngân gợi ý, đẩy Push Sale.</li></ul></div>
+        <div class="step"><span class="time">Đọc loa</span><ul><li>Khung 11h, 15h, 19h, 20h30: Push Sale T10, chăn/mền/gối, khuyến mãi tháng.</li></ul></div>
+        <div class="step"><span class="time">18h - 22h</span><ul><li>Mở tối đa quầy, đứng gần khu quầy để mở thêm khi có &gt; 3 khách chờ.</li><li>Không xếp việc giấy tờ, đổi giá, nhận hàng vào khung này.</li></ul></div>
+        <div class="step"><span class="time">Mỗi bill hủy/trả</span><ul><li>Hỏi lý do, ghi sổ, ký duyệt. Thu ngân nào có 2 bill hủy/ca thì kèm lại ngay trong ca.</li></ul></div>
+        <div class="step"><span class="time">Cuối ca</span><ul><li>Bàn giao: doanh số ca, Push Sale, số đăng ký Topaz Elite, bill hủy/trả, hàng thiếu.</li></ul></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Đo bằng gì</h3>
+      <div>
+        <div class="kpi"><span>Doanh số ngày thường (POS)</span><b class="num">90 tr</b></div>
+        <div class="kpi"><span>Doanh số cuối tuần (POS)</span><b class="num">225 tr</b></div>
+        <div class="kpi"><span>Báo số theo mốc giờ</span><b>4 lần/ngày</b></div>
+        <div class="kpi"><span>Bill hủy/doanh thu</span><b class="num">≤ 0.25%</b></div>
+        <div class="kpi"><span>Bill hủy có ký duyệt</span><b class="num">100%</b></div>
+      </div>
+      <div class="script">
+        <b>Mẫu báo số nhóm Zalo</b>
+        <span class="num">[20h · 07/10] POS 61 tr / mốc 66 tr (-5 tr). Push Sale 8/10. Topaz Elite +4 khách. Còn 2 giờ: quầy 1-2 gợi ý khăn ướt, đọc loa 20h30.</span>
+      </div>
+      <div class="dont"><b>Không làm:</b> duyệt bill hủy không ghi lý do; để quầy thiếu người lúc 20h-21h.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">5 · Cách truyền đạt cho Team Admin</span>
+    <h2>Ba con số, một buổi họp, năm phút mỗi ca</h2>
+  </div>
+
+  <div class="three">
+    <div class="n"><span class="v num">90 tr</span><span>mỗi ngày thường trên POS</span></div>
+    <div class="n"><span class="v num">225 tr</span><span>mỗi Thứ 7, Chủ nhật trên POS</span></div>
+    <div class="n"><span class="v">1 khách · 1 câu</span><span>gợi ý thêm 1 món tại quầy</span></div>
+  </div>
+
+  <div class="comm">
+    <div class="card">
+      <h3>Họp triển khai (15 phút)</h3>
+      <ol class="agenda">
+        <li>Tháng 9 đạt 97.8%, thiếu 84 tr. Điểm mạnh: giỏ hàng cao nhất Area.</li>
+        <li>Tháng 10 cần 3,546 tr. Đổi ra 3 con số ở trên.</li>
+        <li>Mở tab từng vị trí, đọc chung việc của mỗi người.</li>
+        <li>Thống nhất câu gợi ý và câu Topaz Elite, mỗi người nói thử 1 lần.</li>
+        <li>Chốt: báo số 4 mốc/ngày, review Thứ 2 hằng tuần.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Brief đầu ca (5 phút)</h3>
+      <ol class="agenda">
+        <li>Hôm qua: đạt bao nhiêu / chỉ tiêu, ai làm tốt (nêu tên).</li>
+        <li>Hôm nay: chỉ tiêu ca và mốc giờ.</li>
+        <li>Món Push Sale và món gợi ý của ngày.</li>
+        <li>Phân quầy, ai châm ụ quầy, ai hỗ trợ giờ 18h-22h.</li>
+        <li>Một lỗi cần tránh (ví dụ bill hủy hôm qua).</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Theo dõi và nhắc lại</h3>
+      <ul class="plain">
+        <li><b>Hằng ngày:</b> Trưởng ca báo số 13h, 18h, 20h, 22h trên nhóm Zalo.</li>
+        <li><b>Thứ 2 hằng tuần:</b> SM so lũy kế tuần với bảng mốc ở mục 2, nêu 1 việc làm tốt và 1 việc cần sửa.</li>
+        <li><b>Khi tụt mốc 2 ngày liền:</b> SM họp nhanh 5 phút với Trưởng ca, chọn lại món gợi ý và tăng đọc loa.</li>
+        <li><b>Ghi nhận:</b> tuyên dương người có tỷ lệ gợi ý thành công và Push Sale cao nhất tuần.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">6 · Tính nhanh</span>
+    <h2>Còn thiếu bao nhiêu mỗi ngày?</h2>
+  </div>
+  <p class="muted">Nhập doanh số POS lũy kế tháng 10 (có VAT) và ngày đang xem. Kết quả cho biết mỗi ngày còn lại cần bao nhiêu để đạt mục tiêu 3,546 tr chưa VAT.</p>
+  <div class="card">
+    <div class="calc">
+      <label for="acc">Doanh số POS lũy kế (triệu)
+        <input id="acc" type="number" inputmode="decimal" min="0" step="0.1" value="663">
+      </label>
+      <label for="day">Đã có số đến hết ngày
+        <input id="day" type="number" min="1" max="30" value="4">
+      </label>
+      <label for="vat">Hệ số VAT (POS / chưa VAT)
+        <input id="vat" type="number" step="0.001" value="1.079">
+      </label>
+    </div>
+    <div class="out">
+      <div class="stat"><span class="l">Còn thiếu (POS)</span><span class="v num" id="o-gap">-</span></div>
+      <div class="stat"><span class="l">Cần mỗi ngày thường (POS)</span><span class="v num" id="o-wd">-</span></div>
+      <div class="stat"><span class="l">Cần mỗi Thứ 7, CN (POS)</span><span class="v num" id="o-we">-</span></div>
+    </div>
+    <p class="foot" id="o-note">Số mẫu: 01-04/10 đạt 615 tr chưa VAT ≈ 663 tr POS.</p>
+  </div>
+</section>
+
+<p class="foot">Nguồn: Nhận xét - Đánh giá kết quả tháng 9 Store 1016. Budget và số chưa VAT theo bảng so sánh Budget T9-T10; số POS quy đổi theo tỷ lệ doanh thu T9 có VAT / chưa VAT.</p>
+</div>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  function sel(t){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});}
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){sel(t)});
+    t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];sel(n);n.focus();}});
+  });
+
+  var TARGET=3546.132, RATIO=2.56;
+  function fmt(v){return Math.round(v).toLocaleString('en-US')+' tr';}
+  function calc(){
+    var acc=parseFloat(document.getElementById('acc').value)||0;
+    var d=parseInt(document.getElementById('day').value,10)||0;
+    var vat=parseFloat(document.getElementById('vat').value)||1.079;
+    d=Math.max(0,Math.min(31,d));
+    var wd=0,we=0;
+    for(var k=d+1;k<=31;k++){var w=new Date(2026,9,k).getDay();if(w===0||w===6)we++;else wd++;}
+    var gap=TARGET*vat-acc;
+    var x=(wd+we*RATIO)>0?gap/(wd+we*RATIO):0;
+    document.getElementById('o-gap').textContent=gap>0?fmt(gap):'Đã đạt';
+    document.getElementById('o-wd').textContent=gap>0?fmt(x):'-';
+    document.getElementById('o-we').textContent=gap>0?fmt(x*RATIO):'-';
+    document.getElementById('o-note').textContent='Còn '+wd+' ngày thường và '+we+' ngày cuối tuần (từ '+(d+1)+'/10 đến 31/10). Mục tiêu quy POS: '+fmt(TARGET*vat)+'.';
+  }
+  ['acc','day','vat'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+  calc();
+})();
+</script>

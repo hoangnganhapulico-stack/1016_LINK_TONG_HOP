@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Công Cụ Phân Tích Đặt Hàng - 1016 PARC MALL</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Be Vietnam Pro',sans-serif;font-size:13px;background:#f0f2f6;color:#111827;min-height:100vh}
+header{background:#0f172a;color:#f1f5f9;padding:13px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:15px;font-weight:700}
+header span{font-size:11px;color:#94a3b8}
+.hbadge{margin-left:auto;background:#1e3a5f;color:#60a5fa;padding:2px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.upload-section{background:#fff;border-bottom:1px solid #dde1e9;padding:18px 24px}
+.upload-title{font-weight:700;font-size:13px;margin-bottom:14px;color:#0f172a}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:860px}
+.upload-box{border:2px dashed #dde1e9;border-radius:10px;padding:16px;text-align:center;cursor:pointer;position:relative;transition:all .2s}
+.upload-box:hover,.upload-box.drag-over{border-color:#1d4ed8;background:#eff6ff}
+.upload-box.has-file{border-color:#15803d;background:#f0fdf4;border-style:solid}
+.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:24px;margin-bottom:6px}
+.upload-label{font-weight:600;font-size:12px;color:#374151}
+.upload-sub{font-size:10px;color:#9ca3af;margin-top:3px}
+.upload-filename{font-size:11px;color:#15803d;font-weight:600;margin-top:5px;font-family:'IBM Plex Mono',monospace;word-break:break-all}
+.run-row{margin-top:14px;display:flex;align-items:center;gap:12px;max-width:860px;flex-wrap:wrap}
+.btn-run{background:#1d4ed8;color:#fff;border:none;padding:9px 26px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-run:hover{background:#1e40af}
+.btn-run:disabled{background:#9ca3af;cursor:not-allowed}
+.run-note{font-size:12px;color:#6b7280}
+#progress-bar{display:none;height:3px;background:#dbeafe;border-radius:2px;overflow:hidden;margin-top:8px;max-width:860px}
+#progress-bar .fill{height:100%;background:#1d4ed8;width:0;transition:width .3s}
+#status-msg{font-size:11px;color:#6b7280;margin-top:5px;min-height:15px}
+
+/* INV COLUMN GUIDE */
+.inv-guide{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-top:12px;max-width:860px;font-size:11px;color:#92400e;line-height:1.7}
+.inv-guide strong{color:#78350f;font-weight:700}
+
+#results{display:none}
+.kpi-row{display:flex;gap:8px;padding:12px 24px;overflow-x:auto;background:#f8fafc;border-bottom:1px solid #dde1e9}
+.kpi{background:#fff;border:1px solid #dde1e9;border-radius:8px;padding:10px 16px;min-width:140px;flex-shrink:0}
+.kpi-label{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi-val{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;margin-top:3px;color:#0f172a}
+.kpi-sub{font-size:10px;color:#9ca3af;margin-top:2px}
+
+.filters{background:#fff;border-bottom:1px solid #dde1e9;padding:9px 24px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],select{background:#f8fafc;border:1px solid #dde1e9;border-radius:6px;padding:5px 9px;font-size:12px;font-family:inherit;color:#111827;outline:none}
+input[type=text]:focus,select:focus{border-color:#1d4ed8}
+#search{width:220px}
+.dl-row{display:flex;gap:6px;margin-left:auto}
+.btn-dl{padding:5px 12px;border-radius:6px;border:1px solid #dde1e9;background:#fff;color:#374151;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;transition:all .15s}
+.btn-dl:hover{background:#eff6ff;border-color:#1d4ed8;color:#1d4ed8}
+.btn-ghost{padding:5px 10px;border-radius:6px;border:1px solid #dde1e9;background:transparent;color:#6b7280;cursor:pointer;font-size:11px;font-family:inherit}
+.btn-ghost:hover{background:#f8fafc}
+
+.table-wrap{margin:0 24px 24px;background:#fff;border:1px solid #dde1e9;border-radius:8px;overflow:hidden}
+.table-scroll{overflow-x:auto;max-height:500px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:#f8fafc;padding:7px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#6b7280;border-bottom:2px solid #dde1e9;white-space:nowrap;position:sticky;top:0;z-index:2;cursor:pointer;user-select:none}
+thead th:hover{color:#1d4ed8}
+thead th.sorted{color:#1d4ed8;background:#eff6ff}
+/* Freeze first column */
+thead th:first-child,tbody td:first-child{position:sticky;left:0;z-index:3;background:#f8fafc}
+tbody td:first-child{background:#fff;z-index:1}
+tbody tr:hover td:first-child{background:#f8fafc}
+tbody tr.selected td:first-child{background:#eff6ff}
+
+tbody tr{border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s}
+tbody tr:hover{background:#f8fafc}
+tbody tr.selected{background:#eff6ff}
+tbody tr.detail-row{cursor:default}
+tbody tr.detail-row:hover{background:#fff}
+td{padding:6px 10px;vertical-align:middle}
+.td-bc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#374151;white-space:nowrap;font-weight:600}
+.td-code{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9ca3af;white-space:nowrap}
+.td-name{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.td-amt{font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap}
+.td-c{text-align:center;white-space:nowrap}
+.td-r{text-align:right;white-space:nowrap}
+
+.pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.3px}
+.pill-store{background:#dbeafe;color:#1d4ed8}
+.pill-md{background:#fef3c7;color:#c2790a}
+.pill-consign{background:#ede9fe;color:#7c3aed}
+.pill-mix{background:#dcfce7;color:#15803d}
+.pill-supply{background:#f3f4f6;color:#6b7280}
+
+/* TOD color coding */
+.tod-low{color:#dc2626;font-weight:700}   /* <7 ngày: cần đặt gấp */
+.tod-warn{color:#d97706;font-weight:600}  /* 7-14 ngày: sắp cần */
+.tod-ok{color:#15803d}                    /* >14 ngày: ổn */
+.ton-zero{color:#dc2626;font-weight:700}  /* hết hàng */
+.ton-low{color:#d97706;font-weight:600}   /* tồn thấp */
+
+.spark{display:block}
+.detail-panel{padding:14px 18px;background:#f8fafc;border-top:1px solid #dde1e9}
+.dp-header{font-size:13px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.dp-sub{font-size:11px;color:#6b7280;font-family:'IBM Plex Mono',monospace}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 260px;gap:16px}
+.dp-sec h4{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:7px;font-weight:700;border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+.stat-row{display:flex;justify-content:space-between;align-items:flex-start;padding:3px 0;border-bottom:1px solid #f1f5f9;gap:8px;font-size:11px}
+.stat-row:last-child{border-bottom:none}
+.stat-k{color:#6b7280;flex-shrink:0}
+.stat-v{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;font-size:11px}
+
+.pagination{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid #e5e7eb;background:#f8fafc;font-size:11px;color:#6b7280;flex-wrap:wrap}
+.page-info{margin-right:auto}
+.pager{display:flex;gap:3px}
+.pager button{padding:3px 8px;border:1px solid #dde1e9;border-radius:4px;background:#fff;color:#374151;cursor:pointer;font-size:11px;font-family:inherit}
+.pager button.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.pager button:disabled{opacity:.4;cursor:not-allowed}
+
+@media(max-width:700px){
+  .upload-grid{grid-template-columns:1fr}
+  .table-wrap{margin:0 10px 16px}
+  .filters{padding:8px 12px}
+  .kpi-row{padding:8px 12px}
+  .dl-row{margin-left:0}
+  .dp-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>📦 Công Cụ Phân Tích Đặt Hàng — 1016 PARC MALL</h1>
+    <span>Upload PO + Tồn Kho → Xem theo Barcode → Download kết quả</span>
+  </div>
+  <span class="hbadge" id="hbadge">Chưa có dữ liệu</span>
+</header>
+
+<div class="upload-section">
+  <div class="upload-title">📂 Bước 1: Upload file để phân tích</div>
+  <div class="upload-grid">
+    <div class="upload-box" id="box-po">
+      <input type="file" id="file-po" accept=".csv" onchange="onFileSelect('po',this)">
+      <div class="upload-icon">📋</div>
+      <div class="upload-label">File PO Detail (.csv) — Bắt buộc</div>
+      <div class="upload-sub">PODetail_XXXXXX_YYYYMMDDHHMMSS.csv</div>
+      <div class="upload-filename" id="fname-po">Chưa chọn file</div>
+    </div>
+    <div class="upload-box" id="box-inv">
+      <input type="file" id="file-inv" accept=".xlsx,.xls,.csv" onchange="onFileSelect('inv',this)">
+      <div class="upload-icon">🗃️</div>
+      <div class="upload-label">File Tồn Kho (.xlsx/.csv) — Tùy chọn</div>
+      <div class="upload-sub">InventoryPLU_XXXXXX_YYYYMMDDHHMMSS.xlsx</div>
+      <div class="upload-filename" id="fname-inv">Chưa chọn</div>
+    </div>
+  </div>
+
+  <div class="inv-guide">
+    <strong>📌 Cột cần có trong file Tồn Kho để hiển thị đầy đủ:</strong><br>
+    <strong>Barcode</strong> hoặc <strong>Item Code</strong> (để khớp với PO) &nbsp;·&nbsp;
+    <strong>Tồn kho / Stock Qty / On Hand</strong> (số tồn) &nbsp;·&nbsp;
+    <strong>Sale Qty / Số bán / Sold Qty</strong> (số đã bán) &nbsp;·&nbsp;
+    <strong>TOD / Turn Over Days</strong> (nếu có, sẽ dùng trực tiếp; nếu không có sẽ tự tính = Tồn ÷ TB bán/ngày) &nbsp;·&nbsp;
+    <strong>LAYER1</strong> (tầng sản phẩm — tên cột phải là LAYER1)
+  </div>
+
+  <div class="run-row">
+    <button class="btn-run" id="btn-run" onclick="runAnalysis()" disabled>▶ Phân tích ngay</button>
+    <span class="run-note" id="run-note">Chọn ít nhất file PO để bắt đầu</span>
+  </div>
+  <div id="progress-bar"><div class="fill" id="progress-fill"></div></div>
+  <div id="status-msg"></div>
+</div>
+
+<div id="results">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Tổng Barcode</div><div class="kpi-val" id="kk-sku">—</div><div class="kpi-sub">mã vạch duy nhất</div></div>
+    <div class="kpi"><div class="kpi-label">GT nhập thực</div><div class="kpi-val" id="kk-amt">—</div><div class="kpi-sub">purchased amount</div></div>
+    <div class="kpi"><div class="kpi-label">Cửa hàng tự đặt</div><div class="kpi-val" id="kk-store">—</div><div class="kpi-sub">% tổng giá trị</div></div>
+    <div class="kpi"><div class="kpi-label">Lead time TB</div><div class="kpi-val" id="kk-lead">—</div><div class="kpi-sub">ngày (store orders)</div></div>
+    <div class="kpi"><div class="kpi-label">TOD TB</div><div class="kpi-val" id="kk-tod">—</div><div class="kpi-sub">ngày tồn TB (có dữ liệu)</div></div>
+    <div class="kpi"><div class="kpi-label">Tổng PO</div><div class="kpi-val" id="kk-po">—</div><div class="kpi-sub">đơn đặt hàng</div></div>
+    <div class="kpi"><div class="kpi-label">Kỳ dữ liệu</div><div class="kpi-val" id="kk-period">—</div><div class="kpi-sub">tháng đầu → cuối</div></div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="🔍 Barcode / tên SP / mã hàng…" oninput="applyFilters()">
+    <select id="filter-type" onchange="applyFilters()">
+      <option value="">Tất cả loại</option>
+      <option value="store">🏪 Cửa hàng tự đặt</option>
+      <option value="md">🏢 MD phân bổ</option>
+      <option value="consign">🔄 Ký gửi</option>
+      <option value="mix">🔀 Hỗn hợp</option>
+    </select>
+    <select id="filter-cat" onchange="applyFilters()"><option value="">Tất cả CAT</option></select>
+    <select id="filter-approver" onchange="applyFilters()"><option value="">Tất cả approver</option></select>
+    <select id="filter-month" onchange="applyFilters()"><option value="">Tất cả tháng</option></select>
+    <select id="filter-tod" onchange="applyFilters()">
+      <option value="">Tất cả TOD</option>
+      <option value="urgent">🔴 &lt;7 ngày (cần đặt gấp)</option>
+      <option value="warn">🟡 7–14 ngày (sắp cần)</option>
+      <option value="ok">🟢 &gt;14 ngày (ổn)</option>
+      <option value="nodata">— Không có dữ liệu tồn</option>
+    </select>
+    <select id="sort-by" onchange="applyFilters()">
+      <option value="barcode">Sắp xếp: Barcode ↑</option>
+      <option value="purchased_amt">Giá trị nhập ↓</option>
+      <option value="order_amt">Giá trị đặt ↓</option>
+      <option value="purchased_qty">SL nhập ↓</option>
+      <option value="tod">TOD ↑ (cần đặt trước)</option>
+      <option value="stock_qty">Tồn kho ↑</option>
+      <option value="sale_qty">Sale qty ↓</option>
+      <option value="num_po">Số PO ↓</option>
+      <option value="num_months">Tháng HĐ ↓</option>
+      <option value="avg_lead">Lead time ↓</option>
+      <option value="name">Tên A–Z</option>
+    </select>
+    <button class="btn-ghost" onclick="resetFilters()">✕</button>
+    <div class="dl-row">
+      <button class="btn-dl" onclick="downloadCSV()">⬇ CSV</button>
+      <button class="btn-dl" onclick="downloadXLSX()">⬇ Excel</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table id="main-table">
+        <thead id="thead-row"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span class="page-info" id="page-info"></span>
+      <div class="pager">
+        <button id="btn-prev" onclick="changePage(-1)">←</button>
+        <span id="page-numbers"></span>
+        <button id="btn-next" onclick="changePage(1)">→</button>
+      </div>
+      <select id="page-size" onchange="changePageSize()">
+        <option value="50">50/tr</option>
+        <option value="100">100/tr</option>
+        <option value="200">200/tr</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE_APPROVERS = new Set(['LIEN VU','LOAN TRAN','PHU LE','NGAN DUONG']);
+
+let poFile=null, invFile=null;
+let allSKU=[], filtered=[], allMonths=[], allApprovers=[], allCats=[];
+let currentPage=1, pageSize=50;
+let selectedRow=null, detailChart=null;
+let inventoryMap={};
+let analysisDays=270; // default ~9 months
+
+// ── FILE SELECT ──
+function onFileSelect(type, input) {
+  const file=input.files[0]; if(!file) return;
+  if(type==='po'){
+    poFile=file;
+    document.getElementById('fname-po').textContent=file.name;
+    document.getElementById('box-po').classList.add('has-file');
+    document.getElementById('btn-run').disabled=false;
+    document.getElementById('run-note').textContent='✅ Sẵn sàng phân tích!';
+  } else {
+    invFile=file;
+    document.getElementById('fname-inv').textContent=file.name;
+    document.getElementById('box-inv').classList.add('has-file');
+  }
+}
+
+// ── CLASSIFY ROW ──
+function classifyRow(row) {
+  const sup=(row['Supplier Code']||'').trim();
+  const approver=(row['Approver Name']||'').trim();
+  const ptype=(row['Purchase Type(1:Purchase Sale 2:Consignment Sale)']||'').trim();
+  if(sup.startsWith('600')) return 'supply';
+  if(ptype==='2') return 'consign';
+  if(STORE_APPROVERS.has(approver)&&sup.startsWith('100')) return 'store';
+  return 'md';
+}
+
+// ── HELPERS ──
+function sf(v){const n=parseFloat(String(v||'').replace(/,/g,''));return isNaN(n)?0:n;}
+function si(v){const n=parseInt(String(v||'').replace(/,/g,''));return isNaN(n)?0:n;}
+function parseDate8(s){s=String(s||'').trim();if(s.length<8)return null;try{return new Date(s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8));}catch(e){return null;}}
+function fmt(n){if(n===null||n===undefined||n==='')return '—';if(n>=1e9)return (n/1e9).toFixed(1)+'T';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e3)return (n/1e3).toFixed(0)+'K';return n.toLocaleString('vi-VN');}
+function fmtFull(n){if(n===null||n===undefined||n==='')return '—';return n.toLocaleString('vi-VN');}
+function monthLabel(m){if(!m||m.length<6)return m;return 'T'+m.slice(4,6)+'/'+m.slice(0,4);}
+function setProgress(pct,msg){document.getElementById('progress-bar').style.display='block';document.getElementById('progress-fill').style.width=pct+'%';document.getElementById('status-msg').textContent=msg||'';}
+
+// ── INVENTORY PARSE ──
+// Try many column name variants for Vietnamese retail systems
+function tryCol(row, names) {
+  for(const n of names){
+    const v=row[n]; if(v!==undefined&&v!=='') return v;
+    // Case-insensitive
+    const key=Object.keys(row).find(k=>k.toLowerCase()===n.toLowerCase());
+    if(key&&row[key]!==undefined&&row[key]!=='') return row[key];
+  }
+  return null;
+}
+
+async function parseInventory(file) {
+  return new Promise(resolve => {
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try {
+        let rows;
+        const ext=file.name.split('.').pop().toLowerCase();
+        if(ext==='csv'){
+          const result=Papa.parse(e.target.result,{header:true,skipEmptyLines:true});
+          rows=result.data;
+        } else {
+          const wb=XLSX.read(e.target.result,{type:'array'});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+        }
+        const map={};
+        rows.forEach(r=>{
+          const barcode=String(tryCol(r,['Barcode','Mã vạch','barcode','EAN','JAN','UPC'])||'').trim();
+          const code=String(tryCol(r,['Item Code','Mã hàng','ItemCode','PLU','SKU','item_code'])||'').trim();
+          const key=barcode||code; if(!key) return;
+
+          const stockRaw=tryCol(r,['Stock Qty','Tồn kho','On Hand','Qty On Hand','Quantity','SL Tồn','Ton Kho','stock_qty','onhand','Inventory Qty','Closing Stock','Closing Qty','End Qty']);
+          const saleRaw=tryCol(r,['Sale Qty','Số bán','Sales Qty','Sold Qty','Sales','Sale','Doanh so','SL Bán','sold_qty','Sales Quantity','Total Sale Qty','Qty Sold']);
+          const todRaw=tryCol(r,['TOD','Turn Over Days','Days of Supply','Ngay quay vong','DOS','DIO','Days Inventory']);
+          const catRaw=tryCol(r,['LAYER1','Layer1','layer1','Layer 1','LAYER 1','Category','CAT','Layer','Danh muc','Nhom hang','Class','Dept','Department','Group','Category Name','Danh Mục','Nhóm Hàng','cat','layer']);
+          const unitRaw=tryCol(r,['Unit','Đơn vị','UOM','unit']);
+
+          const stockQty=stockRaw!==null?sf(stockRaw):null;
+          const saleQty=saleRaw!==null?sf(saleRaw):null;
+          const todVal=todRaw!==null?sf(todRaw):null;
+          const cat=catRaw?String(catRaw).trim():'';
+          const unit=unitRaw?String(unitRaw).trim():'';
+
+          map[key]={stockQty, saleQty, tod:todVal, cat, unit, barcode, code};
+          // Also index by the other key
+          if(barcode&&code&&barcode!==code){
+            map[code]={stockQty, saleQty, tod:todVal, cat, unit, barcode, code};
+          }
+        });
+        resolve(map);
+      } catch(err){console.warn('Inventory parse error:',err);resolve({});}
+    };
+    if(file.name.endsWith('.csv')) reader.readAsText(file,'UTF-8');
+    else reader.readAsArrayBuffer(file);
+  });
+}
+
+// ── MAIN ANALYSIS ──
+async function runAnalysis() {
+  if(!poFile) return;
+  document.getElementById('btn-run').disabled=true;
+  setProgress(5,'Đang đọc file…');
+
+  if(invFile){
+    setProgress(10,'Đang đọc file tồn kho…');
+    inventoryMap=await parseInventory(invFile);
+    const cnt=Object.keys(inventoryMap).length;
+    setProgress(20,`Tồn kho: ${cnt} barcode/mã`+(cnt===0?' (không đọc được — kiểm tra lại cột)':''));
+  } else { inventoryMap={}; }
+
+  setProgress(25,'Đang đọc PO CSV…');
+  const text=await poFile.text();
+
+  Papa.parse(text,{
+    header:true, skipEmptyLines:true,
+    complete: results => {
+      setProgress(60,`Đang tổng hợp ${results.data.length.toLocaleString()} dòng theo Barcode…`);
+
+      const items={}; // keyed by barcode
+      const allPoNums=new Set();
+      let minDate=null, maxDate=null;
+
+      setTimeout(()=>{
+        results.data.forEach(row=>{
+          const barcode=String(row['Barcode']||'').trim();
+          const code=String(row['Item Code']||'').trim();
+          const key=barcode||code; if(!key) return;
+
+          const ptype=classifyRow(row);
+          const oqty=si(row['Order Qty']); const oamt=sf(row['Order Amount']);
+          const pqty=si(row['Purchased Qty']); const pamt=sf(row['Purchased Amount']);
+          const po=(row['PO No.']||'').trim();
+          const supp_code=(row['Supplier Code']||'').trim();
+          const supp_name=(row['Supplier Name']||'').trim();
+          const approver=(row['Approver Name']||'').trim();
+          const item_name=(row['Item Name']||'').trim();
+          const grp=(row['Order Group Name']||'').trim(); // CAT from PO
+          const order_date=(row['Order Date(yyyymmdd)']||'').trim();
+          const purch_date=(row['Purchased Date(yyyymmdd)']||'').trim();
+          const month=order_date.length>=6?order_date.slice(0,6):'';
+
+          if(po) allPoNums.add(po);
+          const od=parseDate8(order_date);
+          if(od){ if(!minDate||od<minDate)minDate=od; if(!maxDate||od>maxDate)maxDate=od; }
+
+          if(!items[key]) items[key]={
+            barcode, code, name:item_name, supp_code, supp_name,
+            order_qty:0, order_amt:0, purchased_qty:0, purchased_amt:0,
+            po_set:new Set(), months:new Set(), monthly_qty:{}, monthly_amt:{},
+            approvers:{}, lead_days:[], cats:new Set(),
+            type_store:0, type_md:0, type_consign:0, type_supply:0,
+          };
+          const it=items[key];
+          it.name=it.name||item_name;
+          it.order_qty+=oqty; it.order_amt+=oamt;
+          it.purchased_qty+=pqty; it.purchased_amt+=pamt;
+          if(po) it.po_set.add(po);
+          if(month){ it.months.add(month); it.monthly_qty[month]=(it.monthly_qty[month]||0)+oqty; it.monthly_amt[month]=(it.monthly_amt[month]||0)+pamt; }
+          if(approver) it.approvers[approver]=(it.approvers[approver]||0)+1;
+          if(grp) it.cats.add(grp);
+          if(ptype==='store') it.type_store+=pamt;
+          else if(ptype==='md') it.type_md+=pamt;
+          else if(ptype==='consign') it.type_consign+=pamt;
+          else it.type_supply+=pamt;
+
+          const od2=parseDate8(order_date), pd=parseDate8(purch_date);
+          if(od2&&pd){ const diff=Math.round((pd-od2)/86400000); if(diff>=0&&diff<=30) it.lead_days.push(diff); }
+        });
+
+        // Calc days in analysis period
+        if(minDate&&maxDate) analysisDays=Math.max(1,Math.round((maxDate-minDate)/86400000));
+
+        setProgress(85,'Đang khớp dữ liệu tồn kho…');
+
+        allSKU=Object.values(items).map(d=>{
+          const months=[...d.months].sort();
+          const topApp=Object.entries(d.approvers).sort((a,b)=>b[1]-a[1])[0];
+          const leads=d.lead_days;
+          const cat=[...d.cats].join(', ');
+
+          // Inventory lookup: try barcode first, then item code
+          const inv=inventoryMap[d.barcode]||inventoryMap[d.code]||null;
+          const stockQty=inv?inv.stockQty:null;
+          const saleQty=inv?inv.saleQty:null;
+          const invTod=inv?inv.tod:null;
+          const invCat=inv?inv.cat:'';
+
+          // TOD calculation: if not in inventory, estimate from purchased qty rate
+          let tod=invTod;
+          if(tod===null&&stockQty!==null&&stockQty>=0){
+            // avg daily purchase rate as proxy for sales rate
+            const dailyRate=d.purchased_qty/analysisDays;
+            if(dailyRate>0) tod=Math.round(stockQty/dailyRate);
+            else if(stockQty===0) tod=0;
+          }
+
+          return {
+            barcode:d.barcode, code:d.code, name:d.name,
+            supp_code:d.supp_code, supp_name:d.supp_name,
+            order_qty:d.order_qty, order_amt:d.order_amt,
+            purchased_qty:d.purchased_qty, purchased_amt:d.purchased_amt,
+            num_po:d.po_set.size, num_months:d.months.size,
+            first_month:months[0]||'', last_month:months[months.length-1]||'',
+            monthly_qty:d.monthly_qty, monthly_amt:d.monthly_amt,
+            avg_lead:leads.length?+(leads.reduce((a,b)=>a+b,0)/leads.length).toFixed(1):null,
+            top_approver:topApp?topApp[0]:'',
+            cat:invCat||cat, // inventory cat preferred
+            type_store:d.type_store, type_md:d.type_md, type_consign:d.type_consign, type_supply:d.type_supply,
+            stock_qty:stockQty, sale_qty:saleQty, tod:tod,
+          };
+        });
+
+        // Default sort: Barcode ascending
+        allSKU.sort((a,b)=>a.barcode.localeCompare(b.barcode));
+
+        // Gather metadata
+        const mSet=new Set(), aSet=new Set(), cSet=new Set();
+        allSKU.forEach(d=>{
+          Object.keys(d.monthly_qty).forEach(m=>mSet.add(m));
+          if(d.top_approver) aSet.add(d.top_approver);
+          if(d.cat) cSet.add(d.cat);
+        });
+        allMonths=[...mSet].sort(); allApprovers=[...aSet].sort(); allCats=[...cSet].sort();
+
+        // Populate dropdowns
+        const selA=document.getElementById('filter-approver');
+        selA.innerHTML='<option value="">Tất cả approver</option>';
+        allApprovers.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;selA.appendChild(o);});
+
+        const selM=document.getElementById('filter-month');
+        selM.innerHTML='<option value="">Tất cả tháng</option>';
+        allMonths.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=monthLabel(m);selM.appendChild(o);});
+
+        const selC=document.getElementById('filter-cat');
+        selC.innerHTML='<option value="">Tất cả CAT</option>';
+        allCats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;selC.appendChild(o);});
+
+        buildThead();
+
+        // KPIs
+        const totalAmt=allSKU.reduce((s,d)=>s+d.purchased_amt,0);
+        const storeAmt=allSKU.reduce((s,d)=>s+d.type_store,0);
+        const leads=allSKU.map(d=>d.avg_lead).filter(v=>v!==null);
+        const tods=allSKU.map(d=>d.tod).filter(v=>v!==null&&v>=0&&v<=365);
+
+        document.getElementById('kk-sku').textContent=allSKU.length.toLocaleString();
+        document.getElementById('kk-amt').textContent=fmt(totalAmt);
+        document.getElementById('kk-store').textContent=totalAmt>0?(storeAmt/totalAmt*100).toFixed(0)+'%':'—';
+        document.getElementById('kk-lead').textContent=leads.length?(leads.reduce((a,b)=>a+b,0)/leads.length).toFixed(1)+'ng':'—';
+        document.getElementById('kk-tod').textContent=tods.length?(tods.reduce((a,b)=>a+b,0)/tods.length).toFixed(0)+'ng':'—';
+        document.getElementById('kk-po').textContent=allPoNums.size.toLocaleString();
+        document.getElementById('kk-period').textContent=allMonths.length?monthLabel(allMonths[0])+'→'+monthLabel(allMonths[allMonths.length-1]):'—';
+        document.getElementById('hbadge').textContent=allSKU.length.toLocaleString()+' Barcode';
+
+        setProgress(100,`✅ Xong! ${allSKU.length.toLocaleString()} barcode · ${allPoNums.size.toLocaleString()} PO · ${analysisDays} ngày · ${Object.keys(inventoryMap).length} tồn kho khớp`);
+        document.getElementById('results').style.display='block';
+        document.getElementById('btn-run').disabled=false;
+        applyFilters();
+      },50);
+    },
+    error:err=>{setProgress(0,'❌ Lỗi: '+err.message);document.getElementById('btn-run').disabled=false;}
+  });
+}
+
+// ── TABLE HEADER ──
+function buildThead(){
+  const hasInv=Object.keys(inventoryMap).length>0;
+  const thead=document.getElementById('thead-row');
+  thead.innerHTML='';
+  const tr=document.createElement('tr');
+  const cols=[
+    {l:'#',w:'28px'},{l:'Barcode'},{l:'Tên SP'},{l:'CAT'},
+    {l:'Loại'},{l:'Approver'},{l:'NCC'},
+    {l:'GT nhập (đ)',r:true},{l:'GT đặt (đ)',r:true},
+    {l:'SL nhập',c:true},{l:'SL đặt',c:true},
+    {l:'PO',c:true},{l:'Tháng',c:true},{l:'Lead(ng)',c:true},
+    ...(hasInv?[{l:'Tồn kho',c:true},{l:'Sale Qty',c:true},{l:'TOD(ng)',c:true}]:[]),
+    ...allMonths.map(m=>({l:'SL '+monthLabel(m),c:true})),
+    {l:'Xu hướng'},
+  ];
+  cols.forEach(col=>{
+    const th=document.createElement('th');
+    th.textContent=col.l;
+    if(col.w)th.style.width=col.w;
+    if(col.r)th.style.textAlign='right';
+    if(col.c)th.style.textAlign='center';
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+}
+
+// ── TYPE HELPERS ──
+function getType(d){
+  const s=d.type_store>0,m=d.type_md>0,c=d.type_consign>0;
+  const cnt=[s,m,c].filter(Boolean).length;
+  if(cnt>1)return 'mix'; if(s)return 'store'; if(m)return 'md'; if(c)return 'consign'; return 'supply';
+}
+function typeLabel(t){return {store:'Cửa hàng',md:'MD',consign:'Ký gửi',mix:'Hỗn hợp',supply:'Văn phòng'}[t]||t;}
+function typePill(t){return `<span class="pill pill-${t}">${typeLabel(t)}</span>`;}
+
+function todClass(v){if(v===null)return '';if(v<7)return 'tod-low';if(v<14)return 'tod-warn';return 'tod-ok';}
+function tonClass(v){if(v===null)return '';if(v===0)return 'ton-zero';if(v<5)return 'ton-low';return '';}
+
+// ── SPARK ──
+function sparklineSVG(d){
+  const vals=allMonths.map(m=>d.monthly_qty[m]||0);
+  const max=Math.max(...vals,1);
+  const W=66,H=18;
+  const pts=vals.map((v,i)=>{
+    const x=(i/(allMonths.length-1||1))*(W-4)+2;
+    const y=H-(v/max)*(H-4)-2;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline points="${pts.join(' ')}" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+// ── FILTERS ──
+function applyFilters(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const ftype=document.getElementById('filter-type').value;
+  const fapp=document.getElementById('filter-approver').value;
+  const fmonth=document.getElementById('filter-month').value;
+  const fcat=document.getElementById('filter-cat').value;
+  const ftod=document.getElementById('filter-tod').value;
+  const sortBy=document.getElementById('sort-by').value;
+
+  filtered=allSKU.filter(d=>{
+    if(q&&!d.barcode.toLowerCase().includes(q)&&!d.name.toLowerCase().includes(q)&&!d.code.toLowerCase().includes(q)) return false;
+    const t=getType(d);
+    if(ftype&&t!==ftype) return false;
+    if(fapp&&d.top_approver!==fapp) return false;
+    if(fmonth&&!d.monthly_qty[fmonth]) return false;
+    if(fcat&&d.cat!==fcat) return false;
+    if(ftod){
+      const tod=d.tod;
+      if(ftod==='urgent'&&!(tod!==null&&tod<7)) return false;
+      if(ftod==='warn'&&!(tod!==null&&tod>=7&&tod<14)) return false;
+      if(ftod==='ok'&&!(tod!==null&&tod>=14)) return false;
+      if(ftod==='nodata'&&tod!==null) return false;
+    }
+    return true;
+  });
+
+  if(sortBy==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
+  else if(sortBy==='barcode') filtered.sort((a,b)=>a.barcode.localeCompare(b.barcode));
+  else if(sortBy==='tod') filtered.sort((a,b)=>{
+    if(a.tod===null&&b.tod===null)return 0;
+    if(a.tod===null)return 1; if(b.tod===null)return -1;
+    return a.tod-b.tod; // ascending: most urgent first
+  });
+  else filtered.sort((a,b)=>{
+    const av=a[sortBy],bv=b[sortBy];
+    if(av===null&&bv===null)return 0;
+    if(av===null)return 1; if(bv===null)return -1;
+    return bv-av;
+  });
+
+  currentPage=1; renderPage();
+}
+
+// ── RENDER ──
+function renderPage(){
+  const start=(currentPage-1)*pageSize;
+  const page=filtered.slice(start,start+pageSize);
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML='';
+  const hasInv=Object.keys(inventoryMap).length>0;
+
+  page.forEach((d,i)=>{
+    const t=getType(d);
+    const tr=document.createElement('tr');
+
+    const todStr=d.tod!==null?d.tod+'ng':'—';
+    const tonStr=d.stock_qty!==null?fmtFull(d.stock_qty):'—';
+    const saleStr=d.sale_qty!==null?fmtFull(d.sale_qty):'—';
+
+    const invCells=hasInv?`
+      <td class="td-c ${tonClass(d.stock_qty)}">${tonStr}</td>
+      <td class="td-c">${saleStr}</td>
+      <td class="td-c ${todClass(d.tod)}">${todStr}</td>`:'';
+
+    const monthCells=allMonths.map(m=>`<td class="td-c" style="font-size:10px;font-family:'IBM Plex Mono',monospace">${d.monthly_qty[m]?d.monthly_qty[m].toLocaleString('vi-VN'):'—'}</td>`).join('');
+
+    tr.innerHTML=`
+      <td class="td-c" style="color:#d1d5db;font-size:10px">${start+i+1}</td>
+      <td class="td-bc">${d.barcode||'—'}</td>
+      <td class="td-name" title="${d.name}">${d.name}</td>
+      <td style="font-size:10px;color:#6b7280;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis" title="${d.cat}">${d.cat||'—'}</td>
+      <td>${typePill(t)}</td>
+      <td style="font-size:10px;color:#6b7280;white-space:nowrap">${d.top_approver||'—'}</td>
+      <td class="td-code" style="max-width:80px;overflow:hidden;text-overflow:ellipsis;color:#9ca3af" title="${d.supp_name}">${d.supp_code}</td>
+      <td class="td-amt" style="font-weight:700">${fmt(d.purchased_amt)}</td>
+      <td class="td-amt" style="color:#9ca3af">${fmt(d.order_amt)}</td>
+      <td class="td-c">${fmtFull(d.purchased_qty)}</td>
+      <td class="td-c" style="color:#9ca3af">${fmtFull(d.order_qty)}</td>
+      <td class="td-c">${d.num_po}</td>
+      <td class="td-c">${d.num_months}</td>
+      <td class="td-c">${d.avg_lead!==null?d.avg_lead+'ng':'—'}</td>
+      ${invCells}
+      ${monthCells}
+      <td>${sparklineSVG(d)}</td>`;
+    tr.addEventListener('click',()=>toggleDetail(tr,d));
+    tbody.appendChild(tr);
+  });
+
+  const total=filtered.length, totalPages=Math.ceil(total/pageSize)||1;
+  document.getElementById('page-info').textContent=`${start+1}–${Math.min(start+pageSize,total)} / ${total.toLocaleString()} barcode`;
+  document.getElementById('btn-prev').disabled=currentPage===1;
+  document.getElementById('btn-next').disabled=currentPage>=totalPages;
+  const pnums=document.getElementById('page-numbers'); pnums.innerHTML='';
+  const around=2;
+  for(let p=Math.max(1,currentPage-around);p<=Math.min(totalPages,currentPage+around);p++){
+    const b=document.createElement('button'); b.textContent=p;
+    if(p===currentPage)b.classList.add('active');
+    b.onclick=()=>{currentPage=p;renderPage();}; pnums.appendChild(b);
+  }
+}
+
+// ── DETAIL PANEL ──
+function toggleDetail(tr,d){
+  const ex=document.getElementById('detail-row');
+  if(ex){ex.remove();if(detailChart){detailChart.destroy();detailChart=null;}}
+  if(selectedRow)selectedRow.classList.remove('selected');
+  if(selectedRow===tr){selectedRow=null;return;}
+  selectedRow=tr; tr.classList.add('selected');
+
+  const hasInv=Object.keys(inventoryMap).length>0;
+  const qtyVals=allMonths.map(m=>d.monthly_qty[m]||0);
+  const colCount=14+allMonths.length+(hasInv?3:0)+1;
+  const t=getType(d);
+
+  const det=document.createElement('tr');
+  det.id='detail-row'; det.className='detail-row';
+  det.innerHTML=`<td colspan="${colCount}">
+    <div class="detail-panel">
+      <div class="dp-header">${d.barcode} — ${d.name} <span class="dp-sub">&nbsp;·&nbsp; ${d.code}</span></div>
+      <div class="dp-grid">
+        <div class="dp-sec">
+          <h4>Nhận dạng sản phẩm</h4>
+          <div class="stat-row"><span class="stat-k">Barcode</span><span class="stat-v">${d.barcode||'—'}</span></div>
+          <div class="stat-row"><span class="stat-k">Mã hàng</span><span class="stat-v">${d.code}</span></div>
+          <div class="stat-row"><span class="stat-k">CAT / Layer</span><span class="stat-v">${d.cat||'—'}</span></div>
+          <div class="stat-row"><span class="stat-k">Loại đặt hàng</span><span>${typePill(t)}</span></div>
+          <div class="stat-row"><span class="stat-k">Nhà cung cấp</span><span class="stat-v" style="max-width:150px;word-break:break-word;text-align:right;font-size:10px">${d.supp_name}</span></div>
+          <div class="stat-row"><span class="stat-k">Mã NCC</span><span class="stat-v">${d.supp_code}</span></div>
+          <div class="stat-row"><span class="stat-k">Approver chính</span><span class="stat-v">${d.top_approver||'—'}</span></div>
+          <div class="stat-row"><span class="stat-k">Kỳ hoạt động</span><span class="stat-v">${d.first_month?monthLabel(d.first_month)+'→'+monthLabel(d.last_month):'—'}</span></div>
+        </div>
+        <div class="dp-sec">
+          <h4>Số liệu đặt hàng (PO)</h4>
+          <div class="stat-row"><span class="stat-k">GT nhập thực</span><span class="stat-v">${fmtFull(d.purchased_amt)}đ</span></div>
+          <div class="stat-row"><span class="stat-k">GT đặt</span><span class="stat-v">${fmtFull(d.order_amt)}đ</span></div>
+          <div class="stat-row"><span class="stat-k">Tỷ lệ thực nhận</span><span class="stat-v">${d.order_amt>0?(d.purchased_amt/d.order_amt*100).toFixed(1)+'%':'—'}</span></div>
+          <div class="stat-row"><span class="stat-k">SL nhập thực</span><span class="stat-v">${fmtFull(d.purchased_qty)}</span></div>
+          <div class="stat-row"><span class="stat-k">SL đặt</span><span class="stat-v">${fmtFull(d.order_qty)}</span></div>
+          <div class="stat-row"><span class="stat-k">Số PO</span><span class="stat-v">${d.num_po}</span></div>
+          <div class="stat-row"><span class="stat-k">Số tháng HĐ</span><span class="stat-v">${d.num_months}/${allMonths.length} tháng</span></div>
+          <div class="stat-row"><span class="stat-k">Lead time TB</span><span class="stat-v">${d.avg_lead!==null?d.avg_lead+' ngày':'—'}</span></div>
+          <div class="stat-row"><span class="stat-k">Store / MD / KG</span><span class="stat-v">${fmt(d.type_store)} / ${fmt(d.type_md)} / ${fmt(d.type_consign)}</span></div>
+        </div>
+        <div class="dp-sec">
+          <h4>Tồn kho & Bán hàng</h4>
+          ${hasInv?`
+          <div class="stat-row"><span class="stat-k">Tồn kho hiện tại</span><span class="stat-v ${tonClass(d.stock_qty)}">${d.stock_qty!==null?fmtFull(d.stock_qty)+' SP':'Không có DL'}</span></div>
+          <div class="stat-row"><span class="stat-k">Số đã bán (kỳ)</span><span class="stat-v">${d.sale_qty!==null?fmtFull(d.sale_qty)+' SP':'Không có DL'}</span></div>
+          <div class="stat-row"><span class="stat-k">TOD</span><span class="stat-v ${todClass(d.tod)}">${d.tod!==null?d.tod+' ngày':'Không có DL'}</span></div>
+          <div class="stat-row"><span class="stat-k">TOD diễn giải</span><span class="stat-v ${todClass(d.tod)}">${d.tod===null?'—':d.tod<7?'🔴 Cần đặt gấp!':d.tod<14?'🟡 Sắp cần đặt':'🟢 Còn đủ hàng'}</span></div>
+          <div class="stat-row"><span class="stat-k">TB bán/ngày (ước)</span><span class="stat-v">${d.sale_qty!==null&&analysisDays>0?(d.sale_qty/analysisDays).toFixed(2)+' SP/ng':'—'}</span></div>`
+          :`<div style="color:#9ca3af;font-size:11px;padding:8px 0">Upload file tồn kho để xem chỉ số này.</div>`}
+        </div>
+        <div class="dp-sec">
+          <h4>Xu hướng SL đặt theo tháng</h4>
+          <canvas id="dchart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+  </td>`;
+  tr.after(det);
+
+  detailChart=new Chart(document.getElementById('dchart'),{
+    type:'bar',
+    data:{labels:allMonths.map(monthLabel),datasets:[{label:'SL đặt',data:qtyVals,backgroundColor:'#dbeafe',borderColor:'#1d4ed8',borderWidth:1.5,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' SL: '+ctx.parsed.y.toLocaleString('vi-VN')}}},scales:{x:{ticks:{color:'#6b7280',font:{size:10}},grid:{color:'#e5e7eb'}},y:{ticks:{color:'#6b7280',font:{size:10}},grid:{color:'#e5e7eb'},beginAtZero:true}}}
+  });
+}
+
+function changePage(dir){const t=Math.ceil(filtered.length/pageSize)||1;currentPage=Math.max(1,Math.min(t,currentPage+dir));renderPage();}
+function changePageSize(){pageSize=parseInt(document.getElementById('page-size').value);currentPage=1;renderPage();}
+function resetFilters(){
+  ['search','filter-type','filter-approver','filter-month','filter-cat','filter-tod'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sort-by').value='barcode';
+  applyFilters();
+}
+
+// ── DOWNLOAD CSV ──
+function downloadCSV(){
+  const hasInv=Object.keys(inventoryMap).length>0;
+  const headers=['Barcode','Tên SP','CAT/Layer','Loại đặt hàng','Mã NCC','Tên NCC','Approver chính',
+    'GT nhập thực (đ)','GT đặt (đ)','SL nhập','SL đặt','Số PO','Số tháng HĐ','Lead time TB (ng)',
+    ...(hasInv?['Tồn kho','Sale Qty','TOD (ng)']:[]),
+    'Tháng đầu','Tháng cuối','Store (đ)','MD (đ)','Ký gửi (đ)',
+    ...allMonths.map(m=>'SL_'+monthLabel(m)),
+    ...allMonths.map(m=>'GT_'+monthLabel(m)),
+  ];
+  const rows=filtered.map(d=>[
+    d.barcode,d.name,d.cat||'',typeLabel(getType(d)),d.supp_code,d.supp_name,d.top_approver||'',
+    d.purchased_amt,d.order_amt,d.purchased_qty,d.order_qty,d.num_po,d.num_months,d.avg_lead!==null?d.avg_lead:'',
+    ...(hasInv?[d.stock_qty!==null?d.stock_qty:'',d.sale_qty!==null?d.sale_qty:'',d.tod!==null?d.tod:'']:[]),
+    d.first_month?monthLabel(d.first_month):'',d.last_month?monthLabel(d.last_month):'',
+    d.type_store,d.type_md,d.type_consign,
+    ...allMonths.map(m=>d.monthly_qty[m]||0),
+    ...allMonths.map(m=>d.monthly_amt[m]||0),
+  ]);
+  const csv=Papa.unparse({fields:headers,data:rows});
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  const ts=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.href=URL.createObjectURL(blob); a.download=`PhanTich_Barcode_1016_${ts}.csv`;
+  a.click();
+}
+
+// ── DOWNLOAD XLSX ──
+function downloadXLSX(){
+  const hasInv=Object.keys(inventoryMap).length>0;
+  const headers=['Barcode','Tên SP','CAT/Layer','Loại','Mã NCC','Tên NCC','Approver',
+    'GT nhập (đ)','GT đặt (đ)','SL nhập','SL đặt','Số PO','Tháng HĐ','Lead(ng)',
+    ...(hasInv?['Tồn kho','Sale Qty','TOD(ng)']:[]),
+    'Tháng đầu','Tháng cuối','Store(đ)','MD(đ)','Ký gửi(đ)',
+    ...allMonths.map(m=>'SL '+monthLabel(m)),
+    ...allMonths.map(m=>'GT '+monthLabel(m)),
+  ];
+  const data=[headers,...filtered.map(d=>[
+    d.barcode,d.name,d.cat||'',typeLabel(getType(d)),d.supp_code,d.supp_name,d.top_approver||'',
+    d.purchased_amt,d.order_amt,d.purchased_qty,d.order_qty,d.num_po,d.num_months,d.avg_lead!==null?d.avg_lead:'',
+    ...(hasInv?[d.stock_qty!==null?d.stock_qty:'',d.sale_qty!==null?d.sale_qty:'',d.tod!==null?d.tod:'']:[]),
+    d.first_month?monthLabel(d.first_month):'',d.last_month?monthLabel(d.last_month):'',
+    d.type_store,d.type_md,d.type_consign,
+    ...allMonths.map(m=>d.monthly_qty[m]||0),
+    ...allMonths.map(m=>d.monthly_amt[m]||0),
+  ])];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Barcode Analysis',ws);
+  const ts=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  XLSX.writeFile(wb,`PhanTich_Barcode_1016_${ts}.xlsx`);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1205 @@
+<title>Check Ca Chưa Định</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#F4F6F3;
+    --surface:#FFFFFF;
+    --surface-2:#EBEFEA;
+    --surface-3:#E1E7E0;
+    --border:#D7DED5;
+    --text:#1B231D;
+    --text-muted:#5B6A5D;
+    --text-faint:#8A968B;
+    --accent:#1E6F5C;
+    --accent-strong:#154F42;
+    --accent-soft:#DDEEE7;
+    --warn:#A66A0C;
+    --warn-soft:#FBEDD6;
+    --warn-strong:#7A4E08;
+    --critical:#AE3B34;
+    --critical-soft:#F8E2DF;
+    --critical-strong:#832B26;
+    --info:#3B689E;
+    --info-soft:#E1EAF4;
+    --ok:#2E7D4F;
+    --ok-soft:#DFF0E5;
+    --topbar-text:#F2FBF7;
+    --shadow: 0 1px 2px rgba(20,30,22,0.06), 0 6px 20px -8px rgba(20,30,22,0.12);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12160F;
+      --surface:#181D16;
+      --surface-2:#1F251C;
+      --surface-3:#293123;
+      --border:#333C2D;
+      --text:#E9EEE5;
+      --text-muted:#A7B3A0;
+      --text-faint:#748071;
+      --accent:#5FBE9E;
+      --accent-strong:#7CD3B4;
+      --accent-soft:#20352C;
+      --warn:#E3A94C;
+      --warn-soft:#3A2E15;
+      --warn-strong:#F2C271;
+      --critical:#E38C84;
+      --critical-soft:#3B211E;
+      --critical-strong:#F2A69E;
+      --info:#8FB2DE;
+      --info-soft:#1E2A3B;
+      --ok:#7FCB9C;
+      --ok-soft:#1D3327;
+      --topbar-text:#0D1712;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -8px rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12160F;
+    --surface:#181D16;
+    --surface-2:#1F251C;
+    --surface-3:#293123;
+    --border:#333C2D;
+    --text:#E9EEE5;
+    --text-muted:#A7B3A0;
+    --text-faint:#748071;
+    --accent:#5FBE9E;
+    --accent-strong:#7CD3B4;
+    --accent-soft:#20352C;
+    --warn:#E3A94C;
+    --warn-soft:#3A2E15;
+    --warn-strong:#F2C271;
+    --critical:#E38C84;
+    --critical-soft:#3B211E;
+    --critical-strong:#F2A69E;
+    --info:#8FB2DE;
+    --info-soft:#1E2A3B;
+    --ok:#7FCB9C;
+    --ok-soft:#1D3327;
+    --topbar-text:#0D1712;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -8px rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size:14px;
+    line-height:1.5;
+  }
+  ::selection{ background:var(--accent-soft); }
+
+  h1,h2,h3{ font-family:'Be Vietnam Pro', 'Plus Jakarta Sans', sans-serif; text-wrap:balance; margin:0; }
+  table{ font-variant-numeric: tabular-nums; }
+  .tabular{ font-variant-numeric: tabular-nums; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:20px 20px 64px; display:flex; flex-direction:column; gap:18px; }
+
+  /* ---- Top bar ---- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 22px; border-radius:16px;
+    background:linear-gradient(135deg, var(--accent-strong), var(--accent));
+    color:var(--topbar-text); box-shadow:var(--shadow);
+  }
+  .topbar .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    width:40px; height:40px; border-radius:11px; background:rgba(255,255,255,0.16);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .brand-mark svg{ width:22px; height:22px; }
+  .brand-text h1{ font-size:18px; font-weight:800; letter-spacing:.1px; }
+  .brand-text p{ margin:2px 0 0; font-size:12.5px; opacity:.85; font-weight:500; }
+  .topbar .date-pill{
+    font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:999px;
+    background:rgba(255,255,255,0.16); white-space:nowrap;
+  }
+
+  /* ---- Cards ---- */
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow); padding:20px;
+  }
+  .card-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .card-head h2{ font-size:15.5px; font-weight:700; }
+  .card-head .hint{ font-size:12.5px; color:var(--text-muted); }
+
+  /* ---- Upload zone ---- */
+  .upload-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:stretch; }
+  @media (max-width:760px){ .upload-grid{ grid-template-columns:1fr; } }
+
+  .dropzone{
+    border:1.5px dashed var(--border); border-radius:14px; background:var(--surface-2);
+    padding:22px; text-align:center; cursor:pointer; transition:border-color .15s ease, background .15s ease;
+    display:flex; flex-direction:column; align-items:center; gap:8px; justify-content:center;
+  }
+  .dropzone:hover, .dropzone.drag{ border-color:var(--accent); background:var(--accent-soft); }
+  .dropzone svg{ width:26px; height:26px; color:var(--accent); }
+  .dropzone .dz-title{ font-weight:700; font-size:13.5px; }
+  .dropzone .dz-sub{ font-size:12px; color:var(--text-muted); max-width:34ch; }
+  .dropzone input{ display:none; }
+
+  .file-chips{ display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .file-chip{
+    display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px;
+    background:var(--surface-2); border:1px solid var(--border); font-size:12.5px;
+  }
+  .file-chip .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .file-chip.ok .dot{ background:var(--ok); }
+  .file-chip.warn .dot{ background:var(--warn); }
+  .file-chip .fname{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text); font-weight:600; }
+  .file-chip .ftype{ color:var(--text-muted); font-size:11.5px; white-space:nowrap; }
+  .file-chip .rm{ cursor:pointer; color:var(--text-faint); background:none; border:none; font-size:15px; line-height:1; padding:2px 4px; }
+  .file-chip .rm:hover{ color:var(--critical); }
+
+  .side-panel{ display:flex; flex-direction:column; gap:14px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+  select, input[type="text"]{
+    font:inherit; padding:9px 11px; border-radius:9px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text); width:100%;
+  }
+  select:focus, input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  .btn{
+    font:inherit; font-weight:700; font-size:13px; padding:9px 15px; border-radius:9px; border:1px solid transparent;
+    cursor:pointer; display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+    transition:filter .12s ease, transform .05s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn-primary{ background:var(--accent); color:#F2FBF7; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-primary:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; }
+  .btn-ghost{ background:var(--surface-2); color:var(--text); border-color:var(--border); }
+  .btn-ghost:hover{ background:var(--surface-3); }
+  .btn svg{ width:14px; height:14px; }
+
+  /* ---- Stat strip ---- */
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  @media (max-width:760px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  .stat{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; gap:4px; position:relative; overflow:hidden;
+  }
+  .stat::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--stripe,var(--accent)); }
+  .stat .num{ font-family:'Be Vietnam Pro',sans-serif; font-size:27px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .stat .lbl{ font-size:12px; color:var(--text-muted); font-weight:600; }
+
+  /* ---- Table panel ---- */
+  .panel-toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .search-box{ position:relative; flex:1; min-width:180px; max-width:260px; }
+  .search-box svg{ position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--text-faint); }
+  .search-box input{ padding-left:31px; }
+
+  .table-scroll{ overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+  table{ width:100%; border-collapse:collapse; min-width:640px; }
+  thead th{
+    position:sticky; top:0; background:var(--surface-2); text-align:left; font-size:11.5px;
+    text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted); font-weight:700;
+    padding:10px 12px; border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  tbody td{ padding:10px 12px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--surface-2); }
+  td.name{ font-weight:700; white-space:nowrap; }
+  td.code{ color:var(--text-muted); font-size:12px; }
+  td.muted{ color:var(--text-muted); }
+  td.nowrap{ white-space:nowrap; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px;
+    font-size:11.5px; font-weight:700; white-space:nowrap;
+  }
+  .badge-warn{ background:var(--warn-soft); color:var(--warn-strong); }
+  .badge-critical{ background:var(--critical-soft); color:var(--critical-strong); }
+  .badge-info{ background:var(--info-soft); color:var(--info); }
+  .badge-ok{ background:var(--ok-soft); color:var(--ok); }
+  .badge-muted{ background:var(--surface-3); color:var(--text-muted); }
+
+  .empty-state{ padding:44px 20px; text-align:center; color:var(--text-muted); }
+  .empty-state svg{ width:34px; height:34px; color:var(--text-faint); margin-bottom:10px; }
+  .empty-state .big{ font-weight:700; color:var(--text); font-size:14px; margin-bottom:4px; }
+  .empty-state .small{ font-size:12.5px; max-width:44ch; margin:0 auto; }
+
+  .note-line{ font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+  .warn-text{ color:var(--warn-strong); font-weight:600; }
+
+  footer{ text-align:center; font-size:11.5px; color:var(--text-faint); padding-top:6px; }
+
+  .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Check Ca &amp; Chấm Công</h1>
+        <p>Kohnan Parc Mall · Store 1016</p>
+      </div>
+    </div>
+    <div class="date-pill" id="todayPill">—</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Tải dữ liệu</h2>
+      <span class="hint">Kéo thả hoặc chọn 2 file: Lịch phân ca &amp; Bảng chấm công</span>
+    </div>
+    <div class="upload-grid">
+      <div>
+        <label class="dropzone" id="dropzone" for="fileInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <div class="dz-title">Thả file .xls / .xlsx vào đây</div>
+          <div class="dz-sub">Hoặc bấm để chọn — nhận cả file "Lịch phân ca" (WorkingApplicationReport) và file "Bảng chấm công" (BCC), có thể chọn cùng lúc.</div>
+          <input type="file" id="fileInput" accept=".xls,.xlsx" multiple />
+        </label>
+        <div class="file-chips" id="fileChips"></div>
+      </div>
+      <div class="side-panel">
+        <div class="field">
+          <label for="dateSelect">Ngày kiểm tra</label>
+          <select id="dateSelect" disabled>
+            <option>Chưa có dữ liệu</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Trạng thái nhận diện</label>
+          <div class="note-line" id="detectNote">Chưa tải file nào. Hai bảng bên dưới sẽ tự động cập nhật khi có đủ dữ liệu.</div>
+        </div>
+        <button class="btn btn-ghost" id="resetBtn" style="align-self:flex-start;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          Xoá dữ liệu &amp; làm lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat" style="--stripe:var(--accent)">
+      <div class="num tabular" id="statTotal">–</div>
+      <div class="lbl">Nhân viên trong ca</div>
+    </div>
+    <div class="stat" style="--stripe:var(--warn)">
+      <div class="num tabular" id="statMissing">–</div>
+      <div class="lbl">Chưa định ca</div>
+    </div>
+    <div class="stat" style="--stripe:var(--critical)">
+      <div class="num tabular" id="statErrors">–</div>
+      <div class="lbl">Lỗi công</div>
+    </div>
+    <div class="stat" style="--stripe:var(--info)">
+      <div class="num tabular" id="statLate">–</div>
+      <div class="lbl">Đi trễ / về sớm</div>
+    </div>
+  </div>
+
+  <div class="card" id="missingCard">
+    <div class="card-head">
+      <h2>Nhân viên chưa định ca <span id="missingDateLbl" class="hint"></span></h2>
+      <div class="panel-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="missingSearch" placeholder="Tìm tên hoặc mã NV…" />
+        </div>
+        <button class="btn btn-primary" id="exportMissingBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Xuất Excel để thông báo
+        </button>
+      </div>
+    </div>
+    <div class="table-scroll" id="missingTableWrap">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        <div class="big">Chưa có dữ liệu lịch phân ca</div>
+        <div class="small">Tải file "Lịch phân ca" (WorkingApplicationReport) — hoặc chỉ cần file Bảng chấm công cũng đủ để dò theo cột "Tên ca".</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="errorsCard">
+    <div class="card-head">
+      <h2>Nhân viên bị lỗi công</h2>
+      <div class="panel-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="errorSearch" placeholder="Tìm tên hoặc mã NV…" />
+        </div>
+        <button class="btn btn-primary" id="exportErrorsBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Xuất Excel lỗi công
+        </button>
+      </div>
+    </div>
+    <div class="table-scroll" id="errorsTableWrap">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        <div class="big">Chưa có dữ liệu bảng chấm công</div>
+        <div class="small">Tải file BCC (Bảng Chấm Công) — sheet "LỖI 3" và "ĐI TRỄ VỀ SỚM" sẽ được đọc tự động.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="dailyLogCard">
+    <div class="card-head">
+      <h2>Bảng tổng hợp chấm công <span id="dailyLogRangeLbl" class="hint"></span></h2>
+      <div class="panel-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="dailyLogSearch" placeholder="Tìm tên hoặc mã NV…" />
+        </div>
+        <button class="btn btn-primary" id="exportDailyLogBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Xuất Excel tổng hợp
+        </button>
+      </div>
+    </div>
+    <div class="table-scroll" id="dailyLogTableWrap">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        <div class="big">Chưa có dữ liệu bảng chấm công</div>
+        <div class="small">Tải file BCC (Bảng Chấm Công) — sheet "TỔNG" sẽ được đọc để dựng danh sách chi tiết từ đầu tháng đến ngày gần nhất có dữ liệu.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Xử lý hoàn toàn trên trình duyệt — file không được tải lên bất kỳ máy chủ nào.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- utilities ---------------- */
+  function excelSerialToDate(serial){
+    // Excel 1900 date system serial -> JS Date (UTC, date-only)
+    var ms = Math.round((serial - 25569) * 86400 * 1000);
+    return new Date(ms);
+  }
+  function isoFromSerial(serial){
+    var d = excelSerialToDate(serial);
+    return d.getUTCFullYear() + '-' + pad(d.getUTCMonth()+1) + '-' + pad(d.getUTCDate());
+  }
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function isoToVi(iso){
+    var p = iso.split('-');
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+  function mmddyyyyToIso(s){
+    // "08/23/2026" -> "2026-08-23"
+    var p = String(s).trim().split('/');
+    if (p.length !== 3) return null;
+    return p[2] + '-' + pad(parseInt(p[0],10)) + '-' + pad(parseInt(p[1],10));
+  }
+  function normCode(v){
+    if (v === null || v === undefined) return '';
+    var s = String(v).trim();
+    if (s === '') return '';
+    var num = Number(s);
+    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(s)) return String(Math.trunc(num));
+    return s;
+  }
+  function norm(v){ return (v===null||v===undefined) ? '' : String(v).trim(); }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function titleCaseVi(s){
+    s = norm(s);
+    if (!s) return s;
+    return s.replace(/\S+/g, function(w){
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    });
+  }
+
+  /* ---------------- state ---------------- */
+  var state = {
+    files: [],           // {name, kind, detail}
+    schedule: null,       // {employees:[{code,name,position}], byCode:{code:{iso:cellRaw}}, dates:[iso...]}
+    requests: [],         // [{code,name,fromIso,toIso,shift,status}]
+    attendance: {         // rows keyed by purpose
+      tong: null, loi: null, tre: null
+    },
+    attendanceDates: []    // union iso dates seen in attendance sheets
+  };
+
+  var els = {
+    fileInput: document.getElementById('fileInput'),
+    dropzone: document.getElementById('dropzone'),
+    fileChips: document.getElementById('fileChips'),
+    dateSelect: document.getElementById('dateSelect'),
+    detectNote: document.getElementById('detectNote'),
+    resetBtn: document.getElementById('resetBtn'),
+    todayPill: document.getElementById('todayPill'),
+    statTotal: document.getElementById('statTotal'),
+    statMissing: document.getElementById('statMissing'),
+    statErrors: document.getElementById('statErrors'),
+    statLate: document.getElementById('statLate'),
+    missingTableWrap: document.getElementById('missingTableWrap'),
+    errorsTableWrap: document.getElementById('errorsTableWrap'),
+    missingDateLbl: document.getElementById('missingDateLbl'),
+    missingSearch: document.getElementById('missingSearch'),
+    errorSearch: document.getElementById('errorSearch'),
+    exportMissingBtn: document.getElementById('exportMissingBtn'),
+    exportErrorsBtn: document.getElementById('exportErrorsBtn'),
+    dailyLogTableWrap: document.getElementById('dailyLogTableWrap'),
+    dailyLogRangeLbl: document.getElementById('dailyLogRangeLbl'),
+    dailyLogSearch: document.getElementById('dailyLogSearch'),
+    exportDailyLogBtn: document.getElementById('exportDailyLogBtn')
+  };
+
+  (function initTodayPill(){
+    var d = new Date();
+    var days = ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
+    els.todayPill.textContent = days[d.getDay()] + ', ' + pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear();
+  })();
+
+  /* ---------------- file classification ---------------- */
+  function classifySheet(rows){
+    // rows: array of arrays (first ~6 rows enough to sniff)
+    var head = rows.slice(0,6).map(function(r){ return r.map(norm).join('|'); }).join('|');
+    var hasEECode = /ee\s*code/i.test(head) || /mã\s*nv/i.test(head);
+    var hasPosition = /position/i.test(head);
+    var hasAppStatus = /app\.?\s*status|tt\s*đơn/i.test(head);
+    var hasMaNhanVien = /mã nhân viên/i.test(head);
+    var hasTenCa = /tên ca/i.test(head);
+    if (hasEECode && hasPosition && !hasAppStatus) return 'schedule-grid';
+    if (hasAppStatus) return 'requests';
+    if (hasMaNhanVien && hasTenCa) return 'attendance';
+    return 'unknown';
+  }
+
+  function findHeaderRowIndex(rows, testFn){
+    for (var i=0;i<Math.min(rows.length,8);i++){
+      if (testFn(rows[i])) return i;
+    }
+    return -1;
+  }
+
+  function parseScheduleGrid(rows, sheetName, into){
+    var hIdx = findHeaderRowIndex(rows, function(r){
+      var j = r.map(norm).join('|');
+      return /ee\s*code/i.test(j) && /position/i.test(j);
+    });
+    if (hIdx === -1) return;
+    var header = rows[hIdx];
+    var codeCol=-1, nameCol=-1, posCol=-1;
+    header.forEach(function(h,i){
+      var t = norm(h).toLowerCase();
+      if (codeCol===-1 && /ee\s*code/.test(t)) codeCol=i;
+      if (nameCol===-1 && t==='name') nameCol=i;
+      if (posCol===-1 && t==='position') posCol=i;
+    });
+    if (codeCol===-1) codeCol=1;
+    if (nameCol===-1) nameCol=2;
+    if (posCol===-1) posCol=3;
+    var dateCols = [];
+    for (var c=posCol+1; c<header.length; c++){
+      var v = header[c];
+      if (typeof v === 'number' && v > 20000) dateCols.push({col:c, iso: isoFromSerial(v)});
+    }
+    if (!dateCols.length) return;
+
+    into.employees = into.employees || [];
+    into.byCode = into.byCode || {};
+    into.dates = into.dates || [];
+    var seenCodes = {};
+
+    for (var r = hIdx+1; r < rows.length; r++){
+      var row = rows[r];
+      if (!row) continue;
+      var name = norm(row[nameCol]);
+      var code = normCode(row[codeCol]);
+      if (!name || !code) continue;
+      if (!seenCodes[code]){
+        seenCodes[code] = true;
+        into.employees.push({ code: code, name: titleCaseVi(name), position: norm(row[posCol]) || '—' });
+      }
+      into.byCode[code] = into.byCode[code] || {};
+      dateCols.forEach(function(dc){
+        into.byCode[code][dc.iso] = norm(row[dc.col]);
+      });
+    }
+    dateCols.forEach(function(dc){
+      if (into.dates.indexOf(dc.iso) === -1) into.dates.push(dc.iso);
+    });
+    into.sourceSheets = into.sourceSheets || [];
+    into.sourceSheets.push(sheetName);
+  }
+
+  function parseRequests(rows, into){
+    var hIdx = findHeaderRowIndex(rows, function(r){
+      var j = r.map(norm).join('|');
+      return /app\.?\s*status|tt\s*đơn/i.test(j);
+    });
+    if (hIdx === -1) return;
+    var header = rows[hIdx].map(function(h){ return norm(h).toLowerCase(); });
+    function col(re){ for (var i=0;i<header.length;i++){ if (re.test(header[i])) return i; } return -1; }
+    var cStatus = col(/status|tt\s*đơn/);
+    var cCode = col(/emp.*code|mã\s*nv/);
+    var cName = col(/full\s*name|họ.*tên/);
+    var cFrom = col(/from\s*date|từ ngày/);
+    var cTo = col(/to\s*date|đến ngày/);
+    var cShift = col(/shift|^ca$/);
+    for (var r=hIdx+1; r<rows.length; r++){
+      var row = rows[r];
+      if (!row) continue;
+      var code = normCode(row[cCode]);
+      if (!code) continue;
+      var fromIso = mmddyyyyToIso(row[cFrom]);
+      var toIso = mmddyyyyToIso(row[cTo]) || fromIso;
+      if (!fromIso) continue;
+      into.push({
+        code: code, name: titleCaseVi(norm(row[cName])),
+        fromIso: fromIso, toIso: toIso,
+        shift: norm(row[cShift]), status: norm(row[cStatus])
+      });
+    }
+  }
+
+  function parseAttendanceSheet(rows, sheetName){
+    var hIdx = findHeaderRowIndex(rows, function(r){ return /mã nhân viên/i.test(norm(r[0])); });
+    if (hIdx === -1) return null;
+    var header = rows[hIdx];
+    var sub = rows[hIdx+1] || [];
+    function findExact(arr, re){ for (var i=0;i<arr.length;i++){ if (re.test(norm(arr[i]))) return i; } return -1; }
+    var idx = {
+      code: findExact(header, /^mã nhân viên$/i),
+      name: findExact(header, /^họ tên$/i),
+      dept: findExact(header, /^bộ phận$/i),
+      date: findExact(header, /^ngày$/i),
+      thu: findExact(header, /^thứ$/i),
+      kieuNgay: findExact(header, /^kiểu ngày$/i),
+      tenCa: findExact(header, /^tên ca$/i),
+      loai: findExact(header, /^loại$/i),
+      loaiLamViec: findExact(header, /^loại làm việc$/i),
+      lyDoLoi: findExact(header, /^lý do lỗi$/i)
+    };
+    var idxVao = findExact(sub, /^vào$/i);
+    var idxRa = findExact(sub, /^ra$/i);
+    if (idxVao === -1 && idx.tenCa !== -1) idxVao = idx.tenCa + 2;
+    if (idxRa === -1 && idxVao !== -1) idxRa = idxVao + 1;
+    if (idx.code === -1) idx.code = 0;
+    if (idx.name === -1) idx.name = 1;
+
+    var out = [];
+    for (var r = hIdx+2; r < rows.length; r++){
+      var row = rows[r];
+      if (!row) continue;
+      var code = normCode(row[idx.code]);
+      if (!code || !/^\d+$/.test(code)) continue;
+      var dateVal = row[idx.date];
+      var iso = (typeof dateVal === 'number') ? isoFromSerial(dateVal) : null;
+      if (!iso) continue;
+      out.push({
+        code: code,
+        name: titleCaseVi(norm(row[idx.name])),
+        dept: idx.dept!==-1 ? norm(row[idx.dept]) : '',
+        iso: iso,
+        thu: idx.thu!==-1 ? norm(row[idx.thu]) : '',
+        kieuNgay: idx.kieuNgay!==-1 ? norm(row[idx.kieuNgay]) : '',
+        tenCa: idx.tenCa!==-1 ? norm(row[idx.tenCa]) : '',
+        vao: idxVao!==-1 ? norm(row[idxVao]) : '',
+        ra: idxRa!==-1 ? norm(row[idxRa]) : '',
+        loai: idx.loai!==-1 ? norm(row[idx.loai]) : '',
+        loaiLamViec: idx.loaiLamViec!==-1 ? norm(row[idx.loaiLamViec]) : '',
+        lyDoLoi: idx.lyDoLoi!==-1 ? norm(row[idx.lyDoLoi]) : '',
+        sheet: sheetName
+      });
+    }
+    return out;
+  }
+
+  function sheetNamePurpose(name){
+    var n = name.toUpperCase();
+    if (n.indexOf('LỖI') !== -1 || n.indexOf('LOI') !== -1) return 'loi';
+    if (n.indexOf('TRỄ') !== -1 || n.indexOf('SỚM') !== -1 || n.indexOf('TRE') !== -1 || n.indexOf('SOM') !== -1) return 'tre';
+    if (n.indexOf('TỔNG') !== -1 || n.indexOf('TONG') !== -1) return 'tong';
+    return null;
+  }
+
+  // sheetsMap: { sheetName: rows (array-of-arrays) } — decoupled from SheetJS so the
+  // parsing/classification logic can be exercised directly (e.g. in tests) without it.
+  function ingestSheets(sheetsMap){
+    var recognized = [];
+    Object.keys(sheetsMap).forEach(function(sheetName){
+      var rows = sheetsMap[sheetName];
+      if (!rows || !rows.length) return;
+      var kind = classifySheet(rows);
+      if (kind === 'schedule-grid'){
+        state.schedule = state.schedule || {employees:[], byCode:{}, dates:[], sourceSheets:[]};
+        parseScheduleGrid(rows, sheetName, state.schedule);
+        recognized.push('Lịch phân ca (' + sheetName + ')');
+      } else if (kind === 'requests'){
+        parseRequests(rows, state.requests);
+        recognized.push('Đơn xin ca (' + sheetName + ')');
+      } else if (kind === 'attendance'){
+        var purpose = sheetNamePurpose(sheetName);
+        var parsed = parseAttendanceSheet(rows, sheetName);
+        if (parsed && parsed.length){
+          if (purpose === 'loi') { state.attendance.loi = (state.attendance.loi||[]).concat(parsed); recognized.push('Lỗi công (' + sheetName + ')'); }
+          else if (purpose === 'tre') { state.attendance.tre = (state.attendance.tre||[]).concat(parsed); recognized.push('Đi trễ/về sớm (' + sheetName + ')'); }
+          else { state.attendance.tong = (state.attendance.tong||[]).concat(parsed); recognized.push('Chấm công tổng (' + sheetName + ')'); }
+        }
+      }
+    });
+    return recognized;
+  }
+
+  /* ---------------- file handling ---------------- */
+  function handleFiles(fileList){
+    var files = Array.prototype.slice.call(fileList);
+    files.forEach(function(file){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          var data = new Uint8Array(e.target.result);
+          var wb = XLSX.read(data, {type:'array'});
+          var sheetsMap = {};
+          wb.SheetNames.forEach(function(sheetName){
+            sheetsMap[sheetName] = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1, raw:true, defval:''});
+          });
+          var recognized = ingestSheets(sheetsMap);
+          state.files.push({ name:file.name, ok: recognized.length>0, detail: recognized.length ? recognized.join(', ') : 'Không nhận diện được cấu trúc bảng' });
+        }catch(err){
+          state.files.push({ name:file.name, ok:false, detail:'Lỗi đọc file: ' + err.message });
+        }
+        renderFileChips();
+        rebuildDateOptions();
+        recompute();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  els.fileInput.addEventListener('change', function(){
+    handleFiles(this.files);
+    this.value = '';
+  });
+  ['dragenter','dragover'].forEach(function(evt){
+    els.dropzone.addEventListener(evt, function(e){ e.preventDefault(); els.dropzone.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(function(evt){
+    els.dropzone.addEventListener(evt, function(e){ e.preventDefault(); els.dropzone.classList.remove('drag'); });
+  });
+  els.dropzone.addEventListener('drop', function(e){
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
+  els.resetBtn.addEventListener('click', function(){
+    state = { files: [], schedule: null, requests: [], attendance:{tong:null,loi:null,tre:null}, attendanceDates: [] };
+    renderFileChips();
+    rebuildDateOptions();
+    recompute();
+  });
+
+  function renderFileChips(){
+    els.fileChips.innerHTML = '';
+    state.files.forEach(function(f, i){
+      var div = document.createElement('div');
+      div.className = 'file-chip ' + (f.ok ? 'ok' : 'warn');
+      div.innerHTML =
+        '<span class="dot"></span>' +
+        '<span class="fname" title="'+escapeHtml(f.name)+'">'+escapeHtml(f.name)+'</span>' +
+        '<span class="ftype">'+escapeHtml(f.detail)+'</span>' +
+        '<button class="rm" data-i="'+i+'" aria-label="Xoá file">&times;</button>';
+      els.fileChips.appendChild(div);
+    });
+    Array.prototype.forEach.call(els.fileChips.querySelectorAll('.rm'), function(btn){
+      btn.addEventListener('click', function(){
+        // Simplest correct behavior: full reset since sheets are merged into shared state.
+        state = { files: [], schedule: null, requests: [], attendance:{tong:null,loi:null,tre:null}, attendanceDates: [] };
+        renderFileChips();
+        rebuildDateOptions();
+        recompute();
+      });
+    });
+    var haveSchedule = !!state.schedule;
+    var haveAttendance = !!(state.attendance.loi || state.attendance.tre || state.attendance.tong);
+    if (!state.files.length){
+      els.detectNote.classList.remove('warn-text');
+      els.detectNote.textContent = 'Chưa tải file nào. Hai bảng bên dưới sẽ tự động cập nhật khi có đủ dữ liệu.';
+    } else {
+      var parts = [];
+      parts.push(haveSchedule ? '✓ Đã nhận diện Lịch phân ca' : '— Chưa có Lịch phân ca');
+      parts.push(haveAttendance ? '✓ Đã nhận diện Bảng chấm công' : '— Chưa có Bảng chấm công');
+      if (haveAttendance && !haveSchedule){
+        els.detectNote.classList.add('warn-text');
+        parts.push('Thiếu file Lịch phân ca nên cột "Ca được định" sẽ hiện "Chưa định ca" cho mọi người — tải thêm file WorkingApplicationReport để đối chiếu chính xác.');
+      } else {
+        els.detectNote.classList.remove('warn-text');
+      }
+      els.detectNote.textContent = parts.join(' · ');
+    }
+  }
+
+  /* ---------------- date options ---------------- */
+  function allKnownDates(){
+    var set = {};
+    if (state.schedule && state.schedule.dates) state.schedule.dates.forEach(function(d){ set[d]=1; });
+    ['tong','loi','tre'].forEach(function(k){
+      var arr = state.attendance[k];
+      if (arr) arr.forEach(function(row){ set[row.iso]=1; });
+    });
+    var out = Object.keys(set);
+    out.sort();
+    return out;
+  }
+
+  function rebuildDateOptions(){
+    var dates = allKnownDates();
+    els.dateSelect.innerHTML = '';
+    if (!dates.length){
+      els.dateSelect.disabled = true;
+      var opt = document.createElement('option');
+      opt.textContent = 'Chưa có dữ liệu';
+      els.dateSelect.appendChild(opt);
+      return;
+    }
+    els.dateSelect.disabled = false;
+    dates.forEach(function(iso){
+      var opt = document.createElement('option');
+      opt.value = iso;
+      opt.textContent = isoToVi(iso);
+      els.dateSelect.appendChild(opt);
+    });
+    els.dateSelect.value = dates[dates.length-1];
+  }
+  els.dateSelect.addEventListener('change', recompute);
+  els.missingSearch.addEventListener('input', function(){ renderMissingTable(lastMissing); });
+  els.errorSearch.addEventListener('input', function(){ renderErrorsTable(lastErrors); });
+  els.dailyLogSearch.addEventListener('input', function(){ renderDailyLogTable(lastDailyLog); });
+
+  /* ---------------- shift-status helpers ---------------- */
+  var OFF_LIKE = /^(off|nghỉ|wfh|al|al-1\/2|sl|sl-1\/2|nb|nb-1\/2)/i;
+
+  function attendanceLookup(code, iso){
+    var pools = [state.attendance.tong, state.attendance.loi, state.attendance.tre];
+    for (var p=0;p<pools.length;p++){
+      var arr = pools[p];
+      if (!arr) continue;
+      for (var i=0;i<arr.length;i++){
+        if (arr[i].code === code && arr[i].iso === iso) return arr[i];
+      }
+    }
+    return null;
+  }
+
+  function pendingRequestFor(code, iso){
+    for (var i=0;i<state.requests.length;i++){
+      var req = state.requests[i];
+      if (req.code === code && iso >= req.fromIso && iso <= req.toIso) return req;
+    }
+    return null;
+  }
+
+  // A shift/leave request already Submitted or Approved means the employee did their
+  // part — it isn't a scheduling gap, just something waiting on the manager to approve.
+  function hasActiveRequest(code, iso){
+    var req = pendingRequestFor(code, iso);
+    return !!req && /approved|submit/i.test(req.status);
+  }
+
+  /* ---------------- build "chưa định ca" list ---------------- */
+  var lastMissing = [];
+  var lastErrors = [];
+  var lastDailyLog = [];
+
+  function computeMissing(iso){
+    var result = [];
+    if (!iso) return result;
+
+    if (state.schedule && state.schedule.employees.length){
+      state.schedule.employees.forEach(function(emp){
+        var cell = (state.schedule.byCode[emp.code] || {})[iso];
+        cell = norm(cell);
+        if (cell !== '') return; // has something planned (shift time, OFF, AL, WFH...)
+        if (hasActiveRequest(emp.code, iso)) return; // already submitted/approved — just waiting, not an error
+        var att = attendanceLookup(emp.code, iso);
+        result.push({
+          code: emp.code, name: emp.name, position: emp.position,
+          punchedIn: att && att.vao ? att.vao : '',
+          punchedOut: att && att.ra ? att.ra : ''
+        });
+      });
+    } else if (state.attendance.tong){
+      var seen = {};
+      state.attendance.tong.forEach(function(row){
+        if (row.iso !== iso) return;
+        if (row.tenCa !== '') return;
+        if (/nghỉ hằng tuần|nghỉ lễ|nghỉ công ty/i.test(row.kieuNgay)) return;
+        if (row.kieuNgay === '') return;
+        if (seen[row.code]) return;
+        if (hasActiveRequest(row.code, iso)) return; // already submitted/approved — just waiting, not an error
+        seen[row.code] = true;
+        result.push({
+          code: row.code, name: row.name, position: row.dept || '—',
+          punchedIn: row.vao, punchedOut: row.ra
+        });
+      });
+    }
+    result.sort(function(a,b){ return a.name.localeCompare(b.name, 'vi'); });
+    return result;
+  }
+
+  /* ---------------- build "lỗi công" list ---------------- */
+  // Whether a real plan already exists for this employee/day even though the BCC punch
+  // log hasn't caught up to it yet — either the master roster has a real (non-OFF) shift,
+  // or the employee has a Submitted/Approved shift-change or leave request covering it.
+  function plannedShiftInfo(code, iso){
+    if (state.schedule){
+      var cell = norm((state.schedule.byCode[code]||{})[iso]);
+      if (cell !== '' && !OFF_LIKE.test(cell)) return {planned:true, source:'schedule', text: cell};
+    }
+    var req = pendingRequestFor(code, iso);
+    if (req && /approved|submit/i.test(req.status)){
+      var statusLabel = /approved/i.test(req.status) ? 'đã duyệt' : 'chờ duyệt';
+      return {planned:true, source:'request', text: (req.shift || '—') + ' (' + statusLabel + ')'};
+    }
+    return {planned:false, source:null, text:null};
+  }
+
+  function scheduledShiftText(code, iso, fallbackCa){
+    if (state.schedule){
+      var cell = norm((state.schedule.byCode[code]||{})[iso]);
+      if (cell !== '') return cell; // real shift, or OFF/AL/WFH text — all informative
+    }
+    var info = plannedShiftInfo(code, iso);
+    if (info.planned && info.source === 'request') return info.text;
+    if (fallbackCa) return fallbackCa;
+    return 'Chưa định ca';
+  }
+
+  function classifyError(row){
+    var hasCa = row.tenCa !== '';
+    var hasIn = row.vao !== '';
+    var hasOut = row.ra !== '';
+    var llv = row.loaiLamViec;
+
+    // The BCC export can lag behind a schedule finalized afterwards, or behind a
+    // shift/leave request that's Submitted or Approved but not yet transcribed into the
+    // roster — either way, a "no ca yet" reading just means the plan hasn't been punched
+    // yet, not a genuine scheduling gap.
+    var plan = plannedShiftInfo(row.code, row.iso);
+    var plannedLabel = plan.source === 'request' ? 'Đã có đơn xin ca, chưa chấm công' : 'Đã định ca, chưa chấm công';
+
+    if (/đi trễ và về sớm/i.test(llv)) return {label:'Đi trễ & về sớm', level:'critical'};
+    if (/đi trễ/i.test(llv)) return {label:'Đi trễ', level:'warn'};
+    if (/về sớm/i.test(llv)) return {label:'Về sớm', level:'warn'};
+    if (/tăng ca đêm/i.test(llv)) return {label:'Tăng ca đêm', level:'info'};
+    if (/tăng ca/i.test(llv)) return {label:'Tăng ca', level:'info'};
+
+    // The BCC system stamps its own reason on every irregular row ("Lý do lỗi") — trust
+    // that verbatim over a guessed label; it's what the store's own report calls it.
+    if (row.lyDoLoi){
+      if (!hasCa && !hasIn && !hasOut && plan.planned) return {label: plannedLabel, level:'warn'};
+      return {label: row.lyDoLoi, level: (!hasIn && !hasOut) ? 'critical' : 'warn'};
+    }
+
+    if (!hasCa && (hasIn || hasOut)) return {label:'Có chấm công nhưng chưa định ca', level:'warn'};
+    if (!hasCa && !hasIn && !hasOut){
+      if (plan.planned) return {label: plannedLabel, level:'warn'};
+      return {label:'Không có ca, không chấm công', level:'critical'};
+    }
+    if (hasCa && !hasIn && hasOut) return {label:'Thiếu giờ vào', level:'critical'};
+    if (hasCa && hasIn && !hasOut) return {label:'Thiếu giờ ra', level:'critical'};
+    if (hasCa && !hasIn && !hasOut){
+      // a named leave category (loai) means this is a planned absence, not a no-show
+      if (row.loai) return {label: 'Nghỉ — ' + row.loai, level:'muted'};
+      return {label:'Vắng mặt / chưa chấm công', level:'critical'};
+    }
+    if (llv && !/bình thường/i.test(llv)) return {label: llv, level:'warn'};
+    return {label:'Lỗi khác (xem hệ thống)', level:'warn'};
+  }
+
+  function computeErrors(){
+    var rows = [].concat(state.attendance.loi || [], state.attendance.tre || []);
+    // dedupe by code+iso+sheet-origin priority (loi3 + tre rarely overlap, but guard anyway)
+    var byKey = {};
+    rows.forEach(function(row){
+      var key = row.code + '|' + row.iso;
+      if (!byKey[key]) byKey[key] = row;
+      else {
+        // merge: prefer the one carrying an explicit "Đi trễ/Về sớm" classification
+        if (/trễ|sớm/i.test(row.loaiLamViec)) byKey[key] = row;
+      }
+    });
+    var out = Object.keys(byKey).map(function(key){
+      var row = byKey[key];
+      var cls = classifyError(row);
+      return {
+        code: row.code, name: row.name, iso: row.iso, thu: row.thu,
+        errorLabel: cls.label, errorLevel: cls.level,
+        shiftText: scheduledShiftText(row.code, row.iso, row.tenCa),
+        vao: row.vao || '—', ra: row.ra || '—'
+      };
+    });
+    out.sort(function(a,b){
+      if (a.iso !== b.iso) return b.iso.localeCompare(a.iso);
+      return a.name.localeCompare(b.name, 'vi');
+    });
+    return out;
+  }
+
+  /* ---------------- build "bảng tổng hợp" daily log (start of month -> latest date) ---------------- */
+  function dailyStatus(row){
+    var isOffKind = row.kieuNgay !== '' && /nghỉ/i.test(row.kieuNgay);
+    var hasIssue = !!row.lyDoLoi || /trễ|sớm|tăng ca/i.test(row.loaiLamViec);
+
+    if (isOffKind && !hasIssue) return {label: row.kieuNgay, level:'muted'};
+
+    if (row.tenCa && row.vao && row.ra && !hasIssue) return {label:'Đủ công', level:'ok'};
+
+    if (!row.tenCa && !row.vao && !row.ra && !hasIssue && !isOffKind){
+      // e.g. an approved full-day leave ("Nghỉ không lương", "Nghỉ trả lương"…) carries no
+      // shift/punches and no system error, so it isn't flagged — but it's still worth naming.
+      return {label: row.loai || row.kieuNgay || 'Không có dữ liệu', level:'muted'};
+    }
+
+    return classifyError(row);
+  }
+
+  function computeDailyLog(){
+    var rows = state.attendance.tong || [];
+    var empMap = {};
+    if (state.schedule) state.schedule.employees.forEach(function(e){ empMap[e.code] = e; });
+
+    var out = rows.filter(function(row){
+      // drop fully-blank filler rows (no shift, no punches, no day-type, no system reason)
+      return !(row.kieuNgay==='' && row.tenCa==='' && row.vao==='' && row.ra==='' && !row.lyDoLoi);
+    }).map(function(row){
+      var st = dailyStatus(row);
+      var emp = empMap[row.code];
+      var isOffKind = row.kieuNgay !== '' && /nghỉ/i.test(row.kieuNgay);
+      var shiftText = scheduledShiftText(row.code, row.iso, row.tenCa);
+      if (shiftText === 'Chưa định ca' && isOffKind) shiftText = '—'; // a day off has no shift to speak of
+      return {
+        code: row.code, name: row.name, position: emp ? emp.position : (row.dept || '—'),
+        iso: row.iso, thu: row.thu,
+        shiftText: shiftText,
+        vao: row.vao || '—', ra: row.ra || '—',
+        statusLabel: st.label, statusLevel: st.level
+      };
+    });
+    out.sort(function(a,b){
+      if (a.iso !== b.iso) return a.iso.localeCompare(b.iso);
+      return a.name.localeCompare(b.name, 'vi');
+    });
+    return out;
+  }
+
+  /* ---------------- rendering ---------------- */
+  function badgeClass(level){
+    if (level==='critical') return 'badge-critical';
+    if (level==='warn') return 'badge-warn';
+    if (level==='ok') return 'badge-ok';
+    if (level==='muted') return 'badge-muted';
+    return 'badge-info';
+  }
+
+  function renderMissingTable(list){
+    var q = els.missingSearch.value.trim().toLowerCase();
+    var filtered = q ? list.filter(function(r){
+      return r.name.toLowerCase().indexOf(q)!==-1 || r.code.indexOf(q)!==-1;
+    }) : list;
+
+    if (!list.length){
+      els.missingTableWrap.innerHTML =
+        '<div class="empty-state">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>' +
+        '<div class="big">' + (state.schedule || state.attendance.tong ? 'Không có ai thiếu ca trong ngày này' : 'Chưa có dữ liệu lịch phân ca') + '</div>' +
+        '<div class="small">' + (state.schedule || state.attendance.tong ? 'Tất cả nhân viên đã được định ca hoặc nghỉ theo kế hoạch.' : 'Tải file "Lịch phân ca" (WorkingApplicationReport) hoặc file Bảng chấm công.') + '</div>' +
+        '</div>';
+      return;
+    }
+    var rowsHtml = filtered.map(function(r){
+      var statusBadge = r.punchedIn
+        ? '<span class="badge badge-critical">Đã chấm công lúc ' + escapeHtml(r.punchedIn) + '</span>'
+        : '<span class="badge badge-warn">Chưa chấm công</span>';
+      return '<tr>' +
+        '<td class="name">' + escapeHtml(r.name) + '<div class="note-line code">' + escapeHtml(r.code) + '</div></td>' +
+        '<td class="muted">' + escapeHtml(r.position) + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '</tr>';
+    }).join('');
+    els.missingTableWrap.innerHTML =
+      '<table><thead><tr>' +
+      '<th>Nhân viên</th><th>Vị trí / bộ phận</th><th>Trạng thái</th>' +
+      '</tr></thead><tbody>' + (rowsHtml || '<tr><td colspan="3" class="muted" style="text-align:center;padding:24px;">Không tìm thấy kết quả phù hợp.</td></tr>') + '</tbody></table>';
+  }
+
+  function renderErrorsTable(list){
+    var q = els.errorSearch.value.trim().toLowerCase();
+    var filtered = q ? list.filter(function(r){
+      return r.name.toLowerCase().indexOf(q)!==-1 || r.code.indexOf(q)!==-1;
+    }) : list;
+
+    if (!list.length){
+      var haveAny = !!(state.attendance.loi || state.attendance.tre);
+      els.errorsTableWrap.innerHTML =
+        '<div class="empty-state">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>' +
+        '<div class="big">' + (haveAny ? 'Không có lỗi công nào' : 'Chưa có dữ liệu bảng chấm công') + '</div>' +
+        '<div class="small">' + (haveAny ? 'Toàn bộ dữ liệu chấm công trong kỳ đều hợp lệ.' : 'Tải file BCC (Bảng Chấm Công) — sheet "LỖI 3" và "ĐI TRỄ VỀ SỚM" sẽ được đọc tự động.') + '</div>' +
+        '</div>';
+      return;
+    }
+    var rowsHtml = filtered.map(function(r){
+      return '<tr>' +
+        '<td class="name">' + escapeHtml(r.name) + '<div class="note-line code">' + escapeHtml(r.code) + '</div></td>' +
+        '<td class="muted nowrap">' + escapeHtml(isoToVi(r.iso)) + (r.thu ? ' · '+escapeHtml(r.thu) : '') + '</td>' +
+        '<td><span class="badge ' + badgeClass(r.errorLevel) + '">' + r.errorLabel + '</span></td>' +
+        '<td class="muted nowrap">' + escapeHtml(r.shiftText) + '</td>' +
+        '<td class="tabular">' + escapeHtml(r.vao) + '</td>' +
+        '<td class="tabular">' + escapeHtml(r.ra) + '</td>' +
+        '</tr>';
+    }).join('');
+    els.errorsTableWrap.innerHTML =
+      '<table><thead><tr>' +
+      '<th>Nhân viên</th><th>Ngày</th><th>Lỗi</th><th>Ca được định</th><th>Giờ vào thực tế</th><th>Giờ ra thực tế</th>' +
+      '</tr></thead><tbody>' + (rowsHtml || '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">Không tìm thấy kết quả phù hợp.</td></tr>') + '</tbody></table>';
+  }
+
+  function renderDailyLogTable(list){
+    var q = els.dailyLogSearch.value.trim().toLowerCase();
+    var filtered = q ? list.filter(function(r){
+      return r.name.toLowerCase().indexOf(q)!==-1 || r.code.indexOf(q)!==-1;
+    }) : list;
+
+    if (!list.length){
+      els.dailyLogTableWrap.innerHTML =
+        '<div class="empty-state">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>' +
+        '<div class="big">Chưa có dữ liệu bảng chấm công</div>' +
+        '<div class="small">Tải file BCC (Bảng Chấm Công) — sheet "TỔNG" sẽ được đọc để dựng danh sách chi tiết từ đầu tháng đến ngày gần nhất có dữ liệu.</div>' +
+        '</div>';
+      return;
+    }
+    var rowsHtml = filtered.map(function(r){
+      return '<tr>' +
+        '<td class="name">' + escapeHtml(r.name) + '<div class="note-line code">' + escapeHtml(r.code) + '</div></td>' +
+        '<td class="muted nowrap">' + escapeHtml(isoToVi(r.iso)) + (r.thu ? ' · '+escapeHtml(r.thu) : '') + '</td>' +
+        '<td class="muted nowrap">' + escapeHtml(r.position) + '</td>' +
+        '<td class="muted nowrap">' + escapeHtml(r.shiftText) + '</td>' +
+        '<td class="tabular">' + escapeHtml(r.vao) + '</td>' +
+        '<td class="tabular">' + escapeHtml(r.ra) + '</td>' +
+        '<td><span class="badge ' + badgeClass(r.statusLevel) + '">' + escapeHtml(r.statusLabel) + '</span></td>' +
+        '</tr>';
+    }).join('');
+    els.dailyLogTableWrap.innerHTML =
+      '<table><thead><tr>' +
+      '<th>Nhân viên</th><th>Ngày</th><th>Vị trí / bộ phận</th><th>Ca</th><th>Giờ vào</th><th>Giờ ra</th><th>Trạng thái</th>' +
+      '</tr></thead><tbody>' + (rowsHtml || '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">Không tìm thấy kết quả phù hợp.</td></tr>') + '</tbody></table>';
+  }
+
+  function recompute(){
+    var iso = els.dateSelect.value;
+    var validIso = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : null;
+
+    lastMissing = computeMissing(validIso);
+    lastErrors = computeErrors();
+    lastDailyLog = computeDailyLog();
+
+    els.missingDateLbl.textContent = validIso ? '· ' + isoToVi(validIso) : '';
+    renderMissingTable(lastMissing);
+    renderErrorsTable(lastErrors);
+    renderDailyLogTable(lastDailyLog);
+
+    if (lastDailyLog.length){
+      var first = lastDailyLog[0].iso, last = lastDailyLog[lastDailyLog.length-1].iso;
+      els.dailyLogRangeLbl.textContent = '· ' + isoToVi(first) + ' – ' + isoToVi(last);
+    } else {
+      els.dailyLogRangeLbl.textContent = '';
+    }
+
+    var totalEmp = state.schedule ? state.schedule.employees.length : (lastMissing.length || lastErrors.length ? '—' : 0);
+    els.statTotal.textContent = state.schedule ? state.schedule.employees.length : '—';
+    els.statMissing.textContent = lastMissing.length;
+    els.statErrors.textContent = lastErrors.length;
+    els.statLate.textContent = lastErrors.filter(function(r){ return r.errorLevel==='warn' && /trễ|sớm/i.test(r.errorLabel); }).length;
+
+    els.exportMissingBtn.disabled = lastMissing.length === 0;
+    els.exportErrorsBtn.disabled = lastErrors.length === 0;
+    els.exportDailyLogBtn.disabled = lastDailyLog.length === 0;
+  }
+
+  /* ---------------- export ---------------- */
+  function downloadWorkbook(aoa, colWidths, filename, sheetName){
+    var ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = colWidths.map(function(w){ return {wch:w}; });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, filename);
+  }
+
+  els.exportMissingBtn.addEventListener('click', function(){
+    var iso = els.dateSelect.value;
+    var title = 'DANH SÁCH NHÂN VIÊN CHƯA ĐỊNH CA — ' + (isoToVi(iso) || '');
+    var aoa = [
+      [title],
+      ['Store 1016 · Kohnan Parc Mall — xuất lúc ' + new Date().toLocaleString('vi-VN')],
+      [],
+      ['STT','Mã NV','Họ tên','Vị trí / bộ phận','Trạng thái']
+    ];
+    lastMissing.forEach(function(r, i){
+      aoa.push([
+        i+1, r.code, r.name, r.position,
+        r.punchedIn ? ('Đã chấm công lúc ' + r.punchedIn) : 'Chưa chấm công'
+      ]);
+    });
+    downloadWorkbook(aoa, [5,10,26,20,24], 'Chua_dinh_ca_' + iso + '.xlsx', 'Chưa định ca');
+  });
+
+  els.exportErrorsBtn.addEventListener('click', function(){
+    var iso = els.dateSelect.value;
+    var title = 'DANH SÁCH NHÂN VIÊN LỖI CÔNG';
+    var aoa = [
+      [title],
+      ['Store 1016 · Kohnan Parc Mall — xuất lúc ' + new Date().toLocaleString('vi-VN')],
+      [],
+      ['STT','Mã NV','Họ tên','Ngày','Thứ','Lỗi','Ca được định','Giờ vào thực tế','Giờ ra thực tế']
+    ];
+    lastErrors.forEach(function(r, i){
+      aoa.push([i+1, r.code, r.name, isoToVi(r.iso), r.thu||'', r.errorLabel, r.shiftText, r.vao, r.ra]);
+    });
+    downloadWorkbook(aoa, [5,10,26,12,12,28,18,16,16], 'Loi_cong_' + iso + '.xlsx', 'Lỗi công');
+  });
+
+  els.exportDailyLogBtn.addEventListener('click', function(){
+    var range = lastDailyLog.length ? (isoToVi(lastDailyLog[0].iso) + ' - ' + isoToVi(lastDailyLog[lastDailyLog.length-1].iso)) : '';
+    var title = 'BẢNG TỔNG HỢP CHẤM CÔNG — ' + range;
+    var aoa = [
+      [title],
+      ['Store 1016 · Kohnan Parc Mall — xuất lúc ' + new Date().toLocaleString('vi-VN')],
+      [],
+      ['STT','Mã NV','Họ tên','Ngày','Thứ','Vị trí / bộ phận','Ca','Giờ vào','Giờ ra','Trạng thái']
+    ];
+    lastDailyLog.forEach(function(r, i){
+      aoa.push([i+1, r.code, r.name, isoToVi(r.iso), r.thu||'', r.position, r.shiftText, r.vao, r.ra, r.statusLabel]);
+    });
+    var fname = lastDailyLog.length
+      ? ('Tong_hop_cham_cong_' + lastDailyLog[0].iso + '_den_' + lastDailyLog[lastDailyLog.length-1].iso + '.xlsx')
+      : 'Tong_hop_cham_cong.xlsx';
+    downloadWorkbook(aoa, [5,10,26,12,10,20,18,10,10,34], fname, 'Tổng hợp chấm công');
+  });
+
+  /* ---------------- init ---------------- */
+  rebuildDateOptions();
+  recompute();
+})();
+</script>

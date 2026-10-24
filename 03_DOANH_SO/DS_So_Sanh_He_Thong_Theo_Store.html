@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>So Sánh Hệ Thống - Cửa Hàng 1016 Parc Mall</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    color-scheme: light;
+    --page:      #f9f9f7;
+    --surface:   #fcfcfb;
+    --surface-2: #f2f1ed;
+    --ink:       #0b0b0b;
+    --ink-2:     #52514e;
+    --muted:     #898781;
+    --grid:      #e1e0d9;
+    --baseline:  #c3c2b7;
+    --border:    rgba(11,11,11,0.10);
+    --border-strong: rgba(11,11,11,0.16);
+    --accent:    #2a78d6;
+    --accent-wash: #eaf2fc;
+    --home:      #eb6834;
+    --home-wash: #fbe9e0;
+    --south:     #8a5cd6;
+    --south-wash:#f0eafc;
+    --good:      #0ca30c;
+    --warning:   #d98a00;
+    --serious:   #ec835a;
+    --critical:  #d03b3b;
+    --good-wash:     #e6f6e6;
+    --warning-wash:  #fef4e0;
+    --serious-wash:  #fdece4;
+    --critical-wash: #fbe6e6;
+    --shadow: 0 1px 2px rgba(11,11,11,0.04), 0 8px 24px -12px rgba(11,11,11,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232322; --ink:#ffffff; --ink-2:#c3c2b7;
+      --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+      --border-strong:rgba(255,255,255,0.18); --accent:#3987e5; --accent-wash:#17273b;
+      --home:#e2793e; --home-wash:#3a2317; --south:#a684e8; --south-wash:#241c38;
+      --good:#0ca30c; --warning:#e0a324; --serious:#ec835a; --critical:#e66767;
+      --good-wash:#12291a; --warning-wash:#332506; --serious-wash:#33180f; --critical-wash:#331414;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232322; --ink:#ffffff; --ink-2:#c3c2b7;
+    --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --border-strong:rgba(255,255,255,0.18); --accent:#3987e5; --accent-wash:#17273b;
+    --home:#e2793e; --home-wash:#3a2317; --south:#a684e8; --south-wash:#241c38;
+    --good:#0ca30c; --warning:#e0a324; --serious:#ec835a; --critical:#e66767;
+    --good-wash:#12291a; --warning-wash:#332506; --serious-wash:#33180f; --critical-wash:#331414;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--page); color:var(--ink);
+    font-family:'Be Vietnam Pro', system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ margin:0; text-wrap:balance; font-weight:700; }
+  p{ margin:0; }
+  .num{ font-variant-numeric:tabular-nums; }
+  a{ color:var(--accent); }
+  button{ font-family:inherit; }
+
+  .wrap{ max-width:1320px; margin:0 auto; padding:0 20px 64px; }
+
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:color-mix(in srgb, var(--page) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:1320px; margin:0 auto; padding:14px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .tag{
+    width:34px; height:34px; border-radius:9px; background:var(--home);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:13px;
+  }
+  .brand h1{ font-size:16px; }
+  .brand .sub{ font-size:12px; color:var(--muted); margin-top:1px; }
+  .top-actions{ margin-left:auto; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
+  .btn{
+    appearance:none; border:1px solid var(--border-strong); background:var(--surface);
+    color:var(--ink); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
+    cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  .btn:hover{ background:var(--surface-2); }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover{ filter:brightness(1.06); }
+  .btn.danger{ color:var(--critical); border-color:var(--critical); background:transparent; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn.small{ padding:5px 10px; font-size:12px; }
+
+  section{ margin-top:36px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .section-head h2{ font-size:19px; }
+  .section-head .hint{ font-size:12.5px; color:var(--muted); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); padding:18px;
+  }
+
+  /* ---- Upload zone ---- */
+  #dropZone{
+    border:1.5px dashed var(--border-strong); border-radius:16px; padding:34px 20px;
+    text-align:center; background:var(--surface); cursor:pointer; transition:.15s;
+  }
+  #dropZone.drag{ border-color:var(--accent); background:var(--accent-wash); }
+  #dropZone .icon{ font-size:30px; margin-bottom:8px; }
+  #dropZone h3{ font-size:15px; margin-bottom:4px; }
+  #dropZone p{ font-size:12.5px; color:var(--muted); }
+  #fileInput{ display:none; }
+  #statusMsg{ margin-top:12px; font-size:13px; }
+  #statusMsg.error{ color:var(--critical); }
+  #statusMsg.ok{ color:var(--good); }
+  #errorBox{ display:none; margin-top:14px; padding:14px 16px; border-radius:10px; background:var(--critical-wash); color:var(--critical); font-size:13px; border:1px solid var(--critical); }
+
+  #app{ display:none; }
+
+  /* ---- KPI cards ---- */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+  .kpi{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow); }
+  .kpi .label{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .kpi .value{ font-size:21px; font-weight:800; margin-top:6px; }
+  .kpi .value.small{ font-size:17px; }
+  .kpi .chips{ margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+
+  .chip{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700;
+    padding:3px 8px; border-radius:999px; white-space:nowrap;
+  }
+  .chip.good{ background:var(--good-wash); color:var(--good); }
+  .chip.warning{ background:var(--warning-wash); color:var(--warning); }
+  .chip.critical{ background:var(--critical-wash); color:var(--critical); }
+  .chip.neutral{ background:var(--surface-2); color:var(--ink-2); }
+  .chip.accent{ background:var(--accent-wash); color:var(--accent); }
+  .chip.south{ background:var(--south-wash); color:var(--south); }
+
+  /* ---- Insight cards ---- */
+  .insight-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
+  .insight{ background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:10px; padding:14px 16px; box-shadow:var(--shadow); }
+  .insight.good{ border-left-color:var(--good); }
+  .insight.warning{ border-left-color:var(--warning); }
+  .insight.critical{ border-left-color:var(--critical); }
+  .insight .tag{ font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; }
+  .insight p{ font-size:13.5px; line-height:1.55; color:var(--ink-2); }
+  .insight strong{ color:var(--ink); }
+
+  /* ---- Charts ---- */
+  .chart-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:900px){ .chart-grid{ grid-template-columns:1fr; } }
+  .chart-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:var(--shadow); }
+  .chart-card h3{ font-size:13.5px; margin-bottom:2px; }
+  .chart-card .sub{ font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .svg-chart{ width:100%; }
+  .svg-chart svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .svg-chart .axis-line{ stroke:var(--grid); stroke-width:1; }
+  .svg-chart .ref-line{ stroke:var(--muted); stroke-width:1.4; stroke-dasharray:5,4; }
+  .svg-chart .tick-label{ fill:var(--ink-2); font-size:9.5px; font-family:'Be Vietnam Pro', sans-serif; }
+  .svg-chart .ref-label{ fill:var(--muted); font-size:9.5px; font-family:'Be Vietnam Pro', sans-serif; }
+  .svg-chart .legend-label{ fill:var(--ink-2); font-size:11px; font-family:'Be Vietnam Pro', sans-serif; }
+  .svg-chart .center-label{ fill:var(--ink); font-family:'Be Vietnam Pro', sans-serif; font-weight:800; }
+  .svg-chart .center-sub{ fill:var(--muted); font-family:'Be Vietnam Pro', sans-serif; }
+  .svg-empty{ font-size:12px; color:var(--muted); padding:30px 0; text-align:center; }
+
+  /* ---- Table ---- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:var(--shadow); }
+  table{ border-collapse:collapse; width:100%; min-width:960px; font-size:12.8px; }
+  thead th{
+    position:sticky; top:0; background:var(--surface-2); text-align:right; padding:9px 12px;
+    font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted);
+    border-bottom:1px solid var(--border); cursor:pointer; white-space:nowrap; user-select:none;
+  }
+  thead th.left, tbody td.left{ text-align:left; }
+  thead th:hover{ color:var(--ink); }
+  thead th .arrow{ opacity:.35; margin-left:3px; }
+  thead th.sorted .arrow{ opacity:1; color:var(--accent); }
+  tbody td{ padding:8px 12px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--surface-2); }
+  tbody tr.home{ background:var(--home-wash); font-weight:700; }
+  tbody tr.home td{ color:var(--ink); }
+  .badge-region{ display:inline-block; padding:2px 7px; border-radius:6px; font-size:11px; font-weight:700; }
+  .badge-region.Nam{ background:var(--south-wash); color:var(--south); }
+  .badge-region.Bắc{ background:var(--accent-wash); color:var(--accent); }
+  .badge-region.Trung{ background:var(--warning-wash); color:var(--warning); }
+
+  /* ---- Accordion (guide) ---- */
+  .acc-item{ border:1px solid var(--border); border-radius:12px; margin-bottom:10px; background:var(--surface); overflow:hidden; box-shadow:var(--shadow); }
+  .acc-head{ padding:13px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:700; font-size:13.5px; }
+  .acc-head .arrow{ transition:.2s; color:var(--muted); }
+  .acc-item.open .acc-head .arrow{ transform:rotate(180deg); }
+  .acc-body{ display:none; padding:0 16px 16px; font-size:13.3px; color:var(--ink-2); line-height:1.65; }
+  .acc-item.open .acc-body{ display:block; }
+  .acc-body b{ color:var(--ink); }
+  .acc-body ul{ margin:8px 0; padding-left:20px; }
+  .acc-body li{ margin-bottom:5px; }
+
+  /* ---- Region config ---- */
+  .region-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:8px; }
+  .region-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 10px; background:var(--surface-2); border-radius:8px; font-size:12.5px; }
+  .region-row select{
+    font-family:inherit; font-size:12px; font-weight:700; padding:3px 6px; border-radius:6px;
+    border:1px solid var(--border-strong); background:var(--surface); color:var(--ink);
+  }
+
+  /* ---- Profile config (diện tích / nhân sự / ngày khai trương) ---- */
+  table.profile-table{ border-collapse:collapse; width:100%; min-width:860px; font-size:12.2px; }
+  table.profile-table th{ text-align:left; padding:7px 8px; font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; background:var(--surface-2); }
+  table.profile-table td{ padding:5px 6px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  table.profile-table tr.home td{ background:var(--home-wash); }
+  table.profile-table input{
+    font-family:inherit; font-size:12px; padding:4px 6px; border-radius:6px;
+    border:1px solid var(--border-strong); background:var(--surface); color:var(--ink); box-sizing:border-box;
+  }
+  .staff-flag{ font-size:10.5px; color:var(--warning); margin-left:2px; }
+
+  /* ---- Điểm sáng / hạn chế / đề xuất ---- */
+  .assess-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; }
+  .assess-title{ font-size:14.5px; font-weight:800; margin:20px 0 10px; }
+  .insight .boost{ font-size:12.5px; margin-top:8px; color:var(--ink-2); line-height:1.5; }
+  .insight .boost b{ color:var(--ink); }
+  .insight .why{ font-size:12px; margin-top:6px; color:var(--muted); line-height:1.5; }
+  table.action-table{ border-collapse:collapse; width:100%; min-width:780px; font-size:12.6px; }
+  table.action-table thead th{ position:static; text-align:left; cursor:default; }
+  table.action-table tbody td{ text-align:left; white-space:normal; vertical-align:top; padding:11px 12px; line-height:1.55; }
+  table.action-table ul{ margin:0; padding-left:17px; }
+  table.action-table li{ margin-bottom:5px; }
+  .export-bar{ margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .export-bar .hint2{ font-size:12px; color:var(--muted); }
+  .btn.export{ display:none; }
+
+  footer{ margin-top:48px; padding-top:18px; border-top:1px solid var(--border); font-size:11.5px; color:var(--muted); text-align:center; }
+
+  .missing-note{ margin-top:10px; font-size:12px; color:var(--warning); }
+  .period-input{ font-family:inherit; font-size:13px; padding:6px 10px; border-radius:8px; border:1px solid var(--border-strong); background:var(--surface); color:var(--ink); }
+  label.lbl{ font-size:11.5px; color:var(--muted); font-weight:600; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="tag">1016</div>
+      <div>
+        <h1>So Sánh Hệ Thống - Cửa Hàng 1016 Parc Mall</h1>
+        <div class="sub">Phân tích doanh số theo cửa hàng · Kohnan Việt Nam</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span id="topPeriod" class="chip neutral" style="display:none;"></span>
+      <button class="btn export js-export-xlsx">Xuất báo cáo Excel</button>
+      <button class="btn export js-export-html">Xuất báo cáo HTML</button>
+      <button class="btn" id="btnChangeFile">Đổi file khác</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section id="uploadSection" style="margin-top:26px;">
+    <div id="dropZone">
+      <div class="icon">📊</div>
+      <h3>Kéo-thả hoặc bấm để chọn file "Monthly Report By Store"</h3>
+      <p>Nhận file .csv, .xlsx, .xls xuất từ hệ thống POS/ERP (báo cáo doanh số theo từng cửa hàng)</p>
+      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+      <div id="statusMsg"></div>
+    </div>
+    <div id="errorBox"></div>
+  </section>
+
+  <div id="app">
+
+    <section id="kpiSection">
+      <div class="section-head">
+        <h2>Tổng quan Cửa hàng 1016</h2>
+        <span class="hint" id="kpiHint"></span>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+    <section id="insightSection">
+      <div class="section-head"><h2>Nhận định nhanh</h2></div>
+      <div class="insight-grid" id="insightGrid"></div>
+    </section>
+
+    <section id="systemSection">
+      <div class="section-head">
+        <h2>So sánh với toàn hệ thống (16 cửa hàng)</h2>
+        <span class="hint">Trung bình / tổng tính trên các cửa hàng có dữ liệu trong file đã tải lên</span>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Doanh số tháng theo cửa hàng</h3><div class="sub">Cửa hàng 1016 tô màu cam · đường đứt nét = trung bình hệ thống</div><div id="chartSalesAll" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>% đạt chỉ tiêu tháng theo cửa hàng</h3><div class="sub">Đường đứt nét = mốc 100%</div><div id="chartBudgetAll" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Tăng trưởng so với cùng kỳ năm trước (YoY)</h3><div class="sub">% thay đổi doanh số so với cùng kỳ năm trước</div><div id="chartYoyAll" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Tỷ trọng doanh số của 1016 trong hệ thống</h3><div class="sub">Trên tổng doanh số 16 cửa hàng</div><div id="chartShareAll" class="svg-chart"></div></div>
+      </div>
+    </section>
+
+    <section id="southSection">
+      <div class="section-head">
+        <h2>So sánh riêng trong khu vực Miền Nam</h2>
+        <span class="hint" id="southHint"></span>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Doanh số tháng - các cửa hàng Miền Nam</h3><div class="sub">Cửa hàng 1016 tô màu cam · đường đứt nét = trung bình khu vực</div><div id="chartSalesSouth" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>% đạt chỉ tiêu tháng - Miền Nam</h3><div class="sub">Đường đứt nét = mốc 100%</div><div id="chartBudgetSouth" class="svg-chart"></div></div>
+      </div>
+    </section>
+
+    <section id="efficiencySection">
+      <div class="section-head">
+        <h2>Đánh giá hiệu quả vận hành so với tiềm năng (diện tích &amp; nhân sự)</h2>
+        <span class="hint">Doanh số quy đổi theo diện tích sàn kinh doanh và theo nhân sự (FTE) - để so sánh công bằng hơn giữa các cửa hàng khác quy mô</span>
+      </div>
+      <div class="kpi-grid" id="efficiencyKpiGrid" style="margin-bottom:14px;"></div>
+      <div class="insight-grid" id="efficiencyInsightGrid" style="margin-bottom:16px;"></div>
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Doanh số/m² sàn kinh doanh - toàn hệ thống</h3><div class="sub">Cửa hàng 1016 tô màu cam · chỉ tính CH có dữ liệu diện tích</div><div id="chartSqmAll" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Doanh số/nhân viên (FTE) - toàn hệ thống</h3><div class="sub">FTE = số nhân viên chính thức + part-time quy đổi theo giờ làm; CH chưa có breakdown dùng tạm tổng số nhân viên (ước tính thô)</div><div id="chartFteAll" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Doanh số/m² sàn kinh doanh - Miền Nam</h3><div class="sub">Cửa hàng 1016 tô màu cam</div><div id="chartSqmSouth" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Doanh số/nhân viên (FTE) - Miền Nam</h3><div class="sub">Xem lưu ý về độ tin cậy dữ liệu nhân sự ở trên</div><div id="chartFteSouth" class="svg-chart"></div></div>
+      </div>
+      <div class="missing-note" id="efficiencyMissingNote"></div>
+    </section>
+
+    <section id="assessSection">
+      <div class="section-head">
+        <h2>Điểm sáng, điểm hạn chế &amp; đề xuất cho cửa hàng</h2>
+        <span class="hint">Đánh giá tự động theo mức chênh so với trung vị các cửa hàng còn lại trong hệ thống</span>
+      </div>
+      <div class="card" id="assessSummary" style="font-size:13.5px; line-height:1.65; color:var(--ink-2);"></div>
+      <h3 class="assess-title">Điểm sáng</h3>
+      <div class="assess-grid" id="strengthGrid"></div>
+      <h3 class="assess-title">Điểm hạn chế</h3>
+      <div class="assess-grid" id="weaknessGrid"></div>
+      <h3 class="assess-title">Đề xuất hành động</h3>
+      <div class="table-wrap">
+        <table class="action-table">
+          <thead><tr>
+            <th style="width:80px;">Ưu tiên</th>
+            <th style="width:21%;">Vấn đề</th>
+            <th>Hành động cụ thể</th>
+            <th style="width:120px;">Phụ trách</th>
+            <th style="width:22%;">Chỉ số theo dõi / Tiềm năng</th>
+          </tr></thead>
+          <tbody id="actionBody"></tbody>
+        </table>
+      </div>
+      <div class="missing-note" style="color:var(--muted);">Tiềm năng của từng dòng được tính độc lập, không cộng gộp với nhau.</div>
+      <div class="export-bar">
+        <button class="btn primary export js-export-xlsx">Xuất báo cáo chi tiết (Excel)</button>
+        <button class="btn export js-export-html">Xuất báo cáo chi tiết (HTML, in được ra PDF)</button>
+        <span class="hint2">Báo cáo gồm: tổng quan so sánh, điểm sáng, điểm hạn chế, đề xuất, bảng 16 cửa hàng, ghi chú dữ liệu.</span>
+      </div>
+    </section>
+
+    <section id="tableSection">
+      <div class="section-head">
+        <h2>Bảng chi tiết 16 cửa hàng</h2>
+        <span class="hint">Bấm vào tiêu đề cột để sắp xếp</span>
+      </div>
+      <div class="table-wrap">
+        <table id="dataTable">
+          <thead><tr>
+            <th class="left" data-key="rankAll">Hạng HT<span class="arrow">▾</span></th>
+            <th class="left" data-key="code">Mã CH<span class="arrow">▾</span></th>
+            <th class="left" data-key="name">Tên cửa hàng<span class="arrow">▾</span></th>
+            <th class="left" data-key="region">Miền<span class="arrow">▾</span></th>
+            <th data-key="netSales">Doanh số tháng<span class="arrow">▾</span></th>
+            <th data-key="shareAll">% Hệ thống<span class="arrow">▾</span></th>
+            <th data-key="monthlyBudgetProgress">% Chỉ tiêu<span class="arrow">▾</span></th>
+            <th data-key="yoyPct">YoY<span class="arrow">▾</span></th>
+            <th data-key="customer">Lượt khách<span class="arrow">▾</span></th>
+            <th data-key="customerUnitPrice">Chi tiêu BQ/khách<span class="arrow">▾</span></th>
+            <th data-key="itemsPerCustomer">Món/khách<span class="arrow">▾</span></th>
+            <th data-key="yearlySales">Doanh số luỹ kế năm<span class="arrow">▾</span></th>
+            <th data-key="area">Diện tích (m²)<span class="arrow">▾</span></th>
+            <th data-key="salesPerSqm">DS/m²<span class="arrow">▾</span></th>
+            <th data-key="staffFte">NV (FTE)<span class="arrow">▾</span></th>
+            <th data-key="salesPerFte">DS/NV(FTE)<span class="arrow">▾</span></th>
+            <th data-key="ageMonths">Tuổi CH (tháng)<span class="arrow">▾</span></th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="missing-note" id="missingNote"></div>
+    </section>
+
+    <section id="trendSection">
+      <div class="section-head">
+        <h2>Xu hướng qua các tháng</h2>
+        <span class="hint">Dữ liệu lưu trong trình duyệt này - mỗi lần tải file mới, có thể lưu thêm 1 kỳ để xem xu hướng</span>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div>
+            <label class="lbl" for="periodInput">Kỳ báo cáo của file này</label><br>
+            <input type="month" id="periodInput" class="period-input">
+          </div>
+          <button class="btn primary" id="btnSavePeriod">💾 Lưu kỳ này vào xu hướng</button>
+          <span id="saveStatus" style="font-size:12.5px; color:var(--muted);"></span>
+        </div>
+        <div id="savedPeriodsWrap" style="margin-top:14px;"></div>
+      </div>
+      <div id="trendCharts" class="chart-grid" style="display:none;">
+        <div class="chart-card"><h3>Doanh số tháng - 1016 qua các kỳ</h3><div class="sub">So với trung bình hệ thống mỗi kỳ</div><div id="chartTrendSales" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>% đạt chỉ tiêu - 1016 qua các kỳ</h3><div id="chartTrendBudget" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Tăng trưởng YoY - 1016 qua các kỳ</h3><div id="chartTrendYoy" class="svg-chart"></div></div>
+        <div class="chart-card"><h3>Thứ hạng hệ thống - 1016 qua các kỳ</h3><div class="sub">Số nhỏ hơn = xếp hạng cao hơn (hạng 1 = doanh số cao nhất)</div><div id="chartTrendRank" class="svg-chart"></div></div>
+      </div>
+      <div id="trendEmptyNote" style="font-size:12.5px; color:var(--muted); margin-top:8px;">Lưu từ 2 kỳ trở lên để xem biểu đồ xu hướng.</div>
+    </section>
+
+    <section id="guideSection">
+      <div class="section-head"><h2>Hướng dẫn ứng dụng vào vận hành cửa hàng</h2></div>
+      <div id="guideAccordion"></div>
+    </section>
+
+    <section id="configSection">
+      <div class="acc-item" id="regionConfigItem">
+        <div class="acc-head" id="regionConfigHead"><span>⚙️ Cấu hình khu vực (Bắc / Trung / Nam) cho 16 cửa hàng</span><span class="arrow">▾</span></div>
+        <div class="acc-body">
+          <p style="margin-bottom:10px;">Khu vực được gán mặc định theo tên cửa hàng. Nếu có cửa hàng nào bạn thấy chưa đúng khu vực, đổi lại ở đây - lựa chọn sẽ được ghi nhớ trên trình duyệt này cho các lần tải file sau.</p>
+          <div class="region-grid" id="regionGrid"></div>
+        </div>
+      </div>
+      <div class="acc-item" id="profileConfigItem">
+        <div class="acc-head" id="profileConfigHead"><span>⚙️ Cấu hình hồ sơ cửa hàng (diện tích, nhân sự, ngày khai trương)</span><span class="arrow">▾</span></div>
+        <div class="acc-body">
+          <p style="margin-bottom:10px;">Diện tích và ngày khai trương lấy từ danh sách cửa hàng gốc của hệ thống (đáng tin cậy - trừ 1018 hiện chưa có diện tích). Số nhân viên của 1016 do bạn xác nhận chính xác (15 chính thức + 4 part-time); 15 cửa hàng còn lại đang là ước tính thô từ danh sách sự kiện nội bộ. Có thể chỉnh sửa trực tiếp bên dưới - ví dụ khi có diện tích của 1018, hoặc số full-time/part-time thực tế của cửa hàng khác; thay đổi được ghi nhớ trên trình duyệt này. Nếu điền đủ Full-time + Part-time + Giờ tối đa PT/tháng, hệ thống sẽ ưu tiên tính theo FTE (chính xác hơn) thay vì cột "Tổng NV (thô)".</p>
+          <div class="table-wrap">
+            <table class="profile-table">
+              <thead><tr>
+                <th class="left">Cửa hàng</th>
+                <th>Diện tích (m²)</th>
+                <th>Ngày khai trương</th>
+                <th>Tổng NV (thô)</th>
+                <th>Full-time</th>
+                <th>Part-time</th>
+                <th>Giờ tối đa PT/tháng</th>
+              </tr></thead>
+              <tbody id="profileConfigBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    Công cụ chạy hoàn toàn trên trình duyệt của bạn - dữ liệu tải lên không gửi đi đâu khác. Biểu đồ tự vẽ bằng SVG, không cần internet. Chỉ cần internet để tải font chữ (không bắt buộc) và thư viện đọc file Excel (XLSX.js) nếu bạn tải file .xlsx/.xls - file .csv không cần thư viện này.
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+var XLSX_AVAILABLE = (typeof XLSX !== 'undefined');
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+var REGION_DEFAULT = {
+  '1001':'Nam', '1002':'Nam', '1003':'Nam', '1004':'Nam', '1005':'Bắc',
+  '1006':'Nam', '1007':'Nam', '1008':'Bắc', '1009':'Bắc', '1010':'Bắc',
+  '1011':'Nam', '1014':'Nam', '1015':'Nam', '1016':'Nam', '1017':'Bắc', '1018':'Bắc'
+};
+var TARGET_CODES = Object.keys(REGION_DEFAULT).sort();
+var HOME_CODE = '1016';
+var REGIONS = ['Bắc','Trung','Nam'];
+
+// fuzzy(header) -> canonical field name
+var FUZZY_HEADER_MAP = {
+  'store': 'storeRaw',
+  'qty': 'qty',
+  'netsalestaxexcl': 'netSales',
+  'customer': 'customer',
+  'customerunitprice': 'customerUnitPrice',
+  'noofitemspurchased': 'itemsPerCustomer',
+  'averageunitprice': 'avgUnitPrice',
+  'cumulativebudget': 'cumBudget',
+  'cumulativebudgetratio': 'cumBudgetRatio',
+  'monthlybudgetprogress': 'monthlyBudgetProgress',
+  'cumulativebudgetdiff': 'cumBudgetDiff',
+  'salesofprevyear': 'prevYearSales',
+  'yearonyear': 'yoyPct',
+  'differencefromprevyear': 'diffPrevYear',
+  'yearlycustomer': 'yearlyCustomer',
+  'yearlysales': 'yearlySales'
+};
+var REQUIRED_FIELDS = ['storeRaw','netSales'];
+
+var LS_REGION_KEY = 'khn_ms_region_overrides_v1';
+var LS_TREND_KEY  = 'khn_ms_trend_v1';
+var LS_PROFILE_KEY = 'khn_ms_profile_overrides_v1';
+
+// Giả định chuẩn để quy đổi part-time -> FTE (Full-Time Equivalent): 26 ngày x 8 giờ/ngày ≈ 208 giờ/tháng
+var STANDARD_FULLTIME_HOURS = 208;
+
+// Hồ sơ nền của 16 cửa hàng: diện tích sàn kinh doanh (m²) và ngày khai trương lấy từ "store_03092026.csv" (đáng tin cậy).
+// Nhân sự: 1016 do quản lý xác nhận chính xác (fullTime/partTime/partTimeMaxHours) - 15 cửa hàng còn lại là ước tính thô
+// (staff, staffQuality:'rough') từ danh sách đăng ký sự kiện nội bộ, KHÔNG phải hồ sơ nhân sự chính thức.
+var STORE_PROFILE_DEFAULT = {
+  '1001': { openDate:'2016-07-01', area:1768,    staff:30, staffQuality:'rough' },
+  '1002': { openDate:'2019-01-12', area:1710,    staff:21, staffQuality:'rough' },
+  '1003': { openDate:'2019-04-25', area:1769,    staff:32, staffQuality:'rough' },
+  '1004': { openDate:'2019-11-12', area:1123,    staff:24, staffQuality:'rough' },
+  '1005': { openDate:'2019-12-05', area:1944,    staff:25, staffQuality:'rough' },
+  '1006': { openDate:'2020-11-16', area:1635.9,  staff:18, staffQuality:'rough' },
+  '1007': { openDate:'2021-01-18', area:1000.55, staff:15, staffQuality:'rough' },
+  '1008': { openDate:'2020-12-20', area:1659.2,  staff:25, staffQuality:'rough' },
+  '1009': { openDate:'2022-04-28', area:1473.3,  staff:15, staffQuality:'rough' },
+  '1010': { openDate:'2021-10-01', area:1265,    staff:21, staffQuality:'rough' },
+  '1011': { openDate:'2022-12-14', area:1127,    staff:16, staffQuality:'rough' },
+  '1014': { openDate:'2023-07-26', area:842,     staff:20, staffQuality:'rough' },
+  '1015': { openDate:'2024-03-22', area:1298.4,  staff:17, staffQuality:'rough' },
+  '1016': { openDate:'2024-12-18', area:1187.7,  staff:19, staffQuality:'exact', fullTime:15, partTime:4, partTimeMaxHours:79 },
+  '1017': { openDate:'2025-04-30', area:1775.81, staff:18, staffQuality:'rough' },
+  '1018': { openDate:'2025-08-22', area:null,    staff:20, staffQuality:'rough' }
+};
+
+var CURRENT_PERIOD_DATE = new Date(); // mặc định = hôm nay, sẽ cập nhật theo kỳ báo cáo của file tải lên
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function fuzzy(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function parseNumber(v){
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') return v;
+  var s = String(v).trim().replace(/,/g,'');
+  var n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+function fmtInt(n){ return Math.round(n).toLocaleString('vi-VN'); }
+function fmtVND(n){ return Math.round(n).toLocaleString('vi-VN') + ' đ'; }
+function fmtCompactVND(n){
+  var a = Math.abs(n);
+  if (a >= 1e9) return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2}) + ' tỷ đ';
+  if (a >= 1e6) return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1}) + ' triệu đ';
+  return fmtVND(n);
+}
+function fmtPct(n, digits){
+  digits = digits === undefined ? 1 : digits;
+  var sign = n > 0 ? '+' : '';
+  return sign + n.toLocaleString('vi-VN',{minimumFractionDigits:digits, maximumFractionDigits:digits}) + '%';
+}
+function fmtNum(n, digits){
+  digits = digits === undefined ? 1 : digits;
+  return n.toLocaleString('vi-VN',{minimumFractionDigits:digits, maximumFractionDigits:digits});
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function fmtDateVN(iso){
+  if (!iso) return '';
+  var parts = String(iso).split('-');
+  if (parts.length !== 3) return iso;
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+function monthsSince(isoDateStr, refDate){
+  if (!isoDateStr) return null;
+  var d = new Date(isoDateStr);
+  if (isNaN(d.getTime())) return null;
+  var ref = refDate || CURRENT_PERIOD_DATE;
+  var months = (ref.getFullYear()-d.getFullYear())*12 + (ref.getMonth()-d.getMonth());
+  if (ref.getDate() < d.getDate()) months -= 1;
+  return Math.max(0, months);
+}
+
+/* ============================================================
+   CSV PARSER (RFC4180) - tránh dùng XLSX.read cho luồng .csv
+   ============================================================ */
+function parseCsvText(text){
+  var rows = [];
+  var row = [];
+  var field = '';
+  var inQuotes = false;
+  text = text.replace(/^﻿/, ''); // strip BOM
+  for (var i = 0; i < text.length; i++){
+    var c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i+1] === '"'){ field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ','){ row.push(field); field=''; }
+      else if (c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if (c === '\r'){ /* skip, \n handles line end */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(function(r){ return r.length > 1 || (r.length===1 && r[0] !== ''); });
+}
+
+/* ============================================================
+   ROW -> STORE OBJECTS
+   ============================================================ */
+function rowsToStores(rows){
+  if (!rows || rows.length < 2) throw new Error('File không có đủ dữ liệu (cần ít nhất 1 dòng tiêu đề + 1 dòng dữ liệu).');
+  var header = rows[0];
+  var idx = {}; // field -> column index
+  header.forEach(function(h, i){
+    var key = FUZZY_HEADER_MAP[fuzzy(h)];
+    if (key && idx[key] === undefined) idx[key] = i;
+  });
+  var missingReq = REQUIRED_FIELDS.filter(function(f){ return idx[f] === undefined; });
+  if (missingReq.length){
+    throw new Error('Không tìm thấy cột bắt buộc trong file: ' + missingReq.join(', ') + '. Vui lòng kiểm tra file có đúng định dạng báo cáo "Monthly Report By Store" không.');
+  }
+
+  var overrides = loadRegionOverrides();
+  var storesByCode = {};
+
+  for (var r = 1; r < rows.length; r++){
+    var row = rows[r];
+    if (!row || row.every(function(v){ return v === '' || v === undefined || v === null; })) continue;
+    var storeRaw = String(row[idx.storeRaw] || '').trim();
+    if (!storeRaw) continue;
+    var m = storeRaw.match(/^(\d{3,5})\s*(.*)$/);
+    if (!m) continue;
+    var code = m[1];
+    if (!REGION_DEFAULT.hasOwnProperty(code)) continue; // chỉ giữ 16 cửa hàng trong phạm vi phân tích
+    var name = m[2] ? m[2].trim() : code;
+
+    function g(field){ return idx[field] === undefined ? 0 : parseNumber(row[idx[field]]); }
+
+    storesByCode[code] = {
+      code: code,
+      name: name,
+      region: overrides[code] || REGION_DEFAULT[code],
+      qty: g('qty'),
+      netSales: g('netSales'),
+      customer: g('customer'),
+      customerUnitPrice: g('customerUnitPrice'),
+      itemsPerCustomer: g('itemsPerCustomer'),
+      avgUnitPrice: g('avgUnitPrice'),
+      cumBudget: g('cumBudget'),
+      cumBudgetRatio: g('cumBudgetRatio'),
+      monthlyBudgetProgress: g('monthlyBudgetProgress'),
+      cumBudgetDiff: g('cumBudgetDiff'),
+      prevYearSales: g('prevYearSales'),
+      yoyPct: g('yoyPct'),
+      diffPrevYear: g('diffPrevYear'),
+      yearlyCustomer: g('yearlyCustomer'),
+      yearlySales: g('yearlySales')
+    };
+  }
+  return storesByCode;
+}
+
+/* ============================================================
+   REGION OVERRIDES (localStorage)
+   ============================================================ */
+function loadRegionOverrides(){
+  try {
+    var raw = localStorage.getItem(LS_REGION_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+function saveRegionOverride(code, region){
+  try {
+    var cur = loadRegionOverrides();
+    cur[code] = region;
+    localStorage.setItem(LS_REGION_KEY, JSON.stringify(cur));
+  } catch(e){}
+}
+
+/* ============================================================
+   PROFILE OVERRIDES (diện tích / nhân sự / ngày khai trương - localStorage)
+   ============================================================ */
+function loadProfileOverrides(){
+  try {
+    var raw = localStorage.getItem(LS_PROFILE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+function saveProfileOverride(code, field, value){
+  try {
+    var cur = loadProfileOverrides();
+    if (!cur[code]) cur[code] = {};
+    cur[code][field] = value;
+    localStorage.setItem(LS_PROFILE_KEY, JSON.stringify(cur));
+  } catch(e){}
+}
+// Trả về hồ sơ đã gộp (mặc định + chỉnh sửa của người dùng) và các chỉ số dẫn xuất (FTE, độ tin cậy)
+function getStoreProfile(code){
+  var overrides = loadProfileOverrides();
+  var def = STORE_PROFILE_DEFAULT[code] || {};
+  var p = Object.assign({}, def, overrides[code] || {});
+  var hasBreakdown = (p.fullTime !== undefined && p.fullTime !== null && p.fullTime !== '' &&
+                       p.partTime !== undefined && p.partTime !== null && p.partTime !== '' &&
+                       p.partTimeMaxHours !== undefined && p.partTimeMaxHours !== null && p.partTimeMaxHours !== '');
+  var hasRoughStaff = (p.staff !== undefined && p.staff !== null && p.staff !== '');
+  var fte = null, quality = 'missing';
+  if (hasBreakdown){
+    fte = Number(p.fullTime) + Number(p.partTime) * (Number(p.partTimeMaxHours) / STANDARD_FULLTIME_HOURS);
+    quality = 'exact';
+  } else if (hasRoughStaff){
+    fte = Number(p.staff);
+    quality = p.staffQuality || 'rough';
+  }
+  var area = (p.area !== undefined && p.area !== null && p.area !== '') ? Number(p.area) : null;
+  return {
+    area: area,
+    openDate: p.openDate || null,
+    fte: fte,
+    staffQuality: quality,
+    fullTime: hasBreakdown ? Number(p.fullTime) : null,
+    partTime: hasBreakdown ? Number(p.partTime) : null,
+    partTimeMaxHours: hasBreakdown ? Number(p.partTimeMaxHours) : null,
+    staffRaw: hasRoughStaff ? Number(p.staff) : null
+  };
+}
+
+/* ============================================================
+   AGGREGATION / RANKING
+   ============================================================ */
+function agg(list, key){
+  var vals = list.map(function(s){ return s[key]; });
+  var n = vals.length;
+  if (!n) return {sum:0,avg:0,median:0,min:0,max:0,n:0};
+  var sum = vals.reduce(function(a,b){ return a+b; },0);
+  var sorted = vals.slice().sort(function(a,b){ return a-b; });
+  var median = n % 2 ? sorted[(n-1)/2] : (sorted[n/2-1]+sorted[n/2])/2;
+  return {sum:sum, avg:sum/n, median:median, min:sorted[0], max:sorted[n-1], n:n};
+}
+function rankOf(list, key, code, desc){
+  if (desc === undefined) desc = true;
+  var sorted = list.slice().sort(function(a,b){ return desc ? b[key]-a[key] : a[key]-b[key]; });
+  for (var i=0;i<sorted.length;i++){ if (sorted[i].code === code) return i+1; }
+  return null;
+}
+
+/* ============================================================
+   BUILD DATASET
+   ============================================================ */
+var STATE = { stores:null, all:null, south:null, home:null, missing:[] };
+
+function buildDataset(storesByCode){
+  var all = TARGET_CODES.map(function(c){ return storesByCode[c]; }).filter(Boolean);
+  var missing = TARGET_CODES.filter(function(c){ return !storesByCode[c]; });
+  var south = all.filter(function(s){ return s.region === 'Nam'; });
+  var north = all.filter(function(s){ return s.region === 'Bắc'; });
+  var center = all.filter(function(s){ return s.region === 'Trung'; });
+  var home = storesByCode[HOME_CODE];
+
+  if (!home) throw new Error('Không tìm thấy dữ liệu cửa hàng 1016 (PARC MALL) trong file này.');
+
+  var totalAllSales = agg(all,'netSales').sum;
+  var totalSouthSales = agg(south,'netSales').sum;
+
+  all.forEach(function(s){
+    s.rankAll = rankOf(all,'netSales',s.code,true);
+    s.rankSouth = s.region === 'Nam' ? rankOf(south,'netSales',s.code,true) : null;
+    s.rankBudgetAll = rankOf(all,'monthlyBudgetProgress',s.code,true);
+    s.rankYoyAll = rankOf(all,'yoyPct',s.code,true);
+    s.shareAll = totalAllSales ? s.netSales/totalAllSales*100 : 0;
+    s.shareSouth = (s.region==='Nam' && totalSouthSales) ? s.netSales/totalSouthSales*100 : null;
+
+    // Hồ sơ cửa hàng (diện tích / nhân sự / ngày khai trương) - dùng để đánh giá hiệu quả so với tiềm năng
+    var profile = getStoreProfile(s.code);
+    s.profile = profile;
+    s.area = profile.area;
+    s.staffFte = profile.fte;
+    s.staffQuality = profile.staffQuality;
+    s.salesPerSqm = (profile.area ? s.netSales/profile.area : null);
+    s.salesPerFte = (profile.fte ? s.netSales/profile.fte : null);
+    s.ageMonths = monthsSince(profile.openDate);
+  });
+
+  // Chỉ so sánh trong nhóm cửa hàng có dữ liệu diện tích / nhân sự hợp lệ
+  var areaValid = all.filter(function(s){ return s.salesPerSqm !== null; });
+  var areaValidSouth = areaValid.filter(function(s){ return s.region === 'Nam'; });
+  var fteValid = all.filter(function(s){ return s.salesPerFte !== null; });
+  var fteValidSouth = fteValid.filter(function(s){ return s.region === 'Nam'; });
+
+  all.forEach(function(s){
+    s.rankSqmAll = s.salesPerSqm !== null ? rankOf(areaValid,'salesPerSqm',s.code,true) : null;
+    s.rankSqmSouth = (s.salesPerSqm !== null && s.region==='Nam') ? rankOf(areaValidSouth,'salesPerSqm',s.code,true) : null;
+    s.rankFteAll = s.salesPerFte !== null ? rankOf(fteValid,'salesPerFte',s.code,true) : null;
+    s.rankFteSouth = (s.salesPerFte !== null && s.region==='Nam') ? rankOf(fteValidSouth,'salesPerFte',s.code,true) : null;
+  });
+
+  return {
+    all: all, south: south, north: north, center: center, home: home,
+    missing: missing,
+    areaValid: areaValid, areaValidSouth: areaValidSouth, fteValid: fteValid, fteValidSouth: fteValidSouth,
+    aggAll: {
+      netSales: agg(all,'netSales'), monthlyBudgetProgress: agg(all,'monthlyBudgetProgress'),
+      yoyPct: agg(all,'yoyPct'), customer: agg(all,'customer'), customerUnitPrice: agg(all,'customerUnitPrice'),
+      itemsPerCustomer: agg(all,'itemsPerCustomer')
+    },
+    aggSouth: {
+      netSales: agg(south,'netSales'), monthlyBudgetProgress: agg(south,'monthlyBudgetProgress'),
+      yoyPct: agg(south,'yoyPct'), customer: agg(south,'customer'), customerUnitPrice: agg(south,'customerUnitPrice'),
+      itemsPerCustomer: agg(south,'itemsPerCustomer')
+    },
+    aggSqmAll: agg(areaValid,'salesPerSqm'), aggSqmSouth: agg(areaValidSouth,'salesPerSqm'),
+    aggFteAll: agg(fteValid,'salesPerFte'), aggFteSouth: agg(fteValidSouth,'salesPerFte'),
+    // trung bình các cửa hàng khác (không tính 1016) - dùng để so sánh "1016 vs phần còn lại"
+    peerAll: (function(){ var peers = all.filter(function(s){return s.code!==HOME_CODE;}); return {
+      netSales: agg(peers,'netSales'), monthlyBudgetProgress: agg(peers,'monthlyBudgetProgress'),
+      yoyPct: agg(peers,'yoyPct'), customer: agg(peers,'customer'), customerUnitPrice: agg(peers,'customerUnitPrice')
+    };})(),
+    peerSouth: (function(){ var peers = south.filter(function(s){return s.code!==HOME_CODE;}); return {
+      netSales: agg(peers,'netSales'), monthlyBudgetProgress: agg(peers,'monthlyBudgetProgress'),
+      yoyPct: agg(peers,'yoyPct'), customer: agg(peers,'customer'), customerUnitPrice: agg(peers,'customerUnitPrice')
+    };})()
+  };
+}
+
+/* ============================================================
+   INSIGHTS (auto-generated Vietnamese text)
+   ============================================================ */
+function buildInsights(ds){
+  var h = ds.home, insights = [];
+  var nAll = ds.all.length, nSouth = ds.south.length;
+
+  // 1. Vị thế doanh số
+  var lvl1 = h.rankAll <= Math.ceil(nAll/3) ? 'good' : (h.rankAll <= Math.ceil(nAll*2/3) ? 'warning' : 'critical');
+  insights.push({tag:'Vị thế doanh số', level:lvl1, html:
+    'Doanh số tháng của 1016 đạt <strong>'+fmtCompactVND(h.netSales)+'</strong>, xếp <strong>hạng '+h.rankAll+'/'+nAll+'</strong> toàn hệ thống'
+    + (h.rankSouth?(' và <strong>hạng '+h.rankSouth+'/'+nSouth+'</strong> trong khu vực Miền Nam'):'')
+    + ', chiếm '+fmtNum(h.shareAll,1)+'% tổng doanh số 16 cửa hàng.'});
+
+  // 2. So với trung bình hệ thống / miền Nam (loại trừ chính 1016)
+  var diffPeerAll = ds.peerAll.netSales.avg ? (h.netSales-ds.peerAll.netSales.avg)/ds.peerAll.netSales.avg*100 : 0;
+  var diffPeerSouth = (h.region==='Nam' && ds.peerSouth.netSales.avg) ? (h.netSales-ds.peerSouth.netSales.avg)/ds.peerSouth.netSales.avg*100 : null;
+  insights.push({tag:'So với mức trung bình', level: diffPeerAll>=0?'good':'warning', html:
+    'Doanh số 1016 <strong>'+(diffPeerAll>=0?'cao hơn':'thấp hơn')+' '+fmtNum(Math.abs(diffPeerAll),1)+'%</strong> so với trung bình '+(nAll-1)+' cửa hàng còn lại trong hệ thống'
+    + (diffPeerSouth!==null ? (', và <strong>'+(diffPeerSouth>=0?'cao hơn':'thấp hơn')+' '+fmtNum(Math.abs(diffPeerSouth),1)+'%</strong> so với trung bình các cửa hàng Miền Nam khác.') : '.')});
+
+  // 3. Chỉ tiêu
+  var gapToTarget = h.monthlyBudgetProgress - 100;
+  var peersBelow = ds.all.filter(function(s){return s.monthlyBudgetProgress<100;}).length;
+  insights.push({tag:'Đạt chỉ tiêu', level: gapToTarget>=0?'good':(gapToTarget>=-8?'warning':'critical'), html:
+    '1016 đạt <strong>'+fmtNum(h.monthlyBudgetProgress,1)+'%</strong> chỉ tiêu tháng ('+(gapToTarget>=0?'vượt':'thiếu')+' '+fmtNum(Math.abs(gapToTarget),1)+' điểm %, tương đương '+fmtCompactVND(Math.abs(h.cumBudgetDiff))+'). '
+    + 'Toàn hệ thống có <strong>'+peersBelow+'/'+nAll+'</strong> cửa hàng chưa đạt 100% chỉ tiêu' + (h.monthlyBudgetProgress<100?' - 1016 nằm trong nhóm này.':'.')});
+
+  // 4. Tăng trưởng YoY
+  var diffYoyPeer = h.yoyPct - ds.peerAll.yoyPct.avg;
+  insights.push({tag:'Tăng trưởng YoY', level: h.yoyPct>=100? 'good' : (diffYoyPeer>=0?'warning':'critical'), html:
+    'Doanh số 1016 '+(h.yoyPct>=100?'tăng':'giảm')+' so với cùng kỳ năm trước, đạt <strong>'+fmtNum(h.yoyPct,1)+'%</strong> so với năm trước (YoY), xếp hạng '+h.rankYoyAll+'/'+nAll+' về tốc độ tăng trưởng. '
+    + 'Trung bình '+(nAll-1)+' cửa hàng còn lại tăng trưởng <strong>'+fmtNum(ds.peerAll.yoyPct.avg,1)+'%</strong> - 1016 đang tăng trưởng '+(diffYoyPeer>=0?'nhanh hơn':'chậm hơn')+' mặt bằng chung khoảng '+fmtNum(Math.abs(diffYoyPeer),1)+' điểm %.'});
+
+  // 5. Khách hàng vs giá trị hoá đơn
+  var custRank = rankOf(ds.all,'customer',h.code,true);
+  var priceRank = rankOf(ds.all,'customerUnitPrice',h.code,true);
+  var custHigh = custRank <= nAll/2, priceHigh = priceRank <= nAll/2;
+  var advice;
+  if (custHigh && !priceHigh) advice = 'lượng khách vào cửa hàng khá tốt (hạng '+custRank+'/'+nAll+') nhưng chi tiêu bình quân mỗi khách còn thấp (hạng '+priceRank+'/'+nAll+') - nên ưu tiên các kỹ thuật bán chéo (cross-sell), trưng bày combo, đào tạo nhân viên tư vấn thêm sản phẩm đi kèm để tăng giá trị hoá đơn.';
+  else if (!custHigh && priceHigh) advice = 'chi tiêu bình quân mỗi khách khá tốt (hạng '+priceRank+'/'+nAll+') nhưng lượng khách vào cửa hàng còn thấp (hạng '+custRank+'/'+nAll+') - nên ưu tiên các hoạt động thu hút khách mới: marketing tại chỗ, phát tờ rơi khu vực, chương trình khuyến mãi giờ thấp điểm, hợp tác với trung tâm thương mại để tăng lưu lượng khách.';
+  else if (custHigh && priceHigh) advice = 'cả lượng khách (hạng '+custRank+'/'+nAll+') và chi tiêu bình quân/khách (hạng '+priceRank+'/'+nAll+') đều thuộc nhóm tốt trong hệ thống - nên tập trung duy trì trải nghiệm hiện tại và nhân rộng cách làm sang các cửa hàng khác.';
+  else advice = 'cả lượng khách (hạng '+custRank+'/'+nAll+') và chi tiêu bình quân/khách (hạng '+priceRank+'/'+nAll+') đều ở nhóm thấp trong hệ thống - cần rà soát đồng thời cả traffic (marketing, vị trí, giờ mở cửa) lẫn trải nghiệm mua sắm (trưng bày, tư vấn bán hàng, tồn kho đủ hàng bán) để xác định nguyên nhân gốc.';
+  insights.push({tag:'Khách hàng & giá trị đơn hàng', level: (custHigh&&priceHigh)?'good':((!custHigh&&!priceHigh)?'critical':'warning'), html:
+    'Với '+fmtInt(h.customer)+' lượt khách và chi tiêu bình quân '+fmtVND(h.customerUnitPrice)+'/khách, 1016 '+advice});
+
+  return insights;
+}
+
+/* ============================================================
+   INSIGHTS - HIỆU QUẢ SO VỚI TIỀM NĂNG (diện tích / nhân sự)
+   ============================================================ */
+function buildEfficiencyInsights(ds){
+  var h = ds.home, insights = [];
+  var nAll = ds.all.length;
+
+  // 1. Doanh số/m²
+  if (h.salesPerSqm !== null){
+    var betterAdjusted = h.rankSqmAll < h.rankAll;
+    var sameRank = h.rankSqmAll === h.rankAll;
+    insights.push({tag:'Hiệu suất theo diện tích', level: betterAdjusted?'good':(sameRank?'warning':'critical'), html:
+      'Doanh số/m² sàn kinh doanh của 1016 đạt <strong>'+fmtCompactVND(h.salesPerSqm)+'/m²</strong> (diện tích '+fmtNum(h.area,0)+' m²), xếp <strong>hạng '+h.rankSqmAll+'/'+ds.areaValid.length+'</strong> hệ thống'
+      + (h.rankSqmSouth?(' và hạng '+h.rankSqmSouth+'/'+ds.areaValidSouth.length+' Miền Nam'):'')+' (trong số cửa hàng có dữ liệu diện tích). '
+      + (betterAdjusted
+          ? 'Đây là tín hiệu <strong>tích cực</strong>: so với hạng doanh số tuyệt đối (hạng '+h.rankAll+'/'+nAll+'), khi quy đổi theo diện tích 1016 vận hành hiệu quả hơn - mỗi m² đang tạo ra doanh số tốt, cho thấy dư địa tăng trưởng nếu có thêm khách/diện tích trưng bày.'
+          : (sameRank
+              ? 'Thứ hạng không đổi so với doanh số tuyệt đối - hiệu suất khai thác diện tích tương xứng với quy mô doanh số hiện tại.'
+              : 'Đây là tín hiệu <strong>cần lưu ý</strong>: so với hạng doanh số tuyệt đối (hạng '+h.rankAll+'/'+nAll+'), khi quy đổi theo diện tích thứ hạng của 1016 kém hơn - diện tích sàn tương đối lớn nhưng chưa được khai thác hết, nên rà soát bố trí ngành hàng/trưng bày để tăng doanh số trên mỗi m².'))});
+  } else {
+    insights.push({tag:'Hiệu suất theo diện tích', level:'warning', html:'Chưa có dữ liệu diện tích sàn kinh doanh của 1016 để tính doanh số/m² - vui lòng bổ sung ở mục "Cấu hình hồ sơ cửa hàng" bên dưới.'});
+  }
+
+  // 2. Doanh số/nhân viên (FTE)
+  if (h.salesPerFte !== null){
+    var betterAdjustedF = h.rankFteAll < h.rankAll;
+    var roughPeers = ds.fteValid.filter(function(s){ return s.staffQuality !== 'exact'; }).length;
+    insights.push({tag:'Năng suất theo nhân sự (FTE)', level: betterAdjustedF?'good':'warning', html:
+      'Doanh số/nhân viên quy đổi của 1016 đạt <strong>'+fmtCompactVND(h.salesPerFte)+'/người</strong> (quy đổi từ '+fmtNum(h.profile.fullTime,0)+' chính thức + '+fmtNum(h.profile.partTime,0)+' part-time ≈ <strong>'+fmtNum(h.staffFte,1)+' FTE</strong>), xếp hạng '+h.rankFteAll+'/'+ds.fteValid.length+' hệ thống'
+      + (h.rankFteSouth?(' và hạng '+h.rankFteSouth+'/'+ds.fteValidSouth.length+' Miền Nam'):'')+'. '
+      + '<em>Lưu ý: '+roughPeers+'/'+ds.fteValid.length+' cửa hàng trong so sánh này (gồm cả 1016 vẫn tính đúng) đang dùng số nhân sự ước tính thô, chưa tách full-time/part-time - thứ hạng này chỉ mang tính tham khảo và có thể thay đổi khi các cửa hàng khác cung cấp breakdown FTE chính xác như 1016.</em>'});
+  } else {
+    insights.push({tag:'Năng suất theo nhân sự (FTE)', level:'warning', html:'Chưa có dữ liệu nhân sự của 1016 để tính doanh số/nhân viên.'});
+  }
+
+  // 3. Tuổi cửa hàng - cảnh báo so sánh YoY / tuyệt đối với cửa hàng mới
+  if (h.ageMonths !== null && h.ageMonths < 12){
+    insights.push({tag:'Cửa hàng mới mở', level:'warning', html:
+      '1016 mới hoạt động khoảng <strong>'+h.ageMonths+' tháng</strong> (khai trương '+fmtDateVN(h.profile.openDate)+') - nên thận trọng khi so sánh tăng trưởng YoY hoặc xếp hạng tuyệt đối với các cửa hàng đã hoạt động lâu năm, vì cửa hàng mới thường cần 12-24 tháng để đạt doanh số ổn định theo tiềm năng khu vực.'});
+  }
+  var youngPeers = ds.all.filter(function(s){ return s.code!==HOME_CODE && s.ageMonths!==null && s.ageMonths<12; });
+  if (youngPeers.length){
+    insights.push({tag:'Cửa hàng khác mới mở', level:'neutral', html:
+      'Ngoài 1016, hệ thống còn <strong>'+youngPeers.length+' cửa hàng</strong> mới hoạt động dưới 12 tháng ('+youngPeers.map(function(s){return s.code;}).join(', ')+') - khi so sánh xếp hạng doanh số/YoY nên loại các cửa hàng này ra khỏi nhóm so sánh "cùng giai đoạn phát triển" để công bằng hơn.'});
+  }
+
+  return insights;
+}
+
+/* ============================================================
+   RENDER - KPI
+   ============================================================ */
+function rankChip(rank, n, labelPrefix){
+  var cls = rank<=Math.ceil(n/3)?'good':(rank<=Math.ceil(n*2/3)?'warning':'critical');
+  return '<span class="chip '+cls+'">'+labelPrefix+' '+rank+'/'+n+'</span>';
+}
+
+function renderKpis(ds){
+  var h = ds.home;
+  var grid = document.getElementById('kpiGrid');
+  var cards = [];
+
+  cards.push(kpiCard('Doanh số tháng', fmtCompactVND(h.netSales),
+    rankChip(h.rankAll, ds.all.length, 'Hạng HT') + (h.rankSouth?rankChip(h.rankSouth, ds.south.length,'Hạng MN'):'')));
+
+  cards.push(kpiCard('% đạt chỉ tiêu tháng', fmtNum(h.monthlyBudgetProgress,1)+'%',
+    '<span class="chip '+(h.monthlyBudgetProgress>=100?'good':'critical')+'">'+(h.monthlyBudgetProgress>=100?'Vượt':'Chưa đạt')+' chỉ tiêu</span>'
+    + '<span class="chip neutral">Luỹ kế năm: '+fmtNum(h.cumBudgetRatio,1)+'%</span>'));
+
+  cards.push(kpiCard('Tăng trưởng YoY', fmtNum(h.yoyPct,1)+'%',
+    '<span class="chip '+(h.yoyPct>=100?'good':'critical')+'">'+(h.yoyPct>=100?'Tăng trưởng':'Sụt giảm')+'</span>'
+    + rankChip(h.rankYoyAll, ds.all.length, 'Hạng HT')));
+
+  cards.push(kpiCard('Lượt khách trong tháng', fmtInt(h.customer)+' khách',
+    '<span class="chip neutral">'+fmtNum(h.itemsPerCustomer,2)+' món/khách</span>'));
+
+  cards.push(kpiCard('Chi tiêu bình quân/khách', fmtVND(h.customerUnitPrice),
+    '<span class="chip neutral">Giá TB/món: '+fmtVND(h.avgUnitPrice)+'</span>'));
+
+  cards.push(kpiCard('Doanh số luỹ kế năm', fmtCompactVND(h.yearlySales),
+    '<span class="chip neutral">'+fmtInt(h.yearlyCustomer)+' lượt khách luỹ kế</span>'));
+
+  grid.innerHTML = cards.join('');
+}
+function kpiCard(label, value, chipsHtml){
+  return '<div class="kpi"><div class="label">'+label+'</div><div class="value">'+value+'</div><div class="chips">'+chipsHtml+'</div></div>';
+}
+
+function renderInsights(ds){
+  var list = buildInsights(ds);
+  document.getElementById('insightGrid').innerHTML = list.map(function(it){
+    return '<div class="insight '+it.level+'"><div class="tag">'+it.tag+'</div><p>'+it.html+'</p></div>';
+  }).join('');
+}
+
+/* ============================================================
+   RENDER - HIỆU QUẢ SO VỚI TIỀM NĂNG (KPI + nhận định)
+   ============================================================ */
+function renderEfficiencyKpis(ds){
+  var h = ds.home;
+  var grid = document.getElementById('efficiencyKpiGrid');
+  var cards = [];
+
+  cards.push(kpiCard('Diện tích sàn kinh doanh', h.area!==null ? fmtNum(h.area,0)+' m²' : 'Chưa có dữ liệu', ''));
+
+  cards.push(kpiCard('Doanh số / m²', h.salesPerSqm!==null ? fmtCompactVND(h.salesPerSqm)+'/m²' : '—',
+    h.rankSqmAll!==null ? (rankChip(h.rankSqmAll, ds.areaValid.length, 'Hạng HT') + (h.rankSqmSouth?rankChip(h.rankSqmSouth, ds.areaValidSouth.length,'Hạng MN'):'')) : ''));
+
+  cards.push(kpiCard('Nhân sự quy đổi (FTE)', h.staffFte!==null ? fmtNum(h.staffFte,1)+' người' : '—',
+    '<span class="chip '+(h.staffQuality==='exact'?'good':'warning')+'">'+(h.staffQuality==='exact'?'Số liệu chính xác':'Ước tính thô')+'</span>'));
+
+  cards.push(kpiCard('Doanh số / nhân viên (FTE)', h.salesPerFte!==null ? fmtCompactVND(h.salesPerFte)+'/người' : '—',
+    h.rankFteAll!==null ? (rankChip(h.rankFteAll, ds.fteValid.length, 'Hạng HT') + (h.rankFteSouth?rankChip(h.rankFteSouth, ds.fteValidSouth.length,'Hạng MN'):'')) : ''));
+
+  cards.push(kpiCard('Thời gian hoạt động', h.ageMonths!==null ? fmtInt(h.ageMonths)+' tháng' : '—',
+    (h.ageMonths!==null && h.ageMonths<12) ? '<span class="chip warning">Cửa hàng mới &lt;12 tháng</span>' : '<span class="chip neutral">Khai trương '+fmtDateVN(h.profile.openDate)+'</span>'));
+
+  grid.innerHTML = cards.join('');
+}
+
+function renderEfficiencyInsights(ds){
+  var list = buildEfficiencyInsights(ds);
+  document.getElementById('efficiencyInsightGrid').innerHTML = list.map(function(it){
+    return '<div class="insight '+it.level+'"><div class="tag">'+it.tag+'</div><p>'+it.html+'</p></div>';
+  }).join('');
+  var missingArea = ds.all.filter(function(s){ return s.area===null; });
+  document.getElementById('efficiencyMissingNote').textContent = missingArea.length
+    ? ('⚠ Chưa có dữ liệu diện tích cho: ' + missingArea.map(function(s){return s.code;}).join(', ') + ' - các cửa hàng này bị loại khỏi so sánh doanh số/m² cho đến khi có dữ liệu.')
+    : '';
+}
+
+/* ============================================================
+   RENDER - CHARTS (SVG tự vẽ, KHÔNG phụ thuộc thư viện ngoài / internet)
+   ============================================================ */
+function getCss(varName){
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+function svgTag(name, attrs, content){
+  var a = Object.keys(attrs||{}).map(function(k){ return k+'="'+attrs[k]+'"'; }).join(' ');
+  return '<'+name+' '+a+'>'+(content||'')+'</'+name+'>';
+}
+
+/* Biểu đồ cột đơn giản, có thể có đường tham chiếu ngang (trung bình / mốc %) */
+function svgBarChart(containerId, opts){
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var labels = opts.labels, values = opts.values, colors = opts.colors, tickFmt = opts.tickFmt || String;
+  var n = labels.length;
+  if (!n){ el.innerHTML = '<div class="svg-empty">Không có dữ liệu</div>'; return; }
+
+  var W = 640, H = 260, mL = 54, mR = 12, mT = 14, mB = 26;
+  var plotW = W - mL - mR, plotH = H - mT - mB;
+
+  var allVals = values.slice();
+  if (opts.refValue !== undefined && opts.refValue !== null) allVals.push(opts.refValue);
+  if (opts.startAtZero) allVals.push(0);
+  var domainMin = Math.min.apply(null, allVals), domainMax = Math.max.apply(null, allVals);
+  if (domainMin === domainMax){ domainMin -= 1; domainMax += 1; }
+  var pad = (domainMax - domainMin) * 0.12;
+  domainMax += pad;
+  domainMin -= (opts.startAtZero && domainMin <= 0) ? 0 : pad;
+  if (opts.startAtZero && domainMin > 0) domainMin = 0;
+
+  function scaleY(v){ return mT + plotH - (v - domainMin) / (domainMax - domainMin) * plotH; }
+  var baselineY = scaleY(Math.max(domainMin, Math.min(domainMax, 0)));
+
+  var slot = plotW / n;
+  var barW = Math.min(34, slot * 0.62);
+
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  // gridlines (4 mốc)
+  for (var g = 0; g <= 3; g++){
+    var gv = domainMin + (domainMax - domainMin) * g / 3;
+    var gy = scaleY(gv);
+    svg += svgTag('line', {x1:mL, x2:W-mR, y1:gy.toFixed(1), y2:gy.toFixed(1), class:'axis-line'});
+    svg += svgTag('text', {x:mL-6, y:(gy+3).toFixed(1), 'text-anchor':'end', class:'tick-label'}, escapeHtml(tickFmt(gv)));
+  }
+  // reference line
+  if (opts.refValue !== undefined && opts.refValue !== null){
+    var ry = scaleY(opts.refValue);
+    svg += svgTag('line', {x1:mL, x2:W-mR, y1:ry.toFixed(1), y2:ry.toFixed(1), class:'ref-line'});
+    svg += svgTag('text', {x:W-mR, y:(ry-4).toFixed(1), 'text-anchor':'end', class:'ref-label'}, escapeHtml(opts.refLabel || ('TB: '+tickFmt(opts.refValue))));
+  }
+  // bars
+  values.forEach(function(v, i){
+    var x = mL + i*slot + (slot-barW)/2;
+    var y = scaleY(v);
+    var top = Math.min(y, baselineY), h = Math.max(1, Math.abs(y - baselineY));
+    svg += svgTag('rect', {x:x.toFixed(1), y:top.toFixed(1), width:barW.toFixed(1), height:h.toFixed(1), fill:colors[i], rx:2},
+      svgTag('title', {}, escapeHtml(labels[i] + ': ' + tickFmt(v))));
+    svg += svgTag('text', {x:(x+barW/2).toFixed(1), y:(mT+plotH+16).toFixed(1), 'text-anchor':'middle', class:'tick-label'}, escapeHtml(labels[i]));
+  });
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+/* Biểu đồ tròn 2 phần (tỷ trọng) */
+function svgDoughnut(containerId, opts){
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var segs = opts.segments, total = segs.reduce(function(a,s){return a+s.value;},0);
+  if (!total){ el.innerHTML = '<div class="svg-empty">Không có dữ liệu</div>'; return; }
+  var W=300,H=230, cx=W/2, cy=100, r=70, sw=30;
+  var circumf = 2*Math.PI*r;
+  var offset = 0;
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  svg += svgTag('g', {transform:'rotate(-90 '+cx+' '+cy+')'}, segs.map(function(s){
+    var frac = s.value/total;
+    var dash = (frac*circumf).toFixed(2)+' '+(circumf-frac*circumf).toFixed(2);
+    var el2 = svgTag('circle', {cx:cx, cy:cy, r:r, fill:'none', stroke:s.color, 'stroke-width':sw, 'stroke-dasharray':dash, 'stroke-dashoffset':(-offset).toFixed(2)},
+      svgTag('title', {}, escapeHtml(s.label+': '+fmtCompactVND(s.value)+' ('+fmtNum(frac*100,1)+'%)')));
+    offset += frac*circumf;
+    return el2;
+  }).join(''));
+  var mainFrac = segs[0].value/total*100;
+  svg += svgTag('text', {x:cx, y:cy-4, 'text-anchor':'middle', class:'center-label', 'font-size':'22'}, fmtNum(mainFrac,1)+'%');
+  svg += svgTag('text', {x:cx, y:cy+15, 'text-anchor':'middle', class:'center-sub', 'font-size':'10.5'}, escapeHtml(segs[0].label));
+  // legend
+  var ly = 200;
+  var lx = W/2 - (segs.length*95)/2;
+  segs.forEach(function(s){
+    svg += svgTag('rect', {x:lx, y:ly-9, width:10, height:10, rx:2, fill:s.color});
+    svg += svgTag('text', {x:lx+15, y:ly, class:'legend-label'}, escapeHtml(s.label));
+    lx += 95;
+  });
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+/* Biểu đồ đường nhiều chuỗi, hỗ trợ trục Y đảo ngược (dùng cho hạng: nhỏ hơn = tốt hơn) */
+function svgLineChart(containerId, opts){
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var labels = opts.labels, series = opts.series, tickFmt = opts.tickFmt || String, reverseY = !!opts.reverseY;
+  var n = labels.length;
+  if (!n){ el.innerHTML = '<div class="svg-empty">Không có dữ liệu</div>'; return; }
+
+  var W=640,H=260, mL=54, mR=14, mT=16, mB=(series.length>1?46:26);
+  var plotW = W-mL-mR, plotH = H-mT-mB;
+
+  var allVals = [];
+  series.forEach(function(s){ s.data.forEach(function(v){ if (v!==null && v!==undefined) allVals.push(v); }); });
+  if (!allVals.length){ el.innerHTML = '<div class="svg-empty">Chưa đủ dữ liệu</div>'; return; }
+  var domainMin = Math.min.apply(null, allVals), domainMax = Math.max.apply(null, allVals);
+  if (domainMin === domainMax){ domainMin -= 1; domainMax += 1; }
+  var pad = (domainMax-domainMin)*0.15;
+  domainMin -= pad; domainMax += pad;
+
+  function scaleX(i){ return n===1 ? mL+plotW/2 : mL + i/(n-1)*plotW; }
+  function scaleY(v){
+    var t = (v-domainMin)/(domainMax-domainMin);
+    var yt = reverseY ? t : (1-t);
+    return mT + yt*plotH;
+  }
+
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  for (var g=0; g<=3; g++){
+    var gv = domainMin + (domainMax-domainMin)*g/3;
+    var gy = scaleY(gv);
+    svg += svgTag('line', {x1:mL, x2:W-mR, y1:gy.toFixed(1), y2:gy.toFixed(1), class:'axis-line'});
+    svg += svgTag('text', {x:mL-6, y:(gy+3).toFixed(1), 'text-anchor':'end', class:'tick-label'}, escapeHtml(tickFmt(gv)));
+  }
+  labels.forEach(function(lb, i){
+    svg += svgTag('text', {x:scaleX(i).toFixed(1), y:(mT+plotH+16).toFixed(1), 'text-anchor':'middle', class:'tick-label'}, escapeHtml(lb));
+  });
+  series.forEach(function(s){
+    var pts = [];
+    s.data.forEach(function(v,i){ if (v!==null && v!==undefined) pts.push([scaleX(i), scaleY(v), v]); });
+    if (pts.length > 1){
+      svg += svgTag('polyline', {points: pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' '),
+        fill:'none', stroke:s.color, 'stroke-width':2, 'stroke-dasharray': s.dash?'5,4':'', 'stroke-linejoin':'round'});
+    }
+    pts.forEach(function(p){
+      svg += svgTag('circle', {cx:p[0].toFixed(1), cy:p[1].toFixed(1), r:3.5, fill:s.color},
+        svgTag('title', {}, escapeHtml(s.label+': '+tickFmt(p[2]))));
+    });
+  });
+  if (series.length > 1){
+    var ly = H-14, lx = mL;
+    series.forEach(function(s){
+      svg += svgTag('line', {x1:lx, x2:lx+16, y1:ly, y2:ly, stroke:s.color, 'stroke-width':2, 'stroke-dasharray': s.dash?'5,4':''});
+      svg += svgTag('text', {x:lx+21, y:ly+3, class:'legend-label'}, escapeHtml(s.label));
+      lx += 22 + s.label.length*6.4 + 18;
+    });
+  }
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+function barColors(list, code){
+  return list.map(function(s){ return s.code===code ? getCss('--home') : getCss('--accent'); });
+}
+
+function renderSystemCharts(ds){
+  var all = ds.all.slice().sort(function(a,b){ return b.netSales-a.netSales; });
+  svgBarChart('chartSalesAll', { labels: all.map(function(s){return s.code;}), values: all.map(function(s){return s.netSales;}),
+    colors: barColors(all, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggAll.netSales.avg, refLabel:'TB: '+fmtCompactVND(ds.aggAll.netSales.avg), startAtZero:true });
+
+  var allB = ds.all.slice().sort(function(a,b){ return b.monthlyBudgetProgress-a.monthlyBudgetProgress; });
+  svgBarChart('chartBudgetAll', { labels: allB.map(function(s){return s.code;}), values: allB.map(function(s){return s.monthlyBudgetProgress;}),
+    colors: barColors(allB, HOME_CODE), tickFmt: function(v){return fmtNum(v,0)+'%';}, refValue:100, refLabel:'Mốc 100%' });
+
+  var allY = ds.all.slice().sort(function(a,b){ return b.yoyPct-a.yoyPct; });
+  svgBarChart('chartYoyAll', { labels: allY.map(function(s){return s.code;}), values: allY.map(function(s){return s.yoyPct-100;}),
+    colors: barColors(allY, HOME_CODE), tickFmt: function(v){return fmtNum(v,0)+'%';}, refValue:0, refLabel:'Không đổi', startAtZero:true });
+
+  var homeSales = ds.home.netSales, restSales = ds.aggAll.netSales.sum - homeSales;
+  svgDoughnut('chartShareAll', { segments: [
+    {label:'Cửa hàng 1016', value: homeSales, color: getCss('--home')},
+    {label:'15 cửa hàng còn lại', value: restSales, color: getCss('--surface-2')}
+  ]});
+}
+
+function renderSouthCharts(ds){
+  var south = ds.south.slice().sort(function(a,b){ return b.netSales-a.netSales; });
+  svgBarChart('chartSalesSouth', { labels: south.map(function(s){return s.code;}), values: south.map(function(s){return s.netSales;}),
+    colors: barColors(south, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggSouth.netSales.avg, refLabel:'TB: '+fmtCompactVND(ds.aggSouth.netSales.avg), startAtZero:true });
+
+  var southB = ds.south.slice().sort(function(a,b){ return b.monthlyBudgetProgress-a.monthlyBudgetProgress; });
+  svgBarChart('chartBudgetSouth', { labels: southB.map(function(s){return s.code;}), values: southB.map(function(s){return s.monthlyBudgetProgress;}),
+    colors: barColors(southB, HOME_CODE), tickFmt: function(v){return fmtNum(v,0)+'%';}, refValue:100, refLabel:'Mốc 100%' });
+}
+
+function renderEfficiencyCharts(ds){
+  if (ds.areaValid.length){
+    var sqmAll = ds.areaValid.slice().sort(function(a,b){ return b.salesPerSqm-a.salesPerSqm; });
+    svgBarChart('chartSqmAll', { labels: sqmAll.map(function(s){return s.code;}), values: sqmAll.map(function(s){return s.salesPerSqm;}),
+      colors: barColors(sqmAll, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggSqmAll.avg, refLabel:'TB: '+fmtCompactVND(ds.aggSqmAll.avg), startAtZero:true });
+  } else {
+    document.getElementById('chartSqmAll').innerHTML = '<div class="svg-empty">Chưa đủ dữ liệu diện tích</div>';
+  }
+
+  if (ds.areaValidSouth.length){
+    var sqmSouth = ds.areaValidSouth.slice().sort(function(a,b){ return b.salesPerSqm-a.salesPerSqm; });
+    svgBarChart('chartSqmSouth', { labels: sqmSouth.map(function(s){return s.code;}), values: sqmSouth.map(function(s){return s.salesPerSqm;}),
+      colors: barColors(sqmSouth, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggSqmSouth.avg, refLabel:'TB: '+fmtCompactVND(ds.aggSqmSouth.avg), startAtZero:true });
+  } else {
+    document.getElementById('chartSqmSouth').innerHTML = '<div class="svg-empty">Chưa đủ dữ liệu diện tích</div>';
+  }
+
+  if (ds.fteValid.length){
+    var fteAll = ds.fteValid.slice().sort(function(a,b){ return b.salesPerFte-a.salesPerFte; });
+    svgBarChart('chartFteAll', { labels: fteAll.map(function(s){return s.code;}), values: fteAll.map(function(s){return s.salesPerFte;}),
+      colors: barColors(fteAll, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggFteAll.avg, refLabel:'TB: '+fmtCompactVND(ds.aggFteAll.avg), startAtZero:true });
+  } else {
+    document.getElementById('chartFteAll').innerHTML = '<div class="svg-empty">Chưa đủ dữ liệu nhân sự</div>';
+  }
+
+  if (ds.fteValidSouth.length){
+    var fteSouth = ds.fteValidSouth.slice().sort(function(a,b){ return b.salesPerFte-a.salesPerFte; });
+    svgBarChart('chartFteSouth', { labels: fteSouth.map(function(s){return s.code;}), values: fteSouth.map(function(s){return s.salesPerFte;}),
+      colors: barColors(fteSouth, HOME_CODE), tickFmt: fmtCompactVND, refValue: ds.aggFteSouth.avg, refLabel:'TB: '+fmtCompactVND(ds.aggFteSouth.avg), startAtZero:true });
+  } else {
+    document.getElementById('chartFteSouth').innerHTML = '<div class="svg-empty">Chưa đủ dữ liệu nhân sự</div>';
+  }
+}
+
+/* ============================================================
+   RENDER - TABLE
+   ============================================================ */
+var TABLE_SORT = { key:'rankAll', dir:1 };
+function renderTable(ds){
+  var thead = document.querySelectorAll('#dataTable thead th');
+  thead.forEach(function(th){ th.classList.toggle('sorted', th.dataset.key===TABLE_SORT.key); });
+
+  var rows = ds.all.slice().sort(function(a,b){
+    var k = TABLE_SORT.key;
+    var av = a[k], bv = b[k];
+    if (typeof av === 'string') return TABLE_SORT.dir * av.localeCompare(bv);
+    return TABLE_SORT.dir * ((av||0)-(bv||0));
+  });
+
+  document.getElementById('tableBody').innerHTML = rows.map(function(s){
+    var isHome = s.code === HOME_CODE;
+    return '<tr class="'+(isHome?'home':'')+'">'
+      + '<td class="left">'+s.rankAll+'</td>'
+      + '<td class="left num">'+s.code+'</td>'
+      + '<td class="left">'+escapeHtml(s.name)+'</td>'
+      + '<td class="left"><span class="badge-region '+s.region+'">'+s.region+'</span></td>'
+      + '<td class="num">'+fmtVND(s.netSales)+'</td>'
+      + '<td class="num">'+fmtNum(s.shareAll,1)+'%</td>'
+      + '<td class="num">'+fmtNum(s.monthlyBudgetProgress,1)+'%</td>'
+      + '<td class="num">'+fmtNum(s.yoyPct,1)+'%</td>'
+      + '<td class="num">'+fmtInt(s.customer)+'</td>'
+      + '<td class="num">'+fmtVND(s.customerUnitPrice)+'</td>'
+      + '<td class="num">'+fmtNum(s.itemsPerCustomer,2)+'</td>'
+      + '<td class="num">'+fmtCompactVND(s.yearlySales)+'</td>'
+      + '<td class="num">'+(s.area!==null?fmtNum(s.area,0):'—')+'</td>'
+      + '<td class="num">'+(s.salesPerSqm!==null?fmtCompactVND(s.salesPerSqm):'—')+'</td>'
+      + '<td class="num">'+(s.staffFte!==null?fmtNum(s.staffFte,1)+(s.staffQuality!=='exact'?'<span class="staff-flag">*</span>':''):'—')+'</td>'
+      + '<td class="num">'+(s.salesPerFte!==null?fmtCompactVND(s.salesPerFte):'—')+'</td>'
+      + '<td class="num">'+(s.ageMonths!==null?fmtInt(s.ageMonths):'—')+'</td>'
+      + '</tr>';
+  }).join('');
+
+  var missNote = document.getElementById('missingNote');
+  var notes = [];
+  if (ds.missing.length) notes.push('⚠ Không tìm thấy dữ liệu trong file cho các cửa hàng: ' + ds.missing.join(', ') + ' - có thể cửa hàng chưa mở hoặc chưa phát sinh doanh số kỳ này.');
+  notes.push('* Số nhân viên (FTE) là ước tính thô (chưa tách full-time/part-time), trừ 1016 đã được xác nhận chính xác - có thể cập nhật ở mục "Cấu hình hồ sơ cửa hàng".');
+  missNote.textContent = notes.join(' ');
+}
+document.querySelectorAll('#dataTable thead th').forEach(function(th){
+  th.addEventListener('click', function(){
+    var key = th.dataset.key;
+    if (TABLE_SORT.key === key) TABLE_SORT.dir *= -1; else { TABLE_SORT.key = key; TABLE_SORT.dir = -1; }
+    if (STATE.dataset) renderTable(STATE.dataset);
+  });
+});
+
+/* ============================================================
+   TREND (localStorage)
+   ============================================================ */
+function loadTrend(){
+  try { var raw = localStorage.getItem(LS_TREND_KEY); return raw ? JSON.parse(raw) : {}; } catch(e){ return {}; }
+}
+function saveTrend(obj){
+  try { localStorage.setItem(LS_TREND_KEY, JSON.stringify(obj)); } catch(e){}
+}
+function guessPeriodFromFilename(name){
+  var digitRuns = String(name||'').match(/\d+/g) || [];
+  for (var i=0;i<digitRuns.length;i++){
+    var d = digitRuns[i];
+    if (d.length===5 || d.length===6){
+      var year = d.slice(0,4), month = d.slice(4);
+      if (year.slice(0,2)==='20' && +month>=1 && +month<=12) return year+'-'+(month.length===1?'0'+month:month);
+    }
+  }
+  var now = new Date();
+  return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+}
+
+var PENDING_DELETE = null;
+function renderSavedPeriods(){
+  var trend = loadTrend();
+  var keys = Object.keys(trend).sort();
+  var wrap = document.getElementById('savedPeriodsWrap');
+  if (!keys.length){ wrap.innerHTML = '<span style="font-size:12.5px; color:var(--muted);">Chưa có kỳ nào được lưu.</span>'; }
+  else {
+    wrap.innerHTML = '<div style="display:flex; gap:8px; flex-wrap:wrap;">' + keys.map(function(k){
+      return '<span class="chip neutral" style="gap:8px;">'+k
+        + ' <button class="btn small danger" data-del="'+k+'" style="padding:1px 7px; font-size:11px;">×</button></span>';
+    }).join('') + '</div>';
+    wrap.querySelectorAll('[data-del]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var k = btn.dataset.del;
+        if (PENDING_DELETE === k){
+          var t = loadTrend(); delete t[k]; saveTrend(t); PENDING_DELETE = null;
+          renderSavedPeriods(); if (STATE.dataset) renderTrendCharts();
+        } else {
+          PENDING_DELETE = k; btn.textContent = '✓ xoá?';
+          setTimeout(function(){ if (PENDING_DELETE===k){ PENDING_DELETE=null; renderSavedPeriods(); } }, 3000);
+        }
+      });
+    });
+  }
+  renderTrendCharts();
+}
+
+function renderTrendCharts(){
+  var trend = loadTrend();
+  var keys = Object.keys(trend).sort();
+  var wrapCharts = document.getElementById('trendCharts');
+  var emptyNote = document.getElementById('trendEmptyNote');
+  if (keys.length < 2){ wrapCharts.style.display='none'; emptyNote.style.display='block'; emptyNote.textContent = 'Lưu từ 2 kỳ trở lên để xem biểu đồ xu hướng.'; return; }
+  wrapCharts.style.display='grid'; emptyNote.style.display='none';
+
+  var homeSales = keys.map(function(k){ return trend[k].home ? trend[k].home.netSales : null; });
+  var avgSales = keys.map(function(k){ return trend[k].aggAllAvg || null; });
+  var homeBudget = keys.map(function(k){ return trend[k].home ? trend[k].home.monthlyBudgetProgress : null; });
+  var homeYoy = keys.map(function(k){ return trend[k].home ? trend[k].home.yoyPct : null; });
+  var homeRankAll = keys.map(function(k){ return trend[k].home ? trend[k].home.rankAll : null; });
+
+  svgLineChart('chartTrendSales', { labels: keys, tickFmt: fmtCompactVND, series: [
+    {label:'1016', data:homeSales, color:getCss('--home')},
+    {label:'TB hệ thống', data:avgSales, color:getCss('--muted'), dash:true}
+  ]});
+  svgLineChart('chartTrendBudget', { labels: keys, tickFmt:function(v){return fmtNum(v,0)+'%';}, series: [
+    {label:'% chỉ tiêu 1016', data:homeBudget, color:getCss('--home')}
+  ]});
+  svgLineChart('chartTrendYoy', { labels: keys, tickFmt:function(v){return fmtNum(v,0)+'%';}, series: [
+    {label:'YoY 1016', data:homeYoy, color:getCss('--home')}
+  ]});
+  svgLineChart('chartTrendRank', { labels: keys, tickFmt:function(v){return fmtNum(v,0);}, reverseY:true, series: [
+    {label:'Hạng hệ thống', data:homeRankAll, color:getCss('--home')}
+  ]});
+}
+
+document.getElementById('btnSavePeriod').addEventListener('click', function(){
+  if (!STATE.dataset) return;
+  var period = document.getElementById('periodInput').value;
+  if (!period){ document.getElementById('saveStatus').textContent = 'Vui lòng chọn kỳ báo cáo.'; return; }
+  var trend = loadTrend();
+  var doSave = function(){
+    var ds = STATE.dataset;
+    trend[period] = {
+      savedAt: new Date().toISOString(),
+      aggAllAvg: ds.aggAll.netSales.avg,
+      home: { netSales: ds.home.netSales, monthlyBudgetProgress: ds.home.monthlyBudgetProgress, yoyPct: ds.home.yoyPct, rankAll: ds.home.rankAll, rankSouth: ds.home.rankSouth, customer: ds.home.customer }
+    };
+    saveTrend(trend);
+    document.getElementById('saveStatus').textContent = '✓ Đã lưu kỳ '+period;
+    renderSavedPeriods();
+  };
+  if (trend[period] && !this.dataset.confirm){
+    document.getElementById('saveStatus').textContent = 'Kỳ này đã có dữ liệu - bấm "Lưu" lần nữa để ghi đè.';
+    this.dataset.confirm = '1';
+    var self = this;
+    setTimeout(function(){ delete self.dataset.confirm; }, 4000);
+    return;
+  }
+  delete this.dataset.confirm;
+  doSave();
+});
+
+/* ============================================================
+   ĐÁNH GIÁ: ĐIỂM SÁNG / ĐIỂM HẠN CHẾ / ĐỀ XUẤT
+   Cơ sở: so sánh 1016 với TRUNG VỊ các cửa hàng còn lại (không tính 1016)
+   ============================================================ */
+function medianOf(arr){
+  if (!arr.length) return null;
+  var s = arr.slice().sort(function(a,b){ return a-b; }), n = s.length;
+  return n % 2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2;
+}
+function avgOf(arr){
+  return arr.length ? arr.reduce(function(a,b){ return a+b; },0)/arr.length : null;
+}
+function fmtPctPlain(v){ return fmtNum(v,1)+'%'; }
+
+var ASSESS_DIMS = [
+  {key:'netSales', label:'Doanh số tháng', kind:'ratio', numStyle:'int', fmt:fmtCompactVND},
+  {key:'monthlyBudgetProgress', label:'% đạt chỉ tiêu tháng', kind:'points', numStyle:'dec1', fmt:fmtPctPlain},
+  {key:'yoyPct', label:'Doanh số so với cùng kỳ năm trước', kind:'points', numStyle:'dec1', fmt:function(v){ return fmtNum(v,1)+'% so với cùng kỳ'; }},
+  {key:'customer', label:'Lượt khách trong tháng', kind:'ratio', numStyle:'int', fmt:function(v){ return fmtInt(v)+' lượt'; }},
+  {key:'customerUnitPrice', label:'Chi tiêu bình quân/khách', kind:'ratio', numStyle:'int', fmt:fmtVND},
+  {key:'itemsPerCustomer', label:'Số món/khách', kind:'ratio', numStyle:'dec2', fmt:function(v){ return fmtNum(v,2)+' món'; }},
+  {key:'salesPerSqm', label:'Doanh số/m² sàn kinh doanh', kind:'ratio', numStyle:'int', set:'sqm', fmt:function(v){ return fmtCompactVND(v)+'/m²'; }},
+  {key:'salesPerFte', label:'Doanh số/nhân viên (FTE)', kind:'ratio', numStyle:'int', set:'fte', fmt:function(v){ return fmtCompactVND(v)+'/người'; }}
+];
+
+function dimList(ds, d, scope){
+  if (d.set === 'sqm') return scope === 'south' ? ds.areaValidSouth : ds.areaValid;
+  if (d.set === 'fte') return scope === 'south' ? ds.fteValidSouth : ds.fteValid;
+  return scope === 'south' ? ds.south : ds.all;
+}
+
+function classifyDim(d, v, gap){
+  if (d.key === 'monthlyBudgetProgress'){
+    if (v >= 100) return 'strength';
+    return gap >= 2 ? 'neutral' : 'weakness';
+  }
+  if (d.key === 'yoyPct'){
+    if (v >= 100) return gap >= 2 ? 'strength' : 'neutral';
+    return gap >= 2 ? 'neutral' : 'weakness';
+  }
+  var t = d.kind === 'points' ? 2 : 5;
+  return gap >= t ? 'strength' : (gap <= -t ? 'weakness' : 'neutral');
+}
+
+function evalDims(ds){
+  var h = ds.home;
+  return ASSESS_DIMS.map(function(d){
+    var e = { dim:d, key:d.key, label:d.label, kind:d.kind, numStyle:d.numStyle, value:h[d.key],
+              valueText:'', rank:null, n:0, rankSouth:null, nSouth:0,
+              peerMedian:null, peerAvg:null, southPeerAvg:null, gap:null, gapText:'', status:'na' };
+    if (h[d.key] === null || h[d.key] === undefined) return e;
+    var list = dimList(ds, d, 'all');
+    e.n = list.length;
+    e.valueText = d.fmt(h[d.key]);
+    e.rank = rankOf(list, d.key, h.code, true);
+    var peerVals = list.filter(function(s){ return s.code !== h.code; }).map(function(s){ return s[d.key]; });
+    e.peerMedian = medianOf(peerVals);
+    e.peerAvg = avgOf(peerVals);
+    if (h.region === 'Nam'){
+      var sl = dimList(ds, d, 'south');
+      e.nSouth = sl.length;
+      e.rankSouth = rankOf(sl, d.key, h.code, true);
+      e.southPeerAvg = avgOf(sl.filter(function(s){ return s.code !== h.code; }).map(function(s){ return s[d.key]; }));
+    }
+    if (e.peerMedian === null) return e;
+    if (d.kind === 'points'){
+      e.gap = h[d.key] - e.peerMedian;
+      e.gapText = (e.gap >= 0 ? 'cao hơn ' : 'thấp hơn ') + fmtNum(Math.abs(e.gap),1) + ' điểm %';
+    } else {
+      e.gap = e.peerMedian ? (h[d.key] / e.peerMedian - 1) * 100 : 0;
+      e.gapText = (e.gap >= 0 ? 'cao hơn ' : 'thấp hơn ') + fmtNum(Math.abs(e.gap),1) + '%';
+    }
+    e.status = classifyDim(d, h[d.key], e.gap);
+    return e;
+  });
+}
+
+function upliftOf(ds, e){
+  var h = ds.home, v = e.value, m = e.peerMedian, amt = null, how = '';
+  switch (e.key){
+    case 'customer':
+      amt = (m - v) * h.customerUnitPrice; how = 'nếu lượt khách đạt trung vị, giữ nguyên chi tiêu/khách'; break;
+    case 'customerUnitPrice':
+      amt = (m - v) * h.customer; how = 'nếu chi tiêu/khách đạt trung vị, giữ nguyên lượt khách'; break;
+    case 'itemsPerCustomer':
+      amt = v ? h.netSales * (m / v - 1) : null; how = 'nếu số món/khách đạt trung vị, giữ nguyên giá bình quân mỗi món'; break;
+    case 'salesPerSqm':
+      amt = h.area ? (m - v) * h.area : null; how = 'nếu doanh số/m² đạt trung vị'; break;
+    case 'salesPerFte':
+      amt = h.staffFte ? (m - v) * h.staffFte : null; how = 'nếu doanh số/FTE đạt trung vị'; break;
+    case 'monthlyBudgetProgress':
+      if (v > 0 && v < 100){ amt = h.netSales / (v/100) - h.netSales; how = 'doanh số còn thiếu để đạt 100% chỉ tiêu tháng'; } break;
+    case 'yoyPct':
+      if (v < 100 && h.prevYearSales > 0){ amt = h.prevYearSales - h.netSales; how = 'phần doanh số thấp hơn cùng kỳ năm trước'; } break;
+  }
+  return (amt !== null && amt > 0) ? { amount: amt, how: how } : null;
+}
+
+var STRENGTH_BOOST = {
+  netSales: 'Giữ chuẩn trưng bày và dịch vụ hiện tại; ghi lại cách làm tốt thành checklist cho team.',
+  monthlyBudgetProgress: 'Giữ nhịp theo dõi chỉ tiêu ngày/ca; dùng phần vượt để bù cho các ngày thấp điểm.',
+  yoyPct: 'Xác định ngành hàng kéo tăng trưởng và bảo đảm tồn kho đủ bán trong các ngày cao điểm.',
+  customer: 'Tận dụng lượng khách tốt để tăng bán kèm tại quầy thu ngân.',
+  customerUnitPrice: 'Nhân rộng câu mời bán kèm của nhân viên có hóa đơn cao cho cả team.',
+  itemsPerCustomer: 'Giữ các cặp sản phẩm mua kèm đang hiệu quả, bổ sung thêm 1 cặp mới mỗi tháng.',
+  salesPerSqm: 'Giữ cách bố trí hiện tại; ưu tiên đưa thêm hàng xoay nhanh vào các vị trí đang bán tốt.',
+  salesPerFte: 'Giữ cách xếp ca hiện tại; ưu tiên nhân viên bán tốt vào khung giờ cao điểm.'
+};
+
+var ACTION_LIB = {
+  customer: { problem:'Lượt khách thấp hơn mặt bằng chung', owner:'Quản lý CH + Team SC', actions:[
+    'Bố trí 1 SC chào đón và giới thiệu 1 sản phẩm Push Sale (10-30 giây) tại lối vào/sảnh trong khung giờ cao điểm cuối tuần và 17h-21h.',
+    'Đọc loa PA theo lịch cố định 30-45 phút/lần trong giờ đông khách, ưu tiên sản phẩm đang Push Sale.',
+    'Đưa sản phẩm khuyến mãi của MD lên kệ đầu/mặt tiền nhìn thấy từ lối đi chung, đổi trưng bày mỗi tuần.',
+    'Ghi lượt khách theo ngày, đối chiếu ngày thấp với lịch sự kiện của TTTM để chọn ngày chạy hoạt động thu hút khách.' ] },
+  customerUnitPrice: { problem:'Chi tiêu bình quân/khách thấp hơn mặt bằng chung', owner:'Team SC + Team Admin', actions:[
+    'Mỗi SC chốt 1 sản phẩm bán kèm tại quầy thu ngân (câu mời 10-30 giây) với 3 cặp sản phẩm mua kèm cho ngành hàng bán chạy nhất.',
+    'Nhắc khách ngay khi quét mã nếu chỉ cần thêm 1 món là đủ điều kiện Mix and Match/Bundle Sale đang chạy.',
+    'Dùng ngân sách thưởng 500.000đ/tháng cho nhân viên có giá trị hóa đơn bình quân cao nhất hoặc bán kèm nhiều nhất (chấm theo dữ liệu POS).' ] },
+  itemsPerCustomer: { problem:'Số món/khách thấp hơn mặt bằng chung', owner:'Team SC', actions:[
+    'Đặt sản phẩm mua kèm cạnh nhau trên kệ, gắn thẻ gợi ý "mua kèm" tại các cặp phổ biến.',
+    'Quy định câu hỏi chốt cuối hóa đơn: "Anh/chị có cần thêm [sản phẩm đi kèm] không ạ?" cho mọi khách.',
+    'Tổng kết tuần số món/khách theo từng SC để chia sẻ cách làm tốt trong buổi giao ban.' ] },
+  salesPerSqm: { problem:'Doanh số/m² thấp hơn mặt bằng chung (chưa khai thác hết diện tích)', owner:'Quản lý CH + Team Admin', actions:[
+    'Lập danh sách 20 SKU doanh số cao nhất, chuyển lên vị trí ngang tầm mắt/mặt tiền; dùng Dashboard Tồn kho để xác định.',
+    'Thu hẹp mặt trưng bày hàng xoay chậm, dồn diện tích cho hàng xoay nhanh.',
+    'Quan sát 3 khung giờ để tìm khu vực ít khách ghé, đổi vị trí ngành hàng hoặc đặt điểm nhấn trưng bày.' ] },
+  salesPerFte: { problem:'Doanh số/nhân viên (FTE) thấp hơn mặt bằng chung', owner:'Quản lý CH', actions:[
+    'Xếp ca theo lượt khách từng giờ; dồn nhân viên part-time (tối đa 12 ngày/79 giờ/tháng) vào ngày và khung giờ cao điểm.',
+    'Chuyển việc không bán hàng (nhận hàng, nhập liệu, sắp xếp kho) sang khung giờ thấp điểm.',
+    'Đào tạo chéo SC/Admin để hỗ trợ quầy khi đông khách.' ] },
+  monthlyBudgetProgress: { problem:'Chưa đạt chỉ tiêu tháng', owner:'Quản lý CH + Team Admin', actions:[
+    'Chia phần chỉ tiêu còn thiếu theo số ngày còn lại, giao chỉ tiêu theo ngày/ca trên bảng Push Sale.',
+    'Ưu tiên sản phẩm có biên lợi nhuận tốt và tồn kho đủ bán trong các ngày cao điểm cuối tuần.',
+    'Giao ban 5 phút đầu ca: báo doanh số lũy kế so với chỉ tiêu ngày.' ] },
+  yoyPct: { problem:'Doanh số thấp hơn cùng kỳ năm trước', owner:'Quản lý CH + Team Admin', actions:[
+    'Dùng Dashboard Sale tìm 3 ngành hàng giảm mạnh nhất so với cùng kỳ; lập kế hoạch trưng bày và đặt hàng lại cho từng ngành.',
+    'Đối chiếu hoạt động cùng kỳ năm trước (sự kiện, khuyến mãi lớn) để chạy lại hoạt động tương tự.',
+    'Theo dõi YoY theo tuần để điều chỉnh sớm thay vì chờ cuối tháng.' ] }
+};
+
+function buildAssessment(ds){
+  var h = ds.home;
+  var evals = evalDims(ds);
+  var strengths = [], weaknesses = [], neutrals = [];
+  var roughPeers = ds.fteValid.filter(function(s){ return s.staffQuality !== 'exact'; }).length;
+
+  evals.forEach(function(e){
+    if (e.status === 'strength') strengths.push(e);
+    else if (e.status === 'weakness'){ e.uplift = upliftOf(ds, e); weaknesses.push(e); }
+    else if (e.status === 'neutral') neutrals.push(e);
+    e.headline = e.valueText + (e.rank ? (' - hạng ' + e.rank + '/' + e.n + ' hệ thống' + (e.rankSouth ? (', hạng ' + e.rankSouth + '/' + e.nSouth + ' Miền Nam') : '')) : '');
+    e.detail = e.gapText ? (e.gapText + ' so với trung vị các cửa hàng còn lại (' + e.dim.fmt(e.peerMedian) + ')') : '';
+    e.refNote = (e.key === 'salesPerFte' && roughPeers > 0) ? 'Tham khảo: nhân sự các cửa hàng khác đang là ước tính thô.' : '';
+  });
+
+  strengths.sort(function(a,b){ return (a.rank/a.n) - (b.rank/b.n); });
+  weaknesses.sort(function(a,b){
+    var ua = a.uplift ? a.uplift.amount : -1, ub = b.uplift ? b.uplift.amount : -1;
+    if (ua !== ub) return ub - ua;
+    return a.gap - b.gap;
+  });
+
+  var actions = [];
+  weaknesses.forEach(function(e){
+    var lib = ACTION_LIB[e.key];
+    if (!lib) return;
+    var idx = actions.length;
+    actions.push({
+      priority: idx < 2 ? 'Cao' : (idx < 4 ? 'Trung bình' : 'Thấp'),
+      problem: lib.problem, detail: e.headline + ' (' + e.detail + ')',
+      actions: lib.actions, owner: lib.owner,
+      kpi: e.label + ': hiện ' + e.valueText + ', mục tiêu ' + e.dim.fmt(e.peerMedian) + ' (trung vị các cửa hàng khác)',
+      potential: e.uplift ? ('Tiềm năng khoảng +' + fmtCompactVND(e.uplift.amount) + '/tháng ' + e.uplift.how) : ''
+    });
+  });
+  if (strengths.length){
+    actions.push({
+      priority:'Thấp', problem:'Duy trì điểm sáng', detail: strengths.map(function(e){ return e.label; }).join(', '),
+      actions: strengths.map(function(e){ return e.label + ': ' + STRENGTH_BOOST[e.key]; }),
+      owner:'Quản lý CH', kpi:'Giữ hạng của các chỉ số trên khi tải file tháng sau', potential:''
+    });
+  }
+
+  // Tóm tắt
+  var total = strengths.length + weaknesses.length + neutrals.length;
+  var sum = 'So với trung vị ' + (ds.all.length - 1) + ' cửa hàng còn lại, 1016 có ' + strengths.length + ' điểm sáng, ' + weaknesses.length + ' điểm hạn chế và ' + neutrals.length + ' chỉ số ngang mặt bằng chung (trên ' + total + ' chỉ số được đánh giá).';
+  if (weaknesses.length){
+    var top = weaknesses[0];
+    sum += ' Hạn chế cần xử lý trước: ' + top.label.toLowerCase() + ' (' + top.gapText + ')' + (top.uplift ? ', tiềm năng khoảng +' + fmtCompactVND(top.uplift.amount) + '/tháng ' + top.uplift.how : '') + '.';
+  }
+  var sqm = evals.filter(function(e){ return e.key === 'salesPerSqm'; })[0];
+  if (sqm && sqm.rank){
+    sum += ' Về hiệu quả so với tiềm năng diện tích: doanh số/m² hạng ' + sqm.rank + '/' + sqm.n + ' (hạng doanh số tuyệt đối ' + h.rankAll + '/' + ds.all.length + ')' +
+      (sqm.rank < h.rankAll ? ', tức là cửa hàng đang vận hành tốt hơn so với quy mô diện tích.' : (sqm.rank === h.rankAll ? ', tương xứng với quy mô.' : ', tức là còn dư địa khai thác diện tích tốt hơn.'));
+  }
+
+  return { evals: evals, strengths: strengths, weaknesses: weaknesses, neutrals: neutrals, actions: actions, summary: sum };
+}
+
+function renderAssessment(ds){
+  var a = buildAssessment(ds);
+  STATE.assessment = a;
+  document.getElementById('assessSummary').textContent = a.summary;
+
+  function card(e, cls, extraHtml){
+    return '<div class="insight ' + cls + '"><div class="tag">' + escapeHtml(e.label) + '</div>'
+      + '<p><strong>' + escapeHtml(e.headline) + '</strong><br>' + escapeHtml(e.detail) + '</p>' + extraHtml + '</div>';
+  }
+  document.getElementById('strengthGrid').innerHTML = a.strengths.length ? a.strengths.map(function(e){
+    return card(e, 'good', '<div class="boost"><b>Phát huy:</b> ' + escapeHtml(STRENGTH_BOOST[e.key]) + '</div>'
+      + (e.refNote ? '<div class="why">' + escapeHtml(e.refNote) + '</div>' : ''));
+  }).join('') : '<div class="svg-empty" style="grid-column:1/-1;">Chưa có chỉ số nào cao hơn rõ rệt so với mặt bằng chung.</div>';
+
+  document.getElementById('weaknessGrid').innerHTML = a.weaknesses.length ? a.weaknesses.map(function(e){
+    var severe = e.kind === 'points' ? e.gap <= -5 : e.gap <= -15;
+    var why = (e.uplift ? 'Tiềm năng khoảng +' + fmtCompactVND(e.uplift.amount) + '/tháng ' + e.uplift.how + '.' : '') + (e.refNote ? ' ' + e.refNote : '');
+    return card(e, severe ? 'critical' : 'warning', why ? '<div class="why">' + escapeHtml(why) + '</div>' : '');
+  }).join('') : '<div class="svg-empty" style="grid-column:1/-1;">Chưa có chỉ số nào thấp hơn rõ rệt so với mặt bằng chung.</div>';
+
+  document.getElementById('actionBody').innerHTML = a.actions.length ? a.actions.map(function(x){
+    var chip = x.priority === 'Cao' ? 'critical' : (x.priority === 'Trung bình' ? 'warning' : 'neutral');
+    return '<tr><td><span class="chip ' + chip + '">' + x.priority + '</span></td>'
+      + '<td><strong>' + escapeHtml(x.problem) + '</strong><br><span style="color:var(--muted);font-size:12px;">' + escapeHtml(x.detail) + '</span></td>'
+      + '<td><ul>' + x.actions.map(function(t){ return '<li>' + escapeHtml(t) + '</li>'; }).join('') + '</ul></td>'
+      + '<td>' + escapeHtml(x.owner) + '</td>'
+      + '<td>' + escapeHtml(x.kpi) + (x.potential ? '<br><strong>' + escapeHtml(x.potential) + '</strong>' : '') + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);">Không có hạn chế cần xử lý.</td></tr>';
+
+  document.querySelectorAll('.btn.export').forEach(function(b){ b.style.display = 'inline-flex'; });
+}
+
+/* ============================================================
+   XUẤT BÁO CÁO - Excel (.xlsx tự ghi, không cần thư viện ngoài) và HTML
+   ============================================================ */
+var XlsxWriter = (function(){
+  var enc = new TextEncoder();
+  var crcTable = (function(){
+    var t = [], c, n, k;
+    for (n = 0; n < 256; n++){ c = n; for (k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(bytes){
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < bytes.length; i++) c = crcTable[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  function u16(v){ return [v & 255, (v >> 8) & 255]; }
+  function u32(v){ return [v & 255, (v >> 8) & 255, (v >> 16) & 255, (v >>> 24) & 255]; }
+
+  function zip(files){
+    var parts = [], central = [], offset = 0;
+    files.forEach(function(f){
+      var nameB = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+      var local = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size), u16(nameB.length), u16(0));
+      parts.push(new Uint8Array(local), nameB, f.data);
+      var cen = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size),
+                          u16(nameB.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset));
+      central.push(new Uint8Array(cen), nameB);
+      offset += local.length + nameB.length + size;
+    });
+    var cdSize = 0; central.forEach(function(c){ cdSize += c.length; });
+    var end = new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdSize), u32(offset), u16(0)));
+    var all = parts.concat(central, [end]), total = 0;
+    all.forEach(function(p){ total += p.length; });
+    var out = new Uint8Array(total), pos = 0;
+    all.forEach(function(p){ out.set(p, pos); pos += p.length; });
+    return out;
+  }
+
+  function xmlEsc(s){
+    return String(s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function colName(i){
+    var s = ''; i++;
+    while (i > 0){ var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); }
+    return s;
+  }
+
+  // Chỉ số kiểu (cellXfs) - xem STYLES_XML bên dưới
+  var S = { def:0, head:1, text:2, int:3, dec1:4, title:5, homeText:6, homeInt:7, homeDec1:8, good:9, bad:10, bold:11, warn:12, note:13, pct:14, pts:15, dec2:16, homeDec2:17 };
+
+  var STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<numFmts count="3"><numFmt numFmtId="164" formatCode="#,##0.0"/><numFmt numFmtId="165" formatCode="0.0%"/><numFmt numFmtId="166" formatCode="+0.0&quot; điểm %&quot;;-0.0&quot; điểm %&quot;;0.0&quot; điểm %&quot;"/></numFmts>'
+    + '<fonts count="4">'
+    + '<font><sz val="11"/><name val="Arial"/></font>'
+    + '<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>'
+    + '<font><b/><sz val="14"/><name val="Arial"/></font>'
+    + '<font><b/><sz val="11"/><name val="Arial"/></font>'
+    + '</fonts>'
+    + '<fills count="7">'
+    + '<fill><patternFill patternType="none"/></fill>'
+    + '<fill><patternFill patternType="gray125"/></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FF1F3A5F"/><bgColor indexed="64"/></patternFill></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FFFBE9E0"/><bgColor indexed="64"/></patternFill></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FFE6F6E6"/><bgColor indexed="64"/></patternFill></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FFFBE6E6"/><bgColor indexed="64"/></patternFill></fill>'
+    + '<fill><patternFill patternType="solid"><fgColor rgb="FFFEF4E0"/><bgColor indexed="64"/></patternFill></fill>'
+    + '</fills>'
+    + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
+    + '<border><left style="thin"><color rgb="FFD0D0D0"/></left><right style="thin"><color rgb="FFD0D0D0"/></right><top style="thin"><color rgb="FFD0D0D0"/></top><bottom style="thin"><color rgb="FFD0D0D0"/></bottom><diagonal/></border></borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + '<cellXfs count="18">'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+    + '<xf numFmtId="0" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="3" fontId="3" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="164" fontId="3" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="5" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="6" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="166" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="4" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="4" fontId="3" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+
+  function estHeight(row, widths){
+    var lines = 1;
+    row.forEach(function(c, i){
+      var v = (c !== null && typeof c === 'object') ? c.v : c;
+      if (typeof v !== 'string') return;
+      var w = Math.max(6, (widths[i] || 10) * 1.1), n = 0;
+      v.split('\n').forEach(function(seg){ n += Math.max(1, Math.ceil(seg.length / w)); });
+      if (n > lines) lines = n;
+    });
+    return lines > 1 ? lines * 15 : null;
+  }
+
+  function sheetXml(sh, first){
+    var widths = sh.widths || [];
+    var x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+    x += '<sheetViews><sheetView workbookViewId="0"' + (first ? ' tabSelected="1"' : '') + '>'
+      + (sh.freeze ? '<pane ySplit="' + sh.freeze + '" topLeftCell="A' + (sh.freeze + 1) + '" activePane="bottomLeft" state="frozen"/>' : '') + '</sheetView></sheetViews>';
+    x += '<sheetFormatPr defaultRowHeight="15"/>';
+    if (widths.length){
+      x += '<cols>' + widths.map(function(w, i){ return '<col min="' + (i+1) + '" max="' + (i+1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols>';
+    }
+    x += '<sheetData>';
+    sh.rows.forEach(function(row, ri){
+      var ht = (sh.heights && sh.heights[ri]) ? sh.heights[ri] : (sh.autoHeight ? estHeight(row, widths) : null);
+      x += '<row r="' + (ri+1) + '"' + (ht ? ' ht="' + ht + '" customHeight="1"' : '') + '>';
+      row.forEach(function(c, ci){
+        if (c === null || c === undefined || c === '') return;
+        var ref = colName(ci) + (ri+1), v = c, s = S.def, f = null;
+        if (typeof c === 'object'){ v = c.v; s = (c.s !== undefined ? c.s : S.def); f = c.f || null; }
+        if (typeof v === 'number' && isFinite(v)){
+          x += '<c r="' + ref + '" s="' + s + '">' + (f ? '<f>' + xmlEsc(f) + '</f>' : '') + '<v>' + v + '</v></c>';
+        } else if (v !== null && v !== undefined && v !== ''){
+          x += '<c r="' + ref + '" s="' + s + '" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>';
+        }
+      });
+      x += '</row>';
+    });
+    x += '</sheetData>';
+    if (sh.merges && sh.merges.length) x += '<mergeCells count="' + sh.merges.length + '">' + sh.merges.map(function(m){ return '<mergeCell ref="' + m + '"/>'; }).join('') + '</mergeCells>';
+    x += '</worksheet>';
+    return x;
+  }
+
+  function build(sheets){
+    var files = [];
+    var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
+      + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+      + sheets.map(function(s, i){ return '<Override PartName="/xl/worksheets/sheet' + (i+1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('')
+      + '</Types>';
+    files.push({ name:'[Content_Types].xml', data: enc.encode(ct) });
+    files.push({ name:'_rels/.rels', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') });
+    files.push({ name:'xl/workbook.xml', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'
+      + sheets.map(function(s, i){ return '<sheet name="' + xmlEsc(s.name) + '" sheetId="' + (i+1) + '" r:id="rId' + (i+1) + '"/>'; }).join('')
+      + '</sheets><calcPr fullCalcOnLoad="1"/></workbook>') });
+    files.push({ name:'xl/_rels/workbook.xml.rels', data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + sheets.map(function(s, i){ return '<Relationship Id="rId' + (i+1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i+1) + '.xml"/>'; }).join('')
+      + '<Relationship Id="rId' + (sheets.length+1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>') });
+    files.push({ name:'xl/styles.xml', data: enc.encode(STYLES_XML) });
+    sheets.forEach(function(s, i){ files.push({ name:'xl/worksheets/sheet' + (i+1) + '.xml', data: enc.encode(sheetXml(s, i === 0)) }); });
+    return zip(files);
+  }
+  return { build: build, S: S, colName: colName };
+})();
+
+function downloadBlob(blob, filename){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+}
+
+function reportMeta(ds){
+  var period = (document.getElementById('periodInput').value || '').trim();
+  var d = new Date();
+  var today = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+  var exactN = ds.fteValid.filter(function(s){ return s.staffQuality === 'exact'; }).length;
+  var notes = [
+    'Nguồn doanh số: file "Monthly Report By Store" kỳ ' + (period || '(chưa chọn kỳ)') + '; chỉ gồm 16 cửa hàng 1001-1011, 1014-1018.',
+    'Diện tích sàn kinh doanh và ngày khai trương lấy từ danh sách cửa hàng gốc của hệ thống.' + (ds.all.filter(function(s){ return s.area === null; }).length ? ' Cửa hàng chưa có diện tích (' + ds.all.filter(function(s){ return s.area === null; }).map(function(s){ return s.code; }).join(', ') + ') không được tính doanh số/m².' : ''),
+    'Nhân sự: ' + exactN + '/' + ds.fteValid.length + ' cửa hàng có số liệu chính xác (tách full-time/part-time); các cửa hàng còn lại là ước tính thô nên doanh số/FTE chỉ để tham khảo.',
+    'FTE = nhân viên chính thức + part-time x (giờ làm tối đa/tháng chia 208); 208 giờ = 26 ngày x 8 giờ.',
+    'Điểm sáng/hạn chế xác định theo mức chênh so với trung vị các cửa hàng còn lại (không tính 1016): từ 5% trở lên với chỉ số giá trị, từ 2 điểm % trở lên với chỉ số phần trăm. % đạt chỉ tiêu từ 100% luôn tính là điểm sáng.',
+    'Tiềm năng cải thiện của từng chỉ số được tính độc lập, không cộng gộp.',
+    'Ngày xuất báo cáo: ' + today + '.'
+  ];
+  return { period: period, today: today, notes: notes };
+}
+
+function exportFileName(ds, ext){
+  var p = (document.getElementById('periodInput').value || '').trim() || 'ky';
+  return 'Bao_Cao_1016_So_Sanh_He_Thong_' + p + '.' + ext;
+}
+
+/* ---------- EXCEL ---------- */
+function exportXlsx(){
+  var ds = STATE.dataset, a = STATE.assessment;
+  if (!ds || !a) return;
+  var X = XlsxWriter, S = X.S, meta = reportMeta(ds), h = ds.home;
+  var numS = { int:S.int, dec1:S.dec1, dec2:S.dec2 };
+
+  // Sheet 1: Tổng quan
+  var r1 = [];
+  r1.push([{v:'BÁO CÁO SO SÁNH CỬA HÀNG 1016 PARC MALL VỚI HỆ THỐNG', s:S.title}]);
+  r1.push([{v:'Kỳ báo cáo: ' + (meta.period || '-') + '   |   Ngày xuất: ' + meta.today, s:S.note}]);
+  r1.push([]);
+  r1.push(['Chỉ số', 'Cửa hàng 1016', 'TB các cửa hàng khác (hệ thống)', 'Trung vị các cửa hàng khác (hệ thống)', 'TB các cửa hàng Miền Nam khác', 'Chênh lệch so với trung vị', 'Hạng hệ thống', 'Hạng Miền Nam'].map(function(t){ return {v:t, s:S.head}; }));
+  a.evals.forEach(function(e){
+    var r = r1.length + 1, ns = numS[e.numStyle] || S.int;
+    var gapCell;
+    if (e.gap === null) gapCell = {v:'', s:S.text};
+    else if (e.kind === 'points') gapCell = {v:e.gap, f:'B' + r + '-D' + r, s:S.pts};
+    else gapCell = {v:e.peerMedian ? e.value / e.peerMedian - 1 : 0, f:'IF(D' + r + '=0,"",B' + r + '/D' + r + '-1)', s:S.pct};
+    r1.push([
+      {v:e.label, s:S.bold},
+      e.value === null ? {v:'Chưa có dữ liệu', s:S.text} : {v:e.value, s:ns},
+      e.peerAvg === null ? {v:'', s:S.text} : {v:e.peerAvg, s:ns},
+      e.peerMedian === null ? {v:'', s:S.text} : {v:e.peerMedian, s:ns},
+      e.southPeerAvg === null ? {v:'', s:S.text} : {v:e.southPeerAvg, s:ns},
+      gapCell,
+      e.rank ? {v:e.rank + '/' + e.n, s:S.text} : {v:'', s:S.text},
+      e.rankSouth ? {v:e.rankSouth + '/' + e.nSouth, s:S.text} : {v:'', s:S.text}
+    ]);
+  });
+  r1.push([]);
+  r1.push([{v:'Nhận định chung', s:S.bold}]);
+  r1.push([{v:a.summary, s:S.note}]);
+  var sumRow = r1.length;
+  var sheet1 = { name:'Tổng quan', rows:r1, widths:[36,20,22,22,22,20,14,14], freeze:0, merges:['A2:H2','A' + sumRow + ':H' + sumRow], heights:(function(){ var o = {}; o[sumRow-1] = Math.max(30, Math.ceil(a.summary.length / 150) * 17); return o; })() };
+
+  // Sheet 2: Điểm sáng / hạn chế
+  var r2 = [['Loại', 'Chỉ số', 'Giá trị 1016', 'Hạng', 'So với trung vị các cửa hàng khác', 'Ghi chú'].map(function(t){ return {v:t, s:S.head}; })];
+  function rowOf(type, e, style, note){
+    return [{v:type, s:style}, {v:e.label, s:style}, {v:e.valueText, s:style}, {v:e.rank + '/' + e.n + (e.rankSouth ? ' (Miền Nam ' + e.rankSouth + '/' + e.nSouth + ')' : ''), s:style}, {v:e.detail, s:style}, {v:note, s:style}];
+  }
+  a.strengths.forEach(function(e){ r2.push(rowOf('Điểm sáng', e, S.good, 'Phát huy: ' + STRENGTH_BOOST[e.key] + (e.refNote ? ' ' + e.refNote : ''))); });
+  a.weaknesses.forEach(function(e){ r2.push(rowOf('Điểm hạn chế', e, S.bad, (e.uplift ? 'Tiềm năng khoảng +' + fmtCompactVND(e.uplift.amount) + '/tháng ' + e.uplift.how + '.' : '') + (e.refNote ? ' ' + e.refNote : ''))); });
+  a.neutrals.forEach(function(e){ r2.push(rowOf('Ngang mặt bằng chung', e, S.text, '')); });
+  var sheet2 = { name:'Điểm sáng - Hạn chế', rows:r2, widths:[20,32,24,24,44,60], freeze:1, autoHeight:true };
+
+  // Sheet 3: Đề xuất
+  var r3 = [['Ưu tiên', 'Vấn đề', 'Hành động cụ thể', 'Phụ trách', 'Chỉ số theo dõi', 'Tiềm năng'].map(function(t){ return {v:t, s:S.head}; })];
+  a.actions.forEach(function(x){
+    var st = x.priority === 'Cao' ? S.bad : (x.priority === 'Trung bình' ? S.warn : S.text);
+    r3.push([{v:x.priority, s:st}, {v:x.problem + '\n' + x.detail, s:S.text}, {v:x.actions.map(function(t){ return '- ' + t; }).join('\n'), s:S.text}, {v:x.owner, s:S.text}, {v:x.kpi, s:S.text}, {v:x.potential, s:S.text}]);
+  });
+  var sheet3 = { name:'Đề xuất hành động', rows:r3, widths:[13,34,80,22,38,36], freeze:1, autoHeight:true };
+
+  // Sheet 4: Chi tiết 16 cửa hàng (DS/m² và DS/FTE là công thức)
+  var hdr4 = ['Hạng HT','Mã CH','Tên cửa hàng','Miền','Doanh số tháng (đ)','% Hệ thống','% Chỉ tiêu','% so với cùng kỳ','Lượt khách','Chi tiêu BQ/khách (đ)','Món/khách','Doanh số luỹ kế năm (đ)','Diện tích sàn (m²)','DS/m² (đ)','NV quy đổi (FTE)','DS/FTE (đ)','Tuổi CH (tháng)','Độ tin cậy nhân sự'];
+  var r4 = [hdr4.map(function(t){ return {v:t, s:S.head}; })];
+  var list = ds.all.slice().sort(function(p,q){ return p.rankAll - q.rankAll; });
+  list.forEach(function(s){
+    var r = r4.length + 1, home = s.code === HOME_CODE;
+    var t = home ? S.homeText : S.text, ni = home ? S.homeInt : S.int, nd = home ? S.homeDec1 : S.dec1, n2 = home ? S.homeDec2 : S.dec2;
+    r4.push([
+      {v:s.rankAll, s:ni}, {v:s.code, s:t}, {v:s.name, s:t}, {v:s.region, s:t},
+      {v:s.netSales, s:ni}, {v:s.shareAll, s:nd}, {v:s.monthlyBudgetProgress, s:nd}, {v:s.yoyPct, s:nd},
+      {v:s.customer, s:ni}, {v:s.customerUnitPrice, s:ni}, {v:s.itemsPerCustomer, s:n2}, {v:s.yearlySales, s:ni},
+      s.area !== null ? {v:s.area, s:nd} : {v:'Chưa có', s:t},
+      s.salesPerSqm !== null ? {v:s.salesPerSqm, f:'E' + r + '/M' + r, s:ni} : {v:'', s:t},
+      s.staffFte !== null ? {v:s.staffFte, s:nd} : {v:'', s:t},
+      s.salesPerFte !== null ? {v:s.salesPerFte, f:'E' + r + '/O' + r, s:ni} : {v:'', s:t},
+      s.ageMonths !== null ? {v:s.ageMonths, s:ni} : {v:'', s:t},
+      {v: s.staffQuality === 'exact' ? 'Chính xác' : (s.staffQuality === 'rough' ? 'Ước tính thô' : 'Chưa có'), s:t}
+    ]);
+  });
+  var last = r4.length, avgRow = r4.length + 1;
+  function avgCell(col, key, st){
+    var vals = list.map(function(s){ return s[key]; }).filter(function(v){ return v !== null && v !== undefined; });
+    return {v:avgOf(vals), f:'AVERAGE(' + col + '2:' + col + last + ')', s:st};
+  }
+  r4.push([{v:'', s:S.bold}, {v:'', s:S.bold}, {v:'Trung bình', s:S.bold}, {v:'', s:S.bold},
+    avgCell('E','netSales',S.int), {v:'', s:S.bold}, avgCell('G','monthlyBudgetProgress',S.dec1), avgCell('H','yoyPct',S.dec1),
+    avgCell('I','customer',S.int), avgCell('J','customerUnitPrice',S.int), avgCell('K','itemsPerCustomer',S.dec2), avgCell('L','yearlySales',S.int),
+    {v:'', s:S.bold}, avgCell('N','salesPerSqm',S.int), {v:'', s:S.bold}, avgCell('P','salesPerFte',S.int), {v:'', s:S.bold}, {v:'', s:S.bold}]);
+  var sheet4 = { name:'Chi tiết 16 cửa hàng', rows:r4, widths:[9,9,20,8,18,11,11,13,12,16,10,20,14,14,14,16,12,16], freeze:1 };
+
+  // Sheet 5: Ghi chú
+  var r5 = [[{v:'GHI CHÚ DỮ LIỆU VÀ CÁCH ĐỌC BÁO CÁO', s:S.title}], []];
+  meta.notes.forEach(function(n){ r5.push([{v:n, s:S.note}]); });
+  var sheet5 = { name:'Ghi chú dữ liệu', rows:r5, widths:[130], autoHeight:true };
+
+  var bytes = XlsxWriter.build([sheet1, sheet2, sheet3, sheet4, sheet5]);
+  downloadBlob(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), exportFileName(ds, 'xlsx'));
+}
+
+/* ---------- HTML ---------- */
+function exportHtml(){
+  var ds = STATE.dataset, a = STATE.assessment;
+  if (!ds || !a) return;
+  var meta = reportMeta(ds), E = escapeHtml;
+
+  function chartBlock(id, title){
+    var el = document.getElementById(id);
+    return el && el.innerHTML.indexOf('<svg') >= 0 ? '<div class="chart"><h3>' + E(title) + '</h3>' + el.innerHTML + '</div>' : '';
+  }
+  var overview = '<table><thead><tr><th>Chỉ số</th><th class="r">Cửa hàng 1016</th><th class="r">TB các CH khác</th><th class="r">Trung vị các CH khác</th><th class="r">TB Miền Nam khác</th><th>So với trung vị</th><th class="r">Hạng HT</th><th class="r">Hạng MN</th></tr></thead><tbody>'
+    + a.evals.map(function(e){
+      var f = e.dim.fmt;
+      return '<tr><td><strong>' + E(e.label) + '</strong></td><td class="r">' + E(e.valueText || 'Chưa có dữ liệu') + '</td>'
+        + '<td class="r">' + (e.peerAvg === null ? '' : E(f(e.peerAvg))) + '</td><td class="r">' + (e.peerMedian === null ? '' : E(f(e.peerMedian))) + '</td>'
+        + '<td class="r">' + (e.southPeerAvg === null ? '' : E(f(e.southPeerAvg))) + '</td>'
+        + '<td class="' + (e.status === 'strength' ? 'g' : (e.status === 'weakness' ? 'b' : '')) + '">' + E(e.gapText) + '</td>'
+        + '<td class="r">' + (e.rank ? e.rank + '/' + e.n : '') + '</td><td class="r">' + (e.rankSouth ? e.rankSouth + '/' + e.nSouth : '') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+
+  function cards(list, cls, withBoost){
+    if (!list.length) return '<p class="muted">Chưa có chỉ số nào ở nhóm này.</p>';
+    return list.map(function(e){
+      var extra = withBoost ? '<div class="sub"><b>Phát huy:</b> ' + E(STRENGTH_BOOST[e.key]) + '</div>'
+        : (e.uplift ? '<div class="sub">Tiềm năng khoảng +' + E(fmtCompactVND(e.uplift.amount)) + '/tháng ' + E(e.uplift.how) + '.</div>' : '');
+      return '<div class="card ' + cls + '"><div class="t">' + E(e.label) + '</div><div><strong>' + E(e.headline) + '</strong></div><div>' + E(e.detail) + '</div>' + extra
+        + (e.refNote ? '<div class="sub">' + E(e.refNote) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+
+  var actionRows = a.actions.map(function(x){
+    return '<tr><td><span class="prio p' + (x.priority === 'Cao' ? 'c' : (x.priority === 'Trung bình' ? 't' : 'l')) + '">' + E(x.priority) + '</span></td>'
+      + '<td><strong>' + E(x.problem) + '</strong><div class="sub">' + E(x.detail) + '</div></td>'
+      + '<td><ul>' + x.actions.map(function(t){ return '<li>' + E(t) + '</li>'; }).join('') + '</ul></td>'
+      + '<td>' + E(x.owner) + '</td><td>' + E(x.kpi) + (x.potential ? '<div class="sub"><strong>' + E(x.potential) + '</strong></div>' : '') + '</td></tr>';
+  }).join('');
+
+  var list = ds.all.slice().sort(function(p,q){ return p.rankAll - q.rankAll; });
+  var storeRows = list.map(function(s){
+    return '<tr class="' + (s.code === HOME_CODE ? 'home' : '') + '"><td class="r">' + s.rankAll + '</td><td>' + s.code + '</td><td>' + E(s.name) + '</td><td>' + s.region + '</td>'
+      + '<td class="r">' + fmtVND(s.netSales) + '</td><td class="r">' + fmtNum(s.monthlyBudgetProgress,1) + '%</td><td class="r">' + fmtNum(s.yoyPct,1) + '%</td>'
+      + '<td class="r">' + fmtInt(s.customer) + '</td><td class="r">' + fmtVND(s.customerUnitPrice) + '</td>'
+      + '<td class="r">' + (s.area !== null ? fmtNum(s.area,0) : '-') + '</td><td class="r">' + (s.salesPerSqm !== null ? fmtCompactVND(s.salesPerSqm) : '-') + '</td>'
+      + '<td class="r">' + (s.staffFte !== null ? fmtNum(s.staffFte,1) + (s.staffQuality !== 'exact' ? '*' : '') : '-') + '</td><td class="r">' + (s.salesPerFte !== null ? fmtCompactVND(s.salesPerFte) : '-') + '</td>'
+      + '<td class="r">' + (s.ageMonths !== null ? s.ageMonths : '-') + '</td></tr>';
+  }).join('');
+
+  var css = 'body{font-family:Arial,"Be Vietnam Pro",sans-serif;color:#111;margin:0;background:#f1f1ee;line-height:1.5}'
+    + '.page{max-width:1020px;margin:0 auto;padding:30px 26px 50px;background:#fff}'
+    + 'h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid #eb6834}h3{font-size:13px;margin:0 0 4px}'
+    + '.meta{color:#666;font-size:12.5px}.muted{color:#777;font-size:12.5px}'
+    + 'table{border-collapse:collapse;width:100%;font-size:12px;margin-top:6px}th{background:#1f3a5f;color:#fff;text-align:left;padding:7px 8px;font-size:11.5px}'
+    + 'td{padding:6px 8px;border-bottom:1px solid #e3e3df;vertical-align:top}.r{text-align:right}td.g{color:#0a7a0a;font-weight:700}td.b{color:#c02d2d;font-weight:700}'
+    + 'tr.home td{background:#fbe9e0;font-weight:700}ul{margin:0;padding-left:17px}li{margin-bottom:4px}'
+    + '.sum{background:#f6f6f3;border-radius:8px;padding:12px 16px;font-size:13.5px}'
+    + '.card{padding:10px 14px;margin:8px 0;border-radius:6px;font-size:12.8px;border-left:4px solid #999;background:#fafafa}.card .t{font-size:11px;font-weight:700;text-transform:uppercase;color:#666}'
+    + '.card.good{border-color:#0ca30c;background:#f3fbf3}.card.bad{border-color:#d03b3b;background:#fdf4f4}.sub{font-size:12px;color:#555;margin-top:4px}'
+    + '.prio{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}.pc{background:#fbe6e6;color:#c02d2d}.pt{background:#fef4e0;color:#b27000}.pl{background:#eee;color:#555}'
+    + '.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}.chart svg{width:100%;height:auto}'
+    + '.chart .axis-line{stroke:#e1e0d9}.chart .ref-line{stroke:#888;stroke-width:1.4;stroke-dasharray:5,4}.chart .tick-label{fill:#444;font-size:9.5px}.chart .ref-label{fill:#777;font-size:9.5px}'
+    + 'ol{padding-left:18px;font-size:12px;color:#555}'
+    + '@media print{body{background:#fff}.page{padding:0}h2{break-after:avoid}tr,.card{break-inside:avoid}.charts{grid-template-columns:1fr 1fr}}';
+
+  var html = '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Báo cáo so sánh hệ thống - Cửa hàng 1016 - ' + E(meta.period) + '</title><style>' + css + '</style></head><body><div class="page">'
+    + '<h1>Báo cáo so sánh Cửa hàng 1016 Parc Mall với hệ thống</h1><div class="meta">Kohnan Việt Nam - Kỳ báo cáo: ' + E(meta.period || '-') + ' - Ngày xuất: ' + meta.today + '</div>'
+    + '<h2>1. Nhận định chung</h2><div class="sum">' + E(a.summary) + '</div>'
+    + '<h2>2. Tổng quan so sánh với hệ thống và Miền Nam</h2>' + overview
+    + '<h2>3. Biểu đồ</h2><div class="charts">' + chartBlock('chartSalesAll','Doanh số tháng theo cửa hàng') + chartBlock('chartBudgetAll','% đạt chỉ tiêu tháng') + chartBlock('chartSqmAll','Doanh số/m² sàn kinh doanh') + chartBlock('chartFteAll','Doanh số/nhân viên (FTE)') + '</div>'
+    + '<h2>4. Điểm sáng</h2>' + cards(a.strengths, 'good', true)
+    + '<h2>5. Điểm hạn chế</h2>' + cards(a.weaknesses, 'bad', false)
+    + '<h2>6. Đề xuất hành động</h2><table><thead><tr><th style="width:70px">Ưu tiên</th><th style="width:20%">Vấn đề</th><th>Hành động cụ thể</th><th style="width:100px">Phụ trách</th><th style="width:22%">Chỉ số theo dõi / Tiềm năng</th></tr></thead><tbody>' + actionRows + '</tbody></table>'
+    + '<h2>7. Bảng chi tiết 16 cửa hàng</h2><table><thead><tr><th class="r">Hạng</th><th>Mã</th><th>Tên</th><th>Miền</th><th class="r">Doanh số tháng</th><th class="r">% Chỉ tiêu</th><th class="r">% so với cùng kỳ</th><th class="r">Lượt khách</th><th class="r">Chi tiêu/khách</th><th class="r">m²</th><th class="r">DS/m²</th><th class="r">FTE</th><th class="r">DS/FTE</th><th class="r">Tuổi (tháng)</th></tr></thead><tbody>' + storeRows + '</tbody></table>'
+    + '<div class="muted" style="margin-top:6px">* Số nhân viên là ước tính thô, chưa tách full-time/part-time.</div>'
+    + '<h2>8. Ghi chú dữ liệu</h2><ol>' + meta.notes.map(function(n){ return '<li>' + E(n) + '</li>'; }).join('') + '</ol>'
+    + '</div></body></html>';
+  downloadBlob(new Blob([html], {type:'text/html;charset=utf-8'}), exportFileName(ds, 'html'));
+}
+
+document.querySelectorAll('.js-export-xlsx').forEach(function(b){ b.addEventListener('click', function(){ try { exportXlsx(); } catch(err){ console.error(err); alert('Không xuất được file Excel: ' + err.message); } }); });
+document.querySelectorAll('.js-export-html').forEach(function(b){ b.addEventListener('click', function(){ try { exportHtml(); } catch(err){ console.error(err); alert('Không xuất được file HTML: ' + err.message); } }); });
+
+/* ============================================================
+   GUIDE (static content)
+   ============================================================ */
+var GUIDE_ITEMS = [
+  { title: '1. Đọc bảng xếp hạng đúng cách', body:
+    'Thứ hạng (hạng hệ thống / hạng Miền Nam) cho biết vị trí tương đối của 1016 so với các cửa hàng cùng quy mô mở cửa trong tháng, nhưng KHÔNG phản ánh sự khác biệt về mặt bằng, dân cư khu vực, diện tích hay thời gian hoạt động của từng cửa hàng. '
+    + 'Nên ưu tiên so sánh 1016 với các cửa hàng có đặc điểm tương đồng (cùng ở trung tâm thương mại, quy mô diện tích gần nhau, cùng mở trong khung giờ thương mại) thay vì so trực tiếp với toàn bộ 16 cửa hàng.' },
+  { title: '2. Dùng % đạt chỉ tiêu để họp giao ban', body:
+    'Nếu % đạt chỉ tiêu tháng dưới 100%, hãy đối chiếu với "Chênh lệch tuyệt đối so với chỉ tiêu" (cột Doanh số − Chỉ tiêu) để biết mức thiếu hụt thực tế bằng tiền, từ đó tính ra cần tăng doanh số trung bình mỗi ngày còn lại bao nhiêu để về đích. '
+    + 'Nếu nhiều cửa hàng khác cũng chưa đạt chỉ tiêu trong cùng kỳ, nhiều khả năng nguyên nhân đến từ yếu tố thị trường chung (mùa vụ, sức mua) hơn là vấn đề riêng của 1016 - nên trao đổi với MD/khu vực để xem lại mức chỉ tiêu có phù hợp không.' },
+  { title: '3. Tách bạch "tăng trưởng YoY" và "so với hệ thống"', body:
+    'Một cửa hàng có thể tăng trưởng YoY dương nhưng vẫn tụt hạng trong hệ thống nếu tốc độ tăng chậm hơn mặt bằng chung - đây là tín hiệu cảnh báo sớm quan trọng hơn cả việc chỉ nhìn tăng/giảm tuyệt đối. '
+    + 'Ngược lại, YoY âm nhưng vẫn giữ hạng cao có thể do cùng kỳ năm trước có yếu tố đột biến (khai trương, sự kiện) - nên ghi chú lại bối cảnh khi so sánh giữa các tháng.' },
+  { title: '4. Ứng dụng phần "Khách hàng & giá trị đơn hàng"', body:
+    'Đây là công cụ chẩn đoán nhanh giữa hai nguyên nhân chính khiến doanh số thấp: (a) ít khách vào cửa hàng - cần giải pháp marketing/traffic, hoặc (b) khách vào nhưng chi tiêu ít - cần giải pháp trưng bày/tư vấn bán hàng/combo. '
+    + 'Kết hợp thêm với công cụ "Bảng Điều Khiển Phân Tích Doanh Số 1016" (phân tích theo ngành hàng, theo ngày/giờ) và "Dashboard Tồn Kho 1016" để tìm nguyên nhân gốc ở cấp ngành hàng/SKU cụ thể, thay vì dừng lại ở nhận định tổng quan.' },
+  { title: '5. Lưu xu hướng mỗi tháng để theo dõi lâu dài', body:
+    'Sau khi phân tích file tháng, hãy chọn đúng kỳ báo cáo và bấm "Lưu kỳ này vào xu hướng" để tích luỹ dữ liệu qua nhiều tháng. Từ 2 kỳ trở lên, mục "Xu hướng qua các tháng" sẽ hiện biểu đồ giúp thấy được: doanh số và % đạt chỉ tiêu đang cải thiện hay đi xuống, và thứ hạng hệ thống của 1016 đang tăng hay giảm theo thời gian - chỉ số hạng ổn định hoặc cải thiện qua nhiều tháng là tín hiệu vận hành tốt hơn dùng con số tuyệt đối một tháng đơn lẻ.' },
+  { title: '6. Giới hạn cần lưu ý', body:
+    'Công cụ chỉ phân tích 16 cửa hàng do bạn chỉ định (loại các mã kho/EC/dịch vụ/cửa hàng chưa vận hành). Số liệu Cumulative Budget/Ratio và Monthly Budget Progress có thể trùng nhau tuỳ cách hệ thống xuất báo cáo - nếu cần độ chính xác tuyệt đối cho báo cáo chính thức, hãy đối chiếu lại với file gốc. '
+    + 'Khu vực Bắc/Trung/Nam được gán theo tên cửa hàng và có thể chỉnh sửa ở mục "Cấu hình khu vực" cuối trang nếu chưa đúng.' }
+];
+function renderGuide(){
+  document.getElementById('guideAccordion').innerHTML = GUIDE_ITEMS.map(function(it, i){
+    return '<div class="acc-item" data-i="'+i+'"><div class="acc-head"><span>'+it.title+'</span><span class="arrow">▾</span></div><div class="acc-body"><p>'+it.body+'</p></div></div>';
+  }).join('');
+  document.querySelectorAll('#guideAccordion .acc-item').forEach(function(el){
+    el.querySelector('.acc-head').addEventListener('click', function(){ el.classList.toggle('open'); });
+  });
+}
+
+/* ============================================================
+   REGION CONFIG UI
+   ============================================================ */
+function renderRegionConfig(){
+  var overrides = loadRegionOverrides();
+  var grid = document.getElementById('regionGrid');
+  grid.innerHTML = TARGET_CODES.map(function(code){
+    var region = overrides[code] || REGION_DEFAULT[code];
+    var name = (STATE.dataset && STATE.dataset.all.find(function(s){return s.code===code;}));
+    var label = code + (name?(' '+name.name):'');
+    return '<div class="region-row"><span>'+escapeHtml(label)+'</span><select data-code="'+code+'">'
+      + REGIONS.map(function(r){ return '<option value="'+r+'"'+(r===region?' selected':'')+'>'+r+'</option>'; }).join('')
+      + '</select></div>';
+  }).join('');
+  grid.querySelectorAll('select').forEach(function(sel){
+    sel.addEventListener('change', function(){
+      saveRegionOverride(sel.dataset.code, sel.value);
+      if (STATE.rawRows) processRows(STATE.rawRows); // re-parse + re-render with new region
+    });
+  });
+}
+document.getElementById('regionConfigHead').addEventListener('click', function(){
+  document.getElementById('regionConfigItem').classList.toggle('open');
+});
+
+/* ============================================================
+   PROFILE CONFIG UI (diện tích / nhân sự / ngày khai trương)
+   ============================================================ */
+function renderProfileConfig(){
+  var overrides = loadProfileOverrides();
+  var tbody = document.getElementById('profileConfigBody');
+  tbody.innerHTML = TARGET_CODES.map(function(code){
+    var def = STORE_PROFILE_DEFAULT[code] || {};
+    var p = Object.assign({}, def, overrides[code] || {});
+    var found = (STATE.dataset && STATE.dataset.all.find(function(s){ return s.code===code; }));
+    var label = code + (found ? (' - ' + found.name) : '');
+    var isHome = code === HOME_CODE;
+    return '<tr class="'+(isHome?'home':'')+'" data-code="'+code+'">'
+      + '<td class="left">'+escapeHtml(label)+'</td>'
+      + '<td><input type="number" step="any" min="0" data-field="area" value="'+(p.area!==undefined&&p.area!==null?p.area:'')+'" style="width:80px;" placeholder="m²"></td>'
+      + '<td><input type="date" data-field="openDate" value="'+(p.openDate||'')+'" style="width:132px;"></td>'
+      + '<td><input type="number" min="0" data-field="staff" value="'+(p.staff!==undefined&&p.staff!==null?p.staff:'')+'" style="width:56px;" placeholder="tổng"></td>'
+      + '<td><input type="number" min="0" data-field="fullTime" value="'+(p.fullTime!==undefined&&p.fullTime!==null?p.fullTime:'')+'" style="width:52px;" placeholder="FT"></td>'
+      + '<td><input type="number" min="0" data-field="partTime" value="'+(p.partTime!==undefined&&p.partTime!==null?p.partTime:'')+'" style="width:52px;" placeholder="PT"></td>'
+      + '<td><input type="number" min="0" data-field="partTimeMaxHours" value="'+(p.partTimeMaxHours!==undefined&&p.partTimeMaxHours!==null?p.partTimeMaxHours:'')+'" style="width:60px;" placeholder="giờ"></td>'
+      + '</tr>';
+  }).join('');
+
+  tbody.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var tr = inp.closest('tr');
+      var code = tr.dataset.code;
+      var field = inp.dataset.field;
+      var val = inp.value;
+      if (inp.type === 'number'){ val = (val === '' ? null : Number(val)); }
+      if (inp.type === 'date'){ val = val || null; }
+      saveProfileOverride(code, field, val);
+      // nếu người dùng nhập breakdown full-time/part-time đầy đủ, coi như số liệu chính xác
+      var ov = loadProfileOverrides()[code] || {};
+      if (ov.fullTime !== undefined && ov.fullTime !== null && ov.partTime !== undefined && ov.partTime !== null && ov.partTimeMaxHours){
+        saveProfileOverride(code, 'staffQuality', 'exact');
+      }
+      if (STATE.rawRows) processRows(STATE.rawRows);
+    });
+  });
+}
+document.getElementById('profileConfigHead').addEventListener('click', function(){
+  document.getElementById('profileConfigItem').classList.toggle('open');
+});
+
+/* ============================================================
+   MASTER RENDER
+   ============================================================ */
+var SYSTEM_SOUTH_CANVAS_IDS = ['chartSalesAll','chartBudgetAll','chartYoyAll','chartShareAll','chartSalesSouth','chartBudgetSouth'];
+var EFFICIENCY_CANVAS_IDS = ['chartSqmAll','chartFteAll','chartSqmSouth','chartFteSouth'];
+
+function renderAll(ds){
+  STATE.dataset = ds;
+  document.getElementById('kpiHint').textContent = 'Trong tổng ' + ds.all.length + ' cửa hàng phân tích (' + ds.south.length + ' Miền Nam, ' + ds.north.length + ' Miền Bắc' + (ds.center.length?(', '+ds.center.length+' Miền Trung'):'') + ')';
+  document.getElementById('southHint').textContent = ds.south.length + ' cửa hàng Miền Nam trong phạm vi phân tích - trung bình doanh số: ' + fmtCompactVND(ds.aggSouth.netSales.avg);
+  renderKpis(ds);
+  renderInsights(ds);
+  try {
+    renderSystemCharts(ds);
+    renderSouthCharts(ds);
+  } catch(chartErr){
+    console.error('Lỗi khi vẽ biểu đồ (không ảnh hưởng số liệu):', chartErr);
+    SYSTEM_SOUTH_CANVAS_IDS.forEach(function(id){
+      var elc = document.getElementById(id);
+      if (elc) elc.innerHTML = '<div class="svg-empty">⚠ Không vẽ được biểu đồ này - số liệu KPI/nhận định/bảng bên trên vẫn đầy đủ và chính xác.</div>';
+    });
+  }
+  renderEfficiencyKpis(ds);
+  renderEfficiencyInsights(ds);
+  try {
+    renderEfficiencyCharts(ds);
+  } catch(effErr){
+    console.error('Lỗi khi vẽ biểu đồ hiệu quả (không ảnh hưởng số liệu):', effErr);
+    EFFICIENCY_CANVAS_IDS.forEach(function(id){
+      var elc = document.getElementById(id);
+      if (elc) elc.innerHTML = '<div class="svg-empty">⚠ Không vẽ được biểu đồ này - số liệu KPI/nhận định bên trên vẫn đầy đủ và chính xác.</div>';
+    });
+  }
+  try { renderAssessment(ds); } catch(asErr){ console.error('Lỗi khi tạo đánh giá:', asErr); }
+  renderTable(ds);
+  renderRegionConfig();
+  renderProfileConfig();
+  renderSavedPeriods();
+  document.getElementById('app').style.display = 'block';
+}
+
+/* ============================================================
+   FILE HANDLING
+   ============================================================ */
+var dropZone = document.getElementById('dropZone');
+var fileInput = document.getElementById('fileInput');
+var statusMsg = document.getElementById('statusMsg');
+var errorBox = document.getElementById('errorBox');
+
+function showError(msg){
+  errorBox.style.display = 'block';
+  errorBox.textContent = '⚠ ' + msg;
+  statusMsg.textContent = '';
+}
+function clearError(){ errorBox.style.display = 'none'; errorBox.textContent = ''; }
+
+function processRows(rows){
+  STATE.rawRows = rows;
+  var storesByCode = rowsToStores(rows);
+  var ds = buildDataset(storesByCode);
+  renderAll(ds);
+}
+
+function handleFile(file){
+  clearError();
+  statusMsg.className = ''; statusMsg.textContent = 'Đang đọc file "'+file.name+'"...';
+  var ext = (file.name.split('.').pop()||'').toLowerCase();
+  var period = guessPeriodFromFilename(file.name);
+  document.getElementById('periodInput').value = period;
+  document.getElementById('topPeriod').style.display = 'inline-flex';
+  document.getElementById('topPeriod').textContent = '📅 Kỳ: ' + period;
+  // Dùng ngày cuối tháng của kỳ báo cáo làm mốc tính "tuổi cửa hàng" (thay vì ngày hôm nay mở trang)
+  var pm = period.split('-');
+  if (pm.length === 2 && !isNaN(+pm[0]) && !isNaN(+pm[1])){
+    CURRENT_PERIOD_DATE = new Date(+pm[0], +pm[1], 0);
+  }
+
+  var reader = new FileReader();
+  reader.onerror = function(){ showError('Không đọc được file. Vui lòng thử lại hoặc chọn file khác.'); };
+  reader.onload = function(e){
+    try {
+      var rows;
+      if (ext === 'csv'){
+        rows = parseCsvText(String(e.target.result));
+      } else {
+        if (typeof XLSX === 'undefined'){
+          throw new Error('Không đọc được file Excel vì thư viện xử lý file (XLSX) chưa tải được - thường do máy chưa có kết nối Internet lúc mở trang này. Vui lòng kiểm tra mạng rồi tải lại trang (F5), hoặc lưu file dưới dạng .csv (Save As → CSV) rồi tải lên - .csv không cần thư viện này.');
+        }
+        var wb = XLSX.read(e.target.result, {type:'array'});
+        var sheetName = wb.SheetNames[0];
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1, defval:''});
+      }
+      processRows(rows);
+      statusMsg.className = 'ok'; statusMsg.textContent = '✓ Đã phân tích xong file "'+file.name+'".';
+    } catch(err){
+      console.error(err);
+      showError(err.message || 'Có lỗi xảy ra khi phân tích file. Vui lòng kiểm tra lại định dạng file.');
+      statusMsg.textContent = '';
+    }
+  };
+  if (ext === 'csv') reader.readAsText(file, 'UTF-8');
+  else reader.readAsArrayBuffer(file);
+}
+
+dropZone.addEventListener('click', function(){ fileInput.click(); });
+fileInput.addEventListener('change', function(){ if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+['dragenter','dragover'].forEach(function(ev){
+  dropZone.addEventListener(ev, function(e){ e.preventDefault(); dropZone.classList.add('drag'); });
+});
+['dragleave','drop'].forEach(function(ev){
+  dropZone.addEventListener(ev, function(e){ e.preventDefault(); dropZone.classList.remove('drag'); });
+});
+dropZone.addEventListener('drop', function(e){
+  var f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+document.getElementById('btnChangeFile').addEventListener('click', function(){ fileInput.click(); });
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+renderGuide();
+renderRegionConfig();
+renderProfileConfig();
+renderSavedPeriods();
+
+if (!XLSX_AVAILABLE){
+  var warnEl = document.createElement('div');
+  warnEl.style.cssText = 'margin-top:12px; font-size:12.5px; color:var(--warning); text-align:left; max-width:640px; margin-left:auto; margin-right:auto;';
+  warnEl.textContent = '⚠ Trang chưa tải được thư viện đọc file Excel (XLSX) - thường do máy chưa có kết nối Internet lúc mở trang. Vẫn có thể tải lên file .csv để phân tích đầy đủ số liệu (không cần thư viện này). Muốn dùng file .xlsx/.xls, hãy kiểm tra kết nối mạng rồi bấm tải lại trang (F5).';
+  document.getElementById('uploadSection').appendChild(warnEl);
+}
+
+})();
+</script>
+</body>
+</html>

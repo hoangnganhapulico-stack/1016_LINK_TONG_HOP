@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kohnan - So Sánh Tồn Kho (Xuất Ô Riêng)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <style>
+        :root {
+            --bg-a: #e0f2fe; --bg-b: #fef3c7;
+            --surface: rgba(255, 255, 255, 0.92); --surface-solid: #ffffff; --surface-soft: #f8fafc;
+            --border: #e2e8f0; --border-strong: #cbd5e1;
+            --text: #1e293b; --text-strong: #0f172a; --text-muted: #64748b; --text-faint: #94a3b8;
+            --accent: #0284c7; --accent-strong: #0369a1; --accent-soft-bg: #e0f2fe;
+            --danger: #e11d48; --danger-strong: #b91c1c; --success: #16a34a;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-a: #0b1a2b; --bg-b: #1c1408;
+                --surface: rgba(15, 23, 42, 0.88); --surface-solid: #0f172a; --surface-soft: #16223a;
+                --border: #263349; --border-strong: #33445f;
+                --text: #cbd5e1; --text-strong: #f1f5f9; --text-muted: #94a3b8; --text-faint: #64748b;
+                --accent: #38bdf8; --accent-strong: #7dd3fc; --accent-soft-bg: #0c2436;
+                --danger: #fb7185; --danger-strong: #f43f5e; --success: #4ade80;
+            }
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background: linear-gradient(135deg, var(--bg-a) 0%, var(--bg-b) 100%); min-height: 100vh; margin: 0; padding: 24px 12px; color: var(--text); display: flex; align-items: flex-start; justify-content: center; }
+        .container { width: 100%; max-width: 1400px; margin: auto; background: var(--surface); padding: 28px; border-radius: 20px; border: 2px solid var(--border); box-shadow: 0 20px 45px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 24px; }
+        .tag { display: inline-block; background: var(--accent); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+        h1 { margin: 0; font-size: 28px; font-weight: 800; color: var(--text-strong); }
+        .subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+        .section { margin-bottom: 18px; padding: 18px; background: var(--surface-soft); border-radius: 16px; border: 1px solid var(--border); }
+        label { font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; color: var(--text); }
+        input[type="file"], input[type="text"] { width: 100%; padding: 12px 14px; margin-bottom: 8px; background: var(--surface-solid); border: 2px solid var(--border-strong); border-radius: 12px; color: var(--text-strong); font-size: 14px; outline: none; font-family: inherit; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft-bg); }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+        button { padding: 12px 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        button:hover { background: var(--accent-strong); transform: translateY(-2px); }
+        button.secondary { background: var(--danger); }
+        button.secondary:hover { background: var(--danger-strong); }
+        button.ghost { background: var(--surface-solid); color: var(--text); border: 2px solid var(--border-strong); }
+        button.ghost:hover { background: var(--surface-soft); border-color: var(--accent); }
+        .status { font-weight: 600; text-align: center; margin-top: 8px; font-size: 13px; min-height: 18px; }
+        .status.ok { color: var(--success); }
+        .status.err { color: var(--danger); }
+        .status.busy { color: var(--accent); }
+        .stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .store-tag { background: var(--surface-solid); border: 1.5px solid var(--border-strong); border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 600; }
+        .search-box { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
+        .search-box input { flex: 1; margin: 0; }
+        .products-list { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+        .product-item { display: flex; align-items: center; gap: 6px; padding: 8px; background: var(--surface-solid); border-radius: 10px; border: 1px solid var(--border); font-size: 12px; }
+        .product-item input { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+        .product-item label { margin: 0; cursor: pointer; flex: 1; text-transform: none; }
+        .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--surface-solid); }
+        th, td { padding: 6px 8px; border: 1px solid var(--border); text-align: right; white-space: nowrap; }
+        th { background: var(--accent-soft-bg); color: var(--accent-strong); font-weight: 700; text-transform: uppercase; font-size: 10px; }
+        td:first-child, th:first-child { text-align: left; position: sticky; left: 0; z-index: 10; background: var(--surface-soft); }
+        th:first-child { background: var(--accent-soft-bg); }
+        tbody tr:nth-child(odd) td:first-child { background: var(--surface-soft); }
+        tbody tr:nth-child(even) td:first-child { background: var(--surface-solid); }
+        .num { font-variant-numeric: tabular-nums; }
+        .stock { font-weight: 700; color: var(--accent-strong); background: rgba(2, 132, 199, 0.08); }
+        .gp { color: var(--success); font-weight: 600; }
+        .empty { text-align: center; padding: 20px; color: var(--text-faint); font-size: 13px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="tag">📊 KOHNAN MIỀN NAM</div>
+        <h1>So Sánh Tồn Kho Nhiều Sản Phẩm</h1>
+        <div class="subtitle">🏪 Hàng = Cửa hàng | 📦 Cột = Sản phẩm (Tồn|Giá|Bán|GP%) | Xuất Ô Riêng</div>
+    </div>
+
+    <div class="section">
+        <label>📁 Tải file tồn kho các cửa hàng</label>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" multiple>
+        <div id="status" class="status"></div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Chọn nhiều file cùng lúc - hệ thống tự nhận diện cửa hàng</div>
+        <div class="stores" id="stores"></div>
+        <div class="btn-row">
+            <button class="secondary" onclick="clearData()">🗑️ Xóa Dữ Liệu</button>
+        </div>
+    </div>
+
+    <div class="section" id="filterSec" style="display:none;">
+        <label>🔍 Chọn sản phẩm để xem</label>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Tìm mã/tên sản phẩm..." oninput="filterProducts()">
+            <label style="flex:0;margin:0;text-transform:none;font-weight:600;">
+                <input type="checkbox" id="selectAll" onchange="toggleAll()"> Tất cả
+            </label>
+        </div>
+        <div class="products-list" id="prodList"></div>
+    </div>
+
+    <div class="section" id="tableSec" style="display:none;">
+        <label>📊 Bảng so sánh</label>
+        <div class="table-wrap" id="tableWrap"></div>
+        <div class="btn-row">
+            <button onclick="exportCSV()">💾 Xuất CSV (Ô Riêng)</button>
+            <button class="ghost" onclick="exportXLSX()">💾 Xuất XLSX (Ô Riêng)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const db = localforage.createInstance({ name: 'kohnan_export_v3' });
+let stores = {};
+let selected = new Set();
+
+function num(v) { return isNaN(v) ? 0 : Number(v); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function setStatus(msg, type) {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = 'status ' + type;
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    stores = await db.getItem('stores') || {};
+    selected = new Set(await db.getItem('selected') || []);
+    if (Object.keys(stores).length) {
+        renderStores();
+        renderFilter();
+        document.getElementById('filterSec').style.display = 'block';
+        setStatus(`✓ Đã tải ${Object.keys(stores).length} cửa hàng`, 'ok');
+    }
+});
+
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setStatus('Đang đọc...', 'busy');
+    let done = 0, ok = 0, err = 0;
+    files.forEach(f => {
+        const isXl = f.name.toLowerCase().endsWith('.xlsx') || f.name.toLowerCase().endsWith('.xls');
+        if (isXl) {
+            const r = new FileReader();
+            r.onload = (ev) => { try { parseXL(ev.target.result); ok++; } catch(e) { err++; } finish(); };
+            r.onerror = () => { err++; finish(); };
+            r.readAsArrayBuffer(f);
+        } else {
+            Papa.parse(f, {
+                header: true, skipEmptyLines: true,
+                complete: (res) => { try { parseData(res.data); ok++; } catch(e) { err++; } finish(); },
+                error: () => { err++; finish(); }
+            });
+        }
+    });
+    function parseXL(buf) {
+        const wb = XLSX.read(buf, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        parseData(rows);
+    }
+    function parseData(rows) {
+        let sc = null, sn = null, items = {};
+        rows.forEach(r => {
+            if (!r) return;
+            const bc = String(r['Barcode'] || '').trim();
+            if (!bc || !/^\d+$/.test(bc)) return;
+            if (!sc) { sc = String(r['Store Code'] || '').trim(); sn = String(r['Store Name'] || '').trim(); }
+            items[bc] = { n: r['Product Name'] || '', q: num(r['Close Qty']), m: num(r['M.A.C']), s: num(r['Sales Qty']), g: num(r['G.P.%(COGS)']) };
+        });
+        if (!sc) throw new Error('No store code');
+        stores[sc] = { n: sn || sc, items };
+    }
+    function finish() { done++; if (done === files.length) { db.setItem('stores', stores).then(() => { renderStores(); renderFilter(); document.getElementById('filterSec').style.display = 'block'; setStatus(`✓ Tải ${ok} file thành công`, ok ? 'ok' : 'err'); }); } }
+    e.target.value = '';
+});
+
+function renderStores() {
+    const w = document.getElementById('stores');
+    w.innerHTML = Object.keys(stores).sort().map(sc => `<div class="store-tag">${esc(stores[sc].n)} (${sc})</div>`).join('');
+}
+
+function filterProducts() {
+    const inp = document.getElementById('search').value.toLowerCase();
+    const all = new Set();
+    Object.values(stores).forEach(s => Object.keys(s.items).forEach(bc => all.add(bc)));
+    const prods = Array.from(all).map(bc => {
+        const item = Object.values(stores).find(s => s.items[bc])?.items[bc];
+        return { bc, n: item?.n || '' };
+    }).sort((a, b) => a.bc.localeCompare(b.bc));
+    const filt = prods.filter(p => p.bc.includes(inp) || p.n.toLowerCase().includes(inp));
+    const list = document.getElementById('prodList');
+    list.innerHTML = filt.map(p => `<div class="product-item">
+        <input type="checkbox" ${selected.has(p.bc) ? 'checked' : ''} onchange="toggle('${p.bc}')">
+        <label>${esc(p.bc)}<br><span style="font-size:10px;color:var(--text-faint);">${esc(p.n)}</span></label>
+    </div>`).join('');
+}
+
+function renderFilter() {
+    filterProducts();
+}
+
+function toggle(bc) {
+    selected.has(bc) ? selected.delete(bc) : selected.add(bc);
+    db.setItem('selected', Array.from(selected));
+    renderTable();
+}
+
+function toggleAll() {
+    const all = new Set();
+    Object.values(stores).forEach(s => Object.keys(s.items).forEach(bc => all.add(bc)));
+    const inp = document.getElementById('search').value.toLowerCase();
+    const filt = Array.from(all).filter(bc => {
+        const item = Object.values(stores).find(s => s.items[bc])?.items[bc];
+        return bc.includes(inp) || item?.n.toLowerCase().includes(inp);
+    });
+    if (document.getElementById('selectAll').checked) filt.forEach(bc => selected.add(bc));
+    else filt.forEach(bc => selected.delete(bc));
+    db.setItem('selected', Array.from(selected));
+    filterProducts();
+    renderTable();
+}
+
+function renderTable() {
+    const wrap = document.getElementById('tableWrap');
+    const sec = document.getElementById('tableSec');
+    if (!selected.size) { wrap.innerHTML = '<div class="empty">Chọn sản phẩm để xem bảng so sánh</div>'; sec.style.display = 'block'; return; }
+
+    const scs = Object.keys(stores).sort();
+    const prods = Array.from(selected).sort();
+
+    let h = '<table><thead><tr><th rowspan="2">Cửa Hàng</th>';
+    prods.forEach(bc => {
+        const item = Object.values(stores).find(s => s.items[bc])?.items[bc];
+        h += `<th colspan="4" style="text-align:center;border-bottom:3px solid var(--accent);">${esc(bc)}<br><span style="font-size:9px;font-weight:500;">${esc(item?.n || '')}</span></th>`;
+    });
+    h += '</tr><tr>';
+    prods.forEach(() => h += '<th>Tồn</th><th>Giá</th><th>Bán</th><th>GP%</th>');
+    h += '</tr></thead><tbody>';
+
+    scs.forEach(sc => {
+        h += `<tr><td>${esc(stores[sc].n)}<br><span style="font-size:10px;color:var(--text-faint);">${sc}</span></td>`;
+        prods.forEach(bc => {
+            const item = stores[sc].items[bc];
+            if (item) {
+                h += `<td class="num stock">${num(item.q).toLocaleString('vi-VN')}</td>`;
+                h += `<td class="num">${num(item.m).toLocaleString('vi-VN')}</td>`;
+                h += `<td class="num">${num(item.s).toLocaleString('vi-VN')}</td>`;
+                h += `<td class="num gp">${num(item.g).toFixed(1)}%</td>`;
+            } else {
+                h += '<td class="num">-</td><td class="num">-</td><td class="num">-</td><td class="num">-</td>';
+            }
+        });
+        h += '</tr>';
+    });
+    h += '</tbody></table>';
+    wrap.innerHTML = h;
+    sec.style.display = 'block';
+}
+
+function exportCSV() {
+    if (!selected.size) { alert('Chọn sản phẩm trước'); return; }
+    const scs = Object.keys(stores).sort();
+    const prods = Array.from(selected).sort();
+
+    // HEADER: Cửa Hàng | Mã1-Tồn | Mã1-Giá | Mã1-Bán | Mã1-GP% | Mã2-Tồn | Mã2-Giá | ...
+    let csv = '"Cửa Hàng"';
+    prods.forEach(bc => {
+        csv += `,"${bc}-Tồn","${bc}-Giá","${bc}-Bán","${bc}-GP%"`;
+    });
+    csv += '\n';
+
+    // DATA: Mỗi dòng là 1 cửa hàng, mỗi ô riêng 1 giá trị
+    scs.forEach(sc => {
+        csv += `"${stores[sc].n} (${sc})"`;
+        prods.forEach(bc => {
+            const item = stores[sc].items[bc];
+            if (item) {
+                // Mỗi giá trị ở ô riêng - KHÔNG gộp chung
+                csv += `,"${num(item.q)}","${num(item.m)}","${num(item.s)}","${num(item.g).toFixed(2)}"`;
+            } else {
+                csv += `,"","","",""`;
+            }
+        });
+        csv += '\n';
+    });
+
+    download(csv, 'Kohnan_' + Date.now() + '.csv', 'text/csv');
+}
+
+function exportXLSX() {
+    if (!selected.size) { alert('Chọn sản phẩm trước'); return; }
+    const scs = Object.keys(stores).sort();
+    const prods = Array.from(selected).sort();
+
+    // Header: Cửa Hàng | Mã1-Tồn | Mã1-Giá | Mã1-Bán | Mã1-GP% | Mã2-Tồn | ...
+    const data = [['Cửa Hàng']];
+    prods.forEach(bc => {
+        // Mỗi sản phẩm = 4 cột (Tồn, Giá, Bán, GP%)
+        data[0].push(`${bc}-Tồn`, `${bc}-Giá`, `${bc}-Bán`, `${bc}-GP%`);
+    });
+
+    // Data: Mỗi dòng = 1 cửa hàng
+    scs.forEach(sc => {
+        const row = [`${stores[sc].n} (${sc})`];
+        prods.forEach(bc => {
+            const item = stores[sc].items[bc];
+            if (item) {
+                // Push từng giá trị riêng vào 4 ô riêng
+                row.push(num(item.q), num(item.m), num(item.s), num(item.g).toFixed(2));
+            } else {
+                // Nếu không có dữ liệu thì để trống 4 ô
+                row.push('', '', '', '');
+            }
+        });
+        data.push(row);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = Array(data[0].length).fill({ wch: 15 });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'TonKho');
+    XLSX.writeFile(wb, 'Kohnan_' + Date.now() + '.xlsx');
+}
+
+function download(content, name, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+async function clearData() {
+    if (!confirm('Xóa toàn bộ dữ liệu?')) return;
+    stores = {}; selected.clear();
+    await db.clear();
+    document.getElementById('filterSec').style.display = 'none';
+    document.getElementById('tableSec').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    renderStores();
+    setStatus('✓ Đã xóa dữ liệu', 'ok');
+}
+</script>
+</body>
+</html>

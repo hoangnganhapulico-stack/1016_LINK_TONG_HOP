@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Ưu Đãi Tháng 10 - Bảng giới thiệu sản phẩm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700&family=Noto+Sans+SC:wght@500;700&family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-a:#fce7f3; --bg-b:#e0f2fe;
+    --heading:#0f172a; --text:#1e293b; --muted:#64748b;
+    --accent:#db2777; --accent-dark:#be185d; --accent-line:#fbcfe8;
+    --promo:#ea580c; --deal:#dc2626;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:linear-gradient(135deg,var(--bg-a),var(--bg-b));
+    color:var(--text);
+    font-family:'Plus Jakarta Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:20px 12px;
+  }
+  body.ja-active{ font-family:'Noto Sans JP','Plus Jakarta Sans',sans-serif; }
+  body.zh-active{ font-family:'Noto Sans SC','Plus Jakarta Sans',sans-serif; }
+  body.ko-active{ font-family:'Noto Sans KR','Plus Jakarta Sans',sans-serif; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  /* ---- toolbar (screen only) ---- */
+  .toolbar{ max-width:1000px; margin:0 auto 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .lang-tabs{ display:flex; gap:4px; background:#fff; border:1px solid var(--accent-line); border-radius:999px; padding:4px; flex-wrap:wrap; }
+  .lang-tabs button{
+    appearance:none; border:none; background:transparent; font:600 13px 'Plus Jakarta Sans','Noto Sans JP','Noto Sans KR',sans-serif;
+    padding:8px 15px; border-radius:999px; cursor:pointer; color:var(--accent-dark);
+  }
+  .lang-tabs button.active{ background:var(--accent); color:#fff; }
+  .print-btn{
+    appearance:none; border:none; background:var(--accent); color:#fff; font:700 13px 'Plus Jakarta Sans',sans-serif;
+    padding:11px 20px; border-radius:999px; cursor:pointer; display:flex; align-items:center; gap:8px;
+  }
+  .print-btn svg{ width:15px; height:15px; }
+
+  /* ---- sheet = one A5 landscape page (210 x 148mm) ---- */
+  .sheet{
+    width:210mm; height:148mm; margin:0 auto;
+    background:#fff; border-radius:14px;
+    box-shadow:0 20px 45px rgba(157,23,77,.14);
+    padding:5mm 6mm;
+    display:flex; flex-direction:column; gap:3mm;
+    overflow:hidden;
+  }
+  @media screen and (min-width:900px){ .sheet{ zoom:1.25; } }
+
+  header{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding-bottom:2.5mm; border-bottom:2px dashed var(--accent-line);
+  }
+  h1{ margin:0; font-size:24px; font-weight:800; color:var(--heading); line-height:1.15; }
+  .ja-active h1, .zh-active h1, .ko-active h1{ font-size:23px; }
+  .promo-dates{
+    flex:none; font-size:16px; font-weight:800; color:#fff; background:var(--promo);
+    padding:6px 16px; border-radius:999px; white-space:nowrap;
+  }
+
+  /* ---- cards ---- */
+  .cards{ flex:1; min-height:0; display:grid; grid-template-columns:repeat(3,1fr); gap:3mm; }
+  .card{
+    --c:#db2777; --c-bg:#fce7f3; --c-line:#f9a8d4;
+    border:2px solid var(--c-line); border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column; background:var(--c-bg);
+  }
+  .card.pink { --c:#db2777; --c-bg:#fce7f3; --c-line:#f9a8d4; }
+  .card.blue { --c:#0284c7; --c-bg:#e0f2fe; --c-line:#7dd3fc; }
+  .card.green{ --c:#16a34a; --c-bg:#dcfce7; --c-line:#86efac; }
+
+  .deal{
+    background:var(--c); color:#fff; text-align:center;
+    font-size:15px; font-weight:800; letter-spacing:.02em; padding:5px 8px; line-height:1.2;
+  }
+  .deal.soft{ background:var(--c); }
+
+  .body{ flex:1; display:flex; flex-direction:column; justify-content:space-between; padding:2.5mm 3.5mm 3mm; gap:2mm; }
+  .card h2{ margin:0; font-size:21px; font-weight:800; line-height:1.15; color:var(--heading); }
+  .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:20px; }
+  .brand{ margin-top:2px; font-size:13px; font-weight:700; color:var(--c); }
+
+  .price-box{
+    position:relative;
+    background:#fff; border:1.5px solid var(--c-line); border-radius:11px;
+    padding:4px 10px 5px;
+  }
+  .price-line{ display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; }
+  .price-box .old{ font-size:17px; color:#94a3b8; text-decoration:line-through; font-weight:700; }
+  .price-box .new{ font-size:38px; font-weight:700; color:var(--promo); line-height:1.05; letter-spacing:-.02em; }
+  .price-box .unit{ font-size:14px; color:var(--muted); font-weight:600; }
+  .price-box .date{ font-size:13.5px; font-weight:800; color:var(--c); }
+  .pct{
+    position:absolute; top:-9px; right:-4px;
+    background:var(--deal); color:#fff; font-size:16px; font-weight:800;
+    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    transform:rotate(-10deg); box-shadow:0 0 0 2px #fff;
+  }
+
+  .variant{ display:flex; gap:7px; align-items:center; }
+  .variant + .variant{ margin-top:5px; }
+  .variant .vdot{ width:14px; height:14px; border-radius:50%; flex:none; }
+  .variant div{ font-size:15.5px; line-height:1.25; }
+  .variant b{ color:var(--heading); }
+
+  .card ul{ margin:0; padding:0; list-style:none; }
+  .card li{ position:relative; padding-left:15px; font-size:16px; line-height:1.3; font-weight:600; color:var(--text); }
+  .card li + li{ margin-top:5px; }
+  .card li::before{ content:""; position:absolute; left:1px; top:7px; width:7px; height:7px; border-radius:50%; background:var(--c); }
+
+  /* CJK/Hangul: shorter text, so set larger */
+  .ja-active .deal, .zh-active .deal, .ko-active .deal{ font-size:18px; }
+  .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:25px; }
+  .ja-active .brand, .zh-active .brand, .ko-active .brand{ font-size:15px; }
+  .ja-active .variant div, .zh-active .variant div, .ko-active .variant div{ font-size:18px; }
+  .ja-active .card li, .zh-active .card li, .ko-active .card li{ font-size:19px; }
+  .ja-active .card li::before, .zh-active .card li::before, .ko-active .card li::before{ top:9px; }
+  .ja-active .price-box .date, .zh-active .price-box .date, .ko-active .price-box .date{ font-size:16px; }
+  .ja-active h1, .zh-active h1, .ko-active h1{ font-size:27px; }
+  .ja-active .combo .ctext, .zh-active .combo .ctext, .ko-active .combo .ctext{ font-size:15px; }
+
+  /* Japanese runs longer than zh/ko */
+  .ja-active .deal{ font-size:15px; }
+  .ja-active .card h2{ font-size:21px; }
+  .ja-active .brand{ font-size:13px; }
+  .ja-active .variant div{ font-size:15.5px; }
+  .ja-active .card li{ font-size:16px; }
+  .ja-active .card li::before{ top:7px; }
+  .ja-active .price-box .date{ font-size:14px; }
+
+  /* ---- combos ---- */
+  .combos{ display:flex; align-items:stretch; gap:2.5mm; }
+  .combos-title{
+    flex:none; display:flex; align-items:center; justify-content:center; text-align:center;
+    background:var(--accent); color:#fff; font-size:14px; font-weight:800; border-radius:10px; padding:0 10px; width:20mm; line-height:1.2;
+  }
+  .combo{
+    flex:1; display:flex; flex-direction:column; justify-content:center; gap:1px;
+    border:1.5px solid #fed7aa; background:#fff7ed; border-radius:10px; padding:5px 10px;
+  }
+  .combo .ctext{ font-size:14px; font-weight:700; line-height:1.25; color:var(--heading); }
+  .combo .cprice{ font-size:21px; font-weight:700; color:var(--promo); white-space:nowrap; align-self:flex-end; line-height:1.1; }
+
+  @media screen and (max-width:899px){
+    .sheet{ width:100%; height:auto; overflow:visible; }
+    .cards{ grid-template-columns:1fr; }
+    .combos{ flex-direction:column; }
+    .combos-title{ max-width:none; padding:6px; }
+    header{ flex-direction:column; align-items:flex-start; }
+  }
+
+  @media print{
+    @page{ size:A5 landscape; margin:0; }
+    body{ padding:0; min-height:0; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .toolbar{ display:none; }
+    .sheet{ zoom:1; width:210mm; height:148mm; border-radius:0; box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="lang-tabs" id="langTabs">
+    <button data-set="vi" class="active">Tiếng Việt</button>
+    <button data-set="en">English</button>
+    <button data-set="ja">日本語</button>
+    <button data-set="zh">中文</button>
+    <button data-set="ko">한국어</button>
+  </div>
+  <button class="print-btn" onclick="window.print()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    <span id="printLabel">In A5 ngang</span>
+  </button>
+</div>
+
+<div class="sheet" id="page">
+  <header>
+    <h1 id="mainTitle"></h1>
+    <div class="promo-dates" id="promoDates"></div>
+  </header>
+  <div class="cards" id="cards"></div>
+  <div class="combos" id="combos"></div>
+</div>
+
+<script>
+/* Giá cố định cho mọi ngôn ngữ */
+const PRICES = {
+  avatar: { old: "149,000₫", now: "79,000₫", pct: "-47%" },
+  cream:  { old: "89,000₫", now: "49,000₫", pct: "-45%" },
+  lip:    { old: null,      now: "39,000₫", pct: null }
+};
+const COMBO_PRICES = ["167,000₫", "88,000₫", "158,000₫"];
+const VCOLORS = ["#ec4899", "#0284c7"];
+
+const CONTENT = {
+  vi: {
+    printLabel: "In A5 ngang",
+    title: "Ưu Đãi Tháng 10 - Chăm Sóc Da Mùa Hanh Khô",
+    promo: "01.10 - 30.10.2026",
+    cards: {
+      avatar: { deal: "MUA 1 TẶNG 1 BÔNG TẮM", name: "Sữa Tắm Sáng Da AVATAR", brand: "Công nghệ Nhật · Hộp quà có quai xách", unit: "/ hộp",
+        variants: [["Hộp Hồng:", "Ý dĩ + Vitamin C, sáng da"], ["Hộp Xanh:", "Sữa bò, dưỡng ẩm tăng cường"]],
+        points: ["Làm quà 20/10 không cần gói"] },
+      cream: { deal: "GIẢM 40,000₫", name: "Kem Dưỡng Tay Hatomugi", brand: "Reihaku · Nhật Bản · 65g", unit: "/ tuýp",
+        points: ["Chiết xuất hạt ý dĩ, dưỡng ẩm sâu", "Thấm nhanh, không nhờn rít", "Da tay mềm mịn, hết khô ráp"] },
+      lip: { deal: "NAM NỮ ĐỀU DÙNG", name: "Son Dưỡng Môi Menturm", brand: "Omi Brotherhood · Nhật Bản", unit: "/ thỏi",
+        points: ["Dưỡng ẩm, ngừa môi khô nứt", "Không màu, mát nhẹ", "Nhỏ gọn, bỏ túi mang theo"] }
+    },
+    combosTitle: "MUA KÈM",
+    combos: ["AVATAR + Kem tay + Son", "Kem tay + Son", "Hồng + Xanh (2 bông tắm)"]
+  },
+  en: {
+    printLabel: "Print A5 landscape",
+    title: "October Deals - Dry-Season Body Care",
+    promo: "Oct 1 - Oct 30, 2026",
+    cards: {
+      avatar: { deal: "FREE BATH SPONGE", name: "AVATAR Brightening Body Wash", brand: "Japanese technology · Gift box with handle", unit: "/ box",
+        variants: [["Pink:", "Job's tears + Vitamin C, brightening"], ["Blue:", "Cow's milk, extra moisture"]],
+        points: ["Ready to gift, no wrapping needed"] },
+      cream: { deal: "SAVE 40,000₫", name: "Hatomugi Hand Cream", brand: "Reihaku · Japan · 65g", unit: "/ tube",
+        points: ["Job's tears extract, deep moisture", "Fast-absorbing, non-greasy", "Soft, smooth hands"] },
+      lip: { deal: "FOR MEN & WOMEN", name: "Menturm Lip Balm", brand: "Omi Brotherhood · Japan", unit: "/ stick",
+        points: ["Moisturizes, prevents chapped lips", "Colorless, lightly cooling", "Pocket-size, take it anywhere"] }
+    },
+    combosTitle: "BUNDLES",
+    combos: ["AVATAR + Hand cream + Lip balm", "Hand cream + Lip balm", "Pink + Blue (2 free sponges)"]
+  },
+  ja: {
+    printLabel: "A5横で印刷",
+    title: "10月のお得 - 乾燥シーズンのボディケア",
+    promo: "2026年10月1日〜10月30日",
+    cards: {
+      avatar: { deal: "ボディスポンジ付き", name: "AVATAR 美肌ボディソープ", brand: "日本の技術 · 持ち手付き箱", unit: "/ 箱",
+        variants: [["ピンク:", "ハトムギ + ビタミンC、美肌"], ["ブルー:", "ミルク、高保湿"]],
+        points: ["ラッピング不要で贈れる"] },
+      cream: { deal: "40,000₫ OFF", name: "ハトムギ ハンドクリーム", brand: "麗白 Reihaku · 日本製 · 65g", unit: "/ 本",
+        points: ["ハトムギエキスでしっかり保湿", "すばやくなじみ、ベタつかない", "手肌すべすべ、カサつき知らず"] },
+      lip: { deal: "男女兼用", name: "メンターム 薬用リップ", brand: "近江兄弟社 · 日本製", unit: "/ 本",
+        points: ["唇のひび割れを防ぐ保湿", "無色・ほのかな清涼感", "コンパクトで持ち運びに便利"] }
+    },
+    combosTitle: "セットで",
+    combos: ["AVATAR + ハンドクリーム + リップ", "ハンドクリーム + リップ", "ピンク + ブルー（スポンジ2個）"]
+  },
+  zh: {
+    printLabel: "A5横版打印",
+    title: "十月优惠 - 干燥季节身体护理",
+    promo: "2026年10月1日 - 10月30日",
+    cards: {
+      avatar: { deal: "附赠沐浴球1个", name: "AVATAR 亮肤沐浴露", brand: "日本技术 · 手提礼盒", unit: "/ 盒",
+        variants: [["粉色：", "薏仁 + 维生素C，亮肤"], ["蓝色：", "牛奶，特强保湿"]],
+        points: ["送礼无需再包装"] },
+      cream: { deal: "立省 40,000₫", name: "薏仁护手霜", brand: "丽白 Reihaku · 日本制造 · 65克", unit: "/ 支",
+        points: ["薏仁萃取，深层保湿", "快速吸收，不黏腻", "手部柔嫩，告别干裂"] },
+      lip: { deal: "男女通用", name: "Menturm 药用润唇膏", brand: "近江兄弟社 · 日本制造", unit: "/ 支",
+        points: ["保湿，防止双唇干裂", "无色，清凉舒适", "小巧便携"] }
+    },
+    combosTitle: "搭配购买",
+    combos: ["AVATAR + 护手霜 + 润唇膏", "护手霜 + 润唇膏", "粉色 + 蓝色（送2个沐浴球）"]
+  },
+  ko: {
+    printLabel: "A5 가로 인쇄",
+    title: "10월 특가 - 건조한 계절 바디케어",
+    promo: "2026.10.01 - 10.30",
+    cards: {
+      avatar: { deal: "바디 스펀지 1개 증정", name: "AVATAR 브라이트닝 바디워시", brand: "일본 기술 · 손잡이 선물 상자", unit: "/ 상자",
+        variants: [["핑크:", "율무 + 비타민C, 브라이트닝"], ["블루:", "우유, 고보습"]],
+        points: ["포장 없이 바로 선물 가능"] },
+      cream: { deal: "40,000₫ 할인", name: "하토무기 핸드크림", brand: "Reihaku · 일본산 · 65g", unit: "/ 개",
+        points: ["율무 추출물로 깊은 보습", "빠른 흡수, 끈적임 없음", "부드럽고 매끈한 손"] },
+      lip: { deal: "남녀 공용", name: "Menturm 립밤", brand: "Omi Brotherhood · 일본산", unit: "/ 개",
+        points: ["보습, 입술 갈라짐 예방", "무색, 은은한 청량감", "작고 휴대 간편"] }
+    },
+    combosTitle: "함께 구매",
+    combos: ["AVATAR + 핸드크림 + 립밤", "핸드크림 + 립밤", "핑크 + 블루 (스펀지 2개)"]
+  }
+};
+
+const ORDER = [["avatar","pink",false], ["cream","blue",false], ["lip","green",true]];
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function render(lang){
+  const c = CONTENT[lang];
+  document.documentElement.lang = lang;
+  document.body.classList.remove('ja-active','zh-active','ko-active');
+  if(lang !== 'vi' && lang !== 'en') document.body.classList.add(lang + '-active');
+
+  document.getElementById('printLabel').textContent = c.printLabel;
+  document.getElementById('mainTitle').textContent = c.title;
+  document.getElementById('promoDates').textContent = c.promo;
+
+  document.getElementById('cards').innerHTML = ORDER.map(([key, cls, softDeal]) => {
+    const d = c.cards[key], p = PRICES[key];
+    const variants = d.variants ? `<div>${d.variants.map((v,i) => `
+        <div class="variant"><span class="vdot" style="background:${VCOLORS[i]}"></span>
+          <div><b>${esc(v[0])}</b> ${esc(v[1])}</div></div>`).join('')}</div>` : '';
+    return `
+    <div class="card ${cls}">
+      <div class="deal">${esc(d.deal)}</div>
+      <div class="body">
+        <div><h2>${esc(d.name)}</h2><div class="brand">${esc(d.brand)}</div></div>
+        <div class="price-box">
+          ${p.pct ? `<span class="pct">${p.pct}</span>` : ''}
+          <div class="price-line">
+            ${p.old ? `<span class="old mono">${p.old}</span>` : ''}
+            <span class="new mono">${p.now}</span>
+            <span class="unit">${esc(d.unit)}</span>
+          </div>
+          ${d.date ? `<div class="date">${esc(d.date)}</div>` : ''}
+        </div>
+        ${variants}
+        <ul>${d.points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('combos').innerHTML =
+    `<div class="combos-title">${esc(c.combosTitle)}</div>` +
+    c.combos.map((t, i) => `<div class="combo"><span class="ctext">${esc(t)}</span><span class="cprice mono">${COMBO_PRICES[i]}</span></div>`).join('');
+}
+
+const tabs = document.querySelectorAll('#langTabs button');
+tabs.forEach(btn => btn.addEventListener('click', () => {
+  tabs.forEach(b => b.classList.toggle('active', b === btn));
+  render(btn.getAttribute('data-set'));
+}));
+render('vi');
+</script>
+</body>
+</html>

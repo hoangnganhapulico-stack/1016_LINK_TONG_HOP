@@ -1,0 +1,1270 @@
+<title>Xu Hướng Tồn Kho Nhiều Tháng 1016</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    color-scheme: light;
+    --page:      #f9f9f7;
+    --surface:   #fcfcfb;
+    --surface-2: #f2f1ed;
+    --ink:       #0b0b0b;
+    --ink-2:     #52514e;
+    --muted:     #898781;
+    --grid:      #e1e0d9;
+    --baseline:  #c3c2b7;
+    --border:    rgba(11,11,11,0.10);
+    --border-strong: rgba(11,11,11,0.16);
+    --accent:    #2a78d6;
+    --accent-wash: #eaf2fc;
+    --sales:     #2a78d6;
+    --stock:     #eb6834;
+    --stock-wash:#fbe9e0;
+    --profit:    #008300;
+    --good:      #0ca30c;
+    --warning:   #fab219;
+    --serious:   #ec835a;
+    --critical:  #d03b3b;
+    --good-wash:     #e6f6e6;
+    --warning-wash:  #fef4e0;
+    --serious-wash:  #fdece4;
+    --critical-wash: #fbe6e6;
+    --shadow: 0 1px 2px rgba(11,11,11,0.04), 0 8px 24px -12px rgba(11,11,11,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page:      #0d0d0d;
+      --surface:   #1a1a19;
+      --surface-2: #232322;
+      --ink:       #ffffff;
+      --ink-2:     #c3c2b7;
+      --muted:     #898781;
+      --grid:      #2c2c2a;
+      --baseline:  #383835;
+      --border:    rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --accent:    #3987e5;
+      --accent-wash: #17273b;
+      --sales:     #3987e5;
+      --stock:     #d95926;
+      --stock-wash:#3a2317;
+      --profit:    #008300;
+      --good:      #0ca30c;
+      --warning:   #fab219;
+      --serious:   #ec835a;
+      --critical:  #e66767;
+      --good-wash:     #12291a;
+      --warning-wash:  #332506;
+      --serious-wash:  #33180f;
+      --critical-wash: #331414;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:      #0d0d0d;
+    --surface:   #1a1a19;
+    --surface-2: #232322;
+    --ink:       #ffffff;
+    --ink-2:     #c3c2b7;
+    --muted:     #898781;
+    --grid:      #2c2c2a;
+    --baseline:  #383835;
+    --border:    rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.18);
+    --accent:    #3987e5;
+    --accent-wash: #17273b;
+    --sales:     #3987e5;
+    --stock:     #d95926;
+    --stock-wash:#3a2317;
+    --profit:    #008300;
+    --good:      #0ca30c;
+    --warning:   #fab219;
+    --serious:   #ec835a;
+    --critical:  #e66767;
+    --good-wash:     #12291a;
+    --warning-wash:  #332506;
+    --serious-wash:  #33180f;
+    --critical-wash: #331414;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--page);
+    color:var(--ink);
+    font-family:'Be Vietnam Pro', system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ margin:0; text-wrap:balance; font-weight:700; }
+  p{ margin:0; }
+  .num{ font-variant-numeric:tabular-nums; }
+  a{ color:var(--accent); }
+
+  .wrap{ max-width:1320px; margin:0 auto; padding:0 20px 64px; }
+
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:color-mix(in srgb, var(--page) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:1320px; margin:0 auto; padding:14px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; margin-right:auto; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:linear-gradient(135deg, var(--sales), var(--stock));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:800; font-size:15px; flex:none;
+  }
+  .brand-text h1{ font-size:16px; letter-spacing:-0.01em; }
+  .brand-text span{ font-size:12px; color:var(--muted); }
+  .file-status{ font-size:12.5px; color:var(--ink-2); display:flex; align-items:center; gap:8px; }
+  .file-status .dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); flex:none; }
+  .file-status.ok .dot{ background:var(--good); }
+  .btn{
+    appearance:none; border:1px solid var(--border-strong); background:var(--surface);
+    color:var(--ink); font:inherit; font-weight:600; font-size:13px;
+    padding:9px 14px; border-radius:9px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+    transition:background .12s, border-color .12s, transform .04s;
+  }
+  .btn:hover{ background:var(--surface-2); border-color:var(--border-strong); }
+  .btn:active{ transform:scale(0.98); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover{ filter:brightness(1.06); }
+  .btn.ghost{ background:transparent; border-color:transparent; }
+  .btn.small{ padding:6px 10px; font-size:12px; border-radius:7px; }
+  .btn.danger{ color:var(--critical); border-color:color-mix(in srgb, var(--critical) 40%, var(--border-strong)); }
+  input[type=file]{ display:none; }
+
+  .hero{
+    margin-top:36px; border:1.5px dashed var(--border-strong); border-radius:18px;
+    background:var(--surface); padding:56px 32px; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    transition:border-color .15s, background .15s;
+  }
+  .hero.drag{ border-color:var(--accent); background:var(--accent-wash); }
+  .hero .icon{
+    width:56px; height:56px; border-radius:14px; background:var(--accent-wash);
+    display:flex; align-items:center; justify-content:center; color:var(--accent);
+  }
+  .hero h2{ font-size:21px; }
+  .hero p.lead{ color:var(--ink-2); font-size:14.5px; max-width:560px; line-height:1.55; }
+  .hero .meta{ color:var(--muted); font-size:12.5px; max-width:560px; line-height:1.6; }
+  .hero .actions{ display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; justify-content:center; }
+  .error-box{
+    margin-top:16px; border:1px solid var(--critical); background:var(--critical-wash);
+    color:var(--critical); border-radius:10px; padding:12px 14px; font-size:13px;
+    max-width:560px; text-align:left; line-height:1.5; display:none;
+  }
+  .error-box.show{ display:block; }
+  .spinner{
+    width:16px; height:16px; border-radius:50%;
+    border:2px solid rgba(255,255,255,0.4); border-top-color:#fff;
+    animation:spin .7s linear infinite; display:none;
+  }
+  .spinner.show{ display:inline-block; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .boot-loading{ display:flex; align-items:center; justify-content:center; gap:10px; padding:80px 16px; color:var(--muted); font-size:13.5px; }
+  .boot-spin{ width:18px; height:18px; border-radius:50%; border:2px solid var(--grid); border-top-color:var(--accent); animation:spin .7s linear infinite; flex:none; }
+
+  #app{ display:none; }
+  #app.show{ display:block; }
+  section.block{ margin-top:36px; }
+  .block-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .block-head h2{ font-size:17px; }
+  .block-head .sub{ font-size:12.5px; color:var(--muted); }
+
+  .kpi-grid{ display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; }
+  @media (max-width:1100px){ .kpi-grid{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:640px){ .kpi-grid{ grid-template-columns:repeat(2,1fr); } }
+  .tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:16px; display:flex; flex-direction:column; gap:6px; box-shadow:var(--shadow);
+    min-width:0;
+  }
+  .tile .label{ font-size:12px; color:var(--ink-2); font-weight:600; }
+  .tile .value{ font-size:22px; font-weight:800; letter-spacing:-0.01em; line-height:1.15; }
+  .tile .value small{ font-size:12px; font-weight:600; color:var(--muted); margin-left:2px; }
+  .tile .sub{ font-size:11.5px; color:var(--muted); }
+
+  .chart-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:960px){ .chart-grid{ grid-template-columns:1fr; } }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px;
+    box-shadow:var(--shadow);
+  }
+  .card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:4px; }
+  .card-head h3{ font-size:14px; }
+  .card-head p{ font-size:12px; color:var(--muted); margin-top:3px; }
+  .card.wide{ grid-column:1 / -1; }
+  .table-toggle{ font-size:11.5px; }
+
+  .simple-table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; }
+  .simple-table th{ text-align:left; font-size:11px; color:var(--muted); font-weight:600; padding:7px 9px; border-bottom:1px solid var(--grid); white-space:nowrap; }
+  .simple-table td{ padding:7px 9px; border-bottom:1px solid var(--grid); }
+  .simple-table td.num, .simple-table th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .simple-table td.name{ max-width:260px; }
+  .simple-table tbody tr:hover{ background:var(--surface-2); }
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:14px; background:var(--surface); padding:4px 14px; }
+  .table-scroll .simple-table{ min-width:640px; }
+
+  #viz-tooltip{
+    position:fixed; pointer-events:none; z-index:200; background:var(--ink); color:var(--page);
+    font-size:12px; padding:7px 10px; border-radius:8px; box-shadow:var(--shadow);
+    opacity:0; transform:translate(-50%,-120%); transition:opacity .08s; white-space:nowrap;
+  }
+  #viz-tooltip.show{ opacity:1; }
+  #viz-tooltip b{ font-variant-numeric:tabular-nums; }
+
+  details.guide{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px;
+  }
+  details.guide summary{ cursor:pointer; font-weight:700; font-size:14px; list-style:none; display:flex; align-items:center; gap:8px; }
+  details.guide summary::-webkit-details-marker{ display:none; }
+  details.guide summary::before{ content:'▸'; color:var(--accent); transition:transform .15s; font-size:12px; }
+  details.guide[open] summary::before{ transform:rotate(90deg); }
+  .guide-body{ margin-top:14px; display:grid; grid-template-columns:repeat(2,1fr); gap:16px; font-size:13px; color:var(--ink-2); line-height:1.6; }
+  @media (max-width:800px){ .guide-body{ grid-template-columns:1fr; } }
+  .guide-body h4{ font-size:12.5px; color:var(--ink); margin-bottom:5px; }
+
+  footer.app-foot{ margin-top:44px; padding-top:18px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .empty-hint{ color:var(--muted); font-size:13px; text-align:center; padding:32px 12px; }
+
+  /* ---------- Line chart (biểu đồ xu hướng) ---------- */
+  .line-chart-wrap{ margin-top:12px; }
+  .line-chart{ width:100%; height:auto; display:block; overflow:visible; }
+  .line-chart .lc-dot{ transition:r .1s; }
+  .line-chart .lc-hit{ cursor:pointer; }
+  .line-chart .lc-axis-label{ font-size:10.5px; fill:var(--muted); font-family:inherit; }
+  .line-chart .lc-end-label{ font-size:12.5px; font-weight:700; font-family:inherit; }
+
+  /* ---------- Confirm period panel ---------- */
+  .confirm-card select, .confirm-card input[type=number]{
+    font:inherit; font-size:13px; padding:8px 11px; border-radius:9px; border:1px solid var(--border-strong);
+    background:var(--surface-2); color:var(--ink);
+  }
+  .confirm-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .confirm-row label{ font-size:12.5px; color:var(--ink-2); display:flex; align-items:center; gap:7px; }
+
+  .explorer-toolbar{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .explorer-toolbar label{ font-size:12.5px; color:var(--ink-2); display:flex; align-items:center; gap:7px; }
+  .explorer-toolbar select{
+    font:inherit; font-size:13px; padding:8px 11px; border-radius:9px; border:1px solid var(--border-strong);
+    background:var(--surface); color:var(--ink);
+  }
+  .pill{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; }
+  .pill.good{ background:var(--good-wash); color:var(--good); }
+  .pill.critical{ background:var(--critical-wash); color:var(--critical); }
+  .pill.muted{ background:var(--surface-2); color:var(--muted); }
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="brand-mark">1016</div>
+      <div class="brand-text">
+        <h1>Xu hướng tồn kho nhiều tháng</h1>
+        <span>Cửa hàng Kohnan Parc Mall · 1016</span>
+      </div>
+    </div>
+    <div class="file-status" id="fileStatus">
+      <span class="dot"></span>
+      <span id="fileStatusText">Đang tải…</span>
+    </div>
+    <button class="btn primary" id="uploadBtnTop" style="display:none">Nhập thêm 1 tháng</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="boot-loading" id="bootLoading">
+    <div class="boot-spin"></div>
+    <span>Đang tải danh sách các kỳ đã lưu…</span>
+  </div>
+
+  <!-- ============ EMPTY STATE ============ -->
+  <div class="hero" id="hero" style="display:none">
+    <div class="icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+    </div>
+    <h2>Nhập báo cáo tồn kho của từng tháng để xem xu hướng</h2>
+    <p class="lead">Đây là công cụ RIÊNG để so sánh nhiều tháng. Mỗi lần chọn một file "Inventory PLU" (.xlsx, .xls hoặc .csv) xuất từ POS cho MỘT tháng, dữ liệu sẽ được hỏi rõ thuộc tháng nào rồi <b>lưu lại vĩnh viễn</b> trong trình duyệt này — không bị ghi đè khi bạn nhập thêm tháng khác. Cần từ 2 tháng trở lên mới thấy được biểu đồ xu hướng.</p>
+    <div class="actions">
+      <button class="btn primary" id="uploadBtnHero">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span id="uploadBtnHeroLabel">Chọn file .xlsx/.csv</span>
+        <span class="spinner" id="heroSpinner"></span>
+      </button>
+    </div>
+    <p class="meta">Muốn xem đầy đủ chi tiết từng mã hàng của MỘT tháng cụ thể (top sản phẩm, TOD từng mã, đánh giá NCC, bảng lọc...), dùng file "Bảng điều khiển tồn kho 1016" (bản 1 tháng) riêng — hai file bổ trợ nhau, không thay thế nhau.</p>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+  <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+
+  <!-- ============ CONFIRM PERIOD PANEL ============ -->
+  <section class="block" id="confirmSection" style="display:none">
+    <div class="card confirm-card" id="confirmCard"></div>
+  </section>
+
+  <!-- ============ APP ============ -->
+  <div id="app">
+
+    <section class="block" id="periodsSection">
+      <div class="block-head">
+        <h2>Các kỳ đã lưu</h2>
+        <span class="sub" id="periodsSub"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="simple-table" id="periodsTable">
+          <thead><tr>
+            <th>Kỳ</th><th>Dữ liệu tính đến</th><th class="num">Số SKU</th>
+            <th class="num">Giá trị tồn cuối kỳ</th><th class="num">Doanh thu trong kỳ</th>
+            <th class="num">TOD gộp</th><th></th>
+          </tr></thead>
+          <tbody id="periodsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="latestSection" style="display:none">
+      <div class="block-head">
+        <h2>Tóm tắt kỳ gần nhất</h2>
+        <span class="sub" id="latestSub"></span>
+      </div>
+      <div class="kpi-grid" id="latestKpis"></div>
+    </section>
+
+    <section class="block" id="trendsSection">
+      <div class="block-head">
+        <h2>Xu hướng theo tháng</h2>
+        <span class="sub">Mỗi điểm là một kỳ đã lưu, sắp theo thời gian</span>
+      </div>
+      <div id="trendsGrid"></div>
+    </section>
+
+    <section class="block" id="compareSection">
+      <div class="block-head">
+        <h2>So sánh 2 kỳ</h2>
+        <span class="sub">Đối chiếu từng mã hàng (Barcode) giữa hai tháng đã chọn</span>
+      </div>
+      <div class="explorer-toolbar">
+        <label>Kỳ trước <select id="compareFrom"></select></label>
+        <label>Kỳ sau <select id="compareTo"></select></label>
+      </div>
+      <div id="compareBody"></div>
+    </section>
+
+    <section class="block">
+      <details class="guide">
+        <summary>Giải thích & cách dùng công cụ đa tháng</summary>
+        <div class="guide-body">
+          <div>
+            <h4>Vì sao tách riêng thành 2 file?</h4>
+            <p>File "Bảng điều khiển tồn kho 1016" (1 tháng) chỉ giữ MỘT kỳ dữ liệu tại một thời điểm — nhập file mới sẽ ghi đè file cũ, phù hợp khi bạn chỉ cần xem sâu tháng hiện tại. File này (đa tháng) làm việc khác hẳn: lưu NHIỀU kỳ song song, không ghi đè, để dựng được biểu đồ xu hướng và so sánh giữa các tháng — nhưng đổi lại không đi sâu vào từng mã hàng như file 1 tháng (không có bảng lọc chi tiết, không có mục đánh giá NCC). Nên dùng cả hai: file 1 tháng để phân tích sâu tháng hiện tại, file này để theo dõi xu hướng nhiều tháng.</p>
+          </div>
+          <div>
+            <h4>Kỳ (tháng) được xác định thế nào?</h4>
+            <p>Khi nhập file, dashboard tự đoán tháng/năm từ ngày trong tên file xuất (nếu có), sau đó LUÔN cho bạn xác nhận hoặc chỉnh lại trước khi lưu — tránh gộp nhầm dữ liệu. Nếu bạn nhập 2 file khác nhau nhưng cùng chọn một tháng, file nhập sau sẽ hỏi lại và GHI ĐÈ dữ liệu của tháng đó nếu bạn xác nhận (bấm nút lưu 2 lần liên tiếp) — dùng khi muốn cập nhật lại số liệu mới nhất trong tháng.</p>
+          </div>
+          <div>
+            <h4>Biểu đồ xu hướng đọc thế nào?</h4>
+            <p>Mỗi biểu đồ theo dõi MỘT chỉ số qua các tháng đã lưu (sắp xếp theo thời gian, cũ → mới). Di chuột vào từng điểm để xem giá trị chính xác của tháng đó; bấm "Xem bảng" để xem dạng bảng số liệu. Khoảng trống trên đường biểu đồ (nếu có) nghĩa là tháng đó không tính được chỉ số này (ví dụ TOD khi cả kỳ không phát sinh doanh thu bán ra).</p>
+          </div>
+          <div>
+            <h4>So sánh 2 kỳ — vì sao chỉ đối chiếu được theo Barcode?</h4>
+            <p>Việc so khớp một mã hàng giữa hai tháng dựa hoàn toàn vào Barcode giống hệt nhau ở cả hai file. Nếu cửa hàng đổi barcode, gộp/tách mã, hoặc file một tháng nào đó thiếu mã do lỗi xuất báo cáo, mã đó sẽ bị tính nhầm thành "mới xuất hiện" hoặc "biến mất" dù thực tế vẫn là cùng một sản phẩm — nên đối chiếu lại bằng tên hàng nếu thấy số liệu bất thường. Danh sách "mã mới xuất hiện" và "mã biến mất khỏi kỳ sau" vì vậy nên được đọc như một GỢI Ý để rà soát, không phải kết luận cuối cùng.</p>
+          </div>
+          <div>
+            <h4>Dữ liệu có bị mất khi đóng trình duyệt hoặc bấm F5 không?</h4>
+            <p>Không — mỗi kỳ đã lưu nằm trong IndexedDB của trình duyệt và tồn tại vĩnh viễn cho tới khi bạn chủ động bấm "Xoá" kỳ đó. Khác với file 1 tháng (chỉ nhớ đúng 1 bản gần nhất), file này tích luỹ dần qua thời gian — càng nhập đều đặn hàng tháng, xu hướng càng rõ.</p>
+          </div>
+          <div>
+            <h4>Số liệu có gồm VAT không?</h4>
+            <p>Không — giống hệt file 1 tháng, toàn bộ số liệu lấy nguyên từ file "Inventory PLU" xuất từ POS, vốn đã là số CHƯA bao gồm VAT (theo xác nhận của cửa hàng).</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <footer class="app-foot">
+      <span>Dữ liệu được xử lý và lưu hoàn toàn cục bộ trong trình duyệt (IndexedDB) — không gửi lên bất kỳ máy chủ nào. Mỗi kỳ (tháng) được lưu riêng, không bị ghi đè khi nhập thêm tháng khác.</span>
+      <span id="fileInfoFoot"></span>
+    </footer>
+  </div>
+</div>
+
+<div id="viz-tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     0. PERSISTENCE (IndexedDB) — mỗi kỳ (tháng) là 1 bản ghi riêng,
+     không ghi đè lẫn nhau như file 1-tháng. Hai object store:
+       - 'periods'          : bản ghi ĐẦY ĐỦ (gồm items, ~10-15MB/kỳ) — chỉ đọc khi cần so sánh 2 kỳ cụ thể.
+       - 'periodSummaries'  : bản ghi NHẸ (vài chục KB/kỳ, chỉ gồm số liệu tổng hợp) — đọc TOÀN BỘ mỗi lần mở
+                               trang để vẽ danh sách kỳ + biểu đồ xu hướng, không phải tải hết items của mọi kỳ.
+     Toàn bộ thao tác bọc try/catch — nếu trình duyệt/ngữ cảnh không hỗ trợ IndexedDB, dashboard báo lỗi rõ
+     ràng thay vì treo trắng trang, vì công cụ này (khác với file 1 tháng) không có ý nghĩa vận hành nếu
+     không lưu được nhiều kỳ.
+  ============================================================ */
+  var DB_NAME = 'kohnan_1016_ton_kho_da_thang';
+  var STORE_FULL = 'periods';
+  var STORE_SUMMARY = 'periodSummaries';
+
+  function openDb(){
+    return new Promise(function(resolve, reject){
+      if (!window.indexedDB){ reject(new Error('IndexedDB not available')); return; }
+      var req;
+      try{ req = indexedDB.open(DB_NAME, 1); }catch(e){ reject(e); return; }
+      req.onupgradeneeded = function(){
+        var db = req.result;
+        try{ if (!db.objectStoreNames.contains(STORE_FULL)) db.createObjectStore(STORE_FULL, {keyPath:'periodKey'}); }catch(e){}
+        try{ if (!db.objectStoreNames.contains(STORE_SUMMARY)) db.createObjectStore(STORE_SUMMARY, {keyPath:'periodKey'}); }catch(e){}
+      };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error || new Error('IndexedDB open failed')); };
+      req.onblocked = function(){ reject(new Error('IndexedDB blocked')); };
+    });
+  }
+  function savePeriod(fullRec, summaryRec){
+    return openDb().then(function(db){
+      return new Promise(function(resolve, reject){
+        try{
+          var tx = db.transaction([STORE_FULL, STORE_SUMMARY], 'readwrite');
+          tx.objectStore(STORE_FULL).put(fullRec);
+          tx.objectStore(STORE_SUMMARY).put(summaryRec);
+          tx.oncomplete = function(){ resolve(true); };
+          tx.onerror = function(){ reject(tx.error); };
+        }catch(e){ reject(e); }
+      });
+    });
+  }
+  function getAllSummaries(){
+    return openDb().then(function(db){
+      return new Promise(function(resolve){
+        try{
+          var tx = db.transaction(STORE_SUMMARY, 'readonly');
+          var req = tx.objectStore(STORE_SUMMARY).getAll();
+          req.onsuccess = function(){ resolve(req.result || []); };
+          req.onerror = function(){ resolve([]); };
+        }catch(e){ resolve([]); }
+      });
+    }).catch(function(){ return []; });
+  }
+  function getFullPeriod(periodKey){
+    return openDb().then(function(db){
+      return new Promise(function(resolve){
+        try{
+          var tx = db.transaction(STORE_FULL, 'readonly');
+          var req = tx.objectStore(STORE_FULL).get(periodKey);
+          req.onsuccess = function(){ resolve(req.result || null); };
+          req.onerror = function(){ resolve(null); };
+        }catch(e){ resolve(null); }
+      });
+    }).catch(function(){ return null; });
+  }
+  function deletePeriod(periodKey){
+    return openDb().then(function(db){
+      return new Promise(function(resolve){
+        try{
+          var tx = db.transaction([STORE_FULL, STORE_SUMMARY], 'readwrite');
+          tx.objectStore(STORE_FULL).delete(periodKey);
+          tx.objectStore(STORE_SUMMARY).delete(periodKey);
+          tx.oncomplete = function(){ resolve(true); };
+          tx.onerror = function(){ resolve(false); };
+        }catch(e){ resolve(false); }
+      });
+    }).catch(function(){ return false; });
+  }
+
+  /* ============================================================
+     1. COLUMN MAPPING & PARSING (giống hệt file 1-tháng)
+  ============================================================ */
+  var HEADER_MAP = {
+    'barcode':'barcode',
+    'product name':'name',
+    'supplier code':'supplier',
+    'open qty':'openQty', 'open cst':'openCst',
+    'income qty':'incomeQty', 'income cst':'incomeCst',
+    'sales qty':'salesQty', 'sales amt':'salesAmt',
+    'close qty':'closeQty', 'close cst':'closeCst',
+    'g.p.%(cogs)':'gpPct',
+    'g.p.%(cogs/exp/loss)':'gpPctFull',
+    'g.p.amt(cogs)':'gpAmt',
+    'g.p.amt(cogs/exp/loss)':'gpAmtFull',
+    'm.a.c':'mac',
+    'layer1':'layer1', 'layer2':'layer2', 'layer3':'layer3', 'layer4':'layer4',
+    'brand division name':'brand',
+    'order group name':'orderGroup'
+  };
+  var REQUIRED = ['barcode','name','closeQty','closeCst','salesQty','salesAmt'];
+  var EXCLUDED_LAYER1 = ['26'];
+
+  function normHeader(h){
+    return String(h==null?'':h).trim().toLowerCase().replace(/\s+/g,' ');
+  }
+  function num(v){
+    if (v===null||v===undefined||v==='') return 0;
+    if (typeof v === 'number') return isFinite(v)?v:0;
+    var s = String(v).replace(/,/g,'').trim();
+    if (s==='') return 0;
+    var f = parseFloat(s);
+    return isNaN(f) ? 0 : f;
+  }
+  function str(v){ return v===null||v===undefined ? '' : String(v).trim(); }
+
+  // Bộ phân tích CSV RFC4180 tự viết (không qua module CSV của SheetJS) — dùng cho luồng .csv.
+  // Lý do KHÔNG dùng XLSX.read/utils.sheet_to_json cho CSV: với file lớn (~34 nghìn dòng), bộ phân
+  // tích CSV có sẵn trong SheetJS từng gây lỗi thực tế "Too many properties to enumerate" trên máy
+  // người dùng. Parser tự viết dưới đây xử lý đúng chuẩn RFC4180 (trường có ngoặc kép, dấu phẩy/ngoặc
+  // kép/xuống dòng bên trong trường được bọc ngoặc kép, dấu ngoặc kép nhân đôi "" để thoát), chỉ trả
+  // về mảng-các-mảng chuỗi thô — giống hệt định dạng `rows` mà sheet_to_json({header:1}) trả về — rồi
+  // đưa qua CÙNG một hàm rowsToItems() với luồng .xlsx/.xls.
+  function parseCsvText(text){
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    var rows = [], row = [], field = '', inQuotes = false;
+    var i = 0, len = text.length;
+    while (i < len){
+      var c = text.charAt(i);
+      if (inQuotes){
+        if (c === '"'){
+          if (text.charAt(i+1) === '"'){ field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+      if (c === '"'){ inQuotes = true; i++; continue; }
+      if (c === ','){ row.push(field); field = ''; i++; continue; }
+      if (c === '\r'){ i++; continue; }
+      if (c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+      field += c; i++;
+    }
+    if (field !== '' || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function parseWorkbook(wb){
+    var sheetName = wb.SheetNames[0];
+    var sheet = wb.Sheets[sheetName];
+    var rows = XLSX.utils.sheet_to_json(sheet, {header:1, raw:true, defval:null});
+    return rowsToItems(rows);
+  }
+
+  function rowsToItems(rows){
+    if (!rows || !rows.length) throw new Error('File không có dữ liệu.');
+
+    var headerRowIdx = -1;
+    for (var i=0; i<Math.min(5, rows.length); i++){
+      var normed = rows[i].map(normHeader);
+      if (normed.indexOf('barcode') !== -1){ headerRowIdx = i; break; }
+    }
+    if (headerRowIdx === -1){
+      throw new Error('Không tìm thấy dòng tiêu đề chứa cột "Barcode". Vui lòng dùng đúng file xuất báo cáo "Inventory PLU" từ hệ thống POS.');
+    }
+
+    var headerRow = rows[headerRowIdx].map(normHeader);
+    var colIdx = {};
+    headerRow.forEach(function(h, idx){
+      if (HEADER_MAP[h] && !(HEADER_MAP[h] in colIdx)) colIdx[HEADER_MAP[h]] = idx;
+    });
+    var missing = REQUIRED.filter(function(k){ return !(k in colIdx); });
+    if (missing.length){
+      throw new Error('File thiếu cột bắt buộc: ' + missing.join(', ') + '. Vui lòng kiểm tra lại định dạng file xuất.');
+    }
+
+    var items = [];
+    var excludedCount = 0, excludedValue = 0;
+    for (var r=headerRowIdx+1; r<rows.length; r++){
+      var row = rows[r];
+      if (!row) continue;
+      var isEmpty = true;
+      for (var c=0;c<row.length;c++){ if (row[c]!==null && row[c]!==''){ isEmpty=false; break; } }
+      if (isEmpty) continue;
+
+      var get = function(k){ return (k in colIdx) ? row[colIdx[k]] : null; };
+      var barcode = get('barcode');
+      if (barcode===null || barcode==='') continue;
+
+      var layer1Val = str(get('layer1'));
+      var closeCstVal = num(get('closeCst'));
+      if (EXCLUDED_LAYER1.indexOf(layer1Val) !== -1){
+        excludedCount++; excludedValue += closeCstVal;
+        continue;
+      }
+
+      items.push({
+        barcode: str(barcode),
+        name: str(get('name')) || '(Không tên)',
+        supplier: str(get('supplier')),
+        openQty: num(get('openQty')), openCst: num(get('openCst')),
+        incomeQty: num(get('incomeQty')), incomeCst: num(get('incomeCst')),
+        salesQty: num(get('salesQty')), salesAmt: num(get('salesAmt')),
+        closeQty: num(get('closeQty')), closeCst: closeCstVal,
+        gpPct: num(get('gpPct')), gpAmt: num(get('gpAmt')),
+        mac: num(get('mac')),
+        layer1: layer1Val, layer2: str(get('layer2')),
+        layer3: str(get('layer3')), layer4: str(get('layer4')),
+        brand: str(get('brand')) || '(Khác)',
+        orderGroup: str(get('orderGroup')) || '(Không rõ)'
+      });
+    }
+    if (!items.length) throw new Error('Không đọc được mã hàng nào từ file. Vui lòng kiểm tra lại file xuất.');
+    return { items: items, excludedCount: excludedCount, excludedValue: excludedValue };
+  }
+
+  /* ============================================================
+     2. FORMATTERS
+  ============================================================ */
+  var nfVN = new Intl.NumberFormat('vi-VN');
+  var nfVN1 = new Intl.NumberFormat('vi-VN', {maximumFractionDigits:1, minimumFractionDigits:0});
+  var nfVN2 = new Intl.NumberFormat('vi-VN', {maximumFractionDigits:2, minimumFractionDigits:0});
+
+  function fmtInt(v){ return nfVN.format(Math.round(v||0)); }
+  function fmtCompactVND(v){
+    v = v || 0;
+    var sign = v < 0 ? '-' : '';
+    var a = Math.abs(v);
+    if (a >= 1e9) return sign + nfVN2.format(a/1e9) + ' tỷ ₫';
+    if (a >= 1e6) return sign + nfVN2.format(a/1e6) + ' triệu ₫';
+    if (a >= 1e3) return sign + nfVN1.format(a/1e3) + ' nghìn ₫';
+    return sign + nfVN.format(a) + ' ₫';
+  }
+  function fmtTod(v){ return (v===null||v===undefined) ? '—' : (nfVN1.format(v) + ' ngày'); }
+  function fmtPct(v){ return (v===null||v===undefined) ? '—' : (nfVN1.format(v) + '%'); }
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function getCss(varName){
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+
+  /* ============================================================
+     3. STATE
+  ============================================================ */
+  var summaries = [];     // toàn bộ periodSummaries, sắp theo periodKey tăng dần (cũ → mới)
+  var pendingUpload = null; // {items, periodDays, periodDaysFromFile, reportDate, sourceFileName, excludedInfo}
+  var MIN_INCOME_QTY_FOR_NEW_CHECK = 3;
+  var NEW_ITEM_LOW_SELLTHROUGH_PCT = 30;
+
+  var MONTH_NAMES = ['Tháng 01','Tháng 02','Tháng 03','Tháng 04','Tháng 05','Tháng 06',
+                      'Tháng 07','Tháng 08','Tháng 09','Tháng 10','Tháng 11','Tháng 12'];
+  function pad2(n){ return (n<10?'0':'')+n; }
+  function periodKeyOf(y,m){ return y + '-' + pad2(m); }
+  function periodLabelOf(y,m){ return MONTH_NAMES[m-1] + '/' + y; }
+  function periodShortLabelOf(y,m){ return 'T' + m + '/' + String(y).slice(2); }
+
+  /* ============================================================
+     4. AGGREGATION (giống hệt file 1-tháng)
+  ============================================================ */
+  function computeItemTod(it, periodDays){
+    var avgInv = (it.openCst + it.closeCst) / 2;
+    var cogs = it.salesAmt - it.gpAmt;
+    it.avgInv = avgInv;
+    it.cogs = cogs;
+    it.tod = (avgInv > 0 && it.salesQty > 0 && cogs > 0) ? (avgInv / cogs * periodDays) : null;
+    it.isNewItem = (it.openQty <= 0 && it.incomeQty > 0);
+    it.sellThroughPct = (it.incomeQty > 0) ? (it.salesQty / it.incomeQty * 100) : null;
+  }
+
+  function computeStats(items, periodDays){
+    var s = {
+      skuTotal: items.length,
+      skuInStock: 0, skuOutOfStock: 0, skuNegative: 0,
+      deadStockCount: 0, deadStockValue: 0,
+      discontinuedStockCount: 0, discontinuedStockValue: 0,
+      oversellCount: 0,
+      sumOpenCst:0, sumCloseCst:0, sumIncomeCst:0, sumSalesAmt:0, sumGpAmt:0,
+      sumOpenQty:0, sumCloseQty:0, sumSalesQty:0, sumIncomeQty:0,
+      sumAvgInv:0, sumCogs:0
+    };
+    for (var i=0;i<items.length;i++){
+      var it = items[i];
+      s.sumOpenCst += it.openCst; s.sumCloseCst += it.closeCst; s.sumIncomeCst += it.incomeCst;
+      s.sumSalesAmt += it.salesAmt; s.sumGpAmt += it.gpAmt;
+      s.sumOpenQty += it.openQty; s.sumCloseQty += it.closeQty; s.sumSalesQty += it.salesQty; s.sumIncomeQty += it.incomeQty;
+      s.sumAvgInv += it.avgInv; s.sumCogs += it.cogs;
+
+      var isConsignment = /consignment/i.test(it.orderGroup);
+      if (it.closeQty > 0) s.skuInStock++; else s.skuOutOfStock++;
+      if (it.closeQty < 0 && !isConsignment){ s.skuNegative++; }
+      if (it.closeQty > 0 && it.salesQty === 0){ s.deadStockCount++; s.deadStockValue += it.closeCst; }
+      if (/discontin/i.test(it.orderGroup) && it.closeQty > 0){
+        s.discontinuedStockCount++; s.discontinuedStockValue += it.closeCst;
+      }
+      var available = it.openQty + it.incomeQty;
+      if (it.salesQty > available && available >= 0 && !isConsignment){ s.oversellCount++; }
+    }
+    s.gpPctOverall = s.sumSalesAmt > 0 ? (s.sumGpAmt / s.sumSalesAmt * 100) : 0;
+    s.periodDays = periodDays;
+    s.todOverall = (s.sumAvgInv > 0 && s.sumCogs > 0) ? (s.sumAvgInv / s.sumCogs * periodDays) : null;
+    s.newItemsCount = items.filter(function(it){ return it.isNewItem && it.closeQty > 0; }).length;
+    s.newItemsValue = items.filter(function(it){ return it.isNewItem && it.closeQty > 0; })
+      .reduce(function(sum,it){ return sum + it.closeCst; }, 0);
+    return s;
+  }
+
+  function summaryFromStats(s){
+    return {
+      skuTotal:s.skuTotal, skuInStock:s.skuInStock, sumCloseCst:s.sumCloseCst, sumSalesAmt:s.sumSalesAmt,
+      gpPctOverall:s.gpPctOverall, todOverall:s.todOverall, deadStockCount:s.deadStockCount, deadStockValue:s.deadStockValue,
+      skuNegative:s.skuNegative, oversellCount:s.oversellCount, discontinuedStockCount:s.discontinuedStockCount,
+      discontinuedStockValue:s.discontinuedStockValue, newItemsCount:s.newItemsCount, newItemsValue:s.newItemsValue
+    };
+  }
+
+  /* ============================================================
+     5. TOOLTIP
+  ============================================================ */
+  var tooltipEl = null;
+  function ensureTooltip(){ if (!tooltipEl) tooltipEl = document.getElementById('viz-tooltip'); return tooltipEl; }
+  function showTooltip(x, y, html){
+    var t = ensureTooltip();
+    t.innerHTML = html; t.style.left = x + 'px'; t.style.top = y + 'px'; t.classList.add('show');
+  }
+  function hideTooltip(){ ensureTooltip().classList.remove('show'); }
+
+  /* ============================================================
+     6. LINE CHART (biểu đồ xu hướng — 1 chuỗi số liệu qua các kỳ)
+  ============================================================ */
+  function lineChart(opts){
+    // opts: mount, title, sub, categories:[label], values:[number|null], valueFmt, color
+    var W = 640, H = 168, padL = 10, padR = 10, padT = 20, padB = 26;
+    var innerW = W - padL - padR, innerH = H - padT - padB;
+    var vals = opts.values, n = vals.length;
+    var valid = vals.filter(function(v){ return v!==null && v!==undefined && isFinite(v); });
+    var vMax = valid.length ? Math.max.apply(null, valid) : 1;
+    var vMin = valid.length ? Math.min.apply(null, valid) : 0;
+    if (vMin > 0) vMin = 0;
+    if (vMax <= vMin) vMax = vMin + 1;
+    function xAt(i){ return n<=1 ? padL+innerW/2 : padL + innerW * (i/(n-1)); }
+    function yAt(v){ return padT + innerH * (1 - (v - vMin) / (vMax - vMin)); }
+
+    var pathD = '', dots = '', hits = '';
+    vals.forEach(function(v, i){
+      if (v===null||v===undefined||!isFinite(v)) return;
+      var x = xAt(i), y = yAt(v);
+      pathD += (pathD===''?'M':' L') + x.toFixed(1) + ' ' + y.toFixed(1);
+      dots += '<circle class="lc-dot" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--surface)" stroke="'+opts.color+'" stroke-width="2"></circle>';
+      hits += '<circle class="lc-hit" data-idx="'+i+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="13" fill="transparent"></circle>';
+    });
+    var lastIdx = -1;
+    for (var i=n-1;i>=0;i--){ var v=vals[i]; if (v!==null&&v!==undefined&&isFinite(v)){ lastIdx=i; break; } }
+    var endLabel = '';
+    if (lastIdx >= 0){
+      var lx = xAt(lastIdx), ly = yAt(vals[lastIdx]);
+      var lbl = opts.valueFmt(vals[lastIdx]);
+      var anchor = lastIdx === n-1 ? 'end' : 'middle';
+      var ex = lastIdx === n-1 ? Math.min(lx, W-padR) : lx;
+      endLabel = '<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="4" fill="'+opts.color+'"></circle>' +
+        '<text class="lc-end-label" x="'+ex.toFixed(1)+'" y="'+(Math.max(ly-10, 12)).toFixed(1)+'" text-anchor="'+anchor+'" fill="'+opts.color+'">'+esc(lbl)+'</text>';
+    }
+    var axisLabels = opts.categories.map(function(c,i){
+      return '<text class="lc-axis-label" x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(c)+'</text>';
+    }).join('');
+
+    var uid = 'lc'+Math.random().toString(36).slice(2,8);
+    var tableRows = opts.categories.map(function(c,i){
+      return '<tr><td>'+esc(c)+'</td><td class="num">'+esc(opts.valueFmt(vals[i]))+'</td></tr>';
+    }).join('');
+    var tableHtml = '<table class="simple-table" style="display:none"><thead><tr><th>Kỳ</th><th class="num">Giá trị</th></tr></thead><tbody>'+tableRows+'</tbody></table>';
+
+    var html = '<div class="card">' +
+      '<div class="card-head"><div><h3>'+esc(opts.title)+'</h3>'+(opts.sub?'<p>'+esc(opts.sub)+'</p>':'')+'</div>'+
+      '<button class="btn ghost small table-toggle" data-target="'+uid+'">Xem bảng</button></div>'+
+      '<div class="line-chart-wrap" id="'+uid+'-chart">'+
+        '<svg class="line-chart" viewBox="0 0 '+W+' '+H+'" id="'+uid+'-svg">'+
+          '<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="var(--grid)" stroke-width="1"></line>'+
+          '<path d="'+pathD+'" fill="none" stroke="'+opts.color+'" stroke-width="2"></path>'+
+          dots + endLabel + axisLabels + hits +
+        '</svg>'+
+      '</div>'+
+      '<div id="'+uid+'-table">'+tableHtml+'</div>'+
+    '</div>';
+
+    setTimeout(function(){
+      var container = document.getElementById(opts.mount);
+      if (!container) return;
+      var toggleBtn = container.querySelector('.table-toggle');
+      var chartEl = container.querySelector('#'+uid+'-chart');
+      var tableEl = container.querySelector('#'+uid+'-table table');
+      if (toggleBtn){
+        toggleBtn.addEventListener('click', function(){
+          var showingTable = tableEl.style.display !== 'none';
+          tableEl.style.display = showingTable ? 'none' : '';
+          chartEl.style.display = showingTable ? '' : 'none';
+          toggleBtn.textContent = showingTable ? 'Xem bảng' : 'Xem biểu đồ';
+        });
+      }
+      var hitEls = container.querySelectorAll('.lc-hit');
+      hitEls.forEach(function(hit){
+        var idx = +hit.getAttribute('data-idx');
+        hit.addEventListener('mousemove', function(ev){
+          showTooltip(ev.clientX, ev.clientY, esc(opts.categories[idx])+': <b>'+esc(opts.valueFmt(vals[idx]))+'</b>');
+        });
+        hit.addEventListener('mouseleave', hideTooltip);
+      });
+    }, 0);
+
+    return html;
+  }
+
+  /* ============================================================
+     7. RENDER — DANH SÁCH KỲ ĐÃ LƯU
+  ============================================================ */
+  function renderPeriodsList(){
+    var tbody = document.getElementById('periodsTableBody');
+    var rows = summaries.slice().sort(function(a,b){ return b.periodKey.localeCompare(a.periodKey); });
+    tbody.innerHTML = rows.map(function(p){
+      return '<tr>'+
+        '<td><b>'+esc(p.periodLabel)+'</b></td>'+
+        '<td>'+esc(p.reportDate || '—')+'</td>'+
+        '<td class="num">'+fmtInt(p.stats.skuTotal)+'</td>'+
+        '<td class="num">'+fmtCompactVND(p.stats.sumCloseCst)+'</td>'+
+        '<td class="num">'+fmtCompactVND(p.stats.sumSalesAmt)+'</td>'+
+        '<td class="num">'+fmtTod(p.stats.todOverall)+'</td>'+
+        '<td><button class="btn ghost small del-period-btn" data-key="'+esc(p.periodKey)+'">Xoá</button></td>'+
+      '</tr>';
+    }).join('') || '<tr><td colspan="7" class="empty-hint">Chưa có kỳ nào được lưu.</td></tr>';
+
+    document.getElementById('periodsSub').textContent = summaries.length ?
+      ('Đã lưu ' + fmtInt(summaries.length) + ' kỳ · nguồn dữ liệu hoàn toàn cục bộ trong trình duyệt này') : '';
+
+    tbody.querySelectorAll('.del-period-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var key = btn.getAttribute('data-key');
+        if (btn.dataset.confirm === '1'){
+          deletePeriod(key).then(function(){ return refreshSummaries(); }).then(function(){ renderAll(); });
+        } else {
+          btn.dataset.confirm = '1';
+          btn.textContent = 'Bấm lần nữa để xoá';
+          btn.classList.add('danger');
+          setTimeout(function(){ btn.dataset.confirm = '0'; btn.textContent = 'Xoá'; btn.classList.remove('danger'); }, 4000);
+        }
+      });
+    });
+  }
+
+  /* ============================================================
+     8. RENDER — TÓM TẮT KỲ GẦN NHẤT
+  ============================================================ */
+  function renderLatestSummary(){
+    var sec = document.getElementById('latestSection');
+    if (!summaries.length){ sec.style.display = 'none'; return; }
+    sec.style.display = '';
+    var sorted = summaries.slice().sort(function(a,b){ return b.periodKey.localeCompare(a.periodKey); });
+    var p = sorted[0];
+    var s = p.stats;
+    document.getElementById('latestSub').textContent = p.periodLabel + ' · dữ liệu tính đến ' + (p.reportDate || '—');
+    var tiles = [
+      {label:'Giá trị tồn cuối kỳ', value: fmtCompactVND(s.sumCloseCst)},
+      {label:'Doanh thu trong kỳ', value: fmtCompactVND(s.sumSalesAmt)},
+      {label:'GP% bình quân', value: fmtPct(s.gpPctOverall)},
+      {label:'TOD gộp toàn cửa hàng', value: fmtTod(s.todOverall)},
+      {label:'Hàng tồn chưa bán được', value: fmtInt(s.deadStockCount) + ' SKU', sub: fmtCompactVND(s.deadStockValue)},
+      {label:'Tồn kho âm', value: fmtInt(s.skuNegative) + ' SKU'},
+      {label:'Bán vượt tồn', value: fmtInt(s.oversellCount) + ' SKU'},
+      {label:'Ngừng KD còn tồn', value: fmtInt(s.discontinuedStockCount) + ' SKU', sub: fmtCompactVND(s.discontinuedStockValue)},
+      {label:'Hàng mới nhập còn tồn', value: fmtInt(s.newItemsCount) + ' SKU', sub: fmtCompactVND(s.newItemsValue)},
+      {label:'Tổng số SKU', value: fmtInt(s.skuTotal), sub: fmtInt(s.skuInStock) + ' còn tồn kho'}
+    ];
+    document.getElementById('latestKpis').innerHTML = tiles.map(function(t){
+      return '<div class="tile"><span class="label">'+esc(t.label)+'</span><span class="value">'+t.value+'</span>' +
+        (t.sub ? '<span class="sub">'+t.sub+'</span>' : '') + '</div>';
+    }).join('');
+  }
+
+  /* ============================================================
+     9. RENDER — XU HƯỚNG NHIỀU THÁNG
+  ============================================================ */
+  var TREND_METRICS = [
+    {key:'sumCloseCst', title:'Giá trị tồn cuối kỳ', sub:'Tổng giá vốn hàng tồn kho, theo tháng', fmt:fmtCompactVND, color:'--stock'},
+    {key:'sumSalesAmt', title:'Doanh thu bán trong kỳ', sub:'Tổng Sales Amt, theo tháng', fmt:fmtCompactVND, color:'--sales'},
+    {key:'gpPctOverall', title:'GP% bình quân', sub:'Biên lợi nhuận gộp toàn cửa hàng', fmt:fmtPct, color:'--profit'},
+    {key:'todOverall', title:'TOD gộp toàn cửa hàng', sub:'Ngày tồn kho bình quân (tỷ lệ tổng, không phải trung bình cộng)', fmt:fmtTod, color:'--stock'},
+    {key:'deadStockCount', title:'SL hàng tồn chưa bán được', sub:'Số SKU còn tồn nhưng 0 doanh số trong kỳ', fmt:fmtInt, color:'--warning'},
+    {key:'deadStockValue', title:'Giá trị hàng tồn chưa bán được', sub:'Vốn đang treo trong nhóm trên', fmt:fmtCompactVND, color:'--warning'},
+    {key:'skuNegative', title:'SL mã tồn kho âm', sub:'Không tính hàng ký gửi — cần đối chiếu kiểm kê', fmt:fmtInt, color:'--critical'},
+    {key:'oversellCount', title:'SL mã bán vượt tồn', sub:'Bán nhiều hơn lượng có sẵn trong kỳ', fmt:fmtInt, color:'--critical'},
+    {key:'discontinuedStockCount', title:'SL mã ngừng KD còn tồn', sub:'Cần thanh lý dứt điểm', fmt:fmtInt, color:'--serious'},
+    {key:'discontinuedStockValue', title:'Giá trị mã ngừng KD còn tồn', sub:'Vốn cần thu hồi ở nhóm trên', fmt:fmtCompactVND, color:'--serious'}
+  ];
+
+  function renderTrends(){
+    var grid = document.getElementById('trendsGrid');
+    var sub = document.querySelector('#trendsSection .sub');
+    if (summaries.length < 2){
+      grid.innerHTML = '<div class="empty-hint">Cần từ 2 kỳ trở lên để vẽ xu hướng — hiện đã lưu ' + fmtInt(summaries.length) + ' kỳ. Nhập thêm file của (các) tháng khác để bắt đầu thấy biểu đồ.</div>';
+      return;
+    }
+    var sorted = summaries.slice().sort(function(a,b){ return a.periodKey.localeCompare(b.periodKey); });
+    var categories = sorted.map(function(p){ return p.periodShortLabel; });
+    grid.className = 'chart-grid';
+    grid.innerHTML = TREND_METRICS.map(function(m){
+      var values = sorted.map(function(p){ var v = p.stats[m.key]; return (v===undefined) ? null : v; });
+      return '<div id="trend-'+m.key+'"></div>';
+    }).join('');
+    TREND_METRICS.forEach(function(m){
+      var values = sorted.map(function(p){ var v = p.stats[m.key]; return (v===undefined) ? null : v; });
+      document.getElementById('trend-'+m.key).innerHTML = lineChart({
+        mount: 'trend-'+m.key, title: m.title, sub: m.sub, categories: categories, values: values,
+        valueFmt: m.fmt, color: getCss(m.color)
+      });
+    });
+  }
+
+  /* ============================================================
+     10. RENDER — SO SÁNH 2 KỲ
+  ============================================================ */
+  function fillCompareSelects(){
+    var sorted = summaries.slice().sort(function(a,b){ return a.periodKey.localeCompare(b.periodKey); });
+    var fromSel = document.getElementById('compareFrom'), toSel = document.getElementById('compareTo');
+    var optHtml = sorted.map(function(p){ return '<option value="'+esc(p.periodKey)+'">'+esc(p.periodLabel)+'</option>'; }).join('');
+    fromSel.innerHTML = optHtml; toSel.innerHTML = optHtml;
+    if (sorted.length >= 2){
+      fromSel.value = sorted[sorted.length-2].periodKey;
+      toSel.value = sorted[sorted.length-1].periodKey;
+    } else if (sorted.length === 1){
+      fromSel.value = toSel.value = sorted[0].periodKey;
+    }
+  }
+
+  function diffPeriods(itemsA, itemsB){
+    var mapA = {}, mapB = {};
+    itemsA.forEach(function(it){ mapA[it.barcode] = it; });
+    itemsB.forEach(function(it){ mapB[it.barcode] = it; });
+    var common = [], onlyB = [];
+    Object.keys(mapB).forEach(function(bc){
+      if (mapA[bc]) common.push({barcode:bc, a:mapA[bc], b:mapB[bc]});
+      else onlyB.push(mapB[bc]);
+    });
+    var onlyA = Object.keys(mapA).filter(function(bc){ return !mapB[bc]; }).map(function(bc){ return mapA[bc]; });
+    return {common:common, onlyA:onlyA, onlyB:onlyB};
+  }
+
+  function itemDiffTable(title, sub, rows, cols){
+    if (!rows.length) return '<div class="card"><div class="card-head"><div><h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p></div></div><div class="empty-hint">Không có mã hàng nào ở nhóm này.</div></div>';
+    var head = cols.map(function(c){ return '<th'+(c.num?' class="num"':'')+'>'+esc(c.label)+'</th>'; }).join('');
+    var body = rows.map(function(r){
+      return '<tr>'+cols.map(function(c){ return '<td'+(c.num?' class="num"':'')+(c.name?' class="name"':'')+'>'+c.render(r)+'</td>'; }).join('')+'</tr>';
+    }).join('');
+    return '<div class="card wide"><div class="card-head"><div><h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p></div></div>'+
+      '<div class="table-scroll" style="margin-top:10px;"><table class="simple-table"><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div></div>';
+  }
+
+  function renderCompareKpis(sA, sB){
+    var metrics = [
+      {label:'Giá trị tồn cuối kỳ', key:'sumCloseCst', fmt:fmtCompactVND},
+      {label:'Doanh thu trong kỳ', key:'sumSalesAmt', fmt:fmtCompactVND},
+      {label:'GP% bình quân', key:'gpPctOverall', fmt:fmtPct},
+      {label:'TOD gộp toàn cửa hàng', key:'todOverall', fmt:fmtTod},
+      {label:'Hàng tồn chưa bán được (SL)', key:'deadStockCount', fmt:fmtInt},
+      {label:'Tồn kho âm (SL)', key:'skuNegative', fmt:fmtInt},
+      {label:'Bán vượt tồn (SL)', key:'oversellCount', fmt:fmtInt},
+      {label:'Ngừng KD còn tồn (SL)', key:'discontinuedStockCount', fmt:fmtInt}
+    ];
+    var rows = metrics.map(function(m){
+      var a = sA[m.key], b = sB[m.key];
+      var delta = (a===null||a===undefined||b===null||b===undefined) ? null : (b - a);
+      var arrow = delta===null ? '' : (delta > 0 ? '▲' : (delta < 0 ? '▼' : '—'));
+      var deltaTxt = delta===null ? '—' : (arrow + ' ' + m.fmt(Math.abs(delta)));
+      return '<tr><td>'+esc(m.label)+'</td><td class="num">'+m.fmt(a)+'</td><td class="num">'+m.fmt(b)+'</td><td class="num">'+deltaTxt+'</td></tr>';
+    }).join('');
+    return '<div class="card wide"><div class="card-head"><div><h3>Chênh lệch chỉ số tổng hợp</h3></div></div>'+
+      '<div class="table-scroll" style="margin-top:10px;"><table class="simple-table"><thead><tr><th>Chỉ số</th><th class="num">Kỳ trước</th><th class="num">Kỳ sau</th><th class="num">Chênh lệch</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+  }
+
+  function renderCompare(){
+    var body = document.getElementById('compareBody');
+    if (summaries.length < 2){
+      body.innerHTML = '<div class="empty-hint">Cần từ 2 kỳ trở lên để so sánh — hiện đã lưu ' + fmtInt(summaries.length) + ' kỳ.</div>';
+      return;
+    }
+    var fromKey = document.getElementById('compareFrom').value;
+    var toKey = document.getElementById('compareTo').value;
+    if (!fromKey || !toKey) return;
+    if (fromKey === toKey){
+      body.innerHTML = '<div class="empty-hint">Hãy chọn hai kỳ khác nhau để so sánh.</div>';
+      return;
+    }
+    body.innerHTML = '<div class="empty-hint">Đang tải dữ liệu 2 kỳ để so sánh…</div>';
+    Promise.all([getFullPeriod(fromKey), getFullPeriod(toKey)]).then(function(res){
+      var recA = res[0], recB = res[1];
+      if (!recA || !recB){
+        body.innerHTML = '<div class="empty-hint">Không tải được dữ liệu đầy đủ của một trong hai kỳ đã chọn.</div>';
+        return;
+      }
+      var sA = summaries.filter(function(p){ return p.periodKey===fromKey; })[0].stats;
+      var sB = summaries.filter(function(p){ return p.periodKey===toKey; })[0].stats;
+      var diff = diffPeriods(recA.items, recB.items);
+
+      var increases = diff.common.filter(function(p){ return (p.b.closeCst - p.a.closeCst) > 0; })
+        .sort(function(x,y){ return (y.b.closeCst-y.a.closeCst) - (x.b.closeCst-x.a.closeCst); }).slice(0,15);
+      var decreases = diff.common.filter(function(p){ return (p.b.closeCst - p.a.closeCst) < 0; })
+        .sort(function(x,y){ return (x.b.closeCst-x.a.closeCst) - (y.b.closeCst-y.a.closeCst); }).slice(0,15);
+      var appeared = diff.onlyB.filter(function(it){ return it.closeQty > 0; })
+        .sort(function(x,y){ return y.closeCst - x.closeCst; }).slice(0,15);
+      var vanished = diff.onlyA.filter(function(it){ return it.closeQty > 0; })
+        .sort(function(x,y){ return y.closeCst - x.closeCst; }).slice(0,15);
+
+      var deltaCols = [
+        {label:'Barcode', render:function(r){ return esc(r.barcode); }},
+        {label:'Tên hàng', name:true, render:function(r){ return esc(r.b.name); }},
+        {label:'Tồn kỳ trước', num:true, render:function(r){ return fmtCompactVND(r.a.closeCst); }},
+        {label:'Tồn kỳ sau', num:true, render:function(r){ return fmtCompactVND(r.b.closeCst); }},
+        {label:'Chênh lệch', num:true, render:function(r){ return fmtCompactVND(r.b.closeCst - r.a.closeCst); }}
+      ];
+      var singleCols = function(valueLabel){
+        return [
+          {label:'Barcode', render:function(r){ return esc(r.barcode); }},
+          {label:'Tên hàng', name:true, render:function(r){ return esc(r.name); }},
+          {label:'Tồn kho', num:true, render:function(r){ return fmtInt(r.closeQty); }},
+          {label:valueLabel, num:true, render:function(r){ return fmtCompactVND(r.closeCst); }}
+        ];
+      };
+
+      var html = renderCompareKpis(sA, sB) +
+        '<div class="chart-grid" style="margin-top:16px;">' +
+        itemDiffTable('Top mã tăng giá trị tồn kho nhiều nhất', 'Chỉ tính mã có ở cả hai kỳ', increases, deltaCols) +
+        itemDiffTable('Top mã giảm giá trị tồn kho nhiều nhất', 'Chỉ tính mã có ở cả hai kỳ', decreases, deltaCols) +
+        itemDiffTable('Mã mới xuất hiện ở kỳ sau', 'Không có trong dữ liệu kỳ trước — kiểm tra lại bằng tên hàng nếu nghi ngờ đổi barcode', appeared, singleCols('Giá trị tồn')) +
+        itemDiffTable('Mã biến mất khỏi kỳ sau', 'Có tồn ở kỳ trước, không còn xuất hiện ở kỳ sau', vanished, singleCols('Giá trị tồn (kỳ trước)')) +
+        '</div>';
+      body.innerHTML = html;
+    });
+  }
+
+  /* ============================================================
+     11. RENDER ALL
+  ============================================================ */
+  function renderAll(){
+    renderPeriodsList();
+    renderLatestSummary();
+    renderTrends();
+    fillCompareSelects();
+    renderCompare();
+
+    document.getElementById('bootLoading').style.display = 'none';
+    if (!summaries.length){
+      document.getElementById('hero').style.display = '';
+      document.getElementById('app').classList.remove('show');
+      document.getElementById('uploadBtnTop').style.display = 'none';
+      document.getElementById('fileStatusText').textContent = 'Chưa có kỳ dữ liệu nào';
+    } else {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      document.getElementById('uploadBtnTop').style.display = '';
+      var statusEl = document.getElementById('fileStatus');
+      statusEl.classList.add('ok');
+      document.getElementById('fileStatusText').textContent = fmtInt(summaries.length) + ' kỳ đã lưu';
+    }
+  }
+
+  function refreshSummaries(){
+    return getAllSummaries().then(function(list){ summaries = list; });
+  }
+
+  /* ============================================================
+     12. FILE HANDLING & CONFIRM-PERIOD FLOW
+  ============================================================ */
+  function isCsvFile(file){ return /\.csv$/i.test(file.name || ''); }
+
+  function parseReportDateFromFilename(fn){
+    var m = fn.match(/(\d{8})(\d{6})/);
+    if (!m) return null;
+    var d = m[1], t = m[2];
+    var y=d.slice(0,4), mo=d.slice(4,6), da=d.slice(6,8);
+    var hh=t.slice(0,2), mi=t.slice(2,4);
+    return {text: da+'/'+mo+'/'+y+' '+hh+':'+mi, year:+y, month:+mo};
+  }
+  var DEFAULT_PERIOD_DAYS = 30;
+  function getPeriodDaysFromFilename(fn){
+    var m = fn.match(/(\d{8})(\d{6})/);
+    if (!m) return { days: DEFAULT_PERIOD_DAYS, fromFile: false };
+    var day = parseInt(m[1].slice(6,8), 10);
+    if (!(day >= 1 && day <= 31)) return { days: DEFAULT_PERIOD_DAYS, fromFile: false };
+    return { days: day, fromFile: true };
+  }
+
+  function setLoading(on){
+    document.getElementById('heroSpinner').classList.toggle('show', on);
+    document.getElementById('uploadBtnHeroLabel').textContent = on ? 'Đang xử lý…' : 'Chọn file .xlsx/.csv';
+  }
+  function showError(msg){ var box = document.getElementById('errorBox'); box.textContent = msg; box.classList.add('show'); }
+  function clearError(){ var box = document.getElementById('errorBox'); box.classList.remove('show'); box.textContent=''; }
+
+  function handleFile(file){
+    if (!file) return;
+    clearError();
+    var isCsv = isCsvFile(file);
+    if (!isCsv && !/\.xlsx?$/i.test(file.name || '')){
+      showError('Định dạng file không được hỗ trợ. Vui lòng chọn file .xlsx, .xls hoặc .csv xuất từ POS.');
+      return;
+    }
+    setLoading(true);
+    var reader = new FileReader();
+    reader.onload = function(e){
+      setTimeout(function(){
+        try{
+          var parsed = isCsv
+            ? rowsToItems(parseCsvText(e.target.result))
+            : parseWorkbook(XLSX.read(new Uint8Array(e.target.result), {type:'array'}));
+          var items = parsed.items;
+          var periodInfo = getPeriodDaysFromFilename(file.name);
+          items.forEach(function(it){ computeItemTod(it, periodInfo.days); });
+          var rd = parseReportDateFromFilename(file.name);
+          var today = new Date();
+          pendingUpload = {
+            items: items, periodDays: periodInfo.days, periodDaysFromFile: periodInfo.fromFile,
+            reportDateText: rd ? rd.text : null, sourceFileName: file.name,
+            excludedInfo: { count: parsed.excludedCount, value: parsed.excludedValue },
+            defaultYear: rd ? rd.year : today.getFullYear(),
+            defaultMonth: rd ? rd.month : (today.getMonth()+1)
+          };
+          setLoading(false);
+          openConfirmPanel();
+        }catch(err){
+          setLoading(false);
+          showError('Không đọc được file: ' + err.message);
+        }
+      }, 30);
+    };
+    reader.onerror = function(){ setLoading(false); showError('Không thể đọc file. Vui lòng thử lại.'); };
+    if (isCsv) reader.readAsText(file, 'utf-8'); else reader.readAsArrayBuffer(file);
+  }
+
+  function openConfirmPanel(){
+    if (!pendingUpload) return;
+    var sec = document.getElementById('confirmSection');
+    var card = document.getElementById('confirmCard');
+    var thisYear = new Date().getFullYear();
+    var years = [];
+    for (var y = thisYear - 3; y <= thisYear + 1; y++) years.push(y);
+    if (years.indexOf(pendingUpload.defaultYear) === -1) years.push(pendingUpload.defaultYear);
+    years.sort(function(a,b){ return a-b; });
+
+    var monthOpts = MONTH_NAMES.map(function(name, idx){
+      var m = idx+1;
+      return '<option value="'+m+'"'+(m===pendingUpload.defaultMonth?' selected':'')+'>'+esc(name)+'</option>';
+    }).join('');
+    var yearOpts = years.map(function(y){
+      return '<option value="'+y+'"'+(y===pendingUpload.defaultYear?' selected':'')+'>'+y+'</option>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="card-head"><div><h3>Xác nhận kỳ dữ liệu</h3>'+
+      '<p>File: '+esc(pendingUpload.sourceFileName)+' · '+fmtInt(pendingUpload.items.length)+' mã hàng'+
+      (pendingUpload.reportDateText ? (' · dữ liệu tính đến ' + esc(pendingUpload.reportDateText)) : '')+
+      '</p></div></div>'+
+      '<p style="font-size:12.5px; color:var(--ink-2); margin-top:8px;">Dữ liệu này thuộc về tháng nào? (đã tự đoán từ tên file, có thể chỉnh lại)</p>'+
+      '<div class="confirm-row">'+
+        '<label>Tháng <select id="confirmMonth">'+monthOpts+'</select></label>'+
+        '<label>Năm <select id="confirmYear">'+yearOpts+'</select></label>'+
+        '<button class="btn primary" id="confirmSaveBtn">Lưu vào kỳ này</button>'+
+        '<button class="btn ghost" id="confirmCancelBtn">Huỷ</button>'+
+      '</div>'+
+      '<div id="confirmWarning" style="display:none; margin-top:10px; font-size:12.5px; color:var(--critical);"></div>';
+
+    sec.style.display = '';
+    sec.scrollIntoView({behavior:'smooth', block:'center'});
+
+    document.getElementById('confirmCancelBtn').addEventListener('click', function(){
+      pendingUpload = null;
+      sec.style.display = 'none';
+    });
+    var saveBtn = document.getElementById('confirmSaveBtn');
+    saveBtn.addEventListener('click', function(){
+      var month = +document.getElementById('confirmMonth').value;
+      var year = +document.getElementById('confirmYear').value;
+      var key = periodKeyOf(year, month);
+      var exists = summaries.some(function(p){ return p.periodKey === key; });
+      if (exists && saveBtn.dataset.confirm !== key){
+        saveBtn.dataset.confirm = key;
+        var warn = document.getElementById('confirmWarning');
+        warn.style.display = '';
+        warn.textContent = 'Đã có dữ liệu cho ' + periodLabelOf(year, month) + ' — bấm "Lưu vào kỳ này" một lần nữa để GHI ĐÈ dữ liệu cũ của tháng đó.';
+        saveBtn.textContent = 'Bấm lần nữa để ghi đè';
+        return;
+      }
+      doSavePendingUpload(year, month);
+    });
+  }
+
+  function doSavePendingUpload(year, month){
+    if (!pendingUpload) return;
+    var key = periodKeyOf(year, month);
+    var label = periodLabelOf(year, month);
+    var items = pendingUpload.items;
+    var stats = computeStats(items, pendingUpload.periodDays);
+    var fullRec = {
+      periodKey: key, items: items, periodDays: pendingUpload.periodDays,
+      periodDaysFromFile: pendingUpload.periodDaysFromFile, reportDate: pendingUpload.reportDateText,
+      sourceFileName: pendingUpload.sourceFileName, excludedInfo: pendingUpload.excludedInfo, savedAt: Date.now()
+    };
+    var summaryRec = {
+      periodKey: key, periodLabel: label, periodShortLabel: periodShortLabelOf(year, month),
+      reportDate: pendingUpload.reportDateText, sourceFileName: pendingUpload.sourceFileName,
+      savedAt: Date.now(), stats: summaryFromStats(stats)
+    };
+    savePeriod(fullRec, summaryRec).then(function(){
+      pendingUpload = null;
+      document.getElementById('confirmSection').style.display = 'none';
+      return refreshSummaries();
+    }).then(function(){
+      renderAll();
+    }).catch(function(err){
+      showError('Không lưu được dữ liệu: ' + (err && err.message ? err.message : 'lỗi không xác định'));
+    });
+  }
+
+  /* ============================================================
+     13. WIRE UP
+  ============================================================ */
+  var fileInput = document.getElementById('fileInput');
+  var hero = document.getElementById('hero');
+
+  document.getElementById('uploadBtnHero').addEventListener('click', function(){ fileInput.click(); });
+  document.getElementById('uploadBtnTop').addEventListener('click', function(){ fileInput.click(); });
+
+  fileInput.addEventListener('change', function(e){
+    if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+
+  ['dragenter','dragover'].forEach(function(ev){
+    hero.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); hero.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(function(ev){
+    hero.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); hero.classList.remove('drag'); });
+  });
+  hero.addEventListener('drop', function(e){
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+
+  document.getElementById('compareFrom').addEventListener('change', renderCompare);
+  document.getElementById('compareTo').addEventListener('change', renderCompare);
+
+  function tryBoot(){
+    refreshSummaries().then(function(){ renderAll(); }).catch(function(){
+      document.getElementById('bootLoading').style.display = 'none';
+      document.getElementById('hero').style.display = '';
+      showError('Trình duyệt này không hỗ trợ lưu trữ dữ liệu (IndexedDB) — công cụ đa tháng cần tính năng này để hoạt động. Vui lòng dùng trình duyệt khác (Chrome/Edge/Safari bản mới) hoặc mở file trực tiếp thay vì ở chế độ duyệt riêng tư.');
+    });
+  }
+  tryBoot();
+
+})();
+</script>

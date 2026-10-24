@@ -1,0 +1,880 @@
+<title>Kohnan Xin Hàng Miền Nam</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+<style>
+    :root {
+        --bg-a: #e0f2fe;
+        --bg-b: #fef3c7;
+        --bg-glow-1: rgba(56, 189, 248, 0.20);
+        --bg-glow-2: rgba(245, 158, 11, 0.15);
+        --surface: rgba(255, 255, 255, 0.92);
+        --surface-solid: #ffffff;
+        --surface-soft: #f8fafc;
+        --surface-soft-hover: #ffffff;
+        --card-border: rgba(255, 255, 255, 0.9);
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --text: #1e293b;
+        --text-strong: #0f172a;
+        --text-muted: #64748b;
+        --text-faint: #94a3b8;
+        --accent: #0284c7;
+        --accent-strong: #0369a1;
+        --accent-deep: #075985;
+        --accent-soft-bg: #e0f2fe;
+        --accent-soft-bg-hover: #bae6fd;
+        --danger: #e11d48;
+        --danger-strong: #b91c1c;
+        --danger-deep: #7f1d1d;
+        --success: #16a34a;
+        --promo: #ea580c;
+        --focus-ring: rgba(2, 132, 199, 0.15);
+        --shadow-card: 0 20px 45px rgba(14, 116, 144, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+        --shadow-section: 0 4px 12px rgba(0, 0, 0, 0.02);
+        --shadow-section-hover: 0 8px 24px rgba(56, 189, 248, 0.12);
+        --shadow-btn: 0 8px 20px rgba(2, 132, 199, 0.35);
+        --shadow-btn-hover: 0 12px 25px rgba(2, 132, 199, 0.5);
+        --shadow-btn-danger: 0 8px 20px rgba(239, 68, 68, 0.35);
+        --shadow-btn-danger-hover: 0 12px 25px rgba(239, 68, 68, 0.5);
+        --shadow-result: 0 10px 30px rgba(14, 116, 144, 0.08);
+        --promo-muted: #94a3b8;
+        --row-alt: rgba(2, 132, 199, 0.04);
+        --home-bg: rgba(234, 88, 12, 0.08);
+        color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --bg-a: #0b1a2b; --bg-b: #1c1408;
+            --bg-glow-1: rgba(56, 189, 248, 0.12); --bg-glow-2: rgba(245, 158, 11, 0.08);
+            --surface: rgba(15, 23, 42, 0.88); --surface-solid: #0f172a;
+            --surface-soft: #16223a; --surface-soft-hover: #1b2942;
+            --card-border: rgba(148, 163, 184, 0.16); --border: #263349; --border-strong: #33445f;
+            --text: #cbd5e1; --text-strong: #f1f5f9; --text-muted: #94a3b8; --text-faint: #64748b;
+            --accent: #38bdf8; --accent-strong: #7dd3fc; --accent-deep: #bae6fd;
+            --accent-soft-bg: #0c2436; --accent-soft-bg-hover: #123249;
+            --danger: #fb7185; --danger-strong: #f43f5e; --danger-deep: #fecdd3;
+            --success: #4ade80; --promo: #fb923c; --promo-muted: #64748b;
+            --focus-ring: rgba(56, 189, 248, 0.25);
+            --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.45), 0 5px 15px rgba(0, 0, 0, 0.3);
+            --shadow-section: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-section-hover: 0 8px 24px rgba(56, 189, 248, 0.15);
+            --shadow-btn: 0 8px 20px rgba(56, 189, 248, 0.25);
+            --shadow-btn-hover: 0 12px 25px rgba(56, 189, 248, 0.35);
+            --shadow-btn-danger: 0 8px 20px rgba(251, 113, 133, 0.25);
+            --shadow-btn-danger-hover: 0 12px 25px rgba(251, 113, 133, 0.35);
+            --shadow-result: 0 10px 30px rgba(0, 0, 0, 0.35);
+            --row-alt: rgba(56, 189, 248, 0.06);
+            --home-bg: rgba(251, 146, 60, 0.1);
+            color-scheme: dark;
+        }
+    }
+    :root[data-theme="dark"] {
+        --bg-a: #0b1a2b; --bg-b: #1c1408;
+        --bg-glow-1: rgba(56, 189, 248, 0.12); --bg-glow-2: rgba(245, 158, 11, 0.08);
+        --surface: rgba(15, 23, 42, 0.88); --surface-solid: #0f172a;
+        --surface-soft: #16223a; --surface-soft-hover: #1b2942;
+        --card-border: rgba(148, 163, 184, 0.16); --border: #263349; --border-strong: #33445f;
+        --text: #cbd5e1; --text-strong: #f1f5f9; --text-muted: #94a3b8; --text-faint: #64748b;
+        --accent: #38bdf8; --accent-strong: #7dd3fc; --accent-deep: #bae6fd;
+        --accent-soft-bg: #0c2436; --accent-soft-bg-hover: #123249;
+        --danger: #fb7185; --danger-strong: #f43f5e; --danger-deep: #fecdd3;
+        --success: #4ade80; --promo: #fb923c; --promo-muted: #64748b;
+        --focus-ring: rgba(56, 189, 248, 0.25);
+        --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.45), 0 5px 15px rgba(0, 0, 0, 0.3);
+        --shadow-section: 0 4px 12px rgba(0, 0, 0, 0.2);
+        --shadow-section-hover: 0 8px 24px rgba(56, 189, 248, 0.15);
+        --shadow-btn: 0 8px 20px rgba(56, 189, 248, 0.25);
+        --shadow-btn-hover: 0 12px 25px rgba(56, 189, 248, 0.35);
+        --shadow-btn-danger: 0 8px 20px rgba(251, 113, 133, 0.25);
+        --shadow-btn-danger-hover: 0 12px 25px rgba(251, 113, 133, 0.35);
+        --shadow-result: 0 10px 30px rgba(0, 0, 0, 0.35);
+        --row-alt: rgba(56, 189, 248, 0.06);
+        --home-bg: rgba(251, 146, 60, 0.1);
+        color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        background:
+            radial-gradient(circle at 10% 15%, var(--bg-glow-1) 0%, transparent 42%),
+            radial-gradient(circle at 90% 85%, var(--bg-glow-2) 0%, transparent 42%),
+            linear-gradient(135deg, var(--bg-a) 0%, var(--bg-b) 100%);
+        min-height: 100vh; margin: 0; padding: 24px 12px; color: var(--text);
+        display: flex; align-items: flex-start; justify-content: center;
+    }
+    .container { width: 100%; max-width: 880px; margin: auto; background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 28px; border-radius: 28px; border: 2px solid var(--card-border); box-shadow: var(--shadow-card); }
+    .header-banner { text-align: center; margin-bottom: 22px; display: flex; flex-direction: column; gap: 8px; }
+    .brand-tag { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); margin: 0 auto; }
+    h1 { color: var(--text-strong); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-wrap: balance; }
+    .subtitle { font-size: 13.5px; color: var(--text-muted); font-weight: 500; }
+    .section { margin-bottom: 16px; padding: 18px; background: var(--surface-soft); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-section); transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease; }
+    @media (hover: hover) { .section:hover { background: var(--surface-soft-hover); border-color: var(--accent); box-shadow: var(--shadow-section-hover); transform: translateY(-2px); } }
+    label { font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; color: var(--text); text-transform: uppercase; letter-spacing: 0.3px; }
+    label .icon { color: var(--accent); flex-shrink: 0; }
+    input[type="file"], input[type="text"], input[type="number"], select {
+        width: 100%; padding: 13px 16px; margin-bottom: 8px; background: var(--surface-solid);
+        border: 2px solid var(--border-strong); border-radius: 14px; box-sizing: border-box;
+        color: var(--text-strong); font-size: 14.5px; font-weight: 500; outline: none;
+        transition: all 0.2s ease; font-family: inherit;
+    }
+    input[type="text"], input[type="number"] { font-family: 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0.3px; }
+    input[type="file"]::file-selector-button { background: var(--accent-soft-bg); color: var(--accent); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 12px; font-family: inherit; }
+    input[type="file"]::file-selector-button:hover { background: var(--accent-soft-bg-hover); }
+    input::placeholder { color: var(--text-faint); font-family: 'Plus Jakarta Sans', Arial, sans-serif; }
+    input:focus, select:focus { border-color: var(--accent); background: var(--surface-solid); box-shadow: 0 0 0 4px var(--focus-ring); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    button { flex: 1 1 auto; padding: 14px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%); color: white; border: none; border-radius: 14px; font-size: 14.5px; font-weight: 800; cursor: pointer; margin-top: 4px; box-shadow: var(--shadow-btn); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
+    button:hover { background: linear-gradient(135deg, var(--accent-strong) 0%, var(--accent-deep) 100%); transform: translateY(-2px); box-shadow: var(--shadow-btn-hover); }
+    button:active { transform: translateY(0); }
+    button.secondary { background: linear-gradient(135deg, var(--danger) 0%, var(--danger-strong) 100%); box-shadow: var(--shadow-btn-danger); }
+    button.secondary:hover { background: linear-gradient(135deg, var(--danger-strong) 0%, var(--danger-deep) 100%); box-shadow: var(--shadow-btn-danger-hover); }
+    button.ghost { background: var(--surface-solid); color: var(--text); border: 2px solid var(--border-strong); box-shadow: none; }
+    button.ghost:hover { background: var(--surface-soft); transform: none; box-shadow: none; border-color: var(--accent); }
+    button.small { flex: 0 0 auto; padding: 8px 14px; font-size: 12.5px; margin-top: 0; border-radius: 10px; }
+    .status-msg { font-weight: 600; text-align: center; margin-top: 6px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 18px; }
+    .status-msg.ok { color: var(--success); } .status-msg.err { color: var(--danger); } .status-msg.busy { color: var(--accent); }
+    .field-hint { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; line-height: 1.5; }
+    .storage-warning { margin-bottom: 18px; padding: 14px 16px; background: rgba(225, 29, 72, 0.08); border: 1.5px solid var(--danger); border-radius: 14px; color: var(--danger); font-size: 13px; font-weight: 600; line-height: 1.5; align-items: flex-start; gap: 8px; }
+    .icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .icon.fill { fill: currentColor; stroke: none; }
+    .spin { animation: spin 0.9s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--danger-strong); color: white; padding: 12px 22px; border-radius: 14px; font-weight: 700; font-size: 13.5px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.35); z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90vw; }
+
+    .store-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .store-chip { display: flex; align-items: center; gap: 8px; background: var(--surface-solid); border: 1.5px solid var(--border-strong); border-radius: 12px; padding: 7px 10px; font-size: 12px; font-weight: 700; color: var(--text-strong); }
+    .store-chip .cnt { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+    .store-chip button { flex: none; margin: 0; padding: 3px 7px; font-size: 10px; border-radius: 6px; background: var(--danger-strong); box-shadow: none; }
+    .store-chip.home { border-color: var(--promo); background: var(--home-bg); }
+
+    .guide-toggle { background: var(--surface-solid); color: var(--text-strong); border: 2px solid var(--border-strong); box-shadow: none; justify-content: space-between; font-size: 14px; }
+    .guide-toggle:hover { background: var(--surface-soft); transform: none; box-shadow: none; border-color: var(--accent); }
+    .guide-toggle .chev { transition: transform 0.25s ease; }
+    .guide-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    .guide-content { margin-top: 14px; padding-top: 16px; border-top: 1px dashed var(--border); font-size: 13px; line-height: 1.65; color: var(--text); }
+    .guide-content h3 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: var(--text-strong); margin: 18px 0 8px; }
+    .guide-content h3:first-child { margin-top: 0; }
+    .guide-content h3 .step-no { display: inline-flex; align-items: center; justify-content: center; width: 21px; height: 21px; border-radius: 50%; background: var(--accent); color: white; font-size: 11.5px; font-weight: 800; flex-shrink: 0; }
+    .guide-content ol, .guide-content ul { margin: 0 0 4px; padding-left: 20px; }
+    .guide-content li { margin-bottom: 6px; }
+    .guide-content b { color: var(--text-strong); }
+    .guide-content .guide-note { margin-top: 6px; padding: 10px 12px; background: var(--accent-soft-bg); border-radius: 10px; font-size: 12px; color: var(--text-muted); }
+
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+    @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    .settings-grid .fld label { margin-bottom: 6px; }
+    .settings-grid .fld input { margin-bottom: 0; }
+
+    .tier-table-wrap { overflow-x: auto; margin-top: 10px; border-radius: 14px; border: 1px solid var(--border); }
+    table.tier-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--surface-solid); }
+    table.tier-table th, table.tier-table td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    table.tier-table th { background: var(--accent-soft-bg); color: var(--accent-strong); font-weight: 800; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.3px; }
+    table.tier-table tr:last-child td { border-bottom: none; }
+    table.tier-table select { margin: 0; padding: 6px 8px; font-size: 12px; font-family: inherit; }
+
+    .product-card { background: var(--surface-solid); border: 2px solid var(--accent-soft-bg); border-radius: 18px; padding: 16px; margin-top: 14px; box-shadow: var(--shadow-result); animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .product-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+    .product-card-head .pname { font-weight: 800; color: var(--text-strong); font-size: 14.5px; line-height: 1.35; }
+    .product-card-head .pcode { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 12px; font-weight: 700; }
+    .product-card-head button { flex: none; margin: 0; padding: 6px 10px; font-size: 11px; }
+
+    .cmp-table-wrap { overflow-x: auto; margin-top: 10px; }
+    table.cmp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 620px; }
+    table.cmp-table th, table.cmp-table td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--border); }
+    table.cmp-table th:first-child, table.cmp-table td:first-child { text-align: left; }
+    table.cmp-table th { color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px; }
+    table.cmp-table tbody tr:nth-child(odd) { background: var(--row-alt); }
+    table.cmp-table tbody tr.home-row { background: var(--home-bg); }
+    table.cmp-table tbody tr.no-data { opacity: 0.45; }
+    table.cmp-table .storecell { font-weight: 700; color: var(--text-strong); text-align: left; }
+    table.cmp-table .storecell .km { display: block; font-weight: 500; color: var(--text-faint); font-size: 10.5px; }
+    table.cmp-table .stockval { font-weight: 800; color: var(--danger); font-variant-numeric: tabular-nums; }
+    table.cmp-table .gpval { color: var(--success); font-weight: 700; }
+    table.cmp-table input.reqty { width: 64px; text-align: right; padding: 6px 6px; margin: 0; font-size: 12.5px; border-radius: 8px; }
+
+    .ship-card { background: var(--surface-solid); border: 2px solid var(--border-strong); border-radius: 18px; padding: 16px; margin-top: 12px; }
+    .ship-card .ship-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .ship-card .ship-head .sname { font-weight: 800; color: var(--text-strong); font-size: 14.5px; }
+    .ship-card .ship-head .skm { font-size: 11.5px; color: var(--text-faint); font-weight: 600; }
+    .ship-items { list-style: none; margin: 0 0 10px; padding: 0; font-size: 12.5px; }
+    .ship-items li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed var(--border); gap: 10px; }
+    .ship-items li:last-child { border-bottom: none; }
+    .ship-items .iname { color: var(--text); flex: 1; }
+    .ship-items .iqty { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent-strong); flex: none; }
+    .kg-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .kg-row label { margin: 0; flex: none; font-size: 12px; }
+    .kg-row input { margin: 0; }
+    .fee-breakdown { background: var(--surface-soft); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; }
+    .fee-breakdown .frow { display: flex; justify-content: space-between; padding: 3px 0; color: var(--text-muted); }
+    .fee-breakdown .frow.total { border-top: 1.5px dashed var(--border); margin-top: 5px; padding-top: 7px; font-weight: 800; color: var(--text-strong); font-size: 14.5px; }
+    .fee-breakdown .frow.total .val { color: var(--accent-strong); }
+
+    .grand-total { margin-top: 14px; padding: 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%); border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 15px; box-shadow: var(--shadow-btn); }
+    .grand-total .val { font-size: 19px; font-family: 'JetBrains Mono', monospace; }
+
+    .empty-hint { text-align: center; padding: 20px 10px; color: var(--text-faint); font-size: 13px; font-weight: 600; }
+
+    .scanner-panel { margin-top: 14px; display: none; border-radius: 16px; overflow: hidden; border: 2px solid var(--accent); background: #000; }
+    #reader { width: 100%; }
+    #reader video { border-radius: 0; }
+    .scan-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+
+    @media (prefers-reduced-motion: reduce) { .section, button, .product-card { transition: none; animation: none; } .spin { animation-duration: 2.4s; } }
+</style>
+<svg style="display:none" aria-hidden="true">
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 17.01"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+    <symbol id="i-loader" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+</svg>
+
+<div class="container">
+    <div class="header-banner">
+        <div class="brand-tag"><svg class="icon" style="stroke:white"><use href="#i-truck"/></svg> KOHNAN MIỀN NAM</div>
+        <h1>Tra Cứu Tồn Kho &amp; Xin Hàng Liên Cửa Hàng</h1>
+        <div class="subtitle">Xem tồn - giá vốn - GP% các cửa hàng, ưu tiên gần 1016, tính luôn phí ship Sagawa</div>
+    </div>
+
+    <div class="storage-warning" id="storageWarning" style="display:none;">
+        <svg class="icon" style="flex-shrink:0;margin-top:1px;"><use href="#i-alert"/></svg>
+        <span id="storageWarningText"></span>
+    </div>
+
+    <div class="section">
+        <label><svg class="icon"><use href="#i-upload"/></svg> 1. Tải file tồn kho các cửa hàng (InventoryPLU...csv, chọn được nhiều file cùng lúc)</label>
+        <input type="file" id="invFiles" accept=".csv,.txt,.xlsx,.xls" multiple>
+        <div id="status" class="status-msg"></div>
+        <div class="field-hint">Chọn nhiều file cùng lúc (mỗi file 1 cửa hàng) - phần mềm tự nhận diện mã &amp; tên cửa hàng, tự gộp dữ liệu. Tải lại mỗi khi có số liệu mới để không bị lệch tồn.</div>
+        <div class="store-chip-row" id="storeChipRow"></div>
+        <div class="btn-row" style="margin-top:12px;">
+            <button class="secondary" onclick="clearAllData()"><svg class="icon"><use href="#i-trash"/></svg> Xoá Toàn Bộ Dữ Liệu Đã Lưu</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <button class="guide-toggle" id="settingsToggleBtn" aria-expanded="false" onclick="toggleBlock('settingsContent', this)">
+            <span style="display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-settings"/></svg> 2. Cấu hình cửa hàng của bạn &amp; bảng giá Sagawa</span>
+            <svg class="icon chev"><use href="#i-chevron-down"/></svg>
+        </button>
+        <div class="guide-content" id="settingsContent" style="display:none;">
+            <div class="settings-grid">
+                <div class="fld">
+                    <label style="margin-bottom:6px;">Mã cửa hàng của bạn (1016)</label>
+                    <input type="text" id="homeStoreCode" value="1016" oninput="onSettingsChange()">
+                </div>
+                <div class="fld">
+                    <label style="margin-bottom:6px;">Phụ phí xăng dầu (%)</label>
+                    <input type="number" id="fuelPct" value="17" step="0.1" oninput="onSettingsChange()">
+                </div>
+                <div class="fld">
+                    <label style="margin-bottom:6px;">Phí mỗi 30kg vượt thêm (đ)</label>
+                    <input type="number" id="extraFee" value="45000" step="1000" oninput="onSettingsChange()">
+                </div>
+                <div class="fld">
+                    <label style="margin-bottom:6px;">Giới hạn 1 chuyến (kg)</label>
+                    <input type="number" id="baseKgLimit" value="30" step="1" oninput="onSettingsChange()">
+                </div>
+            </div>
+            <div class="guide-note" style="margin-top:10px;">Công thức: Phí = Giá theo Quận (30kg đầu) + số lần vượt 30kg × phí thêm, rồi cộng phụ phí xăng dầu trên tổng đó. Giá gốc theo báo giá Sagawa cho tuyến giao về 1016 (Tạ Quang Bửu), <b>chưa gồm VAT 8%</b>.</div>
+
+            <h3 style="margin-top:16px;"><span class="step-no">*</span> Khoảng cách / Quận từng cửa hàng (bấm để sửa nếu chưa đúng)</h3>
+            <div class="tier-table-wrap">
+                <table class="tier-table">
+                    <thead><tr><th>Mã</th><th>Cửa hàng</th><th>Quận/Khu vực áp giá</th><th>Cự ly (km)</th><th>Phí 30kg đầu</th></tr></thead>
+                    <tbody id="tierTableBody"></tbody>
+                </table>
+            </div>
+            <div class="field-hint">Giga Mall và Vincom Lê Văn Việt cùng ở Tp.Thủ Đức nhưng khác mức giá Sagawa: Giga Mall 80.000đ, Vincom Lê Văn Việt 150.000đ (đã xác nhận).</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <label><svg class="icon"><use href="#i-search"/></svg> 3. Thêm mã sản phẩm cần xin hàng</label>
+        <input type="text" id="addCodeInput" placeholder="Nhập mã Barcode / SKU..." onkeypress="if(event.key==='Enter') addProduct();">
+        <div class="btn-row">
+            <button onclick="addProduct()"><svg class="icon"><use href="#i-box"/></svg> Thêm Vào Danh Sách</button>
+            <button id="scanToggleBtn" class="ghost" onclick="toggleScanner()"><svg class="icon"><use href="#i-camera"/></svg> <span id="scanBtnLabel">Quét Mã Vạch</span></button>
+        </div>
+        <div class="scanner-panel" id="readerWrap">
+            <div id="reader"></div>
+        </div>
+        <div id="scanHint" class="scan-hint" style="display:none;"><svg class="icon" style="width:14px;height:14px;"><use href="#i-camera"/></svg> Đưa mã vạch vào giữa khung hình, camera sẽ tự thêm vào danh sách</div>
+        <div id="productCards"></div>
+    </div>
+
+    <div class="section" id="shipSection" style="display:none;">
+        <label><svg class="icon"><use href="#i-truck"/></svg> 4. Phiếu xin hàng theo từng cửa hàng nguồn (nhập số KG để tính phí ship)</label>
+        <div id="shipCards"></div>
+        <div class="grand-total" id="grandTotal" style="display:none;">
+            <span>Tổng phí ship (tất cả cửa hàng)</span>
+            <span class="val" id="grandTotalVal">0đ</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <button class="guide-toggle" id="guideToggleBtn" aria-expanded="false" onclick="toggleBlock('guideContent', this)">
+            <span style="display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-help"/></svg> Hướng Dẫn Sử Dụng</span>
+            <svg class="icon chev"><use href="#i-chevron-down"/></svg>
+        </button>
+        <div class="guide-content" id="guideContent" style="display:none;">
+            <h3><span class="step-no">1</span> Mở lần đầu trên điện thoại</h3>
+            <ol>
+                <li>Mở đường link này trên trình duyệt (Chrome, Safari...).</li>
+                <li>Bấm menu trình duyệt → "Thêm vào Màn hình chính" để mở nhanh như 1 ứng dụng.</li>
+            </ol>
+            <div class="guide-note">Luôn mở bằng đường link web, không tải file HTML về máy mở trực tiếp - mở file cục bộ sẽ không lưu được dữ liệu.</div>
+
+            <h3><span class="step-no">2</span> Tải dữ liệu tồn kho</h3>
+            <ol>
+                <li>Xuất file <b>InventoryPLU...csv</b> cho từng cửa hàng miền Nam cần so tồn (không cần xuất cửa hàng 1016 của mình).</li>
+                <li>Ở mục 1, bấm "Chọn tệp", chọn <b>tất cả các file cùng lúc</b> (giữ Ctrl/Cmd để chọn nhiều file).</li>
+                <li>Phần mềm tự đọc mã cửa hàng, tên cửa hàng, tồn kho (Close Qty), giá vốn (M.A.C), số bán trong kỳ (Sales Qty), GP% (COGS) - chỉ giữ lại đúng các cột cần để nhẹ máy.</li>
+            </ol>
+
+            <h3><span class="step-no">3</span> Kiểm tra tồn &amp; xin hàng</h3>
+            <ul>
+                <li>Ở mục 3, gõ tay mã sản phẩm rồi bấm "Thêm Vào Danh Sách" (hoặc Enter), hoặc bấm <b>"Quét Mã Vạch"</b> để dùng camera quét trực tiếp - lần đầu trình duyệt sẽ hỏi xin quyền Camera, chọn "Cho phép". Quét được liên tiếp nhiều mã mà không cần bấm lại nút.</li>
+                <li>Mỗi mã thêm vào sẽ hiện bảng so sánh tồn/giá vốn/SL bán kỳ/GP% của các cửa hàng, <b>xếp gần cửa hàng 1016 lên trước</b>.</li>
+                <li>Ở dòng cửa hàng muốn xin, nhập số lượng cần xin vào ô "SL xin".</li>
+                <li>Có thể thêm nhiều mã sản phẩm cùng lúc, xin từ nhiều cửa hàng khác nhau cho từng mã.</li>
+            </ul>
+
+            <h3><span class="step-no">4</span> Tính phí vận chuyển Sagawa</h3>
+            <ul>
+                <li>Mục 4 tự gom danh sách theo từng cửa hàng nguồn đã chọn.</li>
+                <li>Nhập tổng số KG dự kiến của đơn hàng xin từ cửa hàng đó → tự tính phí theo Quận + phụ phí xăng dầu.</li>
+                <li>Bấm "Sao chép danh sách" để dán vào Zalo/tin nhắn khi liên hệ xin hàng.</li>
+            </ul>
+
+            <h3><span class="step-no">5</span> Dữ liệu được lưu ở đâu</h3>
+            <ul>
+                <li>Tự lưu ngay trên thiết bị/trình duyệt đang dùng - tắt mở lại hay bấm F5 vẫn còn nguyên, kể cả danh sách xin hàng đang nhập dở.</li>
+                <li>Dữ liệu <b>không tự đồng bộ</b> sang máy khác. Muốn xoá hết để làm lại: bấm "Xoá Toàn Bộ Dữ Liệu Đã Lưu".</li>
+            </ul>
+
+            <h3><span class="step-no">6</span> Không mở được camera?</h3>
+            <ul>
+                <li>Kiểm tra đã cấp quyền Camera cho trang web chưa (bấm vào icon ổ khoá cạnh thanh địa chỉ → Quyền → Camera → Cho phép).</li>
+                <li>Tắt các icon nổi/quả bóng chat đang chạy trên máy vì có thể chặn hộp thoại xin quyền.</li>
+                <li>Phải mở bằng đường link web (HTTPS) - camera không hoạt động nếu mở file HTML tải về máy trực tiếp.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===================== Bảng giá Sagawa "HÀNG THƯỜNG" (tuyến giao về CH 1016 - Tạ Quang Bửu) =====================
+// Đơn giá chưa gồm VAT 8%. Nguồn: BẢNG GIÁ SAGAWA.xlsx (sheet HÀNG THƯỜNG).
+const TIERS = {
+    dist1:     { label: 'Dist.1 (Quận 1)',              km: 6.2,  fee30: 70000 },
+    dist3:     { label: 'Dist.3 (Quận 3)',               km: 6.8,  fee30: 70000 },
+    dist4:     { label: 'Dist.4 (Quận 4)',               km: 6.0,  fee30: 70000 },
+    dist5:     { label: 'Dist.5 (Quận 5)',               km: 3.9,  fee30: 60000 },
+    dist6:     { label: 'Dist.6 (Quận 6)',               km: 7.0,  fee30: 70000 },
+    dist7:     { label: 'Dist.7 (Quận 7)',               km: 9.6,  fee30: 70000 },
+    dist8:     { label: 'Dist.8 (Quận 8 - chỗ 1016)',    km: 0,    fee30: 0 },
+    dist10:    { label: 'Dist.10 (Quận 10)',             km: 5.3,  fee30: 70000 },
+    dist11:    { label: 'Dist.11 (Quận 11)',             km: 7.4,  fee30: 70000 },
+    dist12:    { label: 'Dist.12 (Quận 12)',             km: 21.0, fee30: 150000 },
+    govap:     { label: 'Gò Vấp',                        km: 13.9, fee30: 80000 },
+    thuduc_a:  { label: 'Tp.Thủ Đức (11 phường)',        km: 11.9, fee30: 80000 },
+    thuduc_b:  { label: 'Tp.Thủ Đức (13 phường)',        km: 19.4, fee30: 150000 },
+    binhtan:   { label: 'Bình Tân',                      km: 11.0, fee30: 80000 },
+    tanphu:    { label: 'Tân Phú',                       km: 9.0,  fee30: 70000 },
+    phunhuan:  { label: 'Phú Nhuận',                     km: 9.0,  fee30: 70000 },
+    tanbinh:   { label: 'Tân Bình',                      km: 10.3, fee30: 80000 },
+    binhthanh: { label: 'Bình Thạnh',                    km: 8.8,  fee30: 70000 },
+    binhchanh: { label: 'Bình Chánh',                    km: 13.6, fee30: 80000 },
+    nhabe:     { label: 'Nhà Bè',                        km: 14.0, fee30: 80000 },
+    hocmon:    { label: 'Hóc Môn',                       km: 23.0, fee30: 150000 },
+    cuchi:     { label: 'Củ Chi',                        km: 30.0, fee30: 150000 },
+    longan:    { label: 'Long An',                       km: 30.0, fee30: 150000 },
+    binhduong: { label: 'Bình Dương',                    km: 30.0, fee30: 150000 },
+    dongnai:   { label: 'Đồng Nai',                      km: 30.0, fee30: 150000 },
+    khac:      { label: 'Khác / chưa rõ (tự nhập)',      km: 99,   fee30: 150000 }
+};
+
+// Danh sách cửa hàng miền Nam đã biết + quận mặc định (dựa theo địa chỉ thực tế mỗi CH).
+// Nếu tải lên mã cửa hàng lạ, hệ thống tự thêm với mức mặc định "khac" để bạn tự chọn lại.
+const KNOWN_STORES = {
+    '1001': { name: 'Bình Tân',              tier: 'binhtan' },
+    '1002': { name: 'Giga Mall (Thủ Đức)',   tier: 'thuduc_a' },
+    '1003': { name: 'Tân Phú (Aeon Celadon)',tier: 'tanphu' },
+    '1004': { name: 'Bình Dương (Canary)',   tier: 'binhduong' },
+    '1006': { name: 'Lê Thánh Tôn (Q1)',     tier: 'dist1' },
+    '1007': { name: 'Biên Hòa (Đồng Nai)',   tier: 'dongnai' },
+    '1011': { name: 'GO Quận 7',             tier: 'dist7' },
+    '1014': { name: 'Sora Gardens (Bình Dương)', tier: 'binhduong' },
+    '1015': { name: 'Vincom Lê Văn Việt (Thủ Đức)', tier: 'thuduc_b' },
+    '1016': { name: 'Parc Mall (CH của bạn)', tier: 'dist8' }
+};
+
+const store = localforage.createInstance({ name: 'kohnan_xin_hang', storeName: 'xinhang_data' });
+
+let storeData = {};      // { storeCode: { name, period, count, items: { barcode: {name, qty, mac, salesQty, gp} } } }
+let tierOverride = {};   // { storeCode: tierKey }
+let cart = {};           // { barcode: { name, req: { storeCode: qty } } }
+let shipKg = {};         // { storeCode: kg }
+let settings = { homeStoreCode: '1016', fuelPct: 17, extraFee: 45000, baseKgLimit: 30 };
+
+async function checkStorageAvailable() {
+    try {
+        await store.setItem('__probe__', '1');
+        const v = await store.getItem('__probe__');
+        await store.removeItem('__probe__');
+        return v === '1';
+    } catch (e) { return false; }
+}
+function showStorageWarning(msg) {
+    document.getElementById('storageWarningText').innerText = msg;
+    document.getElementById('storageWarning').style.display = 'flex';
+}
+function hideStorageWarning() { document.getElementById('storageWarning').style.display = 'none'; }
+
+async function persistAll() {
+    try {
+        await store.setItem('storeData', storeData);
+        await store.setItem('tierOverride', tierOverride);
+        await store.setItem('cart', cart);
+        await store.setItem('shipKg', shipKg);
+        await store.setItem('settings', settings);
+        hideStorageWarning();
+    } catch (e) {
+        console.warn('persist failed', e);
+        showStorageWarning('KHÔNG lưu được vào bộ nhớ trình duyệt (' + (e && e.message ? e.message : 'lỗi') + '). Dữ liệu có thể mất khi tải lại trang - hãy thử xoá bớt file cửa hàng đang tải, hoặc dùng trình duyệt khác.');
+    }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const available = await checkStorageAvailable();
+    if (!available) {
+        showStorageWarning('Trình duyệt đang CHẶN lưu trữ dữ liệu trên thiết bị này - thường do mở ở chế độ Ẩn danh/Riêng tư. Hãy mở bằng tab thường để dữ liệu không mất khi tải lại trang.');
+        return;
+    }
+    try {
+        storeData = (await store.getItem('storeData')) || {};
+        tierOverride = (await store.getItem('tierOverride')) || {};
+        cart = (await store.getItem('cart')) || {};
+        shipKg = (await store.getItem('shipKg')) || {};
+        const savedSettings = await store.getItem('settings');
+        if (savedSettings) settings = Object.assign(settings, savedSettings);
+    } catch (e) { console.error('load failed', e); }
+
+    document.getElementById('homeStoreCode').value = settings.homeStoreCode;
+    document.getElementById('fuelPct').value = settings.fuelPct;
+    document.getElementById('extraFee').value = settings.extraFee;
+    document.getElementById('baseKgLimit').value = settings.baseKgLimit;
+
+    renderStoreChips();
+    renderTierTable();
+    renderProductCards();
+    renderShipSection();
+
+    const storeCount = Object.keys(storeData).length;
+    if (storeCount > 0) {
+        setStatus(`Đã khôi phục dữ liệu đã lưu (${storeCount} cửa hàng).`, 'ok', 'i-check');
+    }
+});
+
+function tierKeyFor(storeCode) {
+    if (tierOverride[storeCode]) return tierOverride[storeCode];
+    if (KNOWN_STORES[storeCode]) return KNOWN_STORES[storeCode].tier;
+    return 'khac';
+}
+function storeLabel(storeCode) {
+    if (KNOWN_STORES[storeCode]) return KNOWN_STORES[storeCode].name;
+    if (storeData[storeCode]) return storeData[storeCode].name;
+    return storeCode;
+}
+function isHomeStore(storeCode) { return String(storeCode) === String(settings.homeStoreCode).trim(); }
+
+// ===================== Upload & parse =====================
+document.getElementById('invFiles').addEventListener('change', function (e) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setStatus(`Đang đọc ${files.length} file...`, 'busy', 'i-loader', true);
+    let done = 0, okCount = 0, errCount = 0;
+    files.forEach(file => {
+        const fname = file.name.toLowerCase();
+        const isExcel = fname.endsWith('.xlsx') || fname.endsWith('.xls');
+        if (isExcel) {
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                    ingestRows(rows, file.name);
+                    okCount++;
+                } catch (err) { console.error(err); errCount++; }
+                finishOne();
+            };
+            reader.onerror = function () { errCount++; finishOne(); };
+            reader.readAsArrayBuffer(file);
+        } else {
+            Papa.parse(file, {
+                header: true, delimiter: ',', skipEmptyLines: true,
+                complete: function (results) {
+                    try { ingestRows(results.data, file.name); okCount++; }
+                    catch (err) { console.error(err); errCount++; }
+                    finishOne();
+                },
+                error: function () { errCount++; finishOne(); }
+            });
+        }
+    });
+    function finishOne() {
+        done++;
+        if (done === files.length) {
+            persistAll().then(() => {
+                renderStoreChips();
+                renderTierTable();
+                renderProductCards();
+                renderShipSection();
+                if (errCount === 0) setStatus(`Đã tải xong ${okCount} file thành công!`, 'ok', 'i-check');
+                else setStatus(`Đã tải ${okCount} file, ${errCount} file lỗi (sai định dạng?).`, 'err', 'i-alert');
+            });
+        }
+    }
+    e.target.value = '';
+});
+
+function num(v) { const n = Number(v); return isNaN(n) ? 0 : n; }
+
+function ingestRows(rows, fname) {
+    if (!rows || rows.length === 0) return;
+    let storeCode = null, storeName = null, period = null;
+    const items = {};
+    rows.forEach(r => {
+        if (!r) return;
+        const barcode = String(r['Barcode'] || '').trim();
+        if (!barcode || !/^\d+$/.test(barcode)) return;
+        if (!storeCode) {
+            storeCode = String(r['Store Code'] || '').trim();
+            storeName = String(r['Store Name'] || '').trim();
+            period = String(r['Target Month'] || '').trim();
+        }
+        items[barcode] = {
+            name: r['Product Name'] || '',
+            qty: num(r['Close Qty']),
+            mac: num(r['M.A.C']),
+            salesQty: num(r['Sales Qty']),
+            gp: num(r['G.P.%(COGS)'])
+        };
+    });
+    if (!storeCode) { throw new Error('Không nhận diện được mã cửa hàng trong file ' + fname); }
+    storeData[storeCode] = { name: storeName || (KNOWN_STORES[storeCode] ? KNOWN_STORES[storeCode].name : storeCode), period, count: Object.keys(items).length, items };
+}
+
+function removeStore(storeCode) {
+    delete storeData[storeCode];
+    persistAll().then(() => { renderStoreChips(); renderTierTable(); renderProductCards(); renderShipSection(); });
+}
+
+async function clearAllData() {
+    storeData = {}; tierOverride = {}; cart = {}; shipKg = {};
+    await store.clear();
+    settings = { homeStoreCode: '1016', fuelPct: 17, extraFee: 45000, baseKgLimit: 30 };
+    document.getElementById('homeStoreCode').value = settings.homeStoreCode;
+    document.getElementById('fuelPct').value = settings.fuelPct;
+    document.getElementById('extraFee').value = settings.extraFee;
+    document.getElementById('baseKgLimit').value = settings.baseKgLimit;
+    renderStoreChips(); renderTierTable(); renderProductCards(); renderShipSection();
+    setStatus('Đã xoá toàn bộ dữ liệu đã lưu.', 'ok', 'i-check');
+}
+
+function renderStoreChips() {
+    const wrap = document.getElementById('storeChipRow');
+    const codes = Object.keys(storeData);
+    if (codes.length === 0) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = codes.map(code => {
+        const sd = storeData[code];
+        const home = isHomeStore(code);
+        return `<div class="store-chip${home ? ' home' : ''}">${escapeHtml(storeLabel(code))} (${escapeHtml(code)}) - <span class="cnt">${sd.count.toLocaleString('vi-VN')}</span> mã${sd.period ? ' - kỳ ' + sd.period : ''}<button onclick="removeStore('${code}')">Xoá</button></div>`;
+    }).join('');
+}
+
+// ===================== Settings & tier table =====================
+function onSettingsChange() {
+    settings.homeStoreCode = document.getElementById('homeStoreCode').value.trim() || '1016';
+    settings.fuelPct = num(document.getElementById('fuelPct').value);
+    settings.extraFee = num(document.getElementById('extraFee').value);
+    settings.baseKgLimit = num(document.getElementById('baseKgLimit').value) || 30;
+    persistAll();
+    renderStoreChips();
+    renderProductCards();
+    renderShipSection();
+}
+
+function onTierChange(storeCode, val) {
+    tierOverride[storeCode] = val;
+    persistAll();
+    renderTierTable();
+    renderProductCards();
+    renderShipSection();
+}
+
+function renderTierTable() {
+    const body = document.getElementById('tierTableBody');
+    const codes = Object.keys(storeData).filter(c => !isHomeStore(c));
+    if (codes.length === 0) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);">Chưa có cửa hàng nào được tải lên</td></tr>'; return; }
+    codes.sort((a, b) => TIERS[tierKeyFor(a)].km - TIERS[tierKeyFor(b)].km);
+    body.innerHTML = codes.map(code => {
+        const tk = tierKeyFor(code);
+        const t = TIERS[tk];
+        const opts = Object.keys(TIERS).map(k => `<option value="${k}"${k === tk ? ' selected' : ''}>${escapeHtml(TIERS[k].label)}</option>`).join('');
+        return `<tr><td><span style="font-family:'JetBrains Mono',monospace;">${escapeHtml(code)}</span></td><td>${escapeHtml(storeLabel(code))}</td><td><select onchange="onTierChange('${code}', this.value)">${opts}</select></td><td>${t.km} km</td><td>${t.fee30.toLocaleString('vi-VN')}đ</td></tr>`;
+    }).join('');
+}
+
+// ===================== Product cart =====================
+let html5QrCode = null;
+let scanning = false;
+let lastScanCode = null;
+let lastScanTime = 0;
+
+function toggleScanner() { scanning ? stopScanner() : startScanner(); }
+
+function startScanner() {
+    if (typeof Html5Qrcode === 'undefined') { showToast('Không tải được thư viện quét mã!'); return; }
+    document.getElementById('readerWrap').style.display = 'block';
+    document.getElementById('scanHint').style.display = 'flex';
+    document.getElementById('scanBtnLabel').innerText = 'Đang mở camera...';
+
+    html5QrCode = new Html5Qrcode('reader');
+    const config = { fps: 10, qrbox: { width: 260, height: 140 } };
+
+    html5QrCode.start(
+        { facingMode: 'environment' },
+        config,
+        (decodedText) => onScanSuccess(decodedText),
+        () => { /* bỏ qua lỗi từng khung hình khi chưa thấy mã */ }
+    ).then(() => {
+        scanning = true;
+        document.getElementById('scanBtnLabel').innerText = 'Dừng Quét';
+    }).catch((err) => {
+        console.error(err);
+        showToast('Không mở được camera. Hãy cấp quyền camera cho trình duyệt.');
+        document.getElementById('readerWrap').style.display = 'none';
+        document.getElementById('scanHint').style.display = 'none';
+        document.getElementById('scanBtnLabel').innerText = 'Quét Mã Vạch';
+    });
+}
+
+function onScanSuccess(decodedText) {
+    const now = Date.now();
+    if (decodedText === lastScanCode && (now - lastScanTime) < 1500) return;
+    lastScanCode = decodedText;
+    lastScanTime = now;
+
+    document.getElementById('addCodeInput').value = decodedText;
+    addProduct();
+
+    if (navigator.vibrate) { try { navigator.vibrate(80); } catch (e) {} }
+}
+
+function stopScanner() {
+    if (html5QrCode && scanning) {
+        html5QrCode.stop().then(() => { html5QrCode.clear(); finishStopUi(); }).catch(() => finishStopUi());
+    } else { finishStopUi(); }
+}
+
+function finishStopUi() {
+    scanning = false;
+    document.getElementById('readerWrap').style.display = 'none';
+    document.getElementById('scanHint').style.display = 'none';
+    document.getElementById('scanBtnLabel').innerText = 'Quét Mã Vạch';
+}
+
+function addProduct() {
+    const input = document.getElementById('addCodeInput');
+    const code = input.value.trim();
+    if (!code) { showToast('Vui lòng nhập mã sản phẩm!'); return; }
+    if (Object.keys(storeData).length === 0) { showToast('Hãy tải file tồn kho ở mục 1 trước!'); return; }
+    let name = null;
+    Object.values(storeData).forEach(sd => { if (!name && sd.items[code]) name = sd.items[code].name; });
+    if (!name) { showToast('Không tìm thấy mã này trong dữ liệu đã tải!'); return; }
+    if (!cart[code]) cart[code] = { name, req: {} };
+    persistAll().then(() => { renderProductCards(); renderShipSection(); });
+    input.value = '';
+}
+
+function removeProduct(code) {
+    delete cart[code];
+    persistAll().then(() => { renderProductCards(); renderShipSection(); });
+}
+
+function onReqChange(code, storeCode, val) {
+    const q = num(val);
+    if (!cart[code]) return;
+    if (q > 0) cart[code].req[storeCode] = q;
+    else delete cart[code].req[storeCode];
+    persistAll().then(() => renderShipSection());
+}
+
+function fmtMoney(v) { return num(v).toLocaleString('vi-VN') + 'đ'; }
+function fmtGp(v) { return num(v).toFixed(2) + '%'; }
+
+function renderProductCards() {
+    const wrap = document.getElementById('productCards');
+    const codes = Object.keys(cart);
+    if (codes.length === 0) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = codes.map(code => {
+        const c = cart[code];
+        const storeCodes = Object.keys(storeData).sort((a, b) => TIERS[tierKeyFor(a)].km - TIERS[tierKeyFor(b)].km);
+        const rows = storeCodes.map(sc => {
+            const sd = storeData[sc];
+            const item = sd.items[code];
+            const home = isHomeStore(sc);
+            const t = TIERS[tierKeyFor(sc)];
+            const reqVal = (c.req && c.req[sc]) || '';
+            if (!item) {
+                return `<tr class="no-data${home ? ' home-row' : ''}"><td class="storecell">${escapeHtml(storeLabel(sc))}<span class="km">${home ? 'CH của bạn' : t.km + ' km'}</span></td><td colspan="4" style="text-align:center;">Không có dữ liệu mã này</td><td>-</td></tr>`;
+            }
+            return `<tr${home ? ' class="home-row"' : ''}>
+                <td class="storecell">${escapeHtml(storeLabel(sc))}<span class="km">${home ? 'CH của bạn' : t.km + ' km'}</span></td>
+                <td class="stockval">${num(item.qty).toLocaleString('vi-VN')}</td>
+                <td>${fmtMoney(item.mac)}</td>
+                <td>${num(item.salesQty).toLocaleString('vi-VN')}</td>
+                <td class="gpval">${fmtGp(item.gp)}</td>
+                <td>${home ? '-' : `<input type="number" min="0" class="reqty" value="${reqVal}" onchange="onReqChange('${code}','${sc}',this.value)" placeholder="0">`}</td>
+            </tr>`;
+        }).join('');
+        return `<div class="product-card">
+            <div class="product-card-head">
+                <div><div class="pname">${escapeHtml(c.name)}</div><div class="pcode">${escapeHtml(code)}</div></div>
+                <button class="secondary" onclick="removeProduct('${code}')"><svg class="icon"><use href="#i-trash"/></svg> Xoá</button>
+            </div>
+            <div class="cmp-table-wrap">
+                <table class="cmp-table">
+                    <thead><tr><th>Cửa hàng</th><th>Tồn</th><th>Giá vốn</th><th>SL bán kỳ</th><th>GP%</th><th>SL xin</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ===================== Shipping summary =====================
+function onKgChange(storeCode, val) {
+    shipKg[storeCode] = num(val);
+    persistAll().then(() => renderShipSection());
+}
+
+function calcFee(storeCode, kg) {
+    const t = TIERS[tierKeyFor(storeCode)];
+    const limit = settings.baseKgLimit || 30;
+    const extraBlocks = kg > limit ? Math.ceil((kg - limit) / limit) : 0;
+    const extraFeeTotal = extraBlocks * settings.extraFee;
+    const subtotal = t.fee30 + extraFeeTotal;
+    const fuel = subtotal * (settings.fuelPct / 100);
+    const total = subtotal + fuel;
+    return { base: t.fee30, extraBlocks, extraFeeTotal, subtotal, fuel, total };
+}
+
+function copyShipList(storeCode) {
+    const grouped = {};
+    Object.keys(cart).forEach(code => {
+        const q = cart[code].req && cart[code].req[storeCode];
+        if (q > 0) grouped[code] = { name: cart[code].name, qty: q };
+    });
+    const lines = [`Xin hàng từ CH ${storeLabel(storeCode)} (${storeCode}) về 1016:`];
+    Object.keys(grouped).forEach(code => lines.push(`- ${grouped[code].name} (${code}): ${grouped[code].qty}`));
+    const kg = shipKg[storeCode] || 0;
+    if (kg > 0) lines.push(`Tổng KG dự kiến: ${kg}kg`);
+    const text = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast('Đã sao chép danh sách!')).catch(() => showToast('Không sao chép được, hãy copy tay.'));
+    } else { showToast('Trình duyệt không hỗ trợ sao chép tự động.'); }
+}
+
+function renderShipSection() {
+    const section = document.getElementById('shipSection');
+    const wrap = document.getElementById('shipCards');
+    const grandEl = document.getElementById('grandTotal');
+    const grandVal = document.getElementById('grandTotalVal');
+
+    const storesWithReq = new Set();
+    Object.values(cart).forEach(c => Object.keys(c.req || {}).forEach(sc => { if (c.req[sc] > 0) storesWithReq.add(sc); }));
+
+    if (storesWithReq.size === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    const storeList = Array.from(storesWithReq).sort((a, b) => TIERS[tierKeyFor(a)].km - TIERS[tierKeyFor(b)].km);
+    let grandTotal = 0;
+    wrap.innerHTML = storeList.map(sc => {
+        const t = TIERS[tierKeyFor(sc)];
+        const items = [];
+        Object.keys(cart).forEach(code => {
+            const q = cart[code].req && cart[code].req[sc];
+            if (q > 0) items.push(`<li><span class="iname">${escapeHtml(cart[code].name)}</span><span class="iqty">${q}</span></li>`);
+        });
+        const kg = shipKg[sc] || '';
+        const fee = calcFee(sc, num(kg));
+        if (num(kg) > 0) grandTotal += fee.total;
+        return `<div class="ship-card">
+            <div class="ship-head"><span class="sname">${escapeHtml(storeLabel(sc))} (${sc})</span><span class="skm">${t.label} - ${t.km}km</span></div>
+            <ul class="ship-items">${items.join('')}</ul>
+            <div class="kg-row">
+                <label style="text-transform:none;font-weight:700;">Tổng KG đơn này:</label>
+                <input type="number" min="0" step="0.1" value="${kg}" onchange="onKgChange('${sc}', this.value)" placeholder="Nhập số kg" style="max-width:120px;">
+            </div>
+            <div class="fee-breakdown">
+                <div class="frow"><span>Giá 30kg đầu (${t.label})</span><span>${fmtMoney(fee.base)}</span></div>
+                <div class="frow"><span>Vượt 30kg (${fee.extraBlocks} lần × ${settings.extraFee.toLocaleString('vi-VN')}đ)</span><span>${fmtMoney(fee.extraFeeTotal)}</span></div>
+                <div class="frow"><span>Phụ phí xăng dầu (${settings.fuelPct}%)</span><span>${fmtMoney(fee.fuel)}</span></div>
+                <div class="frow total"><span>Tổng phí ship</span><span class="val">${fmtMoney(fee.total)}</span></div>
+            </div>
+            <div class="btn-row" style="margin-top:10px;">
+                <button class="ghost small" onclick="copyShipList('${sc}')"><svg class="icon"><use href="#i-copy"/></svg> Sao chép danh sách</button>
+            </div>
+        </div>`;
+    }).join('');
+
+    if (grandTotal > 0) {
+        grandEl.style.display = 'flex';
+        grandVal.innerText = fmtMoney(grandTotal);
+    } else { grandEl.style.display = 'none'; }
+}
+
+// ===================== Utils =====================
+function toggleBlock(id, btn) {
+    const el = document.getElementById(id);
+    const isOpen = el.style.display !== 'none';
+    el.style.display = isOpen ? 'none' : 'block';
+    btn.setAttribute('aria-expanded', String(!isOpen));
+}
+function setStatus(msg, kind, iconId, spin) {
+    const el = document.getElementById('status');
+    el.className = 'status-msg' + (kind ? ' ' + kind : '');
+    const spinClass = spin ? ' spin' : '';
+    el.innerHTML = iconId ? `<svg class="icon${spinClass}" style="width:14px;height:14px;"><use href="#${iconId}"/></svg> ${msg}` : msg;
+}
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function showToast(msg) {
+    const existing = document.getElementById('customToast');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.id = 'customToast';
+    el.className = 'toast';
+    el.innerHTML = `<svg class="icon" style="width:16px;height:16px;stroke:white;"><use href="#i-alert"/></svg> ${msg}`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+}
+</script>

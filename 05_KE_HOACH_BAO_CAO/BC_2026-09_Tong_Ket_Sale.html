@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tổng kết Sale T9/2026 - 1016</title>
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d1f23;--ink2:#555b66;--ink3:#8a909b;--line:#e4e2dc;
+  --acc:#c2410c;--accSoft:#fff1e8;--good:#15803d;--goodSoft:#e8f6ec;--warn:#b45309;--warnSoft:#fdf3e2;
+  --bad:#b91c1c;--badSoft:#fdecec;--rain:#2563eb;--rainSoft:#e8effd;--dry:#d97706;--hol:#7c3aed;--bud:#1d1f23;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px}
+h1{font-size:26px;margin:0;letter-spacing:-.3px}
+.sub{color:var(--ink2);font-size:14px}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px}
+nav a{font-size:13px;text-decoration:none;color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:5px 10px;border-radius:999px}
+nav a:hover{border-color:var(--acc);color:var(--acc)}
+section{margin:0 0 34px}
+h2{font-size:19px;margin:0 0 4px;display:flex;gap:10px;align-items:baseline}
+h2 .n{color:var(--acc);font-variant-numeric:tabular-nums}
+.lead{color:var(--ink2);margin:0 0 14px;font-size:14px}
+h3{font-size:15px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:480px){.g4{grid-template-columns:1fr}}
+.kpi .l{font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;margin:4px 0}
+.kpi .d{font-size:13px;color:var(--ink2)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px}
+.p-good{background:var(--goodSoft);color:var(--good)}.p-bad{background:var(--badSoft);color:var(--bad)}.p-warn{background:var(--warnSoft);color:var(--warn)}.p-rain{background:var(--rainSoft);color:var(--rain)}
+.callout{border-left:4px solid var(--acc);background:var(--accSoft);padding:12px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px}
+.callout b{color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-weight:600;color:var(--ink2);border-bottom:1px solid var(--ink);padding:7px 6px;white-space:nowrap;font-size:12px}
+td{border-bottom:1px solid var(--line);padding:7px 6px;vertical-align:top}
+td.r,th.r{text-align:right;white-space:nowrap}
+tr.me td{background:var(--accSoft);font-weight:600}
+.tw{overflow-x:auto}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink2);margin:6px 0 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-2px}
+.tip{position:fixed;pointer-events:none;background:#1d1f23;color:#fff;font-size:12px;padding:7px 9px;border-radius:6px;max-width:260px;z-index:9;display:none;line-height:1.45}
+.stat{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.stat:last-child{border-bottom:0}
+.stat b{font-variant-numeric:tabular-nums}
+ul.tight{margin:6px 0 0;padding-left:18px}ul.tight li{margin:3px 0}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;min-width:60px}
+.bar>span{display:block;height:100%}
+.tag{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.act td:first-child{font-weight:600;width:26%}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:900px){.timeline{grid-template-columns:1fr}}
+.ph{border-radius:8px;padding:10px 12px;font-size:13px;border:1px solid var(--line);background:var(--card)}
+.ph .t{font-weight:700;font-size:13px}.ph .a{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.ph.rain{border-top:4px solid var(--rain)}.ph.dry{border-top:4px solid var(--dry)}.ph.hol{border-top:4px solid var(--hol)}
+footer{font-size:12px;color:var(--ink3);border-top:1px solid var(--line);padding-top:14px}
+footer a{color:var(--ink2)}
+@media print{nav{display:none}.card{break-inside:avoid}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="sub">Kohnan Parc Mall · Cửa hàng 1016</div>
+    <h1>Tổng kết doanh số Tháng 9/2026</h1>
+    <div class="sub">Đối chiếu hệ thống Kohnan & thị trường TP.HCM · Tác động thời tiết theo ngành hàng · Đề xuất hành động</div>
+  </div>
+  <div class="sub" style="text-align:right">Dữ liệu: POS 01-30/09 · Budget 2026 · Monthly Report By Store T9<br>Lập ngày 04/10/2026</div>
+</header>
+
+<nav>
+  <a href="#s1">1. Kết quả tháng</a><a href="#s2">2. Đối chiếu TP.HCM</a><a href="#s3">3. Thời tiết & nhịp bán</a>
+  <a href="#s4">4. Tác động theo ngành</a><a href="#s5">5. Điểm sáng & hạn chế</a><a href="#s6">6. Đề xuất</a><a href="#s7">7. Kế hoạch T10</a>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>Kết quả tháng 9</h2>
+  <p class="lead">Số liệu chính thức theo Monthly Report By Store (doanh số chưa thuế).</p>
+  <div class="grid g4" id="kpis"></div>
+  <div class="callout" id="sumCallout"></div>
+  <div class="grid g2">
+    <div class="card"><h3>Nửa đầu vs nửa cuối tháng</h3><div id="halves"></div></div>
+    <div class="card"><h3>Ba loại ngày trong tháng</h3><div id="groups"></div></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>Đối chiếu tình hình chung TP.HCM</h2>
+  <p class="lead">So với thị trường bán lẻ TP.HCM và 10 cửa hàng Kohnan Miền Nam (TP.HCM mới gồm cả Bình Dương cũ, cộng Biên Hòa).</p>
+  <div class="grid g3" id="market"></div>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="card chart"><h3>% đạt Budget T9 - 10 cửa hàng Miền Nam</h3><div id="chStoreBud"></div></div>
+    <div class="card chart"><h3>Tăng trưởng so cùng kỳ (YoY) - 10 cửa hàng Miền Nam</h3><div id="chStoreYoy"></div></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h3>Bảng so sánh chi tiết</h3><div class="tw" id="storeTbl"></div></div>
+  <div class="callout" id="sysCallout"></div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>Thời tiết tháng 9 & nhịp bán hàng</h2>
+  <p class="lead">Tháng 9/2026 là cao điểm mùa mưa: mưa lớn nhất từ đầu năm (10/9), đợt mưa kéo dài do xoáy thấp và dải hội tụ nhiệt đới (21-25/9), cuối tháng mưa cực đoan cộng triều cường vượt báo động 3.</p>
+  <div class="timeline" id="phases"></div>
+  <div class="card chart" style="margin-top:12px">
+    <h3>Doanh số từng ngày so với chỉ tiêu ngày (rê chuột vào cột để xem thời tiết)</h3>
+    <div id="chDaily"></div>
+    <div class="legend"><span><i style="background:var(--hol)"></i>Nghỉ lễ 2/9</span><span><i style="background:var(--dry)"></i>Khô ráo / mưa rào nhẹ</span><span><i style="background:var(--rain)"></i>Mưa lớn / ngập (theo tin KTTV & báo chí)</span><span><i style="background:var(--bud);height:2px;vertical-align:3px"></i>Chỉ tiêu ngày (Budget)</span></div>
+  </div>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="card chart">
+      <h3>Doanh số trung bình theo giờ - ngày thường (T2-T6)</h3>
+      <div id="chHour"></div>
+      <div class="legend"><span><i style="background:var(--dry)"></i>Ngày khô ráo</span><span><i style="background:var(--rain)"></i>Ngày mưa lớn</span></div>
+    </div>
+    <div class="card">
+      <h3>Mưa lấy đi gì của cửa hàng? (so ngày thường khô ráo)</h3>
+      <div id="rainImpact"></div>
+      <div class="callout" id="hourCallout" style="margin-bottom:0"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>Tác động thời tiết đến từng ngành hàng</h2>
+  <p class="lead">So sánh % đạt chỉ tiêu ngày của từng ngành trong ngày khô ráo và ngày mưa lớn (đã tự cân bằng ngày thường/cuối tuần vì Budget ngày đã phân bổ theo thứ).</p>
+  <div class="card chart"><h3>% đạt Budget: ngày khô ráo vs ngày mưa lớn</h3><div id="chCat"></div>
+    <div class="legend"><span><i style="background:var(--dry)"></i>Ngày khô ráo</span><span><i style="background:var(--rain)"></i>Ngày mưa lớn</span></div></div>
+  <div class="card" style="margin-top:12px"><h3>Bảng chi tiết theo ngành hàng</h3><div class="tw" id="catTbl"></div></div>
+  <div class="card chart" style="margin-top:12px"><h3>Nhóm sản phẩm theo mùa - doanh số/ngày ngày mưa so với ngày thường khô ráo</h3><div id="chPg"></div></div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>Điểm sáng & điểm hạn chế</h2>
+  <div class="grid g2">
+    <div class="card" style="border-top:4px solid var(--good)">
+      <h3 style="color:var(--good)">Điểm sáng cần duy trì</h3>
+      <ul class="tight">
+        <li><b>Tăng trưởng +24,7% so cùng kỳ - cao nhất Miền Nam</b>, gần gấp đôi tốc độ bán lẻ TP.HCM (+13,8%).</li>
+        <li><b>Đạt 97,8% Budget - hạng 3/10 Miền Nam</b>, cao hơn bình quân vùng (93,0%) 4,8 điểm.</li>
+        <li><b>Chất lượng giỏ hàng tốt:</b> giá trị/bill 279k và 4,36 sản phẩm/bill, cao hơn bình quân Miền Nam (265k; 4,07).</li>
+        <li><b>Hàng tiêu dùng (Cat 15) 108% Budget, +24% YoY</b> - Push Sale nước hoa OTB đạt 81,7 triệu.</li>
+        <li><b>Nội thất / Chăn ga (Cat 06) +35% YoY</b> - mền lạnh Cool, bộ chăn Kids là hàng chủ lực.</li>
+        <li><b>Thú cưng 459%, Nội thất lưu trữ 168%, Làm vườn 157%, Kim khí 119%</b> - vượt xa chỉ tiêu.</li>
+        <li><b>Điện gia dụng (Cat 22)</b> mang về 92 triệu ngoài Budget.</li>
+        <li><b>Ngày lễ 2/9 đạt 122%</b>, cuối tuần đạt 98% bất chấp mưa.</li>
+        <li><b>Hàng mùa mưa bật tăng khi trời mưa:</b> hút ẩm x3,5, áo mưa/dù x1,9.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:4px solid var(--bad)">
+      <h3 style="color:var(--bad)">Điểm hạn chế cần cải thiện</h3>
+      <ul class="tight">
+        <li><b>Hụt 84,6 triệu so Budget</b>, toàn bộ nằm ở 10 ngày mưa lớn (chỉ đạt 79,8%, hụt 179 triệu); ngày khô ráo đạt 99,9%.</li>
+        <li><b>Khung 17-22h ngày mưa giảm 32%</b> - đúng giờ cao điểm của cửa hàng.</li>
+        <li><b>Nửa cuối tháng chỉ đạt 90,8%</b> (nửa đầu 104%), trùng chuỗi mưa 18-30/9.</li>
+        <li><b>Dụng cụ (Cat 02) chỉ 51%, -40% YoY</b> - yếu cả ngày khô, không phải do thời tiết.</li>
+        <li><b>Văn phòng phẩm (Cat 14) 51%, -34% YoY</b> - chưa tận dụng mùa tựu trường.</li>
+        <li><b>Xe đạp / Dã ngoại 69%, Gỗ 72%, Phụ kiện xe 76%</b> - nhóm ngoài trời, cồng kềnh, rất nhạy với mưa.</li>
+        <li><b>Thực phẩm / Đồ uống</b> ngày mưa chỉ đạt 56% - mất doanh số mua ngẫu hứng.</li>
+        <li><b>Chưa có kịch bản "ngày mưa"</b>: hàng mùa mưa chưa được đưa ra vị trí đón khách, nhóm móc phơi, xịt muỗi giảm khi mưa.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>Đề xuất hành động</h2>
+  <div class="callout" id="gapCallout"></div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>A. Kịch bản "Ngày mưa" - bù khoảng hụt 17-22h</h3>
+    <div class="tw"><table class="act">
+      <tr><th>Hành động</th><th>Cách làm</th><th>Phụ trách</th><th>Chỉ số theo dõi</th></tr>
+      <tr><td>Kích hoạt kịch bản lúc 13h</td><td>Xem dự báo Trung tâm KTTV / radar mưa lúc 13h. Có cảnh báo mưa to chiều tối hoặc triều cường vượt báo động 2 → kích hoạt các bước bên dưới, thông báo nhóm Zalo team.</td><td>Quản lý ca</td><td>Số ngày kích hoạt / số ngày mưa thực tế</td></tr>
+      <tr><td>Kệ "Mùa mưa" tại cửa vào và quầy thu ngân</td><td>Gom áo mưa, dù, bao giày đi mưa, hộp hút ẩm, xịt nấm mốc, thảm chùi chân, pin/đèn lên 1 kệ đầu cửa + giỏ cạnh quầy SC. Thiết lập sẵn vị trí, chỉ cần kéo kệ ra khi kích hoạt.</td><td>Team Admin</td><td>DS nhóm hàng mùa mưa/ngày mưa (T9 ngày mưa: áo mưa/dù 1,4 tr/ngày; hút ẩm 0,3 tr/ngày)</td></tr>
+      <tr><td>Giao hàng cho hàng cồng kềnh</td><td>Với chăn ga, giường xếp, xe đạp, kệ tủ: SC chủ động mời giao hàng/COD khi khách ngại mang về lúc mưa. Chuẩn bị sẵn câu chào 10 giây.</td><td>SC</td><td>Số đơn giao hàng ngày mưa; % đạt Cat 06, 18, 23 ngày mưa</td></tr>
+      <tr><td>Tập trung nhân sự trên sàn bán hàng</td><td>Ngày mưa: hạn chế làm việc trong văn phòng (báo cáo, sổ sách, giấy tờ) - toàn bộ nhân sự trong ca có mặt trên sàn: chào và mời khách đang dạo trong TTTM, tư vấn, châm hàng kệ mùa mưa, gợi ý mua kèm tại quầy.</td><td>Quản lý ca</td><td>Khách/giờ 17-22h (T9 ngày mưa: 149 khách vs 195 ngày khô); DS khung 17-22h ngày mưa</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>B. Cải thiện ngành hàng yếu</h3>
+    <div class="tw"><table class="act">
+      <tr><th>Ngành hàng</th><th>Hành động</th><th>Chỉ tiêu T10</th></tr>
+      <tr><td>Dụng cụ (Cat 02) - 51%, -40% YoY</td><td>Rà tồn và trưng bày top SKU (máy khoan bộ, máy xịt rửa, máy hút bụi, thùng đồ nghề): đủ hàng, đủ facing, gắn bảng thông số + mã QR video sản phẩm. Lập kệ "Sửa nhà mùa mưa" ghép Dụng cụ với Kim khí (đang 119%) và keo/băng keo chống thấm.</td><td>≥70% Budget</td></tr>
+      <tr><td>Văn phòng phẩm / Đồ chơi (Cat 14) - 51%, -34% YoY</td><td>Chuyển trọng tâm từ đồ dùng học tập sang đồ chơi: bộ siêu xe mô hình bán chạy (91 bộ) - đưa lên kệ đầu, đặt gần khu chăn Kids và thú cưng (khách gia đình). Chuẩn bị góc quà tặng 20/10.</td><td>≥70% Budget</td></tr>
+      <tr><td>Xe đạp / Dã ngoại (Cat 23) - 69%</td><td>Tập trung bán vào cuối tuần khô ráo (ngày khô đạt 79%); xe đạp trẻ em là chủ lực (Swat ZT16/ZN16). Ngày mưa: mời giao hàng tận nhà. Giường gấp cắm trại chuyển sang nhóm "giường phụ trong nhà" cạnh giường xếp Cat 18.</td><td>≥80% Budget</td></tr>
+      <tr><td>Gỗ, Sơn, Vật liệu ngoại thất, Phụ kiện xe</td><td>Xoay trưng bày sang nhu cầu mùa mưa: chống thấm, chống ẩm mốc, phụ kiện bảo vệ xe khi mưa; giảm diện tích hàng thi công ngoài trời.</td><td>≥80% Budget</td></tr>
+      <tr><td>Thực phẩm / Đồ uống (Cat 25) - ngày mưa 56%</td><td>Ngày mưa đưa snack, bánh gạo, nước Vitamin C ra kệ quầy thu ngân và lối vào - phục vụ khách trú mưa; giữ Push Sale bánh tại quầy.</td><td>Ngày mưa ≥75%</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>C. Duy trì và phát huy điểm sáng</h3>
+    <div class="tw"><table class="act">
+      <tr><th>Điểm sáng</th><th>Hành động duy trì</th><th>Chỉ số theo dõi</th></tr>
+      <tr><td>Push Sale Hàng tiêu dùng (OTB)</td><td>Giữ kịch bản bán tại quầy và vị trí trưng bày; dùng chung cách làm cho sản phẩm Push Sale tháng 10. Ngày mưa ưu tiên giới thiệu hút ẩm, xịt nấm mốc.</td><td>Cat 15 ≥105% Budget</td></tr>
+      <tr><td>Nội thất / Chăn ga +35% YoY</td><td>Mền lạnh Cool sẽ giảm khi trời mát dần: chuyển trọng tâm sang chăn mỏng, bộ chăn ga, thảm chùi chân (thảm tăng 16% ngày mưa). Giữ bộ "I-cool đi học" và chăn Kids.</td><td>Cat 06 ≥95% Budget</td></tr>
+      <tr><td>Thú cưng, Nội thất lưu trữ, Làm vườn, Kim khí</td><td>Giữ đủ tồn top SKU (pate/thức ăn mèo 60g, giường xếp, lọ gốm Bát Tràng mini, phụ kiện vòi) - kiểm tra mức tồn hàng tuần trên Dashboard tồn kho, đặt hàng trước khi chạm ngưỡng.</td><td>Không hết hàng top 10 SKU</td></tr>
+      <tr><td>Giỏ hàng lớn (279k, 4,36 SP/bill)</td><td>Duy trì gợi ý mua kèm tại quầy: chăn + thảm, thức ăn thú cưng + cát vệ sinh, áo mưa + bao giày.</td><td>Giá trị/bill ≥280k</td></tr>
+      <tr><td>Ngày lễ & cuối tuần</td><td>Ngày 20/10: đẩy máy massage, nước uống làm đẹp (Cat 19), mỹ phẩm, chăn ga làm quà tặng; bố trí đủ người cuối tuần.</td><td>Cuối tuần ≥100% Budget</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>Kế hoạch theo dõi tháng 10</h2>
+  <div class="grid g3" id="oct"></div>
+</section>
+
+<footer>
+  <b>Nguồn thời tiết & thị trường:</b>
+  <a href="https://tuoitre.vn/hom-qua-luong-mua-lon-nhat-tai-tphcm-hom-nay-tiep-tuc-mua-to-10026091107485992.htm">Tuổi Trẻ 11/9</a> ·
+  <a href="https://tuoitre.vn/nhieu-duong-tai-tphcm-ngap-sau-tran-mua-lon-ham-chui-nut-giao-an-phu-khong-ngap-100260918194203271.htm">Tuổi Trẻ 18/9</a> ·
+  <a href="https://thanhnien.vn/hom-nay-239-thoi-tiet-xau-nhat-trong-dot-mua-lon-o-nam-bo-185260923073406114.htm">Thanh Niên 23/9</a> ·
+  <a href="https://vnexpress.net/tp-hcm-tiep-tuc-mua-lon-giua-dot-trieu-cuong-5123665.html">VnExpress 23/9</a> ·
+  <a href="https://www.vietnamplus.vn/mua-lon-ket-hop-trieu-cuong-thanh-pho-ho-chi-minh-tiep-tuc-doi-mat-nguy-co-ngap-post1139367.vnp">VietnamPlus 1/10</a> ·
+  <a href="https://vnexpress.net/ly-giai-chuoi-ngay-mua-lon-sam-set-don-dap-o-tp-hcm-5127534.html">VnExpress 4/10</a> ·
+  <a href="https://www.vietnamplus.vn/tp-ho-chi-minh-con-mua-nhieu-ngay-dai-hoi-tu-nhiet-doi-co-xu-huong-manh-len-post1139858.vnp">VietnamPlus 3/10</a> ·
+  <a href="https://vtcnews.vn/du-bao-thoi-tiet-tp-hcm-dip-le-quoc-khanh-2-9-ngay-nang-toi-mua-rao-ar1036965.html">VTC 28/8</a> ·
+  <a href="https://mekongasean.vn/tp-hcm-9-thang-nam-2026-thu-ngan-sach-hon-670000-ty-dong-kinh-te-tang-906-60296.html">Mekong ASEAN - Kinh tế TP.HCM 9 tháng</a> ·
+  <a href="https://baomoi.com/thi-truong-noi-dia-tang-toc-xuat-sieu-tro-lai-trong-thang-9-c56187597.epi">Hà Nội Mới - Thị trường nội địa T9</a>
+</footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+var D = {"days": [{"d": 1, "wd": "T3", "rev": 268997504.0, "bud": 212940000, "cust": 941, "g": "hol", "wx": "Nắng, chiều tối mưa rào nhẹ - nghỉ lễ Quốc khánh"}, {"d": 2, "wd": "T4", "rev": 275349953.0, "bud": 234820000, "cust": 1081, "g": "hol", "wx": "Nắng, chiều tối mưa rào nhẹ - nghỉ lễ Quốc khánh"}, {"d": 3, "wd": "T5", "rev": 127923623.0, "bud": 87530000, "cust": 384, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 4, "wd": "T6", "rev": 109297220.0, "bud": 97250000, "cust": 437, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 5, "wd": "T7", "rev": 219910658.0, "bud": 187160000, "cust": 812, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 6, "wd": "CN", "rev": 224481214.0, "bud": 234820000, "cust": 990, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 7, "wd": "T2", "rev": 70945216.0, "bud": 81640000, "cust": 278, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 8, "wd": "T3", "rev": 79312424.0, "bud": 86350000, "cust": 280, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 9, "wd": "T4", "rev": 83550393.0, "bud": 90680000, "cust": 238, "g": "dry", "wx": "Nắng nóng 32-35°C, mưa rào rải rác chiều tối"}, {"d": 10, "wd": "T5", "rev": 44604707.0, "bud": 87530000, "cust": 189, "g": "rain", "wx": "Mưa lớn nhất từ đầu năm (Củ Chi 127mm, Cát Lái 126mm)"}, {"d": 11, "wd": "T6", "rev": 97446387.0, "bud": 97250000, "cust": 332, "g": "rain", "wx": "Tiếp tục mưa to, nhiều nơi trên 100mm"}, {"d": 12, "wd": "T7", "rev": 187155414.0, "bud": 186370000, "cust": 634, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 13, "wd": "CN", "rev": 216128089.0, "bud": 234820000, "cust": 746, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 14, "wd": "T2", "rev": 82714811.0, "bud": 81640000, "cust": 283, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 15, "wd": "T3", "rev": 81915585.0, "bud": 86350000, "cust": 275, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 16, "wd": "T4", "rev": 90398241.0, "bud": 90680000, "cust": 294, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 17, "wd": "T5", "rev": 92391130.0, "bud": 87530000, "cust": 321, "g": "dry", "wx": "Xen kẽ nắng - mưa rào và dông vài nơi"}, {"d": 18, "wd": "T6", "rev": 71057314.0, "bud": 97250000, "cust": 263, "g": "rain", "wx": "Mưa lớn buổi tối, ngập nhiều tuyến đường"}, {"d": 19, "wd": "T7", "rev": 182884818.0, "bud": 186370000, "cust": 682, "g": "dry", "wx": "Mưa dông, cục bộ mưa to"}, {"d": 20, "wd": "CN", "rev": 231635676.0, "bud": 234820000, "cust": 806, "g": "dry", "wx": "Mưa dông, cục bộ mưa to"}, {"d": 21, "wd": "T2", "rev": 61766408.0, "bud": 81640000, "cust": 247, "g": "rain", "wx": "Bắt đầu đợt mưa lớn kéo dài (Nhà Bè 249mm/24h)"}, {"d": 22, "wd": "T3", "rev": 66271557.0, "bud": 86350000, "cust": 211, "g": "rain", "wx": "Mưa lớn diện rộng; 23/9 là ngày xấu nhất"}, {"d": 23, "wd": "T4", "rev": 78819198.0, "bud": 90680000, "cust": 270, "g": "rain", "wx": "Mưa lớn diện rộng; 23/9 là ngày xấu nhất"}, {"d": 24, "wd": "T5", "rev": 73868005.0, "bud": 87530000, "cust": 303, "g": "rain", "wx": "Mưa to + triều cường vượt báo động 3"}, {"d": 25, "wd": "T6", "rev": 94219379.0, "bud": 97250000, "cust": 354, "g": "dry", "wx": "Mưa giảm dần, triều cường vượt báo động 3"}, {"d": 26, "wd": "T7", "rev": 184081388.0, "bud": 186370000, "cust": 612, "g": "dry", "wx": "Mưa giảm dần, triều cường vượt báo động 3"}, {"d": 27, "wd": "CN", "rev": 211985201.0, "bud": 234820000, "cust": 686, "g": "dry", "wx": "Mưa giảm dần, triều cường vượt báo động 3"}, {"d": 28, "wd": "T2", "rev": 64600062.0, "bud": 81640000, "cust": 246, "g": "rain", "wx": "Triều cường đạt đỉnh, mưa dông chiều tối"}, {"d": 29, "wd": "T3", "rev": 83965161.0, "bud": 86350000, "cust": 263, "g": "rain", "wx": "Mưa dông diện rộng"}, {"d": 30, "wd": "T4", "rev": 65193163.0, "bud": 90569999.99999982, "cust": 241, "g": "rain", "wx": "Mưa cực đoan 79mm/45 phút, 12 tuyến ngập"}], "cats": [{"code": "01", "name": "Gỗ / Vật liệu XD", "rev": 16353110.0, "bud": 22660600.0, "ly": 21028000, "att": 72.16538838336143, "yoy": 77.76826136579798, "dry": 84.08694835680751, "rain": 50.857142857142875, "idx": 51.577105414512324, "cust": 98, "note": "Kệ gỗ, phụ kiện gỗ - hàng trang trí, giảm theo lượng khách."}, {"code": "02", "name": "Dụng cụ", "rev": 63743737.0, "bud": 125414699.99999999, "ly": 106111000, "att": 50.826368041385905, "yoy": 60.07269463109386, "dry": 51.14500666101489, "rain": 47.438469402452895, "idx": 79.91582075708766, "cust": 263, "note": "Yếu ngay cả ngày khô ráo (51%) và giảm 40% so cùng kỳ - vấn đề không nằm ở thời tiết."}, {"code": "03", "name": "Kim khí / Vòi nước", "rev": 29842397.0, "bud": 25004800.000000004, "ly": 19019000, "att": 119.34667343869975, "yoy": 156.90833902939164, "dry": 118.39654290931223, "rain": 104.35731784139422, "idx": 71.70111570645378, "cust": 195, "note": "Nhu cầu sửa chữa nhà mùa mưa (vòi, khóa, phụ kiện) giữ vượt chỉ tiêu cả ngày mưa (104%)."}, {"code": "04", "name": "Sơn / Vật tư", "rev": 21920436.0, "bud": 25786200.0, "ly": 22215000, "att": 85.00839984177584, "yoy": 98.67403106009453, "dry": 83.65523248969983, "rain": 57.58658030910523, "idx": 54.99488892347, "cust": 320, "note": "Sơn, thi công hoãn khi độ ẩm cao."}, {"code": "05", "name": "Bếp / Bàn ăn", "rev": 484863620.0, "bud": 543854399.9999999, "ly": 484844000, "att": 89.1532035044674, "yoy": 100.00404666243163, "dry": 90.47329135133626, "rain": 79.7137969642175, "idx": 89.3504775807997, "cust": 3193, "note": "Mua sắm có kế hoạch, giảm theo lượng khách."}, {"code": "06", "name": "Nội thất / Chăn ga", "rev": 837903233.0, "bud": 871261000, "ly": 622490000, "att": 96.17132328888817, "yoy": 134.6050913267683, "dry": 96.07136503896375, "rain": 73.5192749644863, "idx": 66.78916925025071, "cust": 1905, "note": "Mền lạnh Cool là hàng nóng của tháng; trời mưa mát + hàng cồng kềnh khó mang về khi mưa làm giảm mạnh."}, {"code": "07", "name": "Phụ kiện xe", "rev": 46893991.0, "bud": 61339899.99999999, "ly": 49493000, "att": 76.44940894915057, "yoy": 94.74873416442729, "dry": 78.59467953476862, "rain": 57.79431506701489, "idx": 73.68100905448836, "cust": 350, "note": "Rửa xe, chăm xe hoãn trong mùa mưa."}, {"code": "08", "name": "Thiết bị điện / Đèn", "rev": 80473179.0, "bud": 79312099.99999999, "ly": 73075000, "att": 101.4639367763557, "yoy": 110.12409031816625, "dry": 100.4556127920337, "rain": 102.77428188933517, "idx": 96.15174818015373, "cust": 531, "note": "Pin, đèn dự phòng cúp điện khi mưa dông bán đều."}, {"code": "09", "name": "Làm vườn", "rev": 42382021.0, "bud": 26958300.0, "ly": 18257000, "att": 157.21325528686899, "yoy": 232.14121159007505, "dry": 153.26785472972972, "rain": 164.60902378730583, "idx": 118.57672499028253, "cust": 319, "note": "Mùa mưa là mùa trồng cây; lọ gốm Bát Tràng mini (132 cái) kéo doanh số."}, {"code": "10", "name": "Vật liệu ngoại thất", "rev": 9731039.0, "bud": 9767500.0, "ly": 6813000, "att": 99.62671103148195, "yoy": 142.83045648025833, "dry": 101.5539318885449, "rain": 24.88576, "idx": 21.904707104173866, "cust": 17, "note": "Thi công ngoài trời bị hoãn khi mưa."}, {"code": "11", "name": "Cây cảnh", "rev": 21147473.0, "bud": 21097800.000000004, "ly": 18007000, "att": 100.23544161002566, "yoy": 117.44028988726608, "dry": 102.01999281609196, "rain": 100.88685947286555, "idx": 104.11734644519149, "cust": 250, "note": "Cây cảnh hưởng lợi mùa mưa, ổn định."}, {"code": "12", "name": "Thú cưng", "rev": 62745529.0, "bud": 13674500.0, "ly": 13596000, "att": 458.85062707960077, "yoy": 461.49991909385113, "dry": 451.53731409544946, "rain": 568.095492001939, "idx": 109.34134146212517, "cust": 473, "note": "Khách nuôi thú cưng mua định kỳ, không phụ thuộc thời tiết. Pate/thức ăn mèo dẫn đầu, gấp 4,6 lần cùng kỳ."}, {"code": "14", "name": "Văn phòng phẩm / Đồ chơi", "rev": 62329556.0, "bud": 123070500.0, "ly": 93799000, "att": 50.64540730719385, "yoy": 66.45012846618835, "dry": 58.47459962985811, "rain": 27.31831031332294, "idx": 49.96856270825485, "cust": 771, "note": "Hết mùa tựu trường (khai giảng 5/9); ngày mưa phụ huynh hạn chế đưa trẻ đi. Đồ chơi siêu xe mô hình là điểm sáng."}, {"code": "15", "name": "Hàng tiêu dùng", "rev": 940260054.0, "bud": 870870299.9999999, "ly": 756067000, "att": 107.96786318238205, "yoy": 124.36200151573868, "dry": 110.41111394038754, "rain": 82.00077642775456, "idx": 78.4033187733053, "cust": 6129, "note": "Hút ẩm, xịt nấm mốc bán gấp 3,5 lần ngày mưa; nhưng khách buổi tối giảm và xịt muỗi Push Sale chỉ còn 71% nhịp ngày khô, kéo cả ngành xuống."}, {"code": "18", "name": "Nội thất / Lưu trữ", "rev": 85781072.0, "bud": 51181700.00000001, "ly": 40526000, "att": 167.6010605353085, "yoy": 211.66922963036075, "dry": 171.4547967962029, "rain": 146.86545075290684, "idx": 75.16234294005116, "cust": 254, "note": "Giường xếp bán mạnh (25 triệu); hàng cồng kềnh nên ngày mưa giảm rõ (171% → 147%) dù vẫn vượt chỉ tiêu."}, {"code": "19", "name": "Sức khỏe / Làm đẹp", "rev": 167349229.0, "bud": 168782400.00000003, "ly": 147618000, "att": 99.15087651319094, "yoy": 113.36641127775746, "dry": 101.53749257492575, "rain": 72.37484999634769, "idx": 70.18904580475677, "cust": 991, "note": "Máy massage, nước uống làm đẹp - mua ngẫu hứng, giảm khi ít khách dạo."}, {"code": "20", "name": "Giày dép / Áo mưa / Dù", "rev": 206922009.0, "bud": 219182699.99999997, "ly": 199993000, "att": 94.40617758609599, "yoy": 103.46462576190167, "dry": 95.94616685144123, "rain": 103.83238143486383, "idx": 109.01913797782441, "cust": 1651, "note": "Áo mưa, dù, bao giày bán gần gấp 2 lần (x1,9) vào ngày mưa - ngành duy nhất trong nhóm lớn đạt cao hơn khi trời mưa."}, {"code": "21", "name": "Gia dụng", "rev": 221313465.0, "bud": 244187500.0, "ly": 211742000, "att": 90.63259380598925, "yoy": 104.52034315346035, "dry": 91.08208444748462, "rain": 85.40185240352065, "idx": 91.71010518560088, "cust": 2139, "note": "Móc, kẹp phơi giảm còn 52% khi mưa (khách không phơi đồ ngoài trời); tổng ngành giảm nhẹ."}, {"code": "22", "name": "Điện gia dụng", "rev": 92119507.0, "bud": 0, "ly": 0, "att": null, "yoy": null, "dry": null, "rain": null, "idx": 68.6282817180395, "cust": 113, "note": "Quạt đối lưu, quạt hơi nước - không có Budget riêng, đóng góp 92 triệu ngoài kế hoạch."}, {"code": "23", "name": "Xe đạp / Dã ngoại", "rev": 131137642.0, "bud": 188708100.0, "ly": 132035000, "att": 69.49232279907433, "yoy": 99.32036353997046, "dry": 78.88269236960721, "rain": 45.53085434359983, "idx": 53.56394910197751, "cust": 289, "note": "Xe đạp, đồ cắm trại - sản phẩm ngoài trời, cồng kềnh: ngày mưa gần như không bán."}, {"code": "25", "name": "Thực phẩm / Đồ uống", "rev": 197192146.0, "bud": 214885000, "ly": 183414000, "att": 91.76636154222025, "yoy": 107.51204706292867, "dry": 96.8742867241623, "rain": 55.78375166478844, "idx": 69.0755926889315, "cust": 4084, "note": "Đồ uống lạnh, snack mua ngẫu hứng giảm mạnh khi trời mưa mát và ít khách dạo."}], "hDry": [{"h": 10, "rev": 3116013.6, "cust": 14.6}, {"h": 11, "rev": 7362516.3, "cust": 19.7}, {"h": 12, "rev": 5530792.0, "cust": 16.6}, {"h": 13, "rev": 4460502.5, "cust": 13.9}, {"h": 14, "rev": 4148932.9, "cust": 17.0}, {"h": 15, "rev": 5850848.5, "cust": 19.4}, {"h": 16, "rev": 5692448.8, "cust": 16.0}, {"h": 17, "rev": 6948288.4, "cust": 23.0}, {"h": 18, "rev": 7627964.2, "cust": 28.4}, {"h": 19, "rev": 11187370.4, "cust": 42.9}, {"h": 20, "rev": 16307637.4, "cust": 58.2}, {"h": 21, "rev": 11997609.6, "cust": 43.5}, {"h": 22, "rev": 1035877.6, "cust": 1.2}], "hRain": [{"h": 10, "rev": 3710732.9, "cust": 13.1}, {"h": 11, "rev": 5796106.6, "cust": 15.7}, {"h": 12, "rev": 3914494.9, "cust": 15.3}, {"h": 13, "rev": 4571164.4, "cust": 13.9}, {"h": 14, "rev": 5405414.2, "cust": 16.1}, {"h": 15, "rev": 5301105.9, "cust": 16.4}, {"h": 16, "rev": 4662433.3, "cust": 16.7}, {"h": 17, "rev": 5147484.6, "cust": 19.1}, {"h": 18, "rev": 6101486.0, "cust": 23.7}, {"h": 19, "rev": 6600726.0, "cust": 29.1}, {"h": 20, "rev": 10165809.0, "cust": 44.1}, {"h": 21, "rev": 9137488.4, "cust": 32.7}, {"h": 22, "rev": 244750.0, "cust": 0.6}], "pg": [{"name": "Áo mưa / Dù / Bao giày", "tot": 42561194.0, "dry": 711111.1, "rain": 1368240.5, "idx": 192.40882331888787}, {"name": "Hút ẩm / Chống nấm mốc", "tot": 9387914.0, "dry": 92222.5, "rain": 327129.4, "idx": 354.71755807964433}, {"name": "Thảm chùi chân / thảm", "tot": 38943076.0, "dry": 732870.4, "rain": 853334.3, "idx": 116.43727185597889}, {"name": "Xịt muỗi / Côn trùng", "tot": 27362136.0, "dry": 687315.3, "rain": 486666.6, "idx": 70.80689168420955}, {"name": "Móc / kẹp phơi đồ", "tot": 16386146.0, "dry": 446581.3, "rain": 231205.0, "idx": 51.77220810634032}, {"name": "Pin / Đèn", "tot": 42080950.0, "dry": 916682.5, "rain": 769712.1, "idx": 83.96714238572243}, {"name": "Đồ uống / Snack", "tot": 197192146.0, "dry": 3941371.9, "rain": 2722526.0, "idx": 69.0755926889315}, {"name": "Xe đạp / Cắm trại", "tot": 131137642.0, "dry": 3642208.3, "rain": 1950910.6, "idx": 53.56394910197751}], "stores": [{"code": "1001", "name": "Bình Tân", "reg": "Nam", "ns": 6427000441.0, "bud": 6949000000.0, "ly": 6146233053.0, "cust": 22400.0, "qty": 92883.0}, {"code": "1002", "name": "GIGA MALL", "reg": "Nam", "ns": 4050746040.0, "bud": 4553000000.0, "ly": 3934941850.0, "cust": 15851.0, "qty": 71376.0}, {"code": "1003", "name": "TÂN PHÚ", "reg": "Nam", "ns": 6966778306.0, "bud": 7248000000.0, "ly": 6132303290.0, "cust": 28268.0, "qty": 110361.0}, {"code": "1004", "name": "Bình Dương", "reg": "Nam", "ns": 3113215781.0, "bud": 3524000000.0, "ly": 3119455319.0, "cust": 13865.0, "qty": 50073.0}, {"code": "1005", "name": "HÀ ĐÔNG", "reg": "Bắc", "ns": 5698748957.0, "bud": 5932000000.0, "ly": 5282962958.0, "cust": 21310.0, "qty": 99235.0}, {"code": "1006", "name": "LÊ THÁNH T", "reg": "Nam", "ns": 3676851365.0, "bud": 3977000000.0, "ly": 3461977197.0, "cust": 10878.0, "qty": 52678.0}, {"code": "1007", "name": "BiênHòa Vi", "reg": "Nam", "ns": 1876000757.0, "bud": 1912000000.0, "ly": 1728717081.0, "cust": 5308.0, "qty": 26307.0}, {"code": "1008", "name": "Hải PhòngA", "reg": "Bắc", "ns": 4110084978.0, "bud": 4525000000.0, "ly": 4053968080.0, "cust": 14116.0, "qty": 67378.0}, {"code": "1009", "name": "Smart City", "reg": "Bắc", "ns": 2560990740.0, "bud": 2692000000.0, "ly": 2449316527.0, "cust": 7647.0, "qty": 38310.0}, {"code": "1010", "name": "Long Bien", "reg": "Bắc", "ns": 3468306221.0, "bud": 4409000000.0, "ly": 3434417993.0, "cust": 11919.0, "qty": 50764.0}, {"code": "1011", "name": "GO D7", "reg": "Nam", "ns": 1698332743.0, "bud": 1634000000.0, "ly": 1384645698.0, "cust": 6902.0, "qty": 26003.0}, {"code": "1014", "name": "SORAGARDEN", "reg": "Nam", "ns": 3379090517.0, "bud": 3929000000.0, "ly": 3115234516.0, "cust": 14239.0, "qty": 46532.0}, {"code": "1015", "name": "Vincom LVV", "reg": "Nam", "ns": 1234688768.0, "bud": 1341000000.0, "ly": 1212115261.0, "cust": 5414.0, "qty": 20657.0}, {"code": "1016", "name": "PARC MALL", "reg": "Nam", "ns": 3822406146.0, "bud": 3907000000.0, "ly": 3064604901.0, "cust": 13699.0, "qty": 59669.0}, {"code": "1017", "name": "MM ROYAL", "reg": "Bắc", "ns": 2911520653.0, "bud": 2712000000.0, "ly": 2475781878.0, "cust": 10775.0, "qty": 49038.0}, {"code": "1018", "name": "MM OCEAN", "reg": "Bắc", "ns": 2189368276.0, "bud": 2990000000.0, "ly": 991292848.0, "cust": 8419.0, "qty": 33692.0}], "otb": 81684390.0, "oct": {"bud": 3462000000, "ly": 3253703000}, "tot": 3822869899.0, "bud": 3907000000, "qty": 59669.0, "cust": 13699, "official": {"ns": 3822406146, "bud": 3907000000, "ly": 3064604901, "cust": 13699, "qty": 59669}};
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var tip=$('tip');
+function fmtM(v){return (v/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+' tr';}
+function fmtB(v){return (v/1e9).toLocaleString('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3})+' tỷ';}
+function fmtK(v){return Math.round(v/1000).toLocaleString('vi-VN')+'k';}
+function pct(v,dp){return v==null?'-':v.toLocaleString('vi-VN',{maximumFractionDigits:dp==null?1:dp})+'%';}
+function num(v){return Math.round(v).toLocaleString('vi-VN');}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function showTip(e,html){tip.innerHTML=html;tip.style.display='block';var x=e.clientX+14,y=e.clientY+14;if(x+270>window.innerWidth)x=e.clientX-274;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){tip.style.display='none';}
+function bindTips(root){root.querySelectorAll('[data-tip]').forEach(function(el){el.addEventListener('mousemove',function(e){showTip(e,el.getAttribute('data-tip'));});el.addEventListener('mouseleave',hideTip);});}
+function attClass(v){return v>=100?'p-good':(v>=85?'p-warn':'p-bad');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+var O=D.official, days=D.days;
+var sumRev=function(arr){return arr.reduce(function(s,d){return s+d.rev;},0);};
+var sumBud=function(arr){return arr.reduce(function(s,d){return s+d.bud;},0);};
+var sumCust=function(arr){return arr.reduce(function(s,d){return s+d.cust;},0);};
+
+/* ---------- 1. KPIs ---------- */
+var south=D.stores.filter(function(s){return s.reg==='Nam';});
+function agg(list){var ns=0,b=0,ly=0,c=0,q=0;list.forEach(function(s){ns+=s.ns;b+=s.bud;ly+=s.ly;c+=s.cust;q+=s.qty;});return {ns:ns,bud:b,ly:ly,cust:c,qty:q,att:ns/b*100,yoy:ns/ly*100,atv:ns/c,upt:q/c};}
+var SA=agg(south), ME=south.filter(function(s){return s.code==='1016';})[0];
+var meAtt=O.ns/O.bud*100, meYoy=O.ns/O.ly*100;
+var kp=[
+ {l:'Doanh số (chưa thuế)',v:fmtB(O.ns),d:'Budget '+fmtB(O.bud)},
+ {l:'% đạt Budget',v:pct(meAtt),d:'<span class="pill p-warn">Hụt '+fmtM(O.bud-O.ns)+'</span> · Miền Nam '+pct(SA.att)},
+ {l:'Tăng trưởng so cùng kỳ',v:'+'+pct(meYoy-100),d:'<span class="pill p-good">+'+fmtM(O.ns-O.ly)+'</span> · Miền Nam +'+pct(SA.yoy-100)},
+ {l:'Khách / Giá trị bill / SP mỗi bill',v:num(O.cust),d:fmtK(O.ns/O.cust)+' / bill · '+(O.qty/O.cust).toLocaleString('vi-VN',{maximumFractionDigits:2})+' SP / bill'}
+];
+$('kpis').innerHTML=kp.map(function(k){return '<div class="card kpi"><div class="l">'+k.l+'</div><div class="v">'+k.v+'</div><div class="d">'+k.d+'</div></div>';}).join('');
+
+var rainD=days.filter(function(d){return d.g==='rain';}), dryD=days.filter(function(d){return d.g==='dry';}), holD=days.filter(function(d){return d.g==='hol';});
+var rainLoss=sumBud(rainD)-sumRev(rainD), gap=O.bud-O.ns, rain90=0.9*sumBud(rainD)-sumRev(rainD);
+$('sumCallout').innerHTML='Tháng 9 cửa hàng tăng trưởng <b>+'+pct(meYoy-100)+'</b> so cùng kỳ - cao nhất trong 10 cửa hàng Miền Nam - và đạt <b>'+pct(meAtt)+'</b> Budget. Khoảng hụt '+fmtM(gap)+' đến hoàn toàn từ <b>10 ngày mưa lớn</b> (đạt '+pct(sumRev(rainD)/sumBud(rainD)*100)+', hụt '+fmtM(rainLoss)+'), trong khi ngày khô ráo đạt '+pct(sumRev(dryD)/sumBud(dryD)*100)+'.';
+
+function statRows(rows){return rows.map(function(r){return '<div class="stat"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join('');}
+var h1=days.slice(0,15),h2=days.slice(15);
+$('halves').innerHTML=statRows([
+ ['01-15/9 (có lễ 2/9, mưa 10-11/9)',fmtM(sumRev(h1))+' · <span class="pill '+attClass(sumRev(h1)/sumBud(h1)*100)+'">'+pct(sumRev(h1)/sumBud(h1)*100)+'</span>'],
+ ['16-30/9 (chuỗi mưa 18, 21-24, 28-30/9)',fmtM(sumRev(h2))+' · <span class="pill '+attClass(sumRev(h2)/sumBud(h2)*100)+'">'+pct(sumRev(h2)/sumBud(h2)*100)+'</span>'],
+ ['Khách/ngày nửa đầu → nửa cuối',num(sumCust(h1)/15)+' → '+num(sumCust(h2)/15)]
+]);
+function gRow(lbl,arr){var a=sumRev(arr)/sumBud(arr)*100;return [lbl+' ('+arr.length+' ngày)',fmtM(sumRev(arr)/arr.length)+'/ngày · <span class="pill '+attClass(a)+'">'+pct(a)+'</span>'];}
+$('groups').innerHTML=statRows([gRow('Nghỉ lễ 1-2/9',holD),gRow('Khô ráo / mưa rào nhẹ',dryD),gRow('Mưa lớn / ngập',rainD)]);
+
+/* ---------- 2. Market & system ---------- */
+var mk=[
+ {l:'Bán lẻ hàng hóa & dịch vụ TP.HCM 9 tháng',v:'+13,8%',d:'Riêng bán lẻ hàng hóa +17,2% · CPI bình quân +4,69%'},
+ {l:'Bán lẻ cả nước riêng tháng 9',v:'+14,1%',d:'So cùng kỳ; +1,7% so tháng 8 · Vật liệu XD +24,2%, đồ dùng gia đình +9,7%'},
+ {l:'Cửa hàng 1016 tháng 9',v:'+'+pct(meYoy-100),d:'Cao hơn thị trường TP.HCM ~'+Math.round(meYoy-100-13.8)+' điểm; tăng thực sau trượt giá ~+'+Math.round(meYoy-100-4.69)+'%'}
+];
+$('market').innerHTML=mk.map(function(k,i){return '<div class="card kpi" style="'+(i===2?'border-color:var(--acc);background:var(--accSoft)':'')+'"><div class="l">'+k.l+'</div><div class="v">'+k.v+'</div><div class="d">'+k.d+'</div></div>';}).join('');
+
+function hbar(el,rows,opt){
+  var W=560,rh=26,top=6,left=120,right=60,H=top+rows.length*rh+20;
+  var max=opt.max,min=opt.min||0,sx=function(v){return left+(v-min)/(max-min)*(W-left-right);};
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img">';
+  if(opt.ref!=null){s+='<line x1="'+sx(opt.ref)+'" x2="'+sx(opt.ref)+'" y1="0" y2="'+(H-16)+'" stroke="'+css('--ink')+'" stroke-dasharray="3 3"/><text x="'+sx(opt.ref)+'" y="'+(H-3)+'" font-size="11" text-anchor="middle" fill="'+css('--ink2')+'">'+opt.refLbl+'</text>';}
+  rows.forEach(function(r,i){var y=top+i*rh;var x0=sx(min),x1=sx(r.v);
+    s+='<g data-tip="'+esc(r.tip)+'"><text x="'+(left-8)+'" y="'+(y+16)+'" font-size="12" text-anchor="end" fill="'+(r.me?css('--acc'):css('--ink'))+'" font-weight="'+(r.me?700:400)+'">'+esc(r.lbl)+'</text>';
+    s+='<rect x="'+x0+'" y="'+(y+4)+'" width="'+Math.max(1,x1-x0)+'" height="'+(rh-9)+'" rx="3" fill="'+(r.me?css('--acc'):'#c9c6bd')+'"/>';
+    s+='<text x="'+(x1+5)+'" y="'+(y+16)+'" font-size="12" fill="'+css('--ink')+'" font-weight="'+(r.me?700:400)+'">'+r.txt+'</text></g>';});
+  el.innerHTML=s+'</svg>';bindTips(el);
+}
+var sb=south.slice().sort(function(a,b){return b.ns/b.bud-a.ns/a.bud;});
+hbar($('chStoreBud'),sb.map(function(s){var a=s.ns/s.bud*100;return {lbl:s.code+' '+s.name,v:a,txt:pct(a),me:s.code==='1016',tip:s.code+' '+s.name+'<br>DS '+fmtB(s.ns)+' / Budget '+fmtB(s.bud)};}),{min:60,max:110,ref:SA.att,refLbl:'BQ Miền Nam '+pct(SA.att)});
+var sy=south.slice().sort(function(a,b){return b.ns/b.ly-a.ns/a.ly;});
+hbar($('chStoreYoy'),sy.map(function(s){var a=s.ns/s.ly*100-100;return {lbl:s.code+' '+s.name,v:a,txt:(a>=0?'+':'')+pct(a),me:s.code==='1016',tip:s.code+' '+s.name+'<br>T9/2026 '+fmtB(s.ns)+' · T9/2025 '+fmtB(s.ly)};}),{min:-5,max:30,ref:SA.yoy-100,refLbl:'BQ Miền Nam +'+pct(SA.yoy-100)});
+
+var all=D.stores.slice().sort(function(a,b){return b.ns/b.bud-a.ns/a.bud;});
+var rankAll={};all.forEach(function(s,i){rankAll[s.code]=i+1;});
+var t='<table><tr><th>Cửa hàng</th><th>Vùng</th><th class="r">Doanh số</th><th class="r">% Budget</th><th class="r">Hạng HT</th><th class="r">YoY</th><th class="r">Khách</th><th class="r">Giá trị/bill</th><th class="r">SP/bill</th></tr>';
+D.stores.slice().sort(function(a,b){return (a.reg===b.reg?0:(a.reg==='Nam'?-1:1))||b.ns/b.bud-a.ns/a.bud;}).forEach(function(s){var a=s.ns/s.bud*100,y=s.ns/s.ly*100-100;
+ t+='<tr class="'+(s.code==='1016'?'me':'')+'"><td>'+s.code+' '+esc(s.name)+'</td><td>'+s.reg+'</td><td class="r">'+fmtB(s.ns)+'</td><td class="r"><span class="pill '+attClass(a)+'">'+pct(a)+'</span></td><td class="r">'+rankAll[s.code]+'/16</td><td class="r">'+(y>=0?'+':'')+pct(y)+'</td><td class="r">'+num(s.cust)+'</td><td class="r">'+fmtK(s.ns/s.cust)+'</td><td class="r">'+(s.qty/s.cust).toFixed(2).replace('.',',')+'</td></tr>';});
+t+='<tr style="font-weight:600"><td>Bình quân Miền Nam</td><td></td><td class="r">'+fmtB(SA.ns)+'</td><td class="r">'+pct(SA.att)+'</td><td></td><td class="r">+'+pct(SA.yoy-100)+'</td><td class="r">'+num(SA.cust/south.length)+'</td><td class="r">'+fmtK(SA.atv)+'</td><td class="r">'+SA.upt.toFixed(2).replace('.',',')+'</td></tr></table>';
+$('storeTbl').innerHTML=t;
+var below=south.filter(function(s){return s.ns/s.bud<1;}).length;
+$('sysCallout').innerHTML='Tháng 9 mưa nhiều ảnh hưởng chung: <b>'+below+'/10 cửa hàng Miền Nam không đạt Budget</b>, bình quân vùng chỉ '+pct(SA.att)+'. Trong bối cảnh đó 1016 đứng <b>hạng 3 Miền Nam về % Budget</b> (sau 1011 GO D7 và 1007 Biên Hòa - hai cửa hàng quy mô nhỏ) và <b>hạng 1 Miền Nam về tăng trưởng</b>. So với các cửa hàng cùng quy mô (1002, 1004, 1006, 1014: doanh số 3-4 tỷ), 1016 có % Budget và YoY cao nhất nhóm.';
+
+/* ---------- 3. Weather ---------- */
+var ph=[
+ {c:'hol',t:'1-2/9 · Lễ Quốc khánh',w:'Nắng, chiều tối mưa rào nhẹ',r:[1,2]},
+ {c:'dry',t:'3-9/9 · Nắng nóng',w:'32-35°C, mưa rào rải rác chiều tối; khai giảng 5/9',r:[3,9]},
+ {c:'rain',t:'10-11/9 · Mưa kỷ lục',w:'Mưa lớn nhất từ đầu năm, nhiều nơi >100mm',r:[10,11]},
+ {c:'dry',t:'12-20/9 · Xen kẽ',w:'Nắng xen mưa dông; tối 18/9 mưa lớn gây ngập',r:[12,20]},
+ {c:'rain',t:'21-30/9 · Mưa kéo dài + triều cường',w:'Xoáy thấp + dải hội tụ; Nhà Bè 249mm (21/9); triều cường vượt BĐ3 24-28/9; 30/9 mưa 79mm/45 phút',r:[21,30]}
+];
+$('phases').innerHTML=ph.map(function(p){var arr=days.filter(function(d){return d.d>=p.r[0]&&d.d<=p.r[1];});var a=sumRev(arr)/sumBud(arr)*100;
+ return '<div class="ph '+p.c+'"><div class="t">'+p.t+'</div><div style="color:var(--ink2);min-height:38px">'+p.w+'</div><div class="a">'+pct(a,0)+'</div><div style="color:var(--ink3);font-size:12px">đạt Budget · '+fmtM(sumRev(arr)/arr.length)+'/ngày</div></div>';}).join('');
+
+(function(){var el=$('chDaily');var W=1000,H=300,L=46,R=10,T=14,B=46;var max=300e6;var bw=(W-L-R)/30;
+ var sy=function(v){return T+(1-v/max)*(H-T-B);};var s='<svg viewBox="0 0 '+W+' '+H+'">';
+ for(var g=0;g<=300;g+=50){var y=sy(g*1e6);s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="'+css('--line')+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" font-size="11" text-anchor="end" fill="'+css('--ink3')+'">'+g+'tr</text>';}
+ var col={hol:css('--hol'),dry:css('--dry'),rain:css('--rain')};var path='';
+ days.forEach(function(d,i){var x=L+i*bw;var a=d.rev/d.bud*100;
+  s+='<g data-tip="'+esc('<b>'+d.wd+' '+d.d+'/9</b><br>'+d.wx+'<br>DS '+fmtM(d.rev)+' / chỉ tiêu '+fmtM(d.bud)+'<br>Đạt '+pct(a)+' · '+d.cust+' khách')+'"><rect x="'+(x+2)+'" y="'+T+'" width="'+(bw-4)+'" height="'+(H-T-B)+'" fill="transparent"/>';
+  s+='<rect x="'+(x+3)+'" y="'+sy(d.rev)+'" width="'+(bw-6)+'" height="'+(H-B-sy(d.rev))+'" rx="2" fill="'+col[d.g]+'"/>';
+  s+='<text x="'+(x+bw/2)+'" y="'+(sy(d.rev)-4)+'" font-size="9.5" text-anchor="middle" fill="'+(a<85?css('--bad'):css('--ink2'))+'" font-weight="'+(a<85?700:400)+'">'+Math.round(a)+'%</text></g>';
+  s+='<text x="'+(x+bw/2)+'" y="'+(H-B+14)+'" font-size="10.5" text-anchor="middle" fill="'+css('--ink2')+'">'+d.d+'</text><text x="'+(x+bw/2)+'" y="'+(H-B+27)+'" font-size="9.5" text-anchor="middle" fill="'+css('--ink3')+'">'+d.wd+'</text>';
+  path+=(i?'L':'M')+(x+3)+' '+sy(d.bud)+' L'+(x+bw-3)+' '+sy(d.bud)+' ';});
+ s+='<path d="'+path+'" fill="none" stroke="'+css('--bud')+'" stroke-width="2"/>';
+ el.innerHTML=s+'</svg>';bindTips(el);})();
+
+(function(){var el=$('chHour');var W=560,H=250,L=40,R=8,T=12,B=30;var hs=D.hDry.length;var max=18e6;var gw=(W-L-R)/hs;var sy=function(v){return T+(1-v/max)*(H-T-B);};
+ var s='<svg viewBox="0 0 '+W+' '+H+'">';for(var g=0;g<=18;g+=6){var y=sy(g*1e6);s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="'+css('--line')+'"/><text x="'+(L-5)+'" y="'+(y+4)+'" font-size="10.5" text-anchor="end" fill="'+css('--ink3')+'">'+g+'tr</text>';}
+ var x17=L+7*gw;s+='<rect x="'+x17+'" y="'+T+'" width="'+(5*gw)+'" height="'+(H-T-B)+'" fill="'+css('--rainSoft')+'" opacity=".7"/><text x="'+(x17+5*gw/2)+'" y="'+(T+12)+'" font-size="11" text-anchor="middle" fill="'+css('--rain')+'" font-weight="600">17-22h: '+Math.round((D.hRain.slice(7).reduce(function(s,h){return s+h.rev;},0)/D.hDry.slice(7).reduce(function(s,h){return s+h.rev;},0)-1)*100)+'%</text>';
+ D.hDry.forEach(function(h,i){var r=D.hRain[i];var x=L+i*gw;var bw=(gw-6)/2;
+  s+='<g data-tip="'+esc('<b>'+h.h+'h-'+(h.h+1)+'h</b><br>Ngày khô: '+fmtM(h.rev)+' · '+Math.round(h.cust)+' khách<br>Ngày mưa: '+fmtM(r.rev)+' · '+Math.round(r.cust)+' khách')+'">';
+  s+='<rect x="'+(x+3)+'" y="'+sy(h.rev)+'" width="'+bw+'" height="'+(H-B-sy(h.rev))+'" fill="'+css('--dry')+'" rx="2"/><rect x="'+(x+3+bw)+'" y="'+sy(r.rev)+'" width="'+bw+'" height="'+(H-B-sy(r.rev))+'" fill="'+css('--rain')+'" rx="2"/></g>';
+  s+='<text x="'+(x+gw/2)+'" y="'+(H-B+14)+'" font-size="10.5" text-anchor="middle" fill="'+css('--ink2')+'">'+h.h+'h</text>';});
+ el.innerHTML=s+'</svg>';bindTips(el);})();
+
+var dryWd=days.filter(function(d){return d.g==='dry'&&['T7','CN'].indexOf(d.wd)<0;});
+var a1=sumCust(dryWd)/dryWd.length,a2=sumCust(rainD)/rainD.length,r1=sumRev(dryWd)/dryWd.length,r2=sumRev(rainD)/rainD.length;
+var win=function(arr,h0,h1){return arr.filter(function(h){return h.h>=h0&&h.h<h1;}).reduce(function(s,h){return s+h.rev;},0);};
+function ch(a,b){var v=(b/a-1)*100;return '<span class="pill '+(v<0?'p-bad':'p-good')+'">'+(v>0?'+':'')+pct(v,0)+'</span>';}
+$('rainImpact').innerHTML=statRows([
+ ['Khách / ngày',num(a1)+' → '+num(a2)+' '+ch(a1,a2)],
+ ['Giá trị / bill',fmtK(r1/a1)+' → '+fmtK(r2/a2)+' '+ch(r1/a1,r2/a2)],
+ ['Doanh số / ngày',fmtM(r1)+' → '+fmtM(r2)+' '+ch(r1,r2)],
+ ['Khung 10-17h',fmtM(win(D.hDry,10,17))+' → '+fmtM(win(D.hRain,10,17))+' '+ch(win(D.hDry,10,17),win(D.hRain,10,17))],
+ ['Khung 17-22h',fmtM(win(D.hDry,17,23))+' → '+fmtM(win(D.hRain,17,23))+' '+ch(win(D.hDry,17,23),win(D.hRain,17,23))]
+]);
+$('hourCallout').innerHTML='Mưa ở TP.HCM rơi chủ yếu chiều tối - trùng <b>giờ cao điểm 17-22h</b> (gần 60% doanh số ngày thường). Ban ngày gần như không đổi; <b>mất mát dồn vào buổi tối</b>, chủ yếu do lượng khách giảm chứ không phải giỏ hàng nhỏ đi.';
+
+/* ---------- 4. Categories ---------- */
+var cats=D.cats.filter(function(c){return c.bud>5e6;}).sort(function(a,b){return (b.rain-b.dry)-(a.rain-a.dry);});
+(function(){var el=$('chCat');var W=1000,rh=24,T=22,L=190,R=70,H=T+cats.length*rh+10;var max=180;var sx=function(v){return L+Math.min(v,max)/max*(W-L-R);};
+ var s='<svg viewBox="0 0 '+W+' '+H+'">';[0,50,100,150].forEach(function(g){s+='<line x1="'+sx(g)+'" x2="'+sx(g)+'" y1="'+(T-6)+'" y2="'+(H-6)+'" stroke="'+(g===100?css('--ink'):css('--line'))+'" '+(g===100?'stroke-dasharray="3 3"':'')+'/><text x="'+sx(g)+'" y="'+(T-9)+'" font-size="10.5" text-anchor="middle" fill="'+css('--ink3')+'">'+g+'%</text>';});
+ cats.forEach(function(c,i){var y=T+i*rh;var d=c.rain-c.dry;var tag=d>=-5?css('--good'):(d>-20?css('--warn'):css('--bad'));
+  s+='<g data-tip="'+esc('<b>Cat '+c.code+' '+c.name+'</b><br>Ngày khô: '+pct(c.dry,0)+' · Ngày mưa: '+pct(c.rain,0)+'<br>'+c.note)+'"><rect x="0" y="'+y+'" width="'+W+'" height="'+rh+'" fill="transparent"/>';
+  s+='<text x="'+(L-8)+'" y="'+(y+15)+'" font-size="12" text-anchor="end" fill="'+css('--ink')+'">'+c.code+' '+esc(c.name)+'</text>';
+  s+='<rect x="'+L+'" y="'+(y+3)+'" width="'+(sx(c.dry)-L)+'" height="8" rx="2" fill="'+css('--dry')+'"/><rect x="'+L+'" y="'+(y+12)+'" width="'+(sx(c.rain)-L)+'" height="8" rx="2" fill="'+css('--rain')+'"/>';
+  s+='<text x="'+(Math.max(sx(c.dry),sx(c.rain))+6)+'" y="'+(y+15)+'" font-size="11.5" font-weight="700" fill="'+tag+'">'+(d>=0?'+':'')+Math.round(d)+' đ'+(c.dry>max||c.rain>max?' ›':'')+'</text></g>';});
+ el.innerHTML=s+'</svg>';bindTips(el);})();
+
+var t2='<table><tr><th>Ngành hàng</th><th class="r">Doanh số</th><th class="r">Budget</th><th class="r">% đạt</th><th class="r">YoY</th><th class="r">Ngày khô</th><th class="r">Ngày mưa</th><th>Mức nhạy với mưa</th><th>Diễn giải</th></tr>';
+D.cats.slice().sort(function(a,b){return b.rev-a.rev;}).forEach(function(c){
+ var d=c.rain!=null?c.rain-c.dry:(c.idx-100);var lv,cl;
+ if(d>=-5){lv='Hưởng lợi / ổn định';cl='p-good';}else if(d>-20){lv='Ảnh hưởng vừa';cl='p-warn';}else{lv='Nhạy cảm cao';cl='p-bad';}
+ t2+='<tr><td><b>'+c.code+'</b> '+esc(c.name)+'</td><td class="r">'+fmtM(c.rev)+'</td><td class="r">'+(c.bud?fmtM(c.bud):'-')+'</td><td class="r">'+(c.att!=null?'<span class="pill '+attClass(c.att)+'">'+pct(c.att,0)+'</span>':'-')+'</td><td class="r">'+(c.yoy!=null?((c.yoy>=100?'+':'')+pct(c.yoy-100,0)):'-')+'</td><td class="r">'+(c.dry!=null?pct(c.dry,0):'-')+'</td><td class="r">'+(c.rain!=null?pct(c.rain,0):'<span title="Doanh số/ngày mưa so ngày thường khô">'+pct(c.idx,0)+'*</span>')+'</td><td><span class="tag '+cl+'">'+lv+'</span></td><td style="min-width:260px;color:var(--ink2)">'+esc(c.note)+'</td></tr>';});
+$('catTbl').innerHTML=t2+'</table>';
+
+(function(){var rows=D.pg.slice().sort(function(a,b){return b.idx-a.idx;});var el=$('chPg');var W=1000,rh=28,T=10,L=200,R=150,H=T+rows.length*rh+20;var max=380;var sx=function(v){return L+v/max*(W-L-R);};
+ var s='<svg viewBox="0 0 '+W+' '+H+'"><line x1="'+sx(100)+'" x2="'+sx(100)+'" y1="0" y2="'+(H-14)+'" stroke="'+css('--ink')+'" stroke-dasharray="3 3"/><text x="'+sx(100)+'" y="'+(H-2)+'" font-size="11" text-anchor="middle" fill="'+css('--ink2')+'">= nhịp ngày khô (100%)</text>';
+ rows.forEach(function(r,i){var y=T+i*rh;var c=r.idx>=100?css('--rain'):'#c9c6bd';
+  s+='<g data-tip="'+esc('<b>'+r.name+'</b><br>Ngày thường khô: '+fmtM(r.dry)+'/ngày<br>Ngày mưa: '+fmtM(r.rain)+'/ngày<br>Cả tháng: '+fmtM(r.tot))+'"><text x="'+(L-8)+'" y="'+(y+18)+'" font-size="12.5" text-anchor="end" fill="'+css('--ink')+'">'+esc(r.name)+'</text><rect x="'+L+'" y="'+(y+5)+'" width="'+(sx(r.idx)-L)+'" height="17" rx="3" fill="'+c+'"/><text x="'+(sx(r.idx)+6)+'" y="'+(y+18)+'" font-size="12" font-weight="700" fill="'+css('--ink')+'">'+pct(r.idx,0)+' <tspan font-weight="400" fill="'+css('--ink3')+'">('+fmtM(r.dry)+' → '+fmtM(r.rain)+'/ngày)</tspan></text></g>';});
+ el.innerHTML=s+'</svg>';bindTips(el);})();
+
+/* ---------- 6/7 ---------- */
+$('gapCallout').innerHTML='Nếu 10 ngày mưa đạt <b>90%</b> thay vì '+pct(sumRev(rainD)/sumBud(rainD)*100)+', cửa hàng có thêm <b>'+fmtM(rain90)+'</b> - đủ bù khoảng hụt '+fmtM(gap)+' và vượt Budget tháng 9. Đây là đòn bẩy lớn nhất cho tháng 10.';
+var oc=D.oct;
+$('oct').innerHTML=[
+ {t:'Mục tiêu tháng 10',b:statRows([['Budget T10',fmtB(oc.bud)],['Cùng kỳ T10/2025',fmtB(oc.ly)],['Tăng trưởng cần đạt','+'+pct(oc.bud/oc.ly*100-100)],['Chỉ tiêu bình quân/ngày',fmtM(oc.bud/31)]])},
+ {t:'Thời tiết dự báo',b:'<ul class="tight"><li>Đầu - giữa tháng 10 còn mưa nhiều; dải hội tụ nhiệt đới mạnh lên 5-6/10.</li><li>Cuối tháng 10 triều cường có thể vượt báo động 3 - nguy cơ ngập chiều tối.</li><li>Áp dụng kịch bản "Ngày mưa" ngay từ tuần đầu.</li></ul>'},
+ {t:'KPI theo dõi hằng tuần',b:statRows([['% đạt Budget ngày mưa','≥ 90%'],['DS khung 17-22h ngày mưa','≥ 45 tr/ngày'],['Dụng cụ / VPP','≥ 70%'],['Hàng tiêu dùng','≥ 105%'],['Giá trị/bill','≥ 280k']])}
+].map(function(c){return '<div class="card"><h3>'+c.t+'</h3>'+c.b+'</div>';}).join('');
+})();
+</script>
+</body>
+</html>
