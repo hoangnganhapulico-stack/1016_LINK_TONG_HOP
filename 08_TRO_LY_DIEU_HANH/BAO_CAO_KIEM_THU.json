@@ -1,0 +1,347 @@
+[
+ {
+  "no": 2,
+  "name": "Lịch ca: sửa ca ở công cụ Lịch → lịch tổng hợp + nhân sự trong ca",
+  "result": "ĐẠT",
+  "evidence": {
+   "ca_nhung_san_ban_dau": 665,
+   "ca_truoc": "09:00 ~ 17:00",
+   "ca_sau": "07:30 ~ 15:30",
+   "danh_sach_ngay_26": [
+    "07:30 ~ 15:30"
+   ],
+   "lich_su": [
+    [
+     "raw",
+     "14:30 ~ 22:30",
+     "09:00 ~ 17:00",
+     "Đồng bộ (tự động)"
+    ],
+    [
+     "raw",
+     "09:00 ~ 17:00",
+     "07:30 ~ 15:30",
+     "Đồng bộ (tự động)"
+    ]
+   ],
+   "loi_trang_nguon": []
+  },
+  "note": ""
+ },
+ {
+  "no": 3,
+  "name": "Công việc: tạo + hoàn thành ở công cụ Lịch → danh sách công việc + tổng quan",
+  "result": "ĐẠT",
+  "evidence": {
+   "cong_viec": [
+    "LT:2026-10-26:t179300160424567mmvtxam6n",
+    "todo",
+    "Công cụ Lịch · Thủ công"
+   ],
+   "thong_ke_truoc": {
+    "total": 14,
+    "done": 0,
+    "doing": 0,
+    "overdue": 0,
+    "unassigned": 14,
+    "blocked": 0
+   },
+   "thong_ke_sau": {
+    "total": 14,
+    "done": 1,
+    "doing": 0,
+    "overdue": 0,
+    "unassigned": 13,
+    "blocked": 0
+   },
+   "tong_quan_hien": true
+  },
+  "note": ""
+ },
+ {
+  "no": 1,
+  "name": "Push Sale: nhập POS ở tracker → Trợ lý phản ánh số mới",
+  "result": "ĐẠT",
+  "evidence": {
+   "avatar_MTHU_lan1": 3,
+   "avatar_MTHU_lan2": 5,
+   "kem_tay": 2,
+   "son": 1,
+   "MTHU_[TH,chi_tieu,%]": [
+    5,
+    85,
+    5.9
+   ],
+   "thoi_diem_luu_nguon": [
+    "2026-10-26T08:00:01.688Z",
+    "2026-10-26T08:00:04.227Z"
+   ],
+   "loi_trang_nguon": []
+  },
+  "note": ""
+ },
+ {
+  "no": 4,
+  "name": "Sale: nạp file bán hàng mới ở Dashboard Sale → tổng hợp + % hoàn thành",
+  "result": "ĐẠT",
+  "evidence": {
+   "lan1": {
+    "rev": 21500000,
+    "d26": 6500000,
+    "att": 4.6,
+    "mtdT": 467730000,
+    "budget": "Budget 1016 tháng 10 nạp sẵn (1016.BUDGET2026)"
+   },
+   "lan2": {
+    "rev": 26500000,
+    "d26": 11500000,
+    "att": 5.7,
+    "mtdT": 467730000
+   },
+   "doanh_so_ky_vong_lan1_(Sales-Return)": 21500000,
+   "kiem_tra_%": true
+  },
+  "note": ""
+ },
+ {
+  "no": 5,
+  "name": "Kho: cập nhật tồn + lý do quên đặt ở OrderIQ → cảnh báo + danh sách cần xử lý",
+  "result": "ĐẠT",
+  "evidence": {
+   "lan1": {
+    "counts": {
+     "total": 12,
+     "oos": 1,
+     "low": 3,
+     "ok": 8,
+     "zombie": 0,
+     "disc": 0,
+     "cons": 0,
+     "noorder": 0,
+     "recPositive": 4,
+     "onOrder": 0
+    },
+    "item1": [
+     0,
+     "oos",
+     23
+    ]
+   },
+   "lan2": {
+    "counts": {
+     "total": 12,
+     "oos": 0,
+     "low": 3,
+     "ok": 9,
+     "zombie": 0,
+     "disc": 0,
+     "cons": 0,
+     "noorder": 0,
+     "recPositive": 3,
+     "onOrder": 0
+    },
+    "item1": "không còn trong danh sách cần xử lý",
+    "forgot_reason": "NCC tạm hết hàng - KT5"
+   },
+   "loi_trang_nguon": []
+  },
+  "note": ""
+ },
+ {
+  "no": 10,
+  "name": "Lịch sử: truy được nguồn + thời điểm thay đổi",
+  "result": "ĐẠT",
+  "evidence": {
+   "push_qty": [
+    {
+     "at": "2026-10-26T08:00:11.781Z",
+     "origin": "Đồng bộ (tự động)",
+     "id": "PS:SUATAM-AVATAR:EMP-NGUYEN-LE-MINH-THU:2026-10-26",
+     "field": "(mới)",
+     "new": {
+      "qty": 2,
+      "revenue": 143636,
+      "bills": 1
+     }
+    }
+   ],
+   "kho_ly_do": [
+    {
+     "at": "2026-10-26T08:00:30.685Z",
+     "id": "FG:K20261025:8931234500001",
+     "new": "NCC tạm hết hàng - KT5"
+    }
+   ]
+  },
+  "note": ""
+ },
+ {
+  "no": 8,
+  "name": "Nhật ký: bản nháp → sửa → xác nhận → lưu (không tự lưu chính thức)",
+  "result": "ĐẠT",
+  "evidence": {
+   "tao_nhap_khong_tu_luu": "chưa lưu (bản nháp chỉ trên màn hình)",
+   "sau_luu_nhap": "draft",
+   "sau_xac_nhan_va_tai_lai": {
+    "status": "confirmed",
+    "by": "Dương Xuân Hoàng Ngân",
+    "at": "2026-10-26T08:00:39.252Z",
+    "created": "2026-10-26T08:00:38.849Z",
+    "issues": "KT8 - Máy POS 3 chập chờn, đã báo IT",
+    "push_in": "- Sữa Tắm AVATAR Hộp Quà: hôm nay 2/13,1 Hộp · lũy kế 5/450 (1,1%)\n- Kem Dưỡng Tay Hatomugi: hôm nay 0/2,7 Tuýp · lũy kế",
+    "sources": [
+     "LICH",
+     "PS_T10_AVATAR",
+     "SALE",
+     "KHO"
+    ],
+    "metrics_keys": [
+     "taskStats",
+     "push",
+     "saleDay",
+     "saleAtt",
+     "kho"
+    ]
+   },
+   "thu_ghi_de_ban_chinh_thuc": {
+    "ok": false,
+    "error": "Nhật ký ngày này đã xác nhận chính thức. Tạo bản chỉnh sửa mới nếu cần."
+   }
+  },
+  "note": ""
+ },
+ {
+  "no": 9,
+  "name": "Dữ liệu DEMO không cộng vào báo cáo thật",
+  "result": "ĐẠT",
+  "evidence": {
+   "that_truoc": {
+    "push": "{\"SUATAM-AVATAR\":{\"target\":450,\"actual\":5,\"revenue\":359090,\"dayTarget\":450.3000000000002},\"KEMTAY-HATOMUGI\":{\"target\":120,\"actual\":2,\"revenue\":89090,\"dayTarget\":119.50000000000006},\"SON-MENTURM\":{\"target\":120,\"actual\":1,\"revenue\":35454,\"dayTarget\":119.50000000000006}}",
+    "sale": 26500000,
+    "cache": 223870
+   },
+   "khi_bat_demo": {
+    "sale": 2468000000,
+    "ribbon": "block",
+    "tag": true,
+    "confirm": "Chế độ DEMO - không xác nhận nhật ký chính thức."
+   },
+   "that_sau_khi_tat": {
+    "push": "{\"SUATAM-AVATAR\":{\"target\":450,\"actual\":5,\"revenue\":359090,\"dayTarget\":450.3000000000002},\"KEMTAY-HATOMUGI\":{\"target\":120,\"actual\":2,\"revenue\":89090,\"dayTarget\":119.50000000000006},\"SON-MENTURM\":{\"target\":120,\"actual\":1,\"revenue\":35454,\"dayTarget\":119.50000000000006}}",
+    "sale": 26500000,
+    "cache": 223870,
+    "demoInCache": false
+   },
+   "xoa_demo": true,
+   "doanh_so_that_sau_xoa_demo": 26500000
+  },
+  "note": ""
+ },
+ {
+  "no": 6,
+  "name": "Nhập trùng: nhập cùng 1 gói 2 lần → không cộng trùng",
+  "result": "ĐẠT",
+  "evidence": {
+   "truoc_khi_nhap": "notConfigured",
+   "avatar_lan1_lan2": [
+    5,
+    5
+   ],
+   "kem_lan1_lan2": [
+    2,
+    2
+   ],
+   "nhat_ky_nhap_(file,moi,trung,file_da_nhap)": [
+    [
+     "pack_tracker.json",
+     0,
+     6,
+     true
+    ],
+    [
+     "pack_tracker.json",
+     6,
+     0,
+     false
+    ]
+   ],
+   "che_do": "import"
+  },
+  "note": ""
+ },
+ {
+  "no": 7,
+  "name": "Mất kết nối / sai cấu hình → báo lỗi, không giả vờ đã đồng bộ",
+  "result": "ĐẠT",
+  "evidence": {
+   "kho_hong": {
+    "status": "fail",
+    "err": "Ảnh chụp KHO: dữ liệu không đọc được (JSON lỗi).",
+    "stale": true,
+    "staleFrom": "2026-10-26T08:00:00.275Z"
+   },
+   "canh_bao_tren_man_hinh": true,
+   "so_lan_thu_lai": 2,
+   "sau_khi_khoi_phuc": "ok",
+   "cloud_sai_ma": [
+    {
+     "ok": false,
+     "error": "HTTP 401: {\"message\":\"RLS: sai mã cửa hàng\"}"
+    },
+    "fail"
+   ],
+   "cloud_dung_cau_hinh": {
+    "t": {
+     "ok": true
+    },
+    "p": {
+     "ok": true,
+     "pushed": 7,
+     "conflicts": 0
+    }
+   },
+   "may_C_keo_ve": {
+    "r": {
+     "ok": true,
+     "applied": 7
+    },
+    "avatar": 5,
+    "journal": "confirmed",
+    "kho": "ok"
+   },
+   "cloud_may_chu_tat": [
+    {
+     "ok": false,
+     "error": "Failed to fetch"
+    },
+    "fail"
+   ],
+   "cloud_sai_url": {
+    "ok": false,
+    "errors": [
+     "STATE: Failed to fetch",
+     "khn16-tasks: Failed to fetch"
+    ]
+   }
+  },
+  "note": "Đám mây kiểm thử với máy chủ GIẢ LẬP PostgREST (mock_supabase.js), chưa kiểm thử với dự án Supabase thật."
+ },
+ {
+  "no": "BS1",
+  "name": "Mở bằng file:// trên Chromium (Chrome/Edge): Trợ lý đọc được công cụ Lịch",
+  "result": "ĐẠT",
+  "evidence": {
+   "lich": "ok",
+   "read": 665,
+   "ta": "unverified"
+  },
+  "note": "Chrome/Edge dùng chung bộ nhớ cho mọi file://; Safari tách riêng từng file → dùng bản GitHub Pages."
+ },
+ {
+  "no": "BS2",
+  "name": "Không có lỗi JavaScript ở Trợ lý trong suốt kiểm thử",
+  "result": "ĐẠT",
+  "evidence": [],
+  "note": ""
+ }
+]

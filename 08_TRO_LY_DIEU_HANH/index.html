@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trợ Lý Điều Hành 1016</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="hero-main">
+    <div class="brand"><img src="kohnan_logo.png" alt="Kohnan">STORE 1016 · PARC MALL</div>
+    <span class="group">Team Admin · Trợ lý điều hành</span>
+    <h1>Trợ Lý Điều Hành Store 1016<small>Cập nhật tại công cụ nguồn một lần - xem tất cả tại đây</small></h1>
+    <div class="chips" id="heroChips"></div>
+  </div>
+  <img class="mascot-hero" src="kohnan_mascot.png" alt="Kotan">
+</div></header>
+<nav class="nav"><div class="wrap" id="navTabs">
+  <span class="logo-box"><img src="kohnan_logo.png" alt="Kohnan"></span>
+  <button data-tab="ov" class="on">Tổng quan</button>
+  <button data-tab="cal">Lịch & nhân sự</button>
+  <button data-tab="task">Công việc</button>
+  <button data-tab="push">Push Sale</button>
+  <button data-tab="sale">Doanh số</button>
+  <button data-tab="kho">Kho & đặt hàng</button>
+  <button data-tab="journal">Nhật ký & bàn giao</button>
+  <button data-tab="tools">Công cụ</button>
+  <button data-tab="src">Nguồn dữ liệu</button>
+  <button data-tab="hist">Lịch sử</button>
+  <a href="TAI_LIEU_TRO_LY.html" target="_blank" style="color:#fff;font-size:13px;font-weight:600;white-space:nowrap;padding:6px 10px;text-decoration:none;opacity:.85">Tài liệu ↗</a>
+</div></nav>
+<main class="wrap">
+  <div class="toolbar">
+    <button class="btn sub sm" data-act="day-prev" aria-label="Ngày trước">◀</button>
+    <input type="date" id="selDate" aria-label="Ngày xem">
+    <button class="btn sub sm" data-act="day-next" aria-label="Ngày sau">▶</button>
+    <button class="btn sub sm" data-act="day-today">Hôm nay</button>
+    <span class="sp"></span>
+    <span id="syncPill" class="tag grey">Đang đọc nguồn...</span>
+    <button class="btn sm" data-act="sync-all">⟳ Đồng bộ tất cả</button>
+  </div>
+  <div id="originWarn" class="badbox" style="display:none;margin-top:12px"></div>
+  <div class="demo-ribbon">CHẾ ĐỘ DEMO - TOÀN BỘ SỐ LIỆU TRÊN MÀN HÌNH LÀ DỮ LIỆU MINH HỌA, KHÔNG PHẢI SỐ THẬT</div>
+  <section class="mod on" id="m-ov"></section>
+  <section class="mod" id="m-cal"></section>
+  <section class="mod" id="m-task"></section>
+  <section class="mod" id="m-push"></section>
+  <section class="mod" id="m-sale"></section>
+  <section class="mod" id="m-kho"></section>
+  <section class="mod" id="m-journal"></section>
+  <section class="mod" id="m-tools"></section>
+  <section class="mod" id="m-src"></section>
+  <section class="mod" id="m-hist"></section>
+</main>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileImport" accept=".json,application/json" multiple hidden>
+<script src="js/xw.js"></script>
+<script src="js/data-tools.js"></script>
+<script src="js/data-budget-2026.js"></script>
+<script src="js/data-ta-snapshot.js"></script>
+<script src="js/s1016-core.js"></script>
+<script src="js/s1016-adapters.js"></script>
+<script src="js/s1016-model.js"></script>
+<script src="js/s1016-demo.js"></script>
+<script src="js/s1016-cloud.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
