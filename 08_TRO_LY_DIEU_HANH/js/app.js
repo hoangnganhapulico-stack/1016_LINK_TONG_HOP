@@ -100,7 +100,7 @@
     h += '<div class="grid g2" style="margin-top:14px"><div class="card"><h3 style="margin-top:0">Nhân sự theo ca</h3>' + staffHtml + srcTag("LICH") + '</div><div class="card"><h3 style="margin-top:0">Cảnh báo & việc cần xử lý</h3>' + (al.join("") || '<div class="empty">Không có cảnh báo.</div>') + "</div></div>";
     h += '<div class="card" style="margin-top:14px"><h3 style="margin-top:0">Vấn đề chưa giải quyết & nội dung cần bàn giao (' + hand.length + ')</h3>' + (hand.length ? '<div class="tbl"><table><thead><tr><th>Công việc</th><th>Phụ trách</th><th>Trạng thái</th><th>Lý do</th></tr></thead><tbody>' +
       hand.map(function (t) { return "<tr><td>" + E(t.title) + "</td><td>" + (t.assignee ? E(t.assignee) : '<span class="tag warn">Chưa phân công</span>') + "</td><td>" + (t.overdue ? '<span class="tag bad">Quá hạn</span> ' : "") + E(M.STATUS[t.status]) + "</td><td>" + E(t.reason || "-") + "</td></tr>"; }).join("") + "</tbody></table></div>" : none("Không có việc tồn.")) + "</div>";
-    $("m-ov").innerHTML = h;
+    $("m-ov").innerHTML = S.workflow.html(iso) + '<details class="wf-legacy"><summary>Tổng quan chi tiết cũ (giữ nguyên số liệu và cảnh báo nguồn)</summary>' + h + '</details>';
   }
 
   /* =================== 2. LỊCH & NHÂN SỰ =================== */
@@ -407,7 +407,7 @@
     try { R[UI.tab](); } catch (e) { console.error(e); $("m-" + UI.tab).innerHTML = '<div class="badbox">Lỗi hiển thị: ' + E(e.message) + "</div>"; }
   }
   UI.render = render;
-  var rt = null; function soon() { clearTimeout(rt); rt = setTimeout(function () { var a = document.activeElement; if (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && a.type === "text") || a.tagName === "SELECT") && a.closest("section.mod")) { renderHero(); return; } render(); }, 120); }
+  var rt = null; function soon() { clearTimeout(rt); rt = setTimeout(function () { var a = document.activeElement; if (document.querySelector(".wf details[open]")) { renderHero(); return; } if (a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT" || a.tagName === "SELECT") && a.closest("section.mod")) { renderHero(); return; } render(); }, 120); }
   S.on("sync", soon); S.on("data", soon); S.on("state", soon);
   S.on("error", function (e) { toast(e.where + ": " + e.message, "bad"); });
 
