@@ -186,7 +186,7 @@
     var sugg = M.suggestAssignees(t.role, t.date);
     var opt = function (cur) { return [["", "- Chưa phân công -"]].concat(onNames.map(function (n) { return [n, n + " (trong ca)"]; })).concat(allNames.filter(function (n) { return onNames.indexOf(n) < 0; }).map(function (n) { return [n, n]; })).concat(cur && allNames.indexOf(cur) < 0 && onNames.indexOf(cur) < 0 ? [[cur, cur]] : []); };
     var tid = U.hash(t.id), canEdit = !M.isDemo();
-    var tdLink = t.link ? (/^https?:/.test(t.link) ? t.link : "../01_VAN_HANH_TEAM/VH_Bang_Dieu_Khien_Team_Admin/index.html#" + t.link) : "";
+    var tdLink = t.link ? (/^https?:/.test(t.link) ? t.link : "https://hoangnganhapulico-stack.github.io/1016_SO_TAY_TEAM_ADMIN/#" + t.link) : "";
     return '<div class="task' + (d ? " done" : "") + (UI.open[t.id] ? " open" : "") + '" data-id="' + E(t.id) + '"><button class="chk' + (d ? " on" : "") + '" data-act="t-toggle" data-id="' + E(t.id) + '" title="Đánh dấu hoàn thành"' + (canEdit ? "" : " disabled") + ">" + (d ? "✓" : "") + "</button>" +
       '<div><div class="t">' + E(t.title) + '</div><div class="meta">' + (t.overdue ? '<span class="tag bad">Quá hạn</span>' : "") + '<span class="tag ' + (d ? "ok" : t.status === "doing" ? "" : t.status === "blocked" ? "warn" : "grey") + '">' + E(M.STATUS[t.status] || t.status) + "</span>" +
       (t.role ? '<span class="tag">' + E(M.ROLE[t.role] || t.role) + "</span>" : "") + '<span class="tag grey">' + E(t.group || "") + "</span>" + (t.priority !== "Bình thường" ? '<span class="tag bad">' + E(t.priority) + "</span>" : "") +
@@ -283,7 +283,7 @@
     var wk = {}; s.byDate.forEach(function (d) { var x = U.dateOf(d.iso), mon = U.addDays(d.iso, -((x.getDay() + 6) % 7)); var w = wk[mon] = wk[mon] || { rev: 0, bud: 0, n: 0 }; w.rev += d.revenue; w.bud += s.budgetByDate[d.iso] || 0; w.n++; });
     h += "<h3>Theo tuần</h3><div class='tbl'><table><thead><tr><th>Tuần bắt đầu</th><th class='n'>Số ngày có số</th><th class='n'>Doanh số</th><th class='n'>Budget</th><th class='n'>%</th></tr></thead><tbody>" + Object.keys(wk).sort().map(function (k) { var w = wk[k]; return "<tr><td>" + U.dmy(k) + "</td><td class='n'>" + w.n + "</td><td class='n'>" + U.fmtInt(w.rev) + "</td><td class='n'>" + U.fmtInt(w.bud) + "</td><td class='n'>" + U.fmtPct(U.pct(w.rev, w.bud)) + "</td></tr>"; }).join("") + "</tbody></table></div>";
     if (s.byCategory.length) h += "<h3>Theo ngành hàng (Layer 1)</h3><div class='tbl'><table><thead><tr><th>Mã</th><th>Ngành</th><th class='n'>Doanh số</th><th class='n'>Budget lũy kế</th><th class='n'>%</th><th class='n'>Budget tháng</th></tr></thead><tbody>" + s.byCategory.slice().sort(function (x, y) { return y.revenue - x.revenue; }).map(function (c) { return "<tr><td>" + E(c.code) + "</td><td>" + E(c.name) + "</td><td class='n'>" + U.fmtInt(c.revenue) + "</td><td class='n'>" + (c.mtdTarget == null ? "-" : U.fmtInt(c.mtdTarget)) + "</td><td class='n'>" + U.fmtPct(c.attainmentPct) + "</td><td class='n'>" + (c.monthTarget == null ? "-" : U.fmtInt(c.monthTarget)) + "</td></tr>"; }).join("") + "</tbody></table></div>";
-    h += '<div class="action small"><b>Định nghĩa:</b> ' + E(s.revenueDef) + "<br><b>File bán hàng:</b> " + E(s.sourceFile || "-") + " · <b>Budget:</b> " + E(s.budgetSource || "-") + "</div>";
+    h += '<div class="action small"><b>Công cụ nguồn:</b> ' + E(s.tool || "") + " · gửi lúc " + U.hm(s.at) + '<br><b>Định nghĩa:</b> ' + E(s.revenueDef) + "<br><b>File bán hàng:</b> " + E(s.sourceFile || "-") + " · <b>Budget:</b> " + E(s.budgetSource || "-") + "</div>";
     $("m-sale").innerHTML = h;
   }
 
@@ -340,8 +340,8 @@
 
   /* =================== 8. CÔNG CỤ =================== */
   var TOOL_MAP = [[/VH_Lich_Lam_Viec|LICH_LAM_VIEC_1016/i, ["LICH", "LICH_TASKS", "BUDGET"], "localStorage khn16-sched / khn16-tasks + ảnh chụp S1016_SNAP_LICH"], [/Team_Admin|SO_TAY_TEAM_ADMIN/i, ["TA"], "Hàm lịch việc + ảnh chụp S1016_SNAP_TA_TASKS"],
-    [/OrderIQ|ORDERIQ_STOCK/i, ["KHO"], "IndexedDB orderiq_kho_1016_v2 → ảnh chụp S1016_SNAP_KHO"], [/DS_2026-1[01]_Dashboard_Sale/i, ["SALE"], "Bộ nhớ trang (không lưu) → ảnh chụp S1016_SNAP_SALE_<tháng>"],
-    [/Tracker_Team_1[58]10_AVATAR/i, ["PS_T10_AVATAR"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_AVATAR_V2"], [/Tracker_Team_0210/i, ["PS_T10_ONBODY"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_V1"], [/Tracker_Nhan_Vien/i, ["PS_T10_NV"], "localStorage TEAM_ADMIN_PUSH_SALE_OCT_2026_NHANVIEN_AVATAR_V2"],
+    [/OrderIQ|ORDERIQ_STOCK/i, ["KHO"], "IndexedDB orderiq_kho_1016_v2 → ảnh chụp S1016_SNAP_KHO"], [/DS_Dashboard_Sale_1016_T10_2026-2025/i, ["SALE"], "IndexedDB dash1016_sale → ảnh chụp S1016_SNAP_SALE_V2_<tháng> (nguồn chuẩn doanh số)"], [/DS_2026-1[01]_Dashboard_Sale/i, ["SALE"], "Bộ nhớ trang (không lưu) → ảnh chụp S1016_SNAP_SALE_<tháng>"],
+    [/Tracker_Team_1[58]10_AVATAR|PUSH_SALE_THANG_10/i, ["PS_T10_AVATAR"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_AVATAR_V2"], [/Tracker_Team_0210/i, ["PS_T10_ONBODY"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_V1"], [/Tracker_Nhan_Vien/i, ["PS_T10_NV"], "localStorage TEAM_ADMIN_PUSH_SALE_OCT_2026_NHANVIEN_AVATAR_V2"],
     [/2026-09_GD2_Tracker/i, ["PS_T9_GD2"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_SEPT_2026_GD2_V1"], [/2026-09_GD1_Tracker/i, ["PS_T9_GD1"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_SEPT_2026_V1"],
     [/sweet-gumption|Check_Ton_Gia_KM/i, ["CHECK_TON"], "localStorage trên origin Netlify (khác origin)"], [/xinhangmiennam|Xin_Hang_Lien/i, ["XIN_HANG"], "Origin Netlify (khác origin)"], [/Check_Ca_Cham_Cong/i, ["CHAM_CONG"], "Không lưu - xử lý file tạm"]];
   function toolSources(t) { var s = (t.href || "") + " " + (t.local || ""); for (var i = 0; i < TOOL_MAP.length; i++) if (TOOL_MAP[i][0].test(s)) return TOOL_MAP[i]; return null; }
@@ -353,9 +353,8 @@
         var m = toolSources(t), sts = m ? m[1].map(function (id) { return S.sync[id] || {}; }) : [];
         var st = m ? statusTag(sts[0].status) : '<span class="tag grey">Chỉ mở link</span>';
         var last = m ? sts.map(function (x) { return x.lastOk; }).filter(Boolean).sort().pop() : null;
-        var local = t.local ? "../" + t.local : "";
         var srcObj = m ? S.sourceById(m[1][0]) : null;
-        return '<div class="card toolcard"><div class="nm">' + E(t.name) + '</div><div class="small muted">' + E(t.desc) + '</div><div class="links">' + (t.href ? '<a class="btn sm" target="_blank" rel="noopener" href="' + E(/^https?:/.test(t.href) ? t.href : "../" + t.href) + '">Mở ' + E(t.host || "") + "</a>" : "") + (local && local !== "../" + t.href ? '<a class="btn sub sm" target="_blank" href="' + E(local) + '">📁 Bản thư mục</a>' : "") + "</div>" +
+        return '<div class="card toolcard"><div class="nm">' + E(t.name) + '</div><div class="small muted">' + E(t.desc) + '</div><div class="links">' + (/^https?:/.test(t.href || "") ? '<a class="btn sm" target="_blank" rel="noopener" href="' + E(t.href) + '">Mở ' + E(t.host || "GitHub") + "</a>" : '<span class="tag grey">Chỉ lưu trên máy (không đưa lên GitHub)</span>') + "</div>" +
           '<div class="small"><b>Trạng thái dữ liệu:</b> ' + st + (last ? " · đồng bộ " + U.hm(last) : "") + "</div>" + (m ? '<div class="small"><b>Nguồn dữ liệu:</b> ' + E(m[2]) + "</div>" : '<div class="small muted">Tài liệu/báo cáo tĩnh - không có dữ liệu cần tổng hợp.</div>') +
           (srcObj && srcObj.how ? '<div class="small"><b>Cách cập nhật:</b> ' + E(srcObj.how) + "</div>" : "") + '<div class="small muted">Cập nhật file: ' + E(t.updated || "-") + "</div></div>";
       }).join("") + "</div>";

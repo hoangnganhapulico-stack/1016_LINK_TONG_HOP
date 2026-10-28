@@ -34,7 +34,7 @@
   "result": "ĐẠT",
   "evidence": {
    "cong_viec": [
-    "LT:2026-10-26:t179300160424567mmvtxam6n",
+    "LT:2026-10-26:t17930016041897vl9cxsnmqn",
     "todo",
     "Công cụ Lịch · Thủ công"
    ],
@@ -73,8 +73,8 @@
     5.9
    ],
    "thoi_diem_luu_nguon": [
-    "2026-10-26T08:00:01.688Z",
-    "2026-10-26T08:00:04.227Z"
+    "2026-10-26T08:00:01.707Z",
+    "2026-10-26T08:00:04.258Z"
    ],
    "loi_trang_nguon": []
   },
@@ -154,7 +154,7 @@
   "evidence": {
    "push_qty": [
     {
-     "at": "2026-10-26T08:00:11.781Z",
+     "at": "2026-10-26T08:00:11.773Z",
      "origin": "Đồng bộ (tự động)",
      "id": "PS:SUATAM-AVATAR:EMP-NGUYEN-LE-MINH-THU:2026-10-26",
      "field": "(mới)",
@@ -167,7 +167,7 @@
    ],
    "kho_ly_do": [
     {
-     "at": "2026-10-26T08:00:30.685Z",
+     "at": "2026-10-26T08:00:30.758Z",
      "id": "FG:K20261025:8931234500001",
      "new": "NCC tạm hết hàng - KT5"
     }
@@ -185,8 +185,8 @@
    "sau_xac_nhan_va_tai_lai": {
     "status": "confirmed",
     "by": "Dương Xuân Hoàng Ngân",
-    "at": "2026-10-26T08:00:39.252Z",
-    "created": "2026-10-26T08:00:38.849Z",
+    "at": "2026-10-26T08:00:39.764Z",
+    "created": "2026-10-26T08:00:39.345Z",
     "issues": "KT8 - Máy POS 3 chập chờn, đã báo IT",
     "push_in": "- Sữa Tắm AVATAR Hộp Quà: hôm nay 2/13,1 Hộp · lũy kế 5/450 (1,1%)\n- Kem Dưỡng Tay Hatomugi: hôm nay 0/2,7 Tuýp · lũy kế",
     "sources": [
@@ -218,7 +218,7 @@
    "that_truoc": {
     "push": "{\"SUATAM-AVATAR\":{\"target\":450,\"actual\":5,\"revenue\":359090,\"dayTarget\":450.3000000000002},\"KEMTAY-HATOMUGI\":{\"target\":120,\"actual\":2,\"revenue\":89090,\"dayTarget\":119.50000000000006},\"SON-MENTURM\":{\"target\":120,\"actual\":1,\"revenue\":35454,\"dayTarget\":119.50000000000006}}",
     "sale": 26500000,
-    "cache": 223870
+    "cache": 223881
    },
    "khi_bat_demo": {
     "sale": 2468000000,
@@ -229,7 +229,7 @@
    "that_sau_khi_tat": {
     "push": "{\"SUATAM-AVATAR\":{\"target\":450,\"actual\":5,\"revenue\":359090,\"dayTarget\":450.3000000000002},\"KEMTAY-HATOMUGI\":{\"target\":120,\"actual\":2,\"revenue\":89090,\"dayTarget\":119.50000000000006},\"SON-MENTURM\":{\"target\":120,\"actual\":1,\"revenue\":35454,\"dayTarget\":119.50000000000006}}",
     "sale": 26500000,
-    "cache": 223870,
+    "cache": 223881,
     "demoInCache": false
    },
    "xoa_demo": true,
@@ -278,7 +278,7 @@
     "status": "fail",
     "err": "Ảnh chụp KHO: dữ liệu không đọc được (JSON lỗi).",
     "stale": true,
-    "staleFrom": "2026-10-26T08:00:00.275Z"
+    "staleFrom": "2026-10-26T08:00:00.242Z"
    },
    "canh_bao_tren_man_hinh": true,
    "so_lan_thu_lai": 2,
@@ -340,6 +340,80 @@
  {
   "no": "BS2",
   "name": "Không có lỗi JavaScript ở Trợ lý trong suốt kiểm thử",
+  "result": "ĐẠT",
+  "evidence": [],
+  "note": ""
+ },
+ {
+  "no": "V1",
+  "name": "[28/10] Lịch làm việc bản 27/10: sửa ca → Trợ lý cập nhật",
+  "result": "ĐẠT",
+  "evidence": {
+   "truoc": "09:00 ~ 17:00",
+   "sau": "07:30 ~ 15:30",
+   "loi_trang": []
+  },
+  "note": ""
+ },
+ {
+  "no": "V2",
+  "name": "[28/10] Dashboard Sale T10 2026-2025: nạp file → Trợ lý nhận, là nguồn chuẩn",
+  "result": "ĐẠT",
+  "evidence": {
+   "lan1": {
+    "tool": "Dashboard Sale 1016 T10 2026-2025",
+    "rev": 20000000,
+    "py": 20000000,
+    "d26": 6000000
+   },
+   "lan2": {
+    "rev": 23000000,
+    "d26": 9000000
+   },
+   "sau_khi_mo_dashboard_cu": {
+    "v2": true,
+    "rev": 23000000,
+    "tool": "Dashboard Sale 1016 T10 2026-2025"
+   },
+   "ky_vong": 20000000,
+   "loi_trang": []
+  },
+  "note": ""
+ },
+ {
+  "no": "V3",
+  "name": "[28/10] Tracker T10 bản mới (18/10 + PUSH_SALE_THANG_10) gửi số liệu",
+  "result": "ĐẠT",
+  "evidence": {
+   "avatar": 3,
+   "chip_ban_THANG_10": "🔗 Trợ lý 1016: chờ dữ liệu\nTải gói\n✕",
+   "loi_trang": []
+  },
+  "note": ""
+ },
+ {
+  "no": "V4",
+  "name": "[28/10] Mọi link công cụ trong Trợ lý trỏ GitHub (không còn file trên máy)",
+  "result": "ĐẠT",
+  "evidence": {
+   "link_khong_phai_github": []
+  },
+  "note": ""
+ },
+ {
+  "no": "V5",
+  "name": "[28/10] Trang chủ: mọi link trỏ GitHub (trừ CCCD giữ trên máy)",
+  "result": "ĐẠT",
+  "evidence": {
+   "con_lai": [
+    "01_VAN_HANH_TEAM/VH_Dien_CCCD_Nhan_Vien.html"
+   ]
+  },
+  "note": ""
+ },
+ {
+  "no": "V6",
+  "name": "[28/10] Không lỗi JavaScript ở Trợ lý",
   "result": "ĐẠT",
   "evidence": [],
   "note": ""

@@ -24,6 +24,8 @@ TARGETS = [
     ('04_PUSH_SALE/2026-10/PS_2026-10_Tracker_Team_1510_AVATAR_450.html', 'PS_T10_AVATAR_1510', 'Push Sale T10 - Tracker Team 15/10', None),
     ('04_PUSH_SALE/2026-10/PS_2026-10_Tracker_Team_0210_ON_Body_800.html', 'PS_T10_ONBODY_0210', 'Push Sale T10 - Tracker Team 02/10 ON Body', None),
     ('04_PUSH_SALE/2026-10/PS_2026-10_Tracker_Nhan_Vien.html', 'PS_T10_NHANVIEN', 'Push Sale T10 - Tracker Nhân viên', None),
+    ('04_PUSH_SALE/2026-10/PUSH_SALE_THANG_10.html', 'PS_T10_THANG10', 'Push Sale T10 - bản PUSH_SALE_THANG_10', None),
+    ('03_DOANH_SO/DS_Dashboard_Sale_1016_T10_2026-2025.html', 'SALE_T10_V2', 'Dashboard Sale 1016 T10 2026-2025', 'sale2'),
     ('04_PUSH_SALE/2026-09/PS_2026-09_GD1_Tracker_Team.html', 'PS_T9_GD1', 'Push Sale T9 GĐ1 - Tracker Team', None),
     ('04_PUSH_SALE/2026-09/PS_2026-09_GD2_Tracker_Team.html', 'PS_T9_GD2', 'Push Sale T9 GĐ2 - Tracker Team', None),
 ]
@@ -116,6 +118,36 @@ LICH_TAIL = r"""<script id="s1016-hook-lich">/*S1016-HOOK-LICH*/
 })();
 </script>"""
 
+SALE2_TAIL = r"""<script id="s1016-hook-sale2">/*S1016-HOOK-SALE2*/
+(function(){
+  if(typeof UI==='undefined'||typeof CALC==='undefined'||typeof DB==='undefined'||!UI.render) return;
+  var tm=null;
+  function snap(){ try{
+    if(!window.S1016Bridge) return;
+    var R=CALC.runFull(); if(!R||!R.C) return;
+    var C=R.C, b=R.budget||{}, fc=R.fc, r=function(v){ return (typeof v==='number'&&isFinite(v))?Math.round(v):null; };
+    var days=R.days.filter(function(d){return d.inR;}).map(function(d){ return {iso:d.d, revenue:r(d.revx), revenueTaxIncl:r(d.rev), qty:d.qty, bills:d.bills, partial:!!d.partial}; });
+    var bud={}; R.days.forEach(function(d){ if(d.bud!=null) bud[d.d]=r(d.bud); });
+    var BM=(DB.data.budget&&DB.data.budget.months&&DB.data.budget.months[C.ym])||null;
+    var cats=(R.cats||[]).map(function(o){ return {code:o.code, name:o.n, revenue:r(o.actx!=null?o.actx:o.rev), revenueTaxIncl:r(o.rev), mtdTarget:r(o.bud),
+      monthTarget:(BM&&BM.month&&BM.month[o.code]!=null)?r(BM.month[o.code]*1000):null, attainmentPct:o.budAch!=null?Math.round(o.budAch*1000)/10:null, pyRevenue:r(o.pyRev)}; });
+    var full=R.days.filter(function(d){return d.inR&&!d.partial;}).length, dim=R.days.length;
+    var att=b.ok?{mtdTarget:r(b.full), mtdActual:r(b.act), attainmentPct:b.ach!=null?Math.round(b.ach*1000)/10:null, monthTarget:r(b.month),
+      forecastTotal:fc?r(fc.revx):null, forecastPct:(fc&&fc.ach!=null)?Math.round(fc.ach*1000)/10:null, gapToTarget:(fc&&b.month!=null)?r(b.month-fc.revx):null,
+      daysElapsed:full, daysRemaining:dim-full, totalDaysInBudget:dim, dateMax:b.lastFull}:null;
+    var sm=DB.data.sales[C.ym]||{meta:{},rows:[]};
+    S1016Bridge.publish('SALE_V2_'+C.ym,{month:C.ym, unit:'VND',
+      revenueDef:'Doanh thu chưa thuế (Amount Tax excl.) theo Dashboard Sale T10 2026-2025: cộng mọi dòng POS (Return âm)'+((S.adj&&S.adj.lug)?', đã tách hàng ký gửi LUG':'')+'; % Budget tính trên các ngày đủ dữ liệu',
+      sourceFile:sm.meta.file||'', budgetSource:(DB.data.budget&&DB.data.budget.meta&&DB.data.budget.meta.file)||'', budgetBuiltin:false,
+      totals:{revenue:r(R.K.cur.revx), revenueTaxIncl:r(R.K.cur.rev), slipCount:R.K.cur.bills, aov:r(R.K.cur.basket), itemsPerSlip:R.K.cur.ipb, returnAmount:r(R.K.cur.ret),
+        dateMin:C.first, dateMax:C.last, daysCount:days.length, partialLastDay:!!C.partial, pyRevenue:r(R.K.py.revx)},
+      byDate:days, byCategory:cats, attainment:att, budgetByDate:bud},{rows:sm.rows.length});
+  }catch(e){ if(window.console) console.warn('[S1016] publish Sale V2 lỗi',e); } }
+  function later(){ clearTimeout(tm); tm=setTimeout(snap,600); }
+  var _r=UI.render; UI.render=function(){ var x=_r.apply(this,arguments); later(); return x; };
+})();
+</script>"""
+
 START, END = '<!--S1016-BRIDGE-START-->', '<!--S1016-BRIDGE-END-->'
 
 
@@ -128,7 +160,7 @@ def patch(text, tid, name, kind):
     notes = []
     # 1. bỏ khối cũ (nếu chạy lại)
     text = re.sub(r'(<meta charset="utf-8" data-s1016>)?' + re.escape(START) + r'.*?' + re.escape(END), '', text, flags=re.S)
-    text = re.sub(r'<script id="s1016-hook-(?:ta|orderiq|lich)">.*?</script>', '', text, flags=re.S)
+    text = re.sub(r'\n?<script id="s1016-hook-(?:ta|orderiq|lich|sale2)">.*?</script>', '', text, flags=re.S)
     text = re.sub(r'\n?\s*/\*S1016-HOOK-SALE\*/.*?\}\)\(\);\n', '\n', text, flags=re.S)
     text = text.replace(TA_HOOK, '')
     # 2. chèn cầu nối sớm (trước mọi script của công cụ)
@@ -149,6 +181,8 @@ def patch(text, tid, name, kind):
         if text.count(TA_ANCHOR) != 1: notes.append('THIẾU/NHIỀU điểm neo Team Admin: %d' % text.count(TA_ANCHOR))
         else: text = text.replace(TA_ANCHOR, TA_HOOK + TA_ANCHOR, 1)
         text = append_tail(text, TA_TAIL)
+    if kind == 'sale2':
+        text = append_tail(text, SALE2_TAIL)
     if kind == 'lich':
         text = append_tail(text, LICH_TAIL)
     if kind == 'orderiq':

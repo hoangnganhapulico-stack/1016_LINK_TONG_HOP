@@ -340,7 +340,8 @@ input[type=date]{border:1px solid var(--card-line);border-radius:8px;padding:7px
   <div class="toolbar no-print">
     <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ In trang</button>
     <button class="btn btn-ghost btn-sm" id="btnReset">🗑️ Xóa dữ liệu</button>
-    <button class="btn btn-primary btn-sm" id="btnPickFile">⬆️ Tải file lịch ca (.xlsx)</button>
+    <button class="btn btn-primary btn-sm" id="btnGsheet">🔄 Cập nhật từ Google Sheets</button>
+    <button class="btn btn-ghost btn-sm" id="btnPickFile">⬆️ Tải file lịch ca (.xlsx)</button>
   </div>
 
   <div id="metaBar" class="meta"></div>
@@ -357,7 +358,7 @@ input[type=date]{border:1px solid var(--card-line);border-radius:8px;padding:7px
   <div class="gsheet-tip no-print" id="gsheetTip">
     💡 <b>Google Sheets:</b> File lịch từ
     <a href="https://docs.google.com/spreadsheets/d/1s1Lz3igrehwS2Waa7KKShjkeF5h_JXia/edit?gid=1762028686" target="_blank">link này</a>
-    — tải về định dạng .xlsx rồi bấm <b>Tải file lịch ca</b> để cập nhật. Dữ liệu T10/2026 đã được nhúng sẵn trong trang.
+    - trang tự lấy bản mới nhất mỗi lần mở. Bấm <b>🔄 Cập nhật từ Google Sheets</b> để lấy lại ngay sau khi sửa lịch.
   </div>
 
   <!-- SCHEDULE APP -->
@@ -511,7 +512,7 @@ function shortBadge(c){const dur=c.endH-c.startH;return dur>0&&dur<7.5?`<span cl
 function formatPhone(raw){let d=String(raw||"").replace(/\D/g,"");if(d.length===9)d="0"+d;return/^0\d{9}$/.test(d)?d:null;}
 
 /* ===== STATE ===== */
-const SCHEMA_V=8;
+const SCHEMA_V=9;
 let scheduleData=null, fileMeta=null, selectedDate=null, searchTerm="", tasksStore={};
 
 /* ===== SCHEDULE DATA from built-in ===== */
@@ -584,10 +585,11 @@ function parseWorkbook(wb){
       const name=row[2], pos=row[3], code=row[1];
       if(!name||!String(name).trim()) continue;
       if(["ADMIN","SALES","SC","TOTAL","SM","CAFE PET","CS & SC"].includes(String(name).trim().toUpperCase())) continue;
-      if(typeof row[0]!=="number") continue;
+      const noEmpty=row[0]===null||row[0]===undefined||String(row[0]).trim()==="";
+      if(typeof row[0]!=="number"&&!(noEmpty&&pos&&String(pos).trim()&&/^\d{1,2}\.\d{4}$/.test(String(sn).trim()))) continue;
       saw=true;
       const codeStr=code?String(Math.round(Number(code))||code).trim():"";
-      const phone=phoneMap[codeStr]||phoneMap[normName(String(name))]||"";
+      const phone=phoneMap[normName(String(name))]||phoneMap[codeStr]||"";
       Object.entries(cdm).forEach(([c,iso])=>{
         const v=row[c];if(v===null||v===undefined||v==="") return;
         if(!dates[iso]) dates[iso]=[];
@@ -893,6 +895,9 @@ function wireEvents(){
   tf.addEventListener("change",e=>{if(e.target.files.length)handleTaskFile(e.target.files[0]);});
   $("#prevDay").onclick=()=>shiftDay(-1);
   $("#nextDay").onclick=()=>shiftDay(1);
+  $("#btnGsheet").onclick=()=>loadFromGsheet(false);
+  document.addEventListener("dragover",e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files"))e.preventDefault();});
+  document.addEventListener("drop",e=>{if(e.target.closest&&e.target.closest("#dropzone"))return;const f=e.dataTransfer&&e.dataTransfer.files[0];if(!f)return;e.preventDefault();if(/\.xlsx?$/i.test(f.name))handleScheduleFile(f);});
   $("#btnToday").onclick=()=>{const t=todayIso();if(availDates().includes(t)){selectedDate=t;renderAll();}else showBanner($("#taskBanner"),"warn",`Hôm nay (${t}) không có trong dữ liệu lịch.`);};
   $("#datePicker").addEventListener("change",e=>{if(e.target.value){selectedDate=e.target.value;renderAll();}});
   $("#searchBox").addEventListener("input",e=>{searchTerm=e.target.value;renderStats();renderTeams();});
@@ -917,6 +922,51 @@ function wireEvents(){
 
 function shiftDay(d){const all=availDates();const i=all.indexOf(selectedDate);const n=i+d;if(n>=0&&n<all.length){selectedDate=all[n];renderAll();}}
 
+
+/* ===== GOOGLE SHEETS SYNC ===== */
+const GSHEET_ID="1s1Lz3igrehwS2Waa7KKShjkeF5h_JXia";
+const GSHEET_URL=`https://docs.google.com/spreadsheets/d/${GSHEET_ID}/export?format=xlsx`;
+let gsheetBusy=false;
+async function fetchGsheetBuf(btn){
+  const waits=[0,2000,4000,7000];
+  let lastErr=null;
+  for(let i=0;i<waits.length;i++){
+    if(waits[i]){if(btn)btn.textContent=`⏳ Thử lại lần ${i}/${waits.length-1}...`;await new Promise(o=>setTimeout(o,waits[i]));}
+    try{
+      const url=GSHEET_URL+(i?"&t="+Date.now():"");
+      const r=await fetch(url,{cache:"no-store",credentials:"omit"});
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      const buf=await r.arrayBuffer();
+      const m=new Uint8Array(buf.slice(0,2));
+      if(m[0]!==0x50||m[1]!==0x4b)throw new Error("Google chưa trả về file Excel");
+      return buf;
+    }catch(e){lastErr=e;}
+  }
+  throw lastErr||new Error("Không kết nối được");
+}
+async function loadFromGsheet(silent){
+  if(gsheetBusy)return; gsheetBusy=true;
+  const btn=$("#btnGsheet"); const old="🔄 Cập nhật từ Google Sheets";
+  if(btn){btn.disabled=true;btn.textContent="⏳ Đang tải từ Google Sheets...";}
+  try{
+    const buf=await fetchGsheetBuf(btn);
+    const wb=XLSX.read(buf,{type:"array"});
+    const result=parseWorkbook(wb);
+    if(!Object.keys(result.dates).length)throw new Error("không tìm thấy dữ liệu lịch hợp lệ");
+    const keep=selectedDate;
+    scheduleData=result; fileMeta={name:"Google Sheets - Lịch làm việc 1016",updatedAt:new Date().toISOString()};
+    persistSchedule(); pickDefault();
+    if(silent&&keep&&result.dates[keep])selectedDate=keep;
+    renderAll();
+    showBanner($("#taskBanner"),"ok",`Đã cập nhật lịch từ <b>Google Sheets</b> lúc ${new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"})} - ${Object.keys(result.dates).length} ngày.`);
+  }catch(err){
+    showBanner($("#taskBanner"),"warn",`Google Sheets đang chưa phản hồi (thường gặp vài phút ngay sau khi vừa sửa/tải lại file lịch). Cách xử lý:<br>
+      1. Đợi 1-2 phút rồi bấm lại <b>🔄 Cập nhật từ Google Sheets</b><br>
+      2. Hoặc bấm <a href="${GSHEET_URL}" style="color:var(--kred);font-weight:700">⬇️ tải file lịch mới nhất</a> rồi kéo thả file vừa tải vào bất kỳ chỗ nào trên trang (hoặc bấm <b>⬆️ Tải file lịch ca</b>)`);
+  }finally{
+    gsheetBusy=false; if(btn){btn.disabled=false;btn.textContent=old;}
+  }
+}
 function handleScheduleFile(file){
   const r=new FileReader();
   r.onload=e=>{
@@ -953,6 +1003,7 @@ if(!scheduleData){
 pickDefault();
 wireEvents();
 renderAll();
+loadFromGsheet(true);
 setInterval(()=>{if(scheduleData&&selectedDate===todayIso()){renderStats();renderPush();renderTeams();}},30000);
 </script>
 <script id="s1016-hook-lich">/*S1016-HOOK-LICH*/

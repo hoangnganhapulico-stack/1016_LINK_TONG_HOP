@@ -5303,6 +5303,7 @@ T.poWT={title:'Canh bao PO',sheet:'Canh bao PO',click:r=>showModal(r.barcode),cn
   data:()=>{const f=V('pow-f');return poWarnings().filter(w=>!f||w.t===f).sort((a,b)=>Object.keys(POW).indexOf(a.t)-Object.keys(POW).indexOf(b.t));},
   cols:[C('Loại cảnh báo',r=>POW[r.t],{td:r=>`<span class="badge ${['newlate','dup','blocked'].includes(r.t)?'b-danger':r.t==='short'||r.t==='unappr'?'b-gray':'b-warning'}">${esc(POW[r.t])}</span>`}),C('PO No.',r=>r.po_no,{xt:'code',td:r=>r.po_no?`<code>${esc(r.po_no)}</code>`:'—'}),cBc(),cName(),cSupC(),cSupN(),C('Chi tiết đối chiếu',r=>r.info,{xt:'wrap',td:r=>`<span class="sm" style="display:inline-block;min-width:280px;white-space:normal">${esc(r.info)}</span>`})]};
 </script>
+
 <script id="s1016-hook-orderiq">/*S1016-HOOK-ORDERIQ*/
 (function(){
   if(typeof compute!=='function'||typeof msSave!=='function') return;

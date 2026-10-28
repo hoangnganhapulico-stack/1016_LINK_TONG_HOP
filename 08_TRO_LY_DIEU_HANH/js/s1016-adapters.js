@@ -174,16 +174,18 @@
   /* ================= 4. DOANH SỐ (ảnh chụp từ Dashboard Sale) ================= */
   S.registerSource({
     id: "SALE", name: "Dashboard Sale (doanh số, Budget)", group: "Doanh số", tool: "SALE_T10", entity: "Doanh số theo ngày/ngành, Budget, % hoàn thành",
-    keys: [/^S1016_SNAP_SALE_/], how: "Mở Dashboard Sale tháng (bản có cầu nối) và nạp file bán hàng POS - dashboard tự gửi số liệu.",
+    keys: [/^S1016_SNAP_SALE_/], how: "Mở Dashboard Sale 1016 T10 2026-2025 (hoặc Dashboard Sale Budget tháng) và nạp file bán hàng POS - dashboard tự gửi số liệu.",
     read: function () {
-      var months = {}, keys = {}, latestAt = null, origins = {};
-      S.raw.keys().forEach(function (k) { if (/^S1016_SNAP_SALE_\d{4}-\d{2}$/.test(k)) keys[k] = 1; });
-      Object.keys(S.imports.items).forEach(function (k) { if (/^S1016_SNAP_SALE_\d{4}-\d{2}$/.test(k)) keys[k] = 1; });
-      var ks = Object.keys(keys); if (!ks.length) return { missing: true, message: "Chưa có số liệu: mở Dashboard Sale (bản có cầu nối) và nạp file bán hàng." };
+      var months = {}, keys = {}, latestAt = null, origins = {}, RE = /^S1016_SNAP_SALE_(V2_)?\d{4}-\d{2}$/;
+      S.raw.keys().forEach(function (k) { if (RE.test(k)) keys[k] = 1; });
+      Object.keys(S.imports.items).forEach(function (k) { if (RE.test(k)) keys[k] = 1; });
+      var ks = Object.keys(keys).sort(); if (!ks.length) return { missing: true, message: "Chưa có số liệu: mở Dashboard Sale (bản có cầu nối) và nạp file bán hàng." };
+      // Mỗi tháng 1 nguồn chuẩn: Dashboard Sale T10 2026-2025 (V2) ưu tiên hơn Dashboard Sale Budget cũ
       ks.forEach(function (k) {
-        var kind = k.replace("S1016_SNAP_", ""), sn = readSnap(kind), p = sn.snap.payload;
+        var kind = k.replace("S1016_SNAP_", ""), sn = readSnap(kind), p = sn.snap.payload, v2 = kind.indexOf("SALE_V2_") === 0;
         if (!p.month || !Array.isArray(p.byDate)) throw new Error(k + ": thiếu month/byDate.");
-        months[p.month] = { month: p.month, at: sn.at, origin: sn.origin, tool: sn.snap.toolName, sourceFile: p.sourceFile, budgetSource: p.budgetSource, budgetBuiltin: p.budgetBuiltin, revenueDef: p.revenueDef, unit: p.unit,
+        var cur = months[p.month]; if (cur && cur.v2 && !v2) return;
+        months[p.month] = { month: p.month, v2: v2, at: sn.at, origin: sn.origin, tool: sn.snap.toolName, sourceFile: p.sourceFile, budgetSource: p.budgetSource, budgetBuiltin: p.budgetBuiltin, revenueDef: p.revenueDef, unit: p.unit,
           totals: p.totals, byDate: p.byDate, byCategory: p.byCategory || [], attainment: p.attainment, budgetByDate: p.budgetByDate || {} };
         origins[sn.origin] = 1; if (!latestAt || sn.at > latestAt) latestAt = sn.at;
       });
