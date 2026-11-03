@@ -56,7 +56,12 @@
   /* =================== 1. TỔNG QUAN =================== */
   function renderOv() {
     var iso = UI.date, o = M.overview(iso), h = head(1, "Tổng quan điều hành", "Ngày " + U.dmy(iso) + (o.note ? ' · <b style="color:var(--kred)">📌 ' + E(o.note) + "</b>" : "") + " - mỗi số liệu ghi rõ nguồn.");
-    var k = [];
+    var saleBudget = o.sale && o.sale.budgetByDate && o.sale.budgetByDate[iso];
+    var planBudget = window.S1016_BUDGET_2026 && window.S1016_BUDGET_2026.byDate;
+    var hasSaleBudget = Number.isFinite(saleBudget) && saleBudget > 0;
+    var target = hasSaleBudget ? saleBudget : o.budgetDay;
+    if (!Number.isFinite(target) && planBudget && Number.isFinite(planBudget[iso])) target = planBudget[iso] * 1000;
+    var k = [kpi("Target ngày cửa hàng", Number.isFinite(target) ? U.fmtVnd(target) : "Chưa có target", "Chưa thuế · " + U.dmy(iso), srcTag(hasSaleBudget ? "SALE" : "BUDGET"))];
     // nhân sự
     if (o.shifts) {
       var on = o.shifts.filter(function (s) { return s.kind === "shift"; }), act = on.filter(function (s) { return M.isActive(s, iso); });
@@ -110,7 +115,11 @@
     h += '<div class="tabs">' + [["month", "Tháng"], ["week", "Tuần"], ["day", "Ngày"]].map(function (v) { return '<button class="tab' + (UI.calView === v[0] ? " on" : "") + '" data-act="calview" data-v="' + v[0] + '">' + v[1] + "</button>"; }).join("") + "</div>";
     var l = M.ds("LICH");
     if (!l) { $("m-cal").innerHTML = h + '<div class="card">' + none((S.sync.LICH || {}).message || "Chưa có dữ liệu lịch ca.") + srcTag("LICH") + "</div>"; return; }
-    var emps = M.employees(), iso = UI.date;
+    var iso = UI.date, emps = {}, month = iso.slice(0, 7);
+    Object.keys(l.shifts).forEach(function (key) {
+      var shift = l.shifts[key];
+      if (shift.date.slice(0, 7) === month && l.employees[shift.emp]) emps[shift.emp] = l.employees[shift.emp];
+    });
     if (UI.calView === "month") {
       var d0 = U.dateOf(iso.slice(0, 7) + "-01"), start = U.addDays(U.isoOf(d0), -((d0.getDay() + 6) % 7)), cells = [];
       var ta = M.ds("TA");
@@ -139,7 +148,7 @@
           list.map(function (s) { var r = resp[U.normName(s.name)] || []; return "<tr><td><span class='tag " + shiftCls(s) + "'>" + E(s.raw) + "</span>" + (M.isActive(s, iso) ? '<br><span class="pill-now">Đang làm</span>' : "") + "</td><td><b>" + E(s.name) + "</b><br><span class='small muted'>" + E(s.pos) + "</span></td><td class='small'>" + (r.length ? r.map(E).join("<br>") : "<span class='muted'>-</span>") + "</td></tr>"; }).join("") + "</tbody></table></div></div>";
       }).join("") + "</div>";
       var warn = [];
-      if (noShift.length) warn.push('<div class="warnbox"><b>Chưa được phân ca ngày ' + U.dm(iso) + ":</b> " + noShift.map(E).join(", ") + "</div>");
+      if (sh2.length && noShift.length) warn.push('<div class="warnbox"><b>Chưa được phân ca ngày ' + U.dm(iso) + ":</b> " + noShift.map(E).join(", ") + "</div>");
       (l.duplicates || []).filter(function (x) { return x.date === iso; }).forEach(function (x) { warn.push('<div class="badbox">Ca trùng: ' + E(x.name) + " có 2 dòng (" + E(x.a) + " / " + E(x.b) + ")</div>"); });
       var off = {}; sh2.forEach(function (s) { if (s.kind !== "shift") off[U.normName(s.name)] = s.raw; });
       tasks.forEach(function (t) { if (t.assignee && off[U.normName(t.assignee)]) warn.push('<div class="warnbox">Giao việc "' + E(t.title) + '" cho ' + E(t.assignee) + " nhưng người này " + E(off[U.normName(t.assignee)]) + ".</div>"); });
