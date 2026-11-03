@@ -61,7 +61,8 @@
     var hasSaleBudget = Number.isFinite(saleBudget) && saleBudget > 0;
     var target = hasSaleBudget ? saleBudget : o.budgetDay;
     if (!Number.isFinite(target) && planBudget && Number.isFinite(planBudget[iso])) target = planBudget[iso] * 1000;
-    var k = [kpi("Target ngày cửa hàng", Number.isFinite(target) ? U.fmtVnd(target) : "Chưa có target", "Chưa thuế · " + U.dmy(iso), srcTag(hasSaleBudget ? "SALE" : "BUDGET"))];
+    var targetCard = kpi("Target ngày cửa hàng", Number.isFinite(target) ? U.fmtVnd(target) : "Chưa có target", "Chưa thuế · " + U.dmy(iso), srcTag(hasSaleBudget ? "SALE" : "BUDGET"));
+    var k = [];
     // nhân sự
     if (o.shifts) {
       var on = o.shifts.filter(function (s) { return s.kind === "shift"; }), act = on.filter(function (s) { return M.isActive(s, iso); });
@@ -105,7 +106,7 @@
     h += '<div class="grid g2" style="margin-top:14px"><div class="card"><h3 style="margin-top:0">Nhân sự theo ca</h3>' + staffHtml + srcTag("LICH") + '</div><div class="card"><h3 style="margin-top:0">Cảnh báo & việc cần xử lý</h3>' + (al.join("") || '<div class="empty">Không có cảnh báo.</div>') + "</div></div>";
     h += '<div class="card" style="margin-top:14px"><h3 style="margin-top:0">Vấn đề chưa giải quyết & nội dung cần bàn giao (' + hand.length + ')</h3>' + (hand.length ? '<div class="tbl"><table><thead><tr><th>Công việc</th><th>Phụ trách</th><th>Trạng thái</th><th>Lý do</th></tr></thead><tbody>' +
       hand.map(function (t) { return "<tr><td>" + E(t.title) + "</td><td>" + (t.assignee ? E(t.assignee) : '<span class="tag warn">Chưa phân công</span>') + "</td><td>" + (t.overdue ? '<span class="tag bad">Quá hạn</span> ' : "") + E(M.STATUS[t.status]) + "</td><td>" + E(t.reason || "-") + "</td></tr>"; }).join("") + "</tbody></table></div>" : none("Không có việc tồn.")) + "</div>";
-    $("m-ov").innerHTML = S.workflow.html(iso) + '<details class="wf-legacy"><summary>Tổng quan chi tiết cũ (giữ nguyên số liệu và cảnh báo nguồn)</summary>' + h + '</details>';
+    $("m-ov").innerHTML = '<div class="grid">' + targetCard + '</div>' + S.workflow.html(iso) + '<details class="wf-legacy"><summary>Tổng quan chi tiết cũ (giữ nguyên số liệu và cảnh báo nguồn)</summary>' + h + '</details>';
   }
 
   /* =================== 2. LỊCH & NHÂN SỰ =================== */
