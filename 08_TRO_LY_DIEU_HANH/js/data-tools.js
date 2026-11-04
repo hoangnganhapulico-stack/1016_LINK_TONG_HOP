@@ -1,6 +1,6 @@
 window.S1016_TOOLS = {
   "extractedAt": "2026-10-29T00:00:00+07:00",
-  "count": 62,
+  "count": 63,
   "tools": [
     {
       "name": "Trợ Lý Điều Hành 1016",
@@ -621,6 +621,16 @@ window.S1016_TOOLS = {
       "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Kohnan_DieuChinhTonKho_Face_1016.html",
       "host": "GitHub",
       "updated": "03/11/2026"
+    },
+    {
+      "name": "OrderIQ - Đặt hàng (bản chia sẻ)",
+      "desc": "Bản chia sẻ công cụ đặt hàng OrderIQ",
+      "group": "Kho - Đặt hàng - Trưng bày",
+      "groupId": "kho",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_OrderIQ_Dat_Hang_Chia_Se.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "04/11/2026"
     }
   ]
 };
