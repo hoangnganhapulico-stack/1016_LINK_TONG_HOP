@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *{font-family:'Inter',sans-serif}
+body{background-color:#f8fafc;color:#0f172a}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:#f1f5f9}
 ::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
@@ -23,14 +24,12 @@
 .stat-row td{padding:6px 8px;font-size:13px}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .sticky-col{position:sticky;left:0;background:white;z-index:2}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(2px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal-box{background:white;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:24px}
-.tab-btn{padding:6px 16px;border-radius:9999px;font-size:13px;font-weight:600;transition:all .2s;cursor:pointer}
+.tab-btn{padding:6px 16px;border-radius:9999px;font-size:13px;font-weight:600;transition:all .2s;cursor:pointer;border:none}
 .tab-btn.active{background:#f97316;color:white}
-.tab-btn:not(.active){background:rgba(255,255,255,.1);color:#cbd5e1}
-.tab-btn:not(.active):hover{background:rgba(255,255,255,.2)}
-.kpi-card{border-radius:16px;padding:20px;color:white;position:relative;overflow:hidden}
-.kpi-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1)}
+.tab-btn:not(.active){background:#f1f5f9;color:#475569}
+.tab-btn:not(.active):hover{background:#e2e8f0}
 .avatar-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
 .podium-bar{border-radius:8px 8px 0 0;display:flex;align-items:flex-end;justify-content:center}
 #toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.15);transition:all .3s;pointer-events:none}
@@ -50,6 +49,27 @@
 .rank-1{color:#f59e0b;font-weight:900}
 .rank-2{color:#94a3b8;font-weight:800}
 .rank-3{color:#b45309;font-weight:800}
+
+/* ===== GĐ2-style design system ===== */
+.custom-card{background:#ffffff;border-radius:1.25rem;padding:1.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.04),0 2px 4px -1px rgba(0,0,0,.02);border:1px solid #e2e8f0;transition:all .3s ease}
+.custom-card:hover{box-shadow:0 10px 20px -3px rgba(0,0,0,.06),0 4px 6px -2px rgba(0,0,0,.03)}
+.chart-container{position:relative;width:100%;height:320px}
+.badge-weekend{background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+.badge-weekday{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+@media print{
+  .no-print{display:none!important}
+  nav select,nav button{display:none!important}
+  #excelModal,#barcodeModal,#aliasModal,#quickAddModal,#csvModal,#reportTypeModal,#pluModal,#importScreen{display:none!important}
+  body{background-color:#ffffff!important}
+  .custom-card,.section-wrap{box-shadow:none!important;border:1px solid #cbd5e1!important}
+  .table-scroll,.overflow-x-auto,.overflow-y-auto{overflow:visible!important;max-height:none!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  thead{display:table-header-group!important;position:static!important}
+  tr,td,th{page-break-inside:avoid;break-inside:avoid}
+  .custom-card,.section-wrap{page-break-inside:avoid;break-inside:avoid}
+  input[type="number"],input[type="date"],input[type="text"]{border:none!important;background:transparent!important;box-shadow:none!important;padding:0!important}
+  .sticky,nav{position:static!important}
+}
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -82,89 +102,204 @@
 <div id="dashboardScreen" class="hidden">
 
 <!-- NAV -->
-<nav class="bg-slate-900 sticky top-0 z-40 shadow-lg">
-  <div class="px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
-    <div class="flex items-center gap-2 flex-wrap">
-      <button class="tab-btn active" id="tabALL" onclick="setGroupFilter('ALL')">Tất cả</button>
-      <div id="groupTabs" class="flex gap-2 flex-wrap"></div>
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3.5 px-4 md:px-8 shadow-sm">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+    <div class="flex items-center gap-3">
+      <span class="p-2.5 bg-gradient-to-tr from-red-600 to-orange-500 text-white rounded-xl font-black text-xl shadow-sm">POS</span>
+      <div>
+        <h1 id="navTitle" class="text-lg md:text-xl font-black text-slate-900 tracking-tight leading-none"></h1>
+        <p id="navSubtitle" class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1"></p>
+        <p id="storageStatusBadge" class="text-[10px] font-bold mt-1 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-300 animate-pulse"></span>
+          <span class="text-slate-400">Đang kiểm tra bộ nhớ lưu trữ...</span>
+        </p>
+      </div>
     </div>
-    <div class="text-center flex-1 min-w-0">
-      <h1 id="navTitle" class="text-white font-black text-sm sm:text-base truncate"></h1>
-      <p id="navSubtitle" class="text-slate-400 text-xs truncate"></p>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <select id="groupFilterSelect" onchange="setGroupFilter(this.value)" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold rounded-xl px-3 py-2 cursor-pointer transition focus:ring-2 focus:ring-orange-500">
+        <option value="ALL">🔥 Tất Cả Sản Phẩm Sale</option>
+      </select>
+
+      <button onclick="openModal('barcodeModal')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+        🏷️ Barcode
+      </button>
+
+      <button onclick="openModal('aliasModal')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+        ⚙️ NV Excel
+      </button>
+
+      <button onclick="openModal('pluModal')" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+        📥 Nhập Tồn Kho (PLU)
+      </button>
+
+      <button onclick="openModal('csvModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+        📂 Tải File Excel / CSV
+      </button>
+
+      <button onclick="openModal('quickAddModal')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+        ➕ Nhập Số Ngày
+      </button>
+
+      <button onclick="confirmReset()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Khôi phục dữ liệu ban đầu">
+        🔄 Đặt Lại
+      </button>
+
+      <button onclick="openModal('reportTypeModal')" class="no-print bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+        📄 Xuất Báo Cáo
+      </button>
+
+      <button onclick="window.print()" class="no-print bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition">
+        🖨️ In PDF
+      </button>
     </div>
-    <div class="flex items-center gap-2 flex-wrap">
-      <button onclick="openModal('csvModal')" class="btn-orange text-xs sm:text-sm">📂 Nhập CSV</button>
-      <button onclick="openModal('quickAddModal')" class="btn-slate text-xs sm:text-sm">➕ Nhập nhanh</button>
-      <button onclick="openModal('reportTypeModal')" class="btn-slate text-xs sm:text-sm">📊 Xuất báo cáo</button>
-      <button onclick="openModal('barcodeModal')" class="btn-slate text-xs sm:text-sm">🔍 Barcode</button>
-      <button onclick="openModal('aliasModal')" class="btn-slate text-xs sm:text-sm">👤 Nhân viên</button>
-      <button onclick="confirmReset()" class="btn-slate text-xs sm:text-sm text-red-500">🗑 Đặt lại</button>
-    </div>
-  </div>
-  <!-- Table filter for daily table -->
-  <div class="bg-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto">
-    <span class="text-slate-400 text-xs font-semibold whitespace-nowrap">Xem:</span>
-    <button class="tab-btn active text-xs" id="filterALL" onclick="setTableFilter('ALL')">Tất cả ngày</button>
-    <button class="tab-btn text-xs" id="filterDONE" onclick="setTableFilter('DONE')">Ngày đã qua</button>
-    <button class="tab-btn text-xs" id="filterTODAY" onclick="setTableFilter('TODAY')">Hôm nay</button>
   </div>
 </nav>
 
 <!-- MAIN CONTENT -->
-<main class="max-w-screen-xl mx-auto px-4 py-5 space-y-5">
+<main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+
+<!-- HERO HEADER -->
+<header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+  <div class="relative z-10 max-w-3xl">
+    <div id="heroBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-black uppercase tracking-wider mb-3 border border-orange-500/30">
+      ⚡ Hệ Thống Theo Dõi Push Sale (Tự Động Lưu Khi F5)
+    </div>
+    <h2 id="heroTitle" class="text-2xl md:text-4xl font-black tracking-tight mb-2"></h2>
+    <p id="heroSubtitle" class="text-xs md:text-sm text-slate-300 leading-relaxed font-normal"></p>
+  </div>
+</header>
 
 <!-- KPI CARDS -->
-<div id="kpiSection"></div>
+<section id="kpiSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5"></section>
 
-<!-- INVENTORY GRID -->
-<div id="inventorySection"></div>
+<!-- LOW STOCK WARNING BANNER -->
+<div id="lowStockBanner" class="hidden rounded-2xl border-2 border-rose-400 bg-rose-50 px-5 py-4 flex items-center gap-3 shadow-sm">
+  <span class="text-3xl">🚨</span>
+  <div class="flex-1">
+    <p class="text-sm font-black text-rose-800">Cảnh báo tồn kho thấp!</p>
+    <p id="lowStockBannerText" class="text-xs font-semibold text-rose-700 mt-0.5"></p>
+  </div>
+</div>
+
+<!-- INVENTORY SECTION -->
+<section class="custom-card border-t-4 border-purple-500">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5">
+    <div>
+      <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">📦 TỒN KHO</span>
+      <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Theo Dõi Tồn Kho Thực Thời</h3>
+      <p class="text-xs text-slate-500 mt-0.5">Nhập tay hoặc <strong>tải file PLU</strong> Tồn đầu kỳ & Số nhập — Số bán ra được lấy TỰ ĐỘNG từ dữ liệu Push Sale để ra Tồn kho thực tế. Cảnh báo khi tồn kho dưới 20 sản phẩm.</p>
+    </div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <button onclick="openModal('pluModal')" class="no-print bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5">
+        📥 Nhập File Tồn Kho
+      </button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="inventorySection"></div>
+</section>
 
 <!-- DAILY TEAM TABLE -->
-<div class="section-wrap fade-in">
-  <div class="section-title">📅 Bảng theo dõi hàng ngày – Toàn team</div>
-  <div class="table-scroll" id="dailyTableWrap"></div>
-</div>
+<section class="custom-card border-t-4 border-indigo-600">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+      <span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">📊 BẢNG THEO DÕI TOÀN TEAM</span>
+      <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Tiến Độ Bán Hàng Chi Tiết Theo Ngày</h3>
+      <p id="dailyTableSubtitle" class="text-xs text-slate-500 mt-0.5"></p>
+    </div>
+    <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-bold">
+      <button onclick="setTableFilter('ALL')" id="filterALL" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm">Tất Cả</button>
+      <button onclick="setTableFilter('WEEKEND')" id="filterWEEKEND" class="px-3 py-1.5 rounded-lg hover:bg-white text-orange-700 transition">🏖️ Cuối Tuần</button>
+      <button onclick="setTableFilter('WEEKDAY')" id="filterWEEKDAY" class="px-3 py-1.5 rounded-lg hover:bg-white text-slate-700 transition">💼 Ngày Thường</button>
+      <button onclick="setTableFilter('DONE')" id="filterDONE" class="px-3 py-1.5 rounded-lg hover:bg-white text-indigo-700 transition">✅ Đã Qua</button>
+      <button onclick="setTableFilter('TODAY')" id="filterTODAY" class="px-3 py-1.5 rounded-lg hover:bg-white text-emerald-700 transition">📍 Hôm Nay</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="dailyStatsBanner"></div>
+
+  <div class="overflow-x-auto border border-slate-200 rounded-xl table-scroll" id="dailyTableWrap"></div>
+</section>
 
 <!-- INDIVIDUAL ROADMAP -->
-<div class="section-wrap fade-in">
-  <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-    <div class="section-title mb-0">🧭 Lộ trình cá nhân</div>
-    <select id="staffSelector" onchange="renderIndividual()" class="input-field" style="width:auto;min-width:160px"></select>
+<section class="custom-card border-2 border-orange-400 bg-gradient-to-b from-orange-50/20 to-white">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+      <span class="bg-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">👤 DÀNH CHO TỪNG NHÂN VIÊN</span>
+      <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Lộ Trình & Bảng Theo Dõi Số Sale Hàng Ngày Cá Nhân</h3>
+    </div>
+    <div class="flex items-center gap-2 w-full md:w-auto">
+      <label for="staffSelector" class="text-xs font-bold text-slate-700 whitespace-nowrap">Chọn nhân viên:</label>
+      <select id="staffSelector" onchange="renderIndividual()" class="w-full md:w-64 bg-white border border-slate-300 font-bold text-slate-900 text-sm rounded-xl px-3 py-2 shadow-sm focus:ring-2 focus:ring-orange-500"></select>
+    </div>
   </div>
   <div id="individualSection"></div>
-</div>
+</section>
 
-<!-- CHARTS + LEADERBOARD -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-  <div class="section-wrap fade-in">
-    <div class="section-title">📊 Biểu đồ doanh thu</div>
-    <canvas id="revenueChart" height="280"></canvas>
-  </div>
-  <div class="section-wrap fade-in">
-    <div class="section-title">🥧 Tỷ trọng bán hàng</div>
-    <canvas id="shareChart" height="280"></canvas>
-  </div>
-</div>
-
-<!-- REVENUE COMPARISON -->
-<div class="section-wrap fade-in">
-  <div class="section-title">💰 Đối chiếu doanh thu cửa hàng</div>
-  <div class="flex flex-wrap gap-4 items-end">
+<!-- REVENUE COMPARISON & STORE SHARE -->
+<section class="custom-card border-2 border-emerald-500 bg-gradient-to-br from-emerald-50/20 to-white">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
     <div>
-      <label class="text-xs font-semibold text-slate-500 block mb-1">Doanh thu cửa hàng (₫)</label>
-      <input type="number" id="storeRevenueInput" class="input-field" style="width:200px" placeholder="0" oninput="updateStoreRevenue(this.value)">
+      <span class="bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">💰 ĐỐI SÁT DOANH THU</span>
+      <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-1">Phân Tích Tỷ Trọng Doanh Thu Push Sale / Toàn Cửa Hàng</h3>
     </div>
-    <div id="revenueCompareCards" class="flex flex-wrap gap-3"></div>
+    <div class="flex flex-col items-start md:items-end gap-1">
+      <div class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-emerald-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-600">Tổng Doanh Thu Cửa Hàng:</span>
+        <input type="number" id="storeRevenueInput" onchange="updateStoreRevenue(this.value)" class="w-36 bg-slate-50 border border-slate-300 font-black text-emerald-700 text-sm rounded-lg px-2.5 py-1 text-right" placeholder="0">
+        <span class="text-xs font-bold text-slate-500">VNĐ</span>
+      </div>
+      <span class="text-[10px] text-slate-400">Tự động tính (chưa gồm thuế) từ file DETAIL khi nhập CSV — vẫn có thể sửa tay</span>
+    </div>
   </div>
-</div>
 
-<!-- LEADERBOARD -->
-<div class="section-wrap fade-in">
-  <div class="section-title">🏆 Bảng xếp hạng</div>
-  <div id="podiumSection" class="mb-6"></div>
-  <div class="table-scroll" id="leaderboardTable"></div>
-</div>
+  <div id="revenueCompareCards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
 
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+      <h4 class="text-base font-black text-slate-900 mb-1">So Sánh Doanh Thu Push Sale Từng Nhân Viên</h4>
+      <p class="text-xs text-slate-500 mb-4">Tính theo doanh thu (VNĐ)</p>
+      <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+      <h4 class="text-base font-black text-slate-900 mb-1">Tỷ Lệ Đóng Góp Số Lượng Của Team</h4>
+      <p class="text-xs text-slate-500 mb-4">Phần trăm số lượng đã chốt so với tổng toàn đội</p>
+      <div class="chart-container"><canvas id="shareChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD & PODIUM -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 custom-card border-t-4 border-indigo-600">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5">
+      <div>
+        <span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">🏆 LEADERBOARD</span>
+        <h3 class="text-xl font-black text-slate-900 mt-1">Bảng Xếp Hạng Doanh Thu &amp; Số Lượng Nhân Viên</h3>
+        <span id="leaderboardScopeLabel" class="text-xs font-semibold text-slate-500"></span>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+        <label class="text-[11px] font-black text-slate-600 uppercase whitespace-nowrap">📅 Xem theo:</label>
+        <select id="leaderboardDaySelect" onchange="handleLeaderboardDayChange(this.value)" class="bg-white border border-slate-300 font-bold text-xs rounded-lg px-2.5 py-1.5"></select>
+      </div>
+    </div>
+    <div class="overflow-x-auto table-scroll" id="leaderboardTable"></div>
+  </div>
+
+  <div class="custom-card border-t-4 border-amber-400 bg-gradient-to-b from-amber-50/40 to-white flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">👑 TOP BỨT PHÁ</span>
+        <span class="text-2xl">🏆</span>
+      </div>
+      <h3 class="text-lg font-black text-slate-900 mb-4">Vinh Danh Dẫn Đầu</h3>
+      <div id="podiumSection" class="space-y-3"></div>
+    </div>
+    <div class="mt-6 p-3 bg-amber-100/60 rounded-xl border border-amber-200 text-[11px] text-amber-900 font-semibold leading-relaxed">
+      💡 <strong>Mẹo nhỏ:</strong> Tăng tỷ lệ mở lời tại quầy thanh toán trong các ngày cao điểm & cuối tuần để bứt phá doanh thu!
+    </div>
+  </div>
+</section>
 
 </main>
 </div><!-- end dashboardScreen -->
@@ -184,7 +319,7 @@
         <input type="file" id="billFileInput" accept=".csv,.xlsx,.xls" class="input-field text-xs">
       </div>
       <div>
-        <label class="text-xs font-semibold text-slate-500 block mb-1">File DETAIL.csv (chi tiết sản phẩm)</label>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">File DETAIL.csv (chi tiết sản phẩm — cũng dùng để tự tính "Tổng Doanh Thu Cửa Hàng" chưa gồm thuế)</label>
         <input type="file" id="detailFileInput" accept=".csv,.xlsx,.xls" class="input-field text-xs">
       </div>
       <div class="bg-slate-50 rounded-lg p-3">
@@ -291,6 +426,14 @@ let STORAGE_KEY = 'PUSH_SALE_V8_DEFAULT';
 let storageBackend = 'memory';
 let _mem = {};
 
+function updateStorageStatusBadge() {
+  const el = document.getElementById('storageStatusBadge');
+  if (!el) return;
+  const label = storageBackend==='window' ? 'Đã lưu vào bộ nhớ ứng dụng' : storageBackend==='local' ? 'Đã lưu vào bộ nhớ trình duyệt' : 'Chỉ lưu tạm trong phiên này';
+  const dotColor = storageBackend==='memory' ? 'bg-amber-400' : 'bg-emerald-400';
+  el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span><span class="text-slate-500">${label}</span>`;
+}
+
 async function detectStorageBackend() {
   try {
     if (typeof window !== 'undefined' && window.storage && typeof window.storage.setItem === 'function') {
@@ -363,6 +506,9 @@ function fmtVND(n) {
 }
 
 function pct(a,b) { return b?Math.round(a/b*100):0; }
+// Decimal-precision percentage (Vietnamese comma decimal separator) — used where small,
+// close-together percentages (e.g. Tỷ Lệ Chốt Đơn) need finer comparison than whole numbers.
+function pctDec(a,b,d=2) { return b ? (a/b*100).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d}) : (0).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d}); }
 
 // Timezone-safe day difference: always compare local midnight→local midnight
 function dayDiff(dt, startDate) {
@@ -525,10 +671,23 @@ async function parseConfigExcel(file) {
         // Auto-detect name column position
         const nameCol4 = hRow4.findIndex(c => c && String(c).includes('Tên nhân viên'));
         const nc = nameCol4 >= 0 ? nameCol4 : 1; // default col B
-        // Find group target columns
+        // Optional "Chức danh" (job title) column — not required by the template
+        const roleCol4 = hRow4.findIndex(c => c && /chức\s*danh|chuc\s*danh|vị\s*trí|vi\s*tri|position|role/i.test(String(c)));
+        // Find group target columns. Match is tolerant of accent/substring differences
+        // between the group name (sheet NHÓM SẢN PHẨM) and the column header (sheet NHÂN VIÊN),
+        // e.g. group "Xịt chống muỗi" vs column header "Chống muỗi" — an exact-string match would
+        // silently miss this and zero out that group's targets for every staff member.
         const groupColMap = {}; // groupId -> colIndex
         cfg.groups.forEach(g => {
-          const idx = hRow4.findIndex(c => c && String(c).trim() === g.name);
+          const gNorm = removeVietnameseTones(g.name).toLowerCase().trim();
+          let idx = hRow4.findIndex(c => c && removeVietnameseTones(String(c)).toLowerCase().trim() === gNorm);
+          if (idx < 0) {
+            idx = hRow4.findIndex(c => {
+              if (!c) return false;
+              const cNorm = removeVietnameseTones(String(c)).toLowerCase().trim();
+              return cNorm && (cNorm.includes(gNorm) || gNorm.includes(cNorm));
+            });
+          }
           if (idx >= 0) groupColMap[g.id] = idx;
         });
         cfg.staff = [];
@@ -546,6 +705,7 @@ async function parseConfigExcel(file) {
           cfg.staff.push({
             id: 'S' + i,
             name: nameStr,
+            role: roleCol4 >= 0 ? String(r[roleCol4]||'').trim() : '',
             keywords,
             targets,
             color: AVATAR_COLORS[(cfg.staff.length) % AVATAR_COLORS.length]
@@ -585,6 +745,8 @@ function initAppState(cfg) {
   appState = {
     currentGroup: 'ALL',
     tableFilter: 'ALL',
+    leaderboardDayFilter: 'ALL',
+    leaderboardSort: { field: 'totalRev', dir: 'desc' },
     selectedStaffId: cfg.staff[0]?.id || null,
     totalStoreRevenue: 0,
     staffList,
@@ -632,6 +794,7 @@ async function handleConfigUpload(input) {
   try {
     const cfg = await parseConfigExcel(file);
     await detectStorageBackend();
+    updateStorageStatusBadge();
     // Try to load existing state from storage
     const saved = await sGet(STORAGE_KEY + '_' + cfg.storeName.replace(/\s/g,'_') + '_' + cfg.campaignName.replace(/\s/g,'_'));
     initAppState(cfg);
@@ -730,9 +893,26 @@ function activateDashboard() {
   document.getElementById('pageTitle').textContent = config.campaignName;
   document.getElementById('navTitle').textContent = config.campaignName;
   document.getElementById('navSubtitle').textContent = config.storeName + ' · ' + config.startDate.toLocaleDateString('vi-VN') + ' – ' + config.endDate.toLocaleDateString('vi-VN');
-  // Build group tabs
-  const tabsEl = document.getElementById('groupTabs');
-  tabsEl.innerHTML = config.groups.map(g => `<button class="tab-btn" id="tab${g.id}" onclick="setGroupFilter('${g.id}')">${g.emoji} ${g.name}</button>`).join('');
+
+  // Hero header (dynamic, built from whatever groups/targets the config defines)
+  const totalDays = appState.days.length;
+  const targetSummary = config.groups.map(g => `${fmt(g.target)} ${g.emoji}${g.name}`).join(' + ');
+  document.getElementById('heroBadge').innerHTML = `⚡ Hệ Thống Theo Dõi Push Sale (${config.startDate.toLocaleDateString('vi-VN')} - ${config.endDate.toLocaleDateString('vi-VN')}) · Tự Động Lưu Khi F5`;
+  document.getElementById('heroTitle').textContent = `${config.campaignName} · Tổng Target: ${targetSummary}`;
+  document.getElementById('heroSubtitle').innerHTML = `Mục tiêu chiến dịch được chia tỷ trọng thông minh theo ${totalDays} ngày (${config.startDate.toLocaleDateString('vi-VN')} - ${config.endDate.toLocaleDateString('vi-VN')}): <strong>Ngày thường</strong> áp lực vừa sức (hệ số x${config.dayWeights.weekday}) — <strong>Thứ 7</strong> (x${config.dayWeights.saturday}) và <strong>Chủ nhật</strong> (x${config.dayWeights.sunday}) tăng cao hơn để bùng nổ doanh số!`;
+  document.getElementById('dailyTableSubtitle').textContent = `Theo dõi chuẩn xác từng ngày trong kỳ push sale (01 → ${totalDays})`;
+
+  // Build group filter dropdown
+  const grpSelect = document.getElementById('groupFilterSelect');
+  grpSelect.innerHTML = `<option value="ALL">🔥 Tất Cả Sản Phẩm Sale</option>` +
+    config.groups.map(g => `<option value="${g.id}">${g.emoji} ${g.name} (${fmt(g.target)})</option>`).join('');
+
+  // Build leaderboard "Xem theo" day dropdown
+  const ldSelect = document.getElementById('leaderboardDaySelect');
+  const periodLabel = `${config.startDate.toLocaleDateString('vi-VN')} - ${config.endDate.toLocaleDateString('vi-VN')}`;
+  ldSelect.innerHTML = `<option value="ALL">📊 Tổng Toàn Kỳ (${periodLabel})</option>` +
+    appState.days.map(d => `<option value="${d.dayNum}">${d.dd}/${d.mm} (${d.dayName}${d.isWeekend?' 🏖️':''})</option>`).join('');
+  updateLeaderboardScopeLabel();
   // Build barcode modal content
   document.getElementById('barcodeModalContent').innerHTML = config.groups.map(g => `
     <div class="mb-4">
@@ -760,17 +940,37 @@ function activateDashboard() {
 function setGroupFilter(gid) {
   if (!appState) return;
   appState.currentGroup = gid;
-  document.querySelectorAll('[id^="tab"]').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab'+gid)?.classList.add('active');
+  const sel = document.getElementById('groupFilterSelect');
+  if (sel) sel.value = gid;
   renderKPI(); renderDailyTable(); renderIndividual(); renderLeaderboard(); renderCharts();
 }
 
+function handleLeaderboardDayChange(val) {
+  if (!appState) return;
+  appState.leaderboardDayFilter = val === 'ALL' ? 'ALL' : parseInt(val);
+  updateLeaderboardScopeLabel();
+  renderLeaderboard();
+}
+
+function updateLeaderboardScopeLabel() {
+  const label = document.getElementById('leaderboardScopeLabel');
+  if (!label || !appState) return;
+  const periodLabel = `${config.startDate.toLocaleDateString('vi-VN')} - ${config.endDate.toLocaleDateString('vi-VN')}`;
+  if (appState.leaderboardDayFilter === 'ALL') {
+    label.textContent = `Xếp theo doanh thu · Toàn kỳ ${periodLabel}`;
+  } else {
+    const d = appState.days.find(x => x.dayNum === appState.leaderboardDayFilter);
+    label.textContent = `Xếp theo doanh thu · Ngày ${d ? d.dd+'/'+d.mm : ''} (${d ? d.dayName : ''})`;
+  }
+}
 function setTableFilter(f) {
   if (!appState) return;
   appState.tableFilter = f;
-  ['ALL','DONE','TODAY'].forEach(x => {
+  ['ALL','WEEKEND','WEEKDAY','DONE','TODAY'].forEach(x => {
     const el = document.getElementById('filter'+x);
-    if (el) el.classList.toggle('active', x===f);
+    if (el) el.classList.toggle('bg-white', x===f);
+    if (el) el.classList.toggle('shadow-sm', x===f);
+    if (el) el.classList.toggle('text-slate-900', x===f);
   });
   renderDailyTable();
 }
@@ -781,11 +981,22 @@ function setTableFilter(f) {
 function renderAll() {
   renderKPI();
   renderInventory();
+  updateLowStockBanner();
   renderDailyTable();
   renderIndividual();
   renderRevenue();
   renderLeaderboard();
   renderCharts();
+}
+
+function updateLowStockBanner() {
+  if (!appState) return;
+  const low = config.groups.filter(g => (appState.inventory[g.id]?.closeQty ?? 0) < 20);
+  const banner = document.getElementById('lowStockBanner');
+  if (!low.length) { banner.classList.add('hidden'); return; }
+  banner.classList.remove('hidden');
+  document.getElementById('lowStockBannerText').textContent =
+    low.map(g => `${g.emoji} ${g.name}: còn ${fmt(appState.inventory[g.id].closeQty)} sản phẩm`).join(' · ');
 }
 
 // ================================================================
@@ -812,23 +1023,49 @@ function renderKPI() {
 
   const progress = pct(totalActual, totalTarget);
 
-  const kpis = [
-    { label:'Mục tiêu tổng', val: fmt(totalTarget)+' sp', sub:'Cả chiến dịch', grad:'linear-gradient(135deg,#f97316,#ea580c)', icon:'🎯' },
-    { label:'Thực tế', val: fmt(totalActual)+' sp', sub: fmtVND(totalRevenue), grad:'linear-gradient(135deg,#0ea5e9,#0284c7)', icon:'📦' },
-    { label:'Tiến độ', val: progress+'%', sub: progress>=100?'🎉 Hoàn thành!': (totalTarget-totalActual)+' sp còn lại', grad: progress>=100?'linear-gradient(135deg,#10b981,#059669)':'linear-gradient(135deg,#8b5cf6,#7c3aed)', icon:'📈' },
-    { label:'TB ngày thường', val: fmt(avgWeekday,1)+' sp', sub:'Trung bình/ngày thường', grad:'linear-gradient(135deg,#f59e0b,#d97706)', icon:'📅' },
-    { label:'TB ngày cuối tuần', val: fmt(avgWeekend,1)+' sp', sub:'Trung bình/ngày cuối tuần', grad:'linear-gradient(135deg,#ec4899,#db2777)', icon:'🌟' }
-  ];
-
   document.getElementById('kpiSection').innerHTML = `
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-1">
-      ${kpis.map(k=>`
-        <div class="kpi-card fade-in" style="background:${k.grad}">
-          <div class="text-2xl mb-1">${k.icon}</div>
-          <div class="text-2xl font-black leading-none">${k.val}</div>
-          <div class="text-xs font-semibold opacity-80 mt-1">${k.label}</div>
-          <div class="text-xs opacity-60 mt-0.5">${k.sub}</div>
-        </div>`).join('')}
+    <div class="custom-card border-l-4 border-slate-400">
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng Chỉ Tiêu</span>
+      <div class="flex items-baseline mt-2">
+        <span class="text-3xl font-black text-slate-800">${fmt(totalTarget)}</span>
+        <span class="ml-1.5 text-sm font-bold text-slate-500">sp</span>
+      </div>
+      <p class="text-[11px] text-slate-500 font-medium mt-2 border-t pt-2">Áp dụng cho ${appState.staffList.length} nhân viên</p>
+    </div>
+
+    <div class="custom-card border-l-4 border-orange-500 bg-gradient-to-br from-white to-orange-50/50">
+      <span class="text-xs font-bold text-orange-600 uppercase tracking-wider">Đã Bán Lũy Kế</span>
+      <div class="flex items-baseline mt-2">
+        <span class="text-3xl font-black text-orange-600">${fmt(totalActual)}</span>
+        <span class="ml-1.5 text-sm font-bold text-orange-600">sp</span>
+      </div>
+      <p class="text-[11px] font-bold text-emerald-600 mt-2 border-t border-orange-100 pt-2">🚀 ${fmtVND(totalRevenue)}</p>
+    </div>
+
+    <div class="custom-card border-l-4 border-indigo-500 bg-gradient-to-br from-white to-indigo-50/50">
+      <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Tiến Độ Chung</span>
+      <div class="flex items-baseline mt-2">
+        <span class="text-3xl font-black text-indigo-600">${progress}%</span>
+      </div>
+      <p class="text-[11px] font-bold text-indigo-800 mt-2 border-t border-indigo-100 pt-2">${progress>=100?'🎉 Đã hoàn thành mục tiêu!':'📊 Còn thiếu '+fmt(Math.max(0,totalTarget-totalActual))+' sp'}</p>
+    </div>
+
+    <div class="custom-card border-l-4 border-amber-500 bg-gradient-to-br from-white to-amber-50/50">
+      <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">TB Thực Tế / Ngày Thường</span>
+      <div class="flex items-baseline mt-2">
+        <span class="text-3xl font-black text-amber-700">${fmt(avgWeekday,1)}</span>
+        <span class="ml-1 text-xs font-bold text-amber-700">/ ngày</span>
+      </div>
+      <p class="text-[11px] font-bold text-slate-600 mt-2 border-t border-amber-100 pt-2">💼 Trung bình đã bán (T2–T6, các ngày đã qua)</p>
+    </div>
+
+    <div class="custom-card border-l-4 border-rose-500 bg-gradient-to-br from-white to-rose-50/50">
+      <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">TB Thực Tế / Cuối Tuần</span>
+      <div class="flex items-baseline mt-2">
+        <span class="text-3xl font-black text-rose-700">${fmt(avgWeekend,1)}</span>
+        <span class="ml-1 text-xs font-bold text-rose-700">/ ngày</span>
+      </div>
+      <p class="text-[11px] font-bold text-rose-800 mt-2 border-t border-rose-100 pt-2">🔥 Trung bình đã bán (T7 & CN, các ngày đã qua)</p>
     </div>`;
 }
 
@@ -847,16 +1084,7 @@ function renderInventory() {
   config.groups.forEach(g => {
     appState.inventory[g.id].salesQty = appState.days.reduce((s,d)=>s+(d.groupActual[g.id]||0),0);
   });
-
-  const html = `
-    <div class="flex items-center gap-3 mb-4 flex-wrap">
-      <button onclick="openModal('pluModal')" class="btn-orange text-sm">📥 Nhập file tồn kho</button>
-      <span class="text-xs text-slate-400">Nhập file Excel/CSV có barcode + số lượng tồn để tự điền Tồn đầu kỳ</span>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-${config.groups.length>1?2:1} gap-4">
-      ${config.groups.map(g => renderInventoryCard(g)).join('')}
-    </div>`;
-  document.getElementById('inventorySection').innerHTML = html;
+  document.getElementById('inventorySection').innerHTML = config.groups.map(g => renderInventoryCard(g)).join('');
 }
 
 function renderInventoryCard(g) {
@@ -867,8 +1095,11 @@ function renderInventoryCard(g) {
   inv.closeQty = Math.max(0, closing);
   const low = closing < 20;
   return `
-    <div class="section-wrap fade-in">
-      <div class="section-title">${g.emoji} ${g.name}</div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-base font-black text-slate-900">${g.emoji} ${g.name}</h4>
+        ${low?'<span class="badge-below">⚠️ Sắp hết hàng</span>':'<span class="badge-above">✓ Đủ hàng</span>'}
+      </div>
 
       <!-- Tồn kho 3-block summary -->
       <div class="grid grid-cols-3 gap-2 mb-4">
@@ -906,14 +1137,14 @@ function renderInventoryCard(g) {
     </div>`;
 }
 
-function setOpeningStock(gid, val) { appState.inventory[gid].openingStock=parseInt(val)||0; saveState(); renderInventory(); }
+function setOpeningStock(gid, val) { appState.inventory[gid].openingStock=parseInt(val)||0; saveState(); renderInventory(); updateLowStockBanner(); }
 
 function addRestock(gid) {
   const qty = parseInt(prompt('Số lượng nhập thêm:'));
   if (!qty || isNaN(qty)) return;
   const date = new Date().toLocaleDateString('vi-VN');
   appState.inventory[gid].restocks.push({qty, date});
-  saveState(); renderInventory();
+  saveState(); renderInventory(); updateLowStockBanner();
 }
 
 // ================================================================
@@ -925,11 +1156,22 @@ function renderDailyTable() {
   let days = appState.days;
   if (appState.tableFilter==='DONE') days = days.filter(d=>{ const dd=new Date(config.startDate); dd.setDate(dd.getDate()+d.dayNum-1); return dd<today; });
   if (appState.tableFilter==='TODAY') days = days.filter(d=>{ const dd=new Date(config.startDate); dd.setDate(dd.getDate()+d.dayNum-1); dd.setHours(0,0,0,0); return dd.getTime()===today.getTime(); });
+  if (appState.tableFilter==='WEEKEND') days = days.filter(d=>d.isWeekend);
+  if (appState.tableFilter==='WEEKDAY') days = days.filter(d=>!d.isWeekend);
 
   const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
   const totalWeight = appState.days.reduce((s,d)=>s+d.weight,0);
 
-  let cumActual = 0;
+  // Cumulative totals are computed over the FULL day list (not the filtered view)
+  const cumByDayNum = {};
+  let running = 0;
+  appState.days.forEach(day => {
+    const act = grps.reduce((s,g)=>s+(day.groupActual[g.id]||0),0);
+    running += act;
+    cumByDayNum[day.dayNum] = running;
+  });
+
+  let sumTarget=0, sumActual=0, pastCount=0;
   const rows = days.map(day => {
     let dayTarget=0, dayActual=0, dayRevenue=0;
     grps.forEach(g => {
@@ -938,37 +1180,63 @@ function renderDailyTable() {
       dayActual += (day.groupActual[g.id]||0);
       dayRevenue += (day.groupRevenue[g.id]||0);
     });
-    cumActual += dayActual;
-    const p = pct(dayActual,dayTarget);
+    const dd0=new Date(config.startDate); dd0.setDate(dd0.getDate()+day.dayNum-1); dd0.setHours(0,0,0,0);
+    const isPast = dd0 < today;
+    if (isPast) { sumTarget+=dayTarget; sumActual+=dayActual; pastCount++; }
     const badge = dayActual===0 ? '<span class="badge-near">—</span>' : statusBadge(dayActual,dayTarget);
-    const grpCols = grps.map(g => {
-      const wt = Math.round(groupCampaignTarget(g)*day.weight/totalWeight);
-      const act = day.groupActual[g.id]||0;
-      return `<td class="td">${fmt(wt)}</td><td class="td font-semibold">${fmt(act)}</td><td class="td">${act?pct(act,wt)+'%':'—'}</td>`;
-    }).join('');
+    const dayTypeBadge = day.isWeekend ? `<span class="badge-weekend">${day.dayName}</span>` : `<span class="badge-weekday">${day.dayName}</span>`;
     return `<tr class="hover:bg-slate-50 cursor-pointer" ondblclick="openQuickEditDay(${day.dayNum-1})">
-      <td class="td sticky-col font-bold">${day.dayNum}</td>
-      <td class="td">${day.dd}/${day.mm}</td>
-      <td class="td text-xs ${day.isWeekend?'text-orange-600 font-semibold':''}">${day.dayName}</td>
-      ${grpCols}
-      <td class="td font-bold">${fmt(dayActual)}</td>
-      <td class="td text-xs">${fmtVND(dayRevenue)}</td>
-      <td class="td">${fmt(cumActual)}</td>
-      <td class="td">${badge}</td>
+      <td class="p-3 text-center font-bold">${day.dd}/${day.mm}</td>
+      <td class="p-3 text-center text-xs">${day.dayName}</td>
+      <td class="p-3">${dayTypeBadge}</td>
+      <td class="p-3 text-center bg-blue-50/60 text-blue-900 font-semibold">${fmt(dayTarget)}</td>
+      <td class="p-3 text-center bg-orange-50/60 text-orange-900 font-bold">${fmt(dayActual)}</td>
+      <td class="p-3 text-center bg-purple-50/60 text-purple-900">${fmt(cumByDayNum[day.dayNum])}</td>
+      <td class="p-3 text-center bg-indigo-50/60 text-indigo-900">${fmt(Math.round(grps.reduce((s,g)=>s+groupCampaignTarget(g),0)*appState.days.filter(d=>d.dayNum<=day.dayNum).reduce((s,d)=>s+d.weight,0)/totalWeight))}</td>
+      <td class="p-3 text-center">${pct(cumByDayNum[day.dayNum], Math.round(grps.reduce((s,g)=>s+groupCampaignTarget(g),0)*appState.days.filter(d=>d.dayNum<=day.dayNum).reduce((s,d)=>s+d.weight,0)/totalWeight))}%</td>
+      <td class="p-3 text-center">${badge}</td>
+      <td class="p-3 text-center no-print"><button onclick="event.stopPropagation();openQuickEditDay(${day.dayNum-1})" class="text-indigo-600 hover:underline text-xs font-bold">✏️ Sửa</button></td>
     </tr>`;
   });
 
-  const grpHeaders = grps.map(g=>`<th class="th" colspan="3">${g.emoji} ${g.name}</th>`).join('');
-  const subHeaders = grps.map(g=>`<th class="th">Target</th><th class="th">Thực tế</th><th class="th">%</th>`).join('');
-
   document.getElementById('dailyTableWrap').innerHTML = `
-    <table class="w-full" style="min-width:600px">
+    <table class="w-full text-left border-collapse">
       <thead>
-        <tr><th class="th sticky-col">#</th><th class="th">Ngày</th><th class="th">Thứ</th>${grpHeaders}<th class="th">Tổng</th><th class="th">Doanh thu</th><th class="th">Cộng dồn</th><th class="th">Trạng thái</th></tr>
-        <tr><th class="th sticky-col"></th><th class="th"></th><th class="th"></th>${subHeaders}<th class="th"></th><th class="th"></th><th class="th"></th><th class="th"></th></tr>
+        <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+          <th class="p-3 text-center">Ngày</th>
+          <th class="p-3 text-center">Thứ</th>
+          <th class="p-3">Phân Loại Ngày</th>
+          <th class="p-3 text-center bg-blue-50 text-blue-900">Chỉ Tiêu Ngày</th>
+          <th class="p-3 text-center bg-orange-50 text-orange-900">Bán Thực Tế</th>
+          <th class="p-3 text-center bg-purple-50 text-purple-900">Lũy Kế Đã Bán</th>
+          <th class="p-3 text-center bg-indigo-50 text-indigo-900">Lũy Kế Target</th>
+          <th class="p-3 text-center">Tiến Độ Lũy Kế</th>
+          <th class="p-3 text-center">Trạng Thái</th>
+          <th class="p-3 text-center no-print">Cập Nhật</th>
+        </tr>
       </thead>
-      <tbody>${rows.join('')}</tbody>
+      <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">${rows.join('')}</tbody>
     </table>`;
+
+  const totalTargetAll = grps.reduce((s,g)=>s+groupCampaignTarget(g),0);
+  const totalActualAll = appState.days.reduce((s,d)=>s+grps.reduce((ss,g)=>ss+(d.groupActual[g.id]||0),0),0);
+  document.getElementById('dailyStatsBanner').innerHTML = `
+    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+      <span class="text-[10px] font-bold text-slate-500 uppercase block">Tổng Số Ngày Kỳ Push Sale</span>
+      <span class="text-lg font-black text-slate-900">${appState.days.length} Ngày</span>
+    </div>
+    <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-200">
+      <span class="text-[10px] font-bold text-indigo-800 uppercase block">Tổng Chỉ Tiêu (Nhóm Đang Xem)</span>
+      <span class="text-lg font-black text-indigo-900">${fmt(totalTargetAll)} sp</span>
+    </div>
+    <div class="p-3 bg-orange-50 rounded-xl border border-orange-200">
+      <span class="text-[10px] font-bold text-orange-800 uppercase block">Đã Bán Lũy Kế</span>
+      <span class="text-lg font-black text-orange-900">${fmt(totalActualAll)} sp</span>
+    </div>
+    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+      <span class="text-[10px] font-bold text-emerald-800 uppercase block">Đạt Trung Bình Ngày (Đã Qua)</span>
+      <span class="text-lg font-black text-emerald-900">${fmt(pastCount?sumActual/pastCount:0,1)} sp / Ngày</span>
+    </div>`;
 }
 
 // ================================================================
@@ -993,7 +1261,7 @@ function renderIndividual() {
   const staffTotalBills = Object.values(bs.totalBills[staff.id]||{}).reduce((s,dayMap)=>s+Object.keys(dayMap).length,0);
   let staffPushBills = 0;
   grps.forEach(g => { staffPushBills += Object.values((bs.pushBills[g.id]||{})[staff.id]||{}).reduce((s,dm)=>s+Object.keys(dm).length,0); });
-  const convRate = staffTotalBills ? pct(staffPushBills,staffTotalBills) : 0;
+  const convRate = staffTotalBills ? pctDec(staffPushBills,staffTotalBills) : (0).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // Milestones
   const milestones = [25,50,75,100].map(m => ({ pct:m, achieved: p>=m }));
@@ -1072,17 +1340,23 @@ function renderRevenue() {
   if (!appState) return;
   const pushRev = appState.days.reduce((s,d)=>s+config.groups.reduce((ss,g)=>ss+(d.groupRevenue[g.id]||0),0),0);
   const storeRev = appState.totalStoreRevenue;
-  const sharePct = storeRev ? pct(pushRev,storeRev) : 0;
+  const sharePct = storeRev ? (pushRev/storeRev*100).toFixed(2) : '0.00';
   document.getElementById('storeRevenueInput').value = storeRev||'';
   document.getElementById('revenueCompareCards').innerHTML = `
-    <div class="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
-      <div class="text-xs text-orange-600 font-semibold">Doanh thu Push Sale</div>
-      <div class="text-xl font-black text-orange-700">${fmtVND(pushRev)}</div>
+    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+      <span class="text-xs font-bold text-slate-500 block uppercase">Tổng Doanh Thu Push Sale</span>
+      <div class="flex items-baseline mt-2"><span class="text-2xl font-black text-emerald-700">${fmtVND(pushRev)}</span></div>
+      <p class="text-[11px] text-slate-500 mt-2 border-t pt-2">Tính từ các sản phẩm push sale đã bán</p>
     </div>
-    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-      <div class="text-xs text-blue-600 font-semibold">Tỷ trọng Push Sale</div>
-      <div class="text-xl font-black text-blue-700">${sharePct}%</div>
-      <div class="text-xs text-blue-500">${storeRev?'của '+fmtVND(storeRev):'Chưa nhập doanh thu CH'}</div>
+    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+      <span class="text-xs font-bold text-slate-500 block uppercase">Tổng Doanh Thu Cửa Hàng</span>
+      <div class="flex items-baseline mt-2"><span class="text-2xl font-black text-slate-800">${fmtVND(storeRev)}</span></div>
+      <p class="text-[11px] text-slate-500 mt-2 border-t pt-2">Nhập từ báo cáo POS tổng cửa hàng</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm">
+      <span class="text-xs font-bold text-slate-500 block uppercase">Tỷ Trọng Đóng Góp Doanh Thu</span>
+      <div class="flex items-baseline mt-2"><span class="text-2xl font-black text-indigo-600">${sharePct}%</span></div>
+      <p class="text-[11px] font-bold text-emerald-700 mt-2 border-t pt-2">📈 Đánh giá mức độ hiệu quả doanh thu quầy</p>
     </div>`;
 }
 
@@ -1095,68 +1369,113 @@ function updateStoreRevenue(val) {
 // ================================================================
 // LEADERBOARD
 // ================================================================
+function setLeaderboardSort(field) {
+  if (!appState) return;
+  const cur = appState.leaderboardSort;
+  if (cur.field === field) {
+    cur.dir = cur.dir === 'desc' ? 'asc' : 'desc';
+  } else {
+    appState.leaderboardSort = { field, dir: field==='name' || field==='role' ? 'asc' : 'desc' };
+  }
+  renderLeaderboard();
+}
+
 function renderLeaderboard() {
   if (!appState) return;
   const grps = appState.currentGroup==='ALL' ? config.groups : config.groups.filter(g=>g.id===appState.currentGroup);
-  const ranked = [...appState.staffList].map(s => ({
-    ...s,
-    total: grps.reduce((ss,g)=>ss+(s.actualQty[g.id]||0),0),
-    totalRev: grps.reduce((ss,g)=>ss+(s.actualRev[g.id]||0),0),
-    totalTarget: grps.reduce((ss,g)=>ss+(s.targets[g.id]||0),0)
-  })).sort((a,b)=>b.total-a.total);
+  const bs = appState.billStats;
+  const dayFilter = appState.leaderboardDayFilter; // 'ALL' or 1-based dayNum
+  const dayIdx = dayFilter==='ALL' ? null : dayFilter-1; // 0-based, matches billStats/day array index
+  const totalWeight = appState.days.reduce((s,d)=>s+d.weight,0);
+  const selectedDay = dayFilter==='ALL' ? null : appState.days[dayIdx];
 
-  // Podium (top 3)
-  const top3 = ranked.slice(0,3);
-  const podiumOrder = top3.length>=2 ? [top3[1],top3[0],top3[2]].filter(Boolean) : top3;
-  const podiumHeights = ['podium-2','podium-1','podium-3'];
-  const podiumColors = ['linear-gradient(180deg,#94a3b8,#64748b)','linear-gradient(180deg,#f59e0b,#d97706)','linear-gradient(180deg,#b45309,#92400e)'];
-  const medals = ['🥈','🥇','🥉'];
-  const podiumHTML = podiumOrder.length ? `
-    <div class="flex items-end justify-center gap-4 mb-6">
-      ${podiumOrder.map((s,i)=>`
-        <div class="text-center">
-          <div class="avatar-circle mx-auto mb-2 text-sm" style="background:${s.color};width:44px;height:44px">${initials(s.name)}</div>
-          <div class="text-xs font-bold text-slate-700 mb-1">${s.name.split(' ').pop()}</div>
-          <div class="text-lg font-black text-slate-800">${fmt(s.total)}</div>
-          <div class="text-xs text-slate-500">${fmtVND(s.totalRev)}</div>
-          <div class="podium-bar mt-1 w-20" style="height:${[65,90,50][i]}px;background:${podiumColors[i]};border-radius:8px 8px 0 0">
-            <span class="text-2xl">${medals[i]}</span>
-          </div>
-        </div>`).join('')}
-    </div>` : '';
+  const ranked = [...appState.staffList].map(s => {
+    let total, totalRev, totalTarget, totalBills, pushBills;
+    if (dayFilter==='ALL') {
+      total = grps.reduce((ss,g)=>ss+(s.actualQty[g.id]||0),0);
+      totalRev = grps.reduce((ss,g)=>ss+(s.actualRev[g.id]||0),0);
+      totalTarget = grps.reduce((ss,g)=>ss+(s.targets[g.id]||0),0);
+      totalBills = Object.values(bs.totalBills[s.id]||{}).reduce((sum,dayMap)=>sum+Object.keys(dayMap).length,0);
+      pushBills = 0;
+      grps.forEach(g => { pushBills += Object.values((bs.pushBills[g.id]||{})[s.id]||{}).reduce((sum,dm)=>sum+Object.keys(dm).length,0); });
+    } else {
+      const sd = selectedDay ? selectedDay.staffDaily[s.id] : null;
+      total = sd ? grps.reduce((ss,g)=>ss+(sd.qty[g.id]||0),0) : 0;
+      totalRev = sd ? grps.reduce((ss,g)=>ss+(sd.rev[g.id]||0),0) : 0;
+      totalTarget = selectedDay ? Math.round(grps.reduce((ss,g)=>ss+groupCampaignTarget(g),0) * selectedDay.weight / totalWeight) : 0;
+      totalBills = Object.keys((bs.totalBills[s.id]||{})[dayIdx]||{}).length;
+      pushBills = 0;
+      grps.forEach(g => { pushBills += Object.keys(((bs.pushBills[g.id]||{})[s.id]||{})[dayIdx]||{}).length; });
+    }
+    const convRateNum = totalBills ? (pushBills/totalBills*100) : 0;
+    const progressPct = totalTarget ? (total/totalTarget*100) : 0;
+    return { ...s, total, totalRev, totalTarget, totalBills, pushBills, progressPct,
+      convRateNum, convRate: convRateNum.toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2}) };
+  });
+
+  // Sort by whichever column the user clicked (defaults to Doanh Thu, descending)
+  const { field: sortField, dir: sortDir } = appState.leaderboardSort;
+  const sortMul = sortDir === 'asc' ? 1 : -1;
+  ranked.sort((a, b) => {
+    let va = a[sortField], vb = b[sortField];
+    if (typeof va === 'string') return va.localeCompare(vb, 'vi') * sortMul;
+    return ((va||0) - (vb||0)) * sortMul;
+  });
+
+  // Podium always ranks by revenue regardless of the table's current sort, so it stays a
+  // stable "overall top performers" widget
+  const top3 = [...ranked].sort((a,b)=>b.totalRev-a.totalRev).slice(0,3);
+  const medalEmoji = ['🥇','🥈','🥉'];
+  const medalBg = ['bg-amber-400','bg-slate-300','bg-amber-700'];
+  document.getElementById('podiumSection').innerHTML = top3.map((s,i)=>`
+    <div class="flex items-center gap-3 bg-white rounded-xl border border-amber-200 p-3">
+      <div class="w-8 h-8 rounded-full ${medalBg[i]} flex items-center justify-center text-sm font-black text-white flex-shrink-0">${medalEmoji[i]}</div>
+      <div class="avatar-circle" style="background:${s.color}">${initials(s.name)}</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-slate-800 truncate">${s.name}</div>
+        ${s.role?`<div class="text-[10px] text-slate-400 truncate">${s.role}</div>`:''}
+        <div class="text-[11px] text-slate-500">${fmt(s.total)} sp · ${fmtVND(s.totalRev)}</div>
+      </div>
+    </div>`).join('') || '<p class="text-xs text-slate-400">Chưa có dữ liệu</p>';
 
   // Table
   const tableRows = ranked.map((s,i)=>{
-    const p = pct(s.total,s.totalTarget);
     const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'text-slate-600';
-    const grpCols = grps.map(g=>`<td class="td">${fmt(s.actualQty[g.id]||0)}</td><td class="td text-xs">${fmtVND(s.actualRev[g.id]||0)}</td>`).join('');
     return `<tr class="hover:bg-slate-50">
-      <td class="td sticky-col font-bold ${rankClass}">${i+1}</td>
-      <td class="td sticky-col">
+      <td class="p-3 text-center font-bold ${rankClass}">${i+1}</td>
+      <td class="p-3">
         <div class="flex items-center gap-2">
           <div class="avatar-circle" style="background:${s.color}">${initials(s.name)}</div>
           <span class="font-semibold text-sm">${s.name}</span>
         </div>
       </td>
-      ${grpCols}
-      <td class="td font-bold">${fmt(s.total)}</td>
-      <td class="td text-xs">${fmtVND(s.totalRev)}</td>
-      <td class="td">${statusBadge(s.total,s.totalTarget)}</td>
+      <td class="p-3 text-center text-xs text-slate-500">${s.role || '—'}</td>
+      <td class="p-3 text-center bg-orange-50/60 text-orange-900 font-bold">${fmt(s.total)}</td>
+      <td class="p-3 text-center bg-emerald-50/60 text-emerald-900 font-semibold text-xs">${fmtVND(s.totalRev)}</td>
+      <td class="p-3 text-center">${statusBadge(s.total,s.totalTarget)}</td>
+      <td class="p-3 text-center bg-indigo-50/60 text-indigo-900 font-bold">${s.convRate}%</td>
     </tr>`;
   }).join('');
 
-  const grpHeaders = grps.map(g=>`<th class="th" colspan="2">${g.emoji} ${g.name}</th>`).join('');
-  const subHeaders = grps.map(g=>`<th class="th">SL</th><th class="th">Doanh thu</th>`).join('');
+  const arrow = (field) => sortField===field ? (sortDir==='desc'?' ▼':' ▲') : '';
+  const th = (field, label, extraCls='') => `<th class="p-3 text-center cursor-pointer select-none hover:bg-slate-200/70 transition ${extraCls}" onclick="setLeaderboardSort('${field}')" title="Sắp xếp theo ${label}">${label}${arrow(field)}</th>`;
 
-  document.getElementById('podiumSection').innerHTML = podiumHTML;
   document.getElementById('leaderboardTable').innerHTML = `
-    <table class="w-full" style="min-width:600px">
+    <table class="w-full text-left border-collapse">
       <thead>
-        <tr><th class="th sticky-col">#</th><th class="th sticky-col">Nhân viên</th>${grpHeaders}<th class="th">Tổng</th><th class="th">Doanh thu</th><th class="th">Tiến độ</th></tr>
-        <tr><th></th><th></th>${subHeaders}<th></th><th></th><th></th></tr>
+        <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+          <th class="p-3">Hạng</th>
+          ${th('name','Nhân Viên').replace('text-center','')}
+          ${th('role','Chức Danh')}
+          ${th('total','Đã Bán','bg-orange-50 text-orange-900')}
+          ${th('totalRev','Doanh Thu','bg-emerald-50 text-emerald-900')}
+          ${th('progressPct','Tiến Độ (%)')}
+          ${th('convRateNum','Tỷ Lệ Chốt Đơn','bg-indigo-50 text-indigo-900')}
+        </tr>
       </thead>
-      <tbody>${tableRows}</tbody>
-    </table>`;
+      <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">${tableRows}</tbody>
+    </table>
+    <p class="text-[10px] text-slate-400 mt-2 px-1">💡 Bấm vào tiêu đề cột để sắp xếp — bấm lại để đảo chiều tăng/giảm.</p>`;
 }
 
 // ================================================================
@@ -1294,13 +1613,21 @@ function classifyFile(rows) {
 function matchStaffFromText(text) {
   if (!text || !appState) return null;
   const norm = removeVietnameseTones(text);
+  // Compare EVERY (staff, keyword) pair across the whole roster and keep the longest
+  // matching keyword overall — not just the first staff in list order. Otherwise a short/
+  // generic keyword belonging to an earlier-listed staff member can wrongly "steal" a sale
+  // that should go to a later-listed staff member whose keyword is longer/more specific
+  // (e.g. staff A keyword "Thư" vs staff B keyword "Minh Thư" — B should win on "Nguyễn Lê Minh Thư").
+  let best = null, bestLen = -1;
   for (const s of appState.staffList) {
-    const sorted = [...s.keywords].sort((a,b)=>b.length-a.length);
-    for (const kw of sorted) {
-      if (norm.includes(removeVietnameseTones(kw))) return s;
+    for (const kw of s.keywords) {
+      const kwNorm = removeVietnameseTones(kw);
+      if (kwNorm && norm.includes(kwNorm) && kwNorm.length > bestLen) {
+        best = s; bestLen = kwNorm.length;
+      }
     }
   }
-  return null;
+  return best;
 }
 
 async function handleCSVImport() {
@@ -1360,6 +1687,7 @@ async function processCSVData(billRows, detailRows, mode) {
     });
     appState.billStats = { totalBills:{}, pushBills:Object.fromEntries(config.groups.map(g=>[g.id,{}])) };
     appState.staffList.forEach(s => { config.groups.forEach(g => { s.actualQty[g.id]=0; s.actualRev[g.id]=0; }); });
+    appState.totalStoreRevenue = 0;
   }
 
   // Build Slip No. → Staff map from BILL
@@ -1375,6 +1703,11 @@ async function processCSVData(billRows, detailRows, mode) {
     const staffCol = findColIdx(hdr,'Sales Staff','Staff','Cashier','Nhân viên','Nhan vien','staff name','Sales Person','salesperson', /sales\s*staff|nhân\s*viên/i);
     const dateCol = findColIdx(hdr,'Sales Day','Sales Date','Trading Datetime','Trading Date','Date','Ngày','date', /sales\s*day|trading\s*date/i);
     const divCol = findColIdx(hdr,'Slip Div','slip div','Type','type', /slip\s*div/i);
+    // Whole-bill revenue column — used to auto-fill "Tổng Doanh Thu Cửa Hàng" from the BILL file
+    // instead of requiring manual entry. Prefer the already-adjusted cash total; fall back to
+    // tax-inclusive net sales.
+    const billAmtCol = findColIdx(hdr,'Adjusted Total','adjusted total','Net Sales(Tax incl.)','net sales(tax incl.)','Net Sales','net sales','Doanh thu','Thành tiền', /adjusted\s*total|net\s*sales/i);
+    let storeRevSum = 0;
 
     for (let i=hIdx+1; i<billRows.length; i++) {
       const r = billRows[i];
@@ -1392,9 +1725,17 @@ async function processCSVData(billRows, detailRows, mode) {
 
       // Map slip to day
       const dt = normDateStr(dateVal);
+      let inRange = false;
       if (dt) {
         const diff = dayDiff(dt, config.startDate);
-        if (diff>=0 && diff<appState.days.length) slipDayMap[slipNo] = diff;
+        if (diff>=0 && diff<appState.days.length) { slipDayMap[slipNo] = diff; inRange = true; }
+      }
+
+      // Accumulate whole-store revenue — every bill in the campaign period, regardless of
+      // whether it contains push-sale products or whether the staff was recognised.
+      if (inRange && billAmtCol>=0) {
+        const amt = parseFloat(String(r[billAmtCol]).replace(/[^0-9.-]/g,''))||0;
+        storeRevSum += amt;
       }
 
       // Track total bills
@@ -1405,6 +1746,10 @@ async function processCSVData(billRows, detailRows, mode) {
         appState.billStats.totalBills[si][di][slipNo]=true;
       }
     }
+    // Fallback only: BILL has no tax-exclusive column, so this tax-INCLUSIVE total is only
+    // used when no DETAIL file was provided at all. When DETAIL is present, the tax-exclusive
+    // sum computed from it (further below) is used instead and this is skipped.
+    if (billAmtCol>=0 && !detailRows) appState.totalStoreRevenue = (appState.totalStoreRevenue||0) + storeRevSum;
   }
 
   // Track out-of-range records
@@ -1424,6 +1769,7 @@ async function processCSVData(billRows, detailRows, mode) {
     const dateCol = findColIdx(hdr,'Sales Day','Sales Date','Trading Datetime','Trading Date','Date','date','Ngày','Ngay', /sales\s*day|trading\s*date/i);
     const divCol = findColIdx(hdr,'Slip Div','slip div','Type','type', /slip\s*div/i);
     const staffCol = findColIdx(hdr,'Sales Staff','Staff','Cashier','Nhân viên','Nhan vien','Sales Person','salesperson', /sales\s*staff|nhân\s*viên/i);
+    let storeRevSumExclTax = 0;
 
     for (let i=hIdx+1; i<detailRows.length; i++) {
       const r = detailRows[i];
@@ -1446,6 +1792,18 @@ async function processCSVData(billRows, detailRows, mode) {
         if (price>0 && qty>0) amt = price * qty;
       }
       const dateVal = r[dateCol]||'';
+
+      // Resolve day index BEFORE filtering by barcode, so we can accumulate whole-store
+      // revenue (every line item, not just push-sale products) for "Tổng Doanh Thu Cửa Hàng".
+      let dayIdx0 = slipDayMap[slipNo];
+      if (dayIdx0==null) {
+        const dt0 = normDateStr(dateVal);
+        if (dt0) dayIdx0 = dayDiff(dt0, config.startDate);
+      }
+      if (dayIdx0!=null && dayIdx0>=0 && dayIdx0<appState.days.length) {
+        // amtCol targets "Amount(Tax excl.)" first — this is intentionally tax-EXCLUSIVE.
+        storeRevSumExclTax += amt;
+      }
 
       // Find group from barcode
       const gid = config.barcodeMap[barcode];
@@ -1500,6 +1858,7 @@ async function processCSVData(billRows, detailRows, mode) {
         }
       }
     }
+    appState.totalStoreRevenue = (appState.totalStoreRevenue||0) + storeRevSumExclTax;
   }
   // Recompute staff totals from days
   recomputeStaffTotals();
@@ -1580,10 +1939,18 @@ async function handlePLUImport() {
     const hdr = rows.find(r=>r.some(c=>c&&c!==''))||[];
     const hIdx = rows.indexOf(hdr);
     const bcCol = findColIdx(hdr,'barcode','Barcode','JAN','jan','EAN','PLU','plu','mã hàng','ma hang');
-    const openCol = findColIdx(hdr,'ton dau','Tồn đầu','opening','open stock','dau ky','Đầu kỳ','tồn đầu kỳ');
-    const incomeCol = findColIdx(hdr,'nhap','Nhập','income','Nhập kỳ','nhap ky','restock','in qty','Nhập trong kỳ','so luong nhap');
-    const qtyCol = openCol>=0 ? openCol : findColIdx(hdr,'qty','Qty','tồn','ton','stock','Stock','quantity','số lượng','so luong','sl','Tồn cuối','ton cuoi','closing');
+    // "Open Qty" / "Income Qty" are the exact headers used by the store's POS inventory export
+    // (see mẫu 1016_TỒN_KHO.xlsx). These MUST be matched precisely — the file also has many other
+    // *Qty columns (Sales Qty, Close Qty, Adj Qty, Log Qty, Loss Qty, Inspec Qty...), so a bare
+    // "qty" substring match is dangerous: it silently grabs whichever *Qty column appears first in
+    // the sheet, which may not be "Open Qty" at all.
+    const openCol = findColIdx(hdr, /^\s*open\s*qty\s*$/i, 'Open Qty','open qty','ton dau','Tồn đầu','opening','open stock','dau ky','Đầu kỳ','tồn đầu kỳ');
+    const incomeCol = findColIdx(hdr, /^\s*income\s*qty\s*$/i, 'Income Qty','income qty','nhap','Nhập','income','Nhập kỳ','nhap ky','restock','in qty','Nhập trong kỳ','so luong nhap');
+    // Fallback ONLY for simple single-column templates (no bare "qty" — too ambiguous on POS exports)
+    const qtyCol = openCol>=0 ? openCol : findColIdx(hdr,'tồn hiện tại','ton hien tai','stock','quantity','số lượng','so luong','sl');
     if (bcCol<0) { showToast('Không tìm thấy cột Barcode/JAN','error'); return; }
+    if (qtyCol<0) { showToast('⚠️ Không tìm thấy cột "Open Qty" / "Tồn đầu kỳ" — kiểm tra lại tên cột trong file','error'); return; }
+    if (incomeCol<0) { showToast('⚠️ Không tìm thấy cột "Income Qty" / "Nhập trong kỳ" — Số nhập sẽ để trống','info'); }
     // Reset opening stock and restocks before import
     config.groups.forEach(g => { appState.inventory[g.id].openingStock = 0; appState.inventory[g.id].restocks = []; });
     let matched = 0;
@@ -1738,6 +2105,7 @@ function confirmReset() {
 // ================================================================
 (async function init() {
   await detectStorageBackend();
+  updateStorageStatusBadge();
 
   // ── F5 auto-restore ─────────────────────────────────────────
   try {
