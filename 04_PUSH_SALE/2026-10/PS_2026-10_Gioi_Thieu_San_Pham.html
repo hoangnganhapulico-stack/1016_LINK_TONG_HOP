@@ -2,286 +2,513 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Ưu Đãi Tháng 10 - Bảng giới thiệu sản phẩm</title>
+<title>Bộ 3 Chăm Sóc Cơ Thể Mùa Thu Đông - Bảng giới thiệu sản phẩm T10</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700&family=Noto+Sans+SC:wght@500;700&family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+SC:wght@500;600;700&family=Noto+Sans+JP:wght@500;600;700&family=Noto+Sans+KR:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-a:#fce7f3; --bg-b:#e0f2fe;
-    --heading:#0f172a; --text:#1e293b; --muted:#64748b;
-    --accent:#db2777; --accent-dark:#be185d; --accent-line:#fbcfe8;
-    --promo:#ea580c; --deal:#dc2626;
+    --bg-a:#fce7f3;
+    --bg-b:#e0f2fe;
+    --glow-pink:rgba(236,72,153,0.16);
+    --glow-green:rgba(22,163,74,0.12);
+
+    --surface:rgba(255,255,255,0.92);
+    --surface-border:rgba(255,255,255,0.9);
+    --surface-shadow:0 20px 45px rgba(157,23,77,0.12);
+
+    --heading:#0f172a;
+    --text:#1e293b;
+    --muted:#64748b;
+    --muted-2:#94a3b8;
+
+    --accent:#db2777;
+    --accent-dark:#be185d;
+    --accent-soft:#fdf2f8;
+    --accent-soft-2:#fbcfe8;
+
+    --promo:#ea580c;
   }
+
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg-a:#1f0b17;
+      --bg-b:#0b1a2b;
+      --surface:rgba(15,23,42,0.88);
+      --surface-border:rgba(236,72,153,0.2);
+      --heading:#f1f5f9;
+      --text:#cbd5e1;
+      --muted:#94a3b8;
+      --accent-dark:#f9a8d4;
+      --accent-soft:#1e1b2e;
+      --accent-soft-2:#3b2140;
+    }
+  }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     min-height:100vh;
-    background:linear-gradient(135deg,var(--bg-a),var(--bg-b));
+    background:
+      radial-gradient(420px 320px at 8% 8%, var(--glow-pink), transparent 70%),
+      radial-gradient(420px 320px at 92% 92%, var(--glow-green), transparent 70%),
+      linear-gradient(135deg, var(--bg-a), var(--bg-b));
     color:var(--text);
     font-family:'Plus Jakarta Sans',sans-serif;
     -webkit-font-smoothing:antialiased;
-    padding:20px 12px;
+    padding:26px 16px;
   }
   body.ja-active{ font-family:'Noto Sans JP','Plus Jakarta Sans',sans-serif; }
   body.zh-active{ font-family:'Noto Sans SC','Plus Jakarta Sans',sans-serif; }
   body.ko-active{ font-family:'Noto Sans KR','Plus Jakarta Sans',sans-serif; }
   .mono{ font-family:'JetBrains Mono',monospace; }
 
-  /* ---- toolbar (screen only) ---- */
-  .toolbar{ max-width:1000px; margin:0 auto 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-  .lang-tabs{ display:flex; gap:4px; background:#fff; border:1px solid var(--accent-line); border-radius:999px; padding:4px; flex-wrap:wrap; }
+  .sheet{
+    max-width:1180px;
+    margin:0 auto;
+    background:var(--surface);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:2px solid var(--surface-border);
+    border-radius:28px;
+    box-shadow:var(--surface-shadow);
+    padding:28px 32px 30px;
+  }
+
+  /* ---- toolbar ---- */
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+  .lang-tabs{ display:flex; gap:4px; background:var(--accent-soft); border:1px solid var(--accent-soft-2); border-radius:999px; padding:4px; flex-wrap:wrap; }
   .lang-tabs button{
-    appearance:none; border:none; background:transparent; font:600 13px 'Plus Jakarta Sans','Noto Sans JP','Noto Sans KR',sans-serif;
-    padding:8px 15px; border-radius:999px; cursor:pointer; color:var(--accent-dark);
+    appearance:none; border:none; background:transparent;
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:13px;
+    padding:8px 16px; border-radius:999px; cursor:pointer; color:var(--accent-dark);
+    transition:background .15s ease,color .15s ease,box-shadow .15s ease;
   }
-  .lang-tabs button.active{ background:var(--accent); color:#fff; }
+  .lang-tabs button.active{ background:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(219,39,119,0.35); }
   .print-btn{
-    appearance:none; border:none; background:var(--accent); color:#fff; font:700 13px 'Plus Jakarta Sans',sans-serif;
+    appearance:none; border:none; background:var(--accent); color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:13px;
     padding:11px 20px; border-radius:999px; cursor:pointer; display:flex; align-items:center; gap:8px;
+    box-shadow:0 10px 20px rgba(219,39,119,0.30); transition:box-shadow .15s ease, transform .15s ease;
   }
+  .print-btn:hover{ box-shadow:0 12px 25px rgba(219,39,119,0.42); transform:translateY(-1px); }
   .print-btn svg{ width:15px; height:15px; }
 
-  /* ---- sheet = one A5 landscape page (210 x 148mm) ---- */
-  .sheet{
-    width:210mm; height:148mm; margin:0 auto;
-    background:#fff; border-radius:14px;
-    box-shadow:0 20px 45px rgba(157,23,77,.14);
-    padding:5mm 6mm;
-    display:flex; flex-direction:column; gap:3mm;
-    overflow:hidden;
-  }
-  @media screen and (min-width:900px){ .sheet{ zoom:1.25; } }
-
+  /* ---- header ---- */
   header{
-    display:flex; justify-content:space-between; align-items:center; gap:12px;
-    padding-bottom:2.5mm; border-bottom:2px dashed var(--accent-line);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    padding-bottom:16px; border-bottom:1.5px dashed var(--accent-soft-2); margin-bottom:16px;
   }
-  h1{ margin:0; font-size:24px; font-weight:800; color:var(--heading); line-height:1.15; }
-  .ja-active h1, .zh-active h1, .ko-active h1{ font-size:23px; }
-  .promo-dates{
-    flex:none; font-size:16px; font-weight:800; color:#fff; background:var(--promo);
-    padding:6px 16px; border-radius:999px; white-space:nowrap;
+  .head-left{ min-width:240px; flex:1; }
+  .eyebrow{ font-size:12px; font-weight:700; letter-spacing:.1em; color:var(--accent-dark); text-transform:uppercase; }
+  h1{ font-size:30px; font-weight:800; color:var(--heading); margin:6px 0 6px; line-height:1.15; }
+  .ja-active h1, .zh-active h1, .ko-active h1{ font-size:26px; }
+  .subtitle{ font-size:14px; color:var(--muted); font-weight:500; }
+  .head-right{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; text-align:right; }
+  .promo-dates{ font-size:13px; font-weight:700; color:#fff; background:var(--promo); padding:6px 15px; border-radius:999px; white-space:nowrap; }
+  .gift-note{ font-size:12.5px; font-weight:700; color:var(--accent-dark); }
+
+  /* ---- features ---- */
+  .features{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .feature{
+    display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--accent-dark);
+    background:var(--accent-soft); border:1px solid var(--accent-soft-2); padding:7px 14px 7px 11px; border-radius:999px;
   }
+  .feature .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none; }
+
+  .section-title{ text-align:center; font-size:16px; font-weight:700; color:var(--heading); margin:0 0 16px; }
 
   /* ---- cards ---- */
-  .cards{ flex:1; min-height:0; display:grid; grid-template-columns:repeat(3,1fr); gap:3mm; }
+  .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
   .card{
-    --c:#db2777; --c-bg:#fce7f3; --c-line:#f9a8d4;
-    border:2px solid var(--c-line); border-radius:14px; overflow:hidden;
-    display:flex; flex-direction:column; background:var(--c-bg);
+    --c:#db2777; --c-soft:#fdf2f8; --c-line:#fbcfe8;
+    background:#fff; color:#1e293b;
+    border-radius:22px; padding:20px 20px 18px;
+    border:1.5px solid var(--c-line);
+    box-shadow:0 10px 24px rgba(15,23,42,0.07), 0 2px 6px rgba(15,23,42,0.05);
+    display:flex; flex-direction:column;
   }
-  .card.pink { --c:#db2777; --c-bg:#fce7f3; --c-line:#f9a8d4; }
-  .card.blue { --c:#0284c7; --c-bg:#e0f2fe; --c-line:#7dd3fc; }
-  .card.green{ --c:#16a34a; --c-bg:#dcfce7; --c-line:#86efac; }
+  .card.pink { --c:#db2777; --c-soft:#fdf2f8; --c-line:#fbcfe8; }
+  .card.blue { --c:#0284c7; --c-soft:#f0f9ff; --c-line:#bae6fd; }
+  .card.green{ --c:#16a34a; --c-soft:#f0fdf4; --c-line:#bbf7d0; }
 
-  .deal{
-    background:var(--c); color:#fff; text-align:center;
-    font-size:15px; font-weight:800; letter-spacing:.02em; padding:5px 8px; line-height:1.2;
-  }
-  .deal.soft{ background:var(--c); }
+  .top-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
+  .swatch-row{ display:flex; align-items:center; gap:7px; min-width:0; }
+  .swatch{ width:12px; height:12px; border-radius:50%; background:var(--c); flex:none; }
+  .swatch-label{ font-size:12.5px; color:#64748b; font-weight:600; }
+  .tag{ background:var(--c); color:#fff; font-size:11.5px; font-weight:700; padding:5px 12px; border-radius:999px; white-space:nowrap; flex:none; }
 
-  .body{ flex:1; display:flex; flex-direction:column; justify-content:space-between; padding:2.5mm 3.5mm 3mm; gap:2mm; }
-  .card h2{ margin:0; font-size:21px; font-weight:800; line-height:1.15; color:var(--heading); }
-  .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:20px; }
-  .brand{ margin-top:2px; font-size:13px; font-weight:700; color:var(--c); }
+  .card h2{ font-size:23px; font-weight:800; line-height:1.2; margin:0 0 4px; color:#0f172a; }
+  .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:21px; }
+  .brand{ font-size:13px; font-weight:600; color:var(--c); margin-bottom:10px; }
 
   .price-box{
-    position:relative;
-    background:#fff; border:1.5px solid var(--c-line); border-radius:11px;
-    padding:4px 10px 5px;
+    display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;
+    background:var(--c-soft); border:1px solid var(--c-line); border-radius:14px; padding:8px 13px; margin-bottom:10px;
   }
-  .price-line{ display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; }
-  .price-box .old{ font-size:17px; color:#94a3b8; text-decoration:line-through; font-weight:700; }
-  .price-box .new{ font-size:38px; font-weight:700; color:var(--promo); line-height:1.05; letter-spacing:-.02em; }
-  .price-box .unit{ font-size:14px; color:var(--muted); font-weight:600; }
-  .price-box .date{ font-size:13.5px; font-weight:800; color:var(--c); }
-  .pct{
-    position:absolute; top:-9px; right:-4px;
-    background:var(--deal); color:#fff; font-size:16px; font-weight:800;
-    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    transform:rotate(-10deg); box-shadow:0 0 0 2px #fff;
-  }
+  .price-box .old{ font-size:14px; color:#94a3b8; text-decoration:line-through; }
+  .price-box .new{ font-size:30px; font-weight:700; color:var(--promo); letter-spacing:-.01em; line-height:1.1; }
+  .price-box .unit{ font-size:13px; color:#64748b; font-weight:500; }
+  .price-box .date{ flex-basis:100%; font-size:11.5px; font-weight:700; color:var(--c); }
 
-  .variant{ display:flex; gap:7px; align-items:center; }
-  .variant + .variant{ margin-top:5px; }
-  .variant .vdot{ width:14px; height:14px; border-radius:50%; flex:none; }
-  .variant div{ font-size:15.5px; line-height:1.25; }
-  .variant b{ color:var(--heading); }
+  .lbl{ font-size:11.5px; font-weight:700; letter-spacing:.04em; color:#94a3b8; text-transform:uppercase; margin:10px 0 5px; }
+  .ja-active .lbl, .zh-active .lbl, .ko-active .lbl{ letter-spacing:.02em; }
+  .variant{ display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; }
+  .variant .vdot{ width:11px; height:11px; border-radius:50%; margin-top:5px; flex:none; }
+  .variant b{ display:block; font-size:15px; color:#0f172a; line-height:1.35; }
+  .variant span{ display:block; font-size:13.5px; color:#475569; line-height:1.4; }
 
   .card ul{ margin:0; padding:0; list-style:none; }
-  .card li{ position:relative; padding-left:15px; font-size:16px; line-height:1.3; font-weight:600; color:var(--text); }
-  .card li + li{ margin-top:5px; }
-  .card li::before{ content:""; position:absolute; left:1px; top:7px; width:7px; height:7px; border-radius:50%; background:var(--c); }
+  .card li{ position:relative; padding-left:16px; font-size:15px; line-height:1.45; margin-bottom:5px; color:#1e293b; }
+  .card li::before{ content:""; position:absolute; left:2px; top:8px; width:6px; height:6px; border-radius:50%; background:var(--c); }
 
-  /* CJK/Hangul: shorter text, so set larger */
-  .ja-active .deal, .zh-active .deal, .ko-active .deal{ font-size:18px; }
-  .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:25px; }
-  .ja-active .brand, .zh-active .brand, .ko-active .brand{ font-size:15px; }
-  .ja-active .variant div, .zh-active .variant div, .ko-active .variant div{ font-size:18px; }
-  .ja-active .card li, .zh-active .card li, .ko-active .card li{ font-size:19px; }
-  .ja-active .card li::before, .zh-active .card li::before, .ko-active .card li::before{ top:9px; }
-  .ja-active .price-box .date, .zh-active .price-box .date, .ko-active .price-box .date{ font-size:16px; }
-  .ja-active h1, .zh-active h1, .ko-active h1{ font-size:27px; }
-  .ja-active .combo .ctext, .zh-active .combo .ctext, .ko-active .combo .ctext{ font-size:15px; }
-
-  /* Japanese runs longer than zh/ko */
-  .ja-active .deal{ font-size:15px; }
-  .ja-active .card h2{ font-size:21px; }
-  .ja-active .brand{ font-size:13px; }
-  .ja-active .variant div{ font-size:15.5px; }
-  .ja-active .card li{ font-size:16px; }
-  .ja-active .card li::before{ top:7px; }
-  .ja-active .price-box .date{ font-size:14px; }
+  .fit{ margin-top:auto; padding-top:10px; }
+  .fit .lbl{ margin-top:0; }
+  .fit p{ margin:0; font-size:14px; line-height:1.45; color:#334155; font-weight:500; }
 
   /* ---- combos ---- */
-  .combos{ display:flex; align-items:stretch; gap:2.5mm; }
-  .combos-title{
-    flex:none; display:flex; align-items:center; justify-content:center; text-align:center;
-    background:var(--accent); color:#fff; font-size:14px; font-weight:800; border-radius:10px; padding:0 10px; width:20mm; line-height:1.2;
-  }
+  .combos{ margin-top:16px; border:1.5px dashed var(--accent-soft-2); border-radius:18px; padding:12px 14px; }
+  .combos-title{ font-size:13px; font-weight:800; color:var(--accent-dark); text-transform:uppercase; letter-spacing:.06em; margin-bottom:9px; text-align:center; }
+  .ja-active .combos-title, .zh-active .combos-title, .ko-active .combos-title{ letter-spacing:.02em; }
+  .combo-list{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
   .combo{
-    flex:1; display:flex; flex-direction:column; justify-content:center; gap:1px;
-    border:1.5px solid #fed7aa; background:#fff7ed; border-radius:10px; padding:5px 10px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:#fff; color:#1e293b; border:1px solid #e2e8f0; border-radius:12px; padding:8px 12px;
   }
-  .combo .ctext{ font-size:14px; font-weight:700; line-height:1.25; color:var(--heading); }
-  .combo .cprice{ font-size:21px; font-weight:700; color:var(--promo); white-space:nowrap; align-self:flex-end; line-height:1.1; }
+  .combo .ctext{ font-size:13px; font-weight:600; line-height:1.35; }
+  .combo .cprice{ font-size:17px; font-weight:700; color:var(--promo); white-space:nowrap; }
 
-  @media screen and (max-width:899px){
-    .sheet{ width:100%; height:auto; overflow:visible; }
-    .cards{ grid-template-columns:1fr; }
-    .combos{ flex-direction:column; }
-    .combos-title{ max-width:none; padding:6px; }
+  @media (max-width:860px){
+    .sheet{ padding:22px 18px 24px; }
+    .cards, .combo-list{ grid-template-columns:1fr; }
     header{ flex-direction:column; align-items:flex-start; }
+    .head-right{ align-items:flex-start; text-align:left; }
+    .toolbar{ flex-direction:column; align-items:stretch; }
   }
 
+  /* ---- PRINT: A5 landscape, one page ---- */
   @media print{
-    @page{ size:A5 landscape; margin:0; }
-    body{ padding:0; min-height:0; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page{ size:A5 landscape; margin:5mm; }
+    :root{
+      --bg-a:#fce7f3; --bg-b:#e0f2fe; --heading:#0f172a; --text:#1e293b; --muted:#64748b;
+      --accent-dark:#be185d; --accent-soft:#fdf2f8; --accent-soft-2:#fbcfe8;
+    }
+    html, body{ height:auto; }
+    body{
+      padding:0; min-height:0;
+      background:linear-gradient(135deg, var(--bg-a), var(--bg-b)) !important;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
     .toolbar{ display:none; }
-    .sheet{ zoom:1; width:210mm; height:148mm; border-radius:0; box-shadow:none; }
+    .sheet{
+      backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+      background:#ffffff !important; box-shadow:none !important; border:none;
+      border-radius:12px; padding:9px 13px 10px; max-width:100%;
+      zoom:1.12;
+    }
+    .card, .combo{ box-shadow:none !important; }
+
+    header{ flex-direction:row !important; align-items:flex-end !important; margin-bottom:6px; padding-bottom:6px; gap:10px; }
+    .head-right{ align-items:flex-end !important; text-align:right !important; gap:3px; }
+    .eyebrow{ font-size:8.5px; }
+    h1{ font-size:17px; margin:2px 0 2px; }
+    .ja-active h1, .zh-active h1, .ko-active h1{ font-size:16px; }
+    .subtitle{ font-size:9.5px; }
+    .promo-dates{ font-size:9.5px; padding:3px 10px; }
+    .gift-note{ font-size:9px; }
+
+    .features{ margin-bottom:6px; gap:5px; }
+    .feature{ font-size:8.5px; padding:2px 8px 2px 7px; gap:5px; }
+    .feature .dot{ width:4px; height:4px; }
+    .section-title{ display:none; }
+
+    .cards{ grid-template-columns:repeat(3,1fr) !important; gap:7px; }
+    .card{ padding:8px 10px 8px; border-radius:11px; }
+    .top-row{ margin-bottom:4px; }
+    .swatch{ width:8px; height:8px; }
+    .swatch-label{ font-size:8.5px; }
+    .tag{ font-size:8px; padding:2px 7px; }
+    .card h2{ font-size:14px; margin-bottom:1px; }
+    .ja-active .card h2, .zh-active .card h2, .ko-active .card h2{ font-size:13px; }
+    .brand{ font-size:8.5px; margin-bottom:4px; }
+    .price-box{ padding:3px 8px; border-radius:8px; margin-bottom:3px; gap:6px; }
+    .price-box .old{ font-size:9px; }
+    .price-box .new{ font-size:17px; }
+    .price-box .unit{ font-size:8.5px; }
+    .price-box .date{ font-size:8px; }
+    .lbl{ font-size:7.5px; margin:4px 0 2px; }
+    .variant{ gap:5px; margin-bottom:2px; }
+    .variant .vdot{ width:7px; height:7px; margin-top:3px; }
+    .variant b{ font-size:9.5px; line-height:1.3; }
+    .variant span{ font-size:8.5px; line-height:1.3; }
+    .card li{ font-size:9.5px; line-height:1.3; margin-bottom:1.5px; padding-left:10px; }
+    .card li::before{ width:4px; height:4px; top:5px; left:1px; }
+    .fit{ padding-top:3px; }
+    .fit p{ font-size:9px; line-height:1.3; }
+
+    .combos{ margin-top:6px; padding:5px 8px; border-radius:10px; }
+    .combos-title{ font-size:8.5px; margin-bottom:4px; }
+    .combo-list{ grid-template-columns:repeat(3,1fr) !important; gap:5px; }
+    .combo{ padding:3px 8px; border-radius:7px; gap:6px; }
+    .combo .ctext{ font-size:8.5px; line-height:1.25; }
+    .combo .cprice{ font-size:11px; }
   }
 </style>
 </head>
 <body>
-
-<div class="toolbar">
-  <div class="lang-tabs" id="langTabs">
-    <button data-set="vi" class="active">Tiếng Việt</button>
-    <button data-set="en">English</button>
-    <button data-set="ja">日本語</button>
-    <button data-set="zh">中文</button>
-    <button data-set="ko">한국어</button>
-  </div>
-  <button class="print-btn" onclick="window.print()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    <span id="printLabel">In A5 ngang</span>
-  </button>
-</div>
-
 <div class="sheet" id="page">
+
+  <div class="toolbar">
+    <div class="lang-tabs" id="langTabs">
+      <button data-set="vi" class="active">Tiếng Việt</button>
+      <button data-set="en">English</button>
+      <button data-set="ja">日本語</button>
+      <button data-set="zh">中文</button>
+      <button data-set="ko">한국어</button>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      <span id="printLabel">In trang này (A5 ngang)</span>
+    </button>
+  </div>
+
   <header>
-    <h1 id="mainTitle"></h1>
-    <div class="promo-dates" id="promoDates"></div>
+    <div class="head-left">
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="mainTitle"></h1>
+      <div class="subtitle" id="subtitle"></div>
+    </div>
+    <div class="head-right">
+      <div class="promo-dates" id="promoDates"></div>
+      <div class="gift-note" id="giftNote"></div>
+    </div>
   </header>
+
+  <div class="features" id="features"></div>
+  <p class="section-title" id="sectionTitle"></p>
   <div class="cards" id="cards"></div>
-  <div class="combos" id="combos"></div>
+
+  <div class="combos">
+    <div class="combos-title" id="combosTitle"></div>
+    <div class="combo-list" id="combos"></div>
+  </div>
+
 </div>
 
 <script>
-/* Giá cố định cho mọi ngôn ngữ */
+/* Giá cố định (không đổi theo ngôn ngữ) */
 const PRICES = {
-  avatar: { old: "149,000₫", now: "79,000₫", pct: "-47%" },
-  cream:  { old: "89,000₫", now: "49,000₫", pct: "-45%" },
-  lip:    { old: null,      now: "39,000₫", pct: null }
+  avatar: { old: null,       now: "79,000₫" },
+  cream:  { old: "89,000₫",  now: "49,000₫" },
+  lip:    { old: null,       now: "39,000₫" }
 };
 const COMBO_PRICES = ["167,000₫", "88,000₫", "158,000₫"];
-const VCOLORS = ["#ec4899", "#0284c7"];
 
 const CONTENT = {
   vi: {
-    printLabel: "In A5 ngang",
-    title: "Ưu Đãi Tháng 10 - Chăm Sóc Da Mùa Hanh Khô",
-    promo: "01.10 - 30.10.2026",
-    cards: {
-      avatar: { deal: "MUA 1 TẶNG 1 BÔNG TẮM", name: "Sữa Tắm Sáng Da AVATAR", brand: "Công nghệ Nhật · Hộp quà có quai xách", unit: "/ hộp",
-        variants: [["Hộp Hồng:", "Ý dĩ + Vitamin C, sáng da"], ["Hộp Xanh:", "Sữa bò, dưỡng ẩm tăng cường"]],
-        points: ["Làm quà 20/10 không cần gói"] },
-      cream: { deal: "GIẢM 40,000₫", name: "Kem Dưỡng Tay Hatomugi", brand: "Reihaku · Nhật Bản · 65g", unit: "/ tuýp",
-        points: ["Chiết xuất hạt ý dĩ, dưỡng ẩm sâu", "Thấm nhanh, không nhờn rít", "Da tay mềm mịn, hết khô ráp"] },
-      lip: { deal: "NAM NỮ ĐỀU DÙNG", name: "Son Dưỡng Môi Menturm", brand: "Omi Brotherhood · Nhật Bản", unit: "/ thỏi",
-        points: ["Dưỡng ẩm, ngừa môi khô nứt", "Không màu, mát nhẹ", "Nhỏ gọn, bỏ túi mang theo"] }
-    },
-    combosTitle: "MUA KÈM",
-    combos: ["AVATAR + Kem tay + Son", "Kem tay + Son", "Hồng + Xanh (2 bông tắm)"]
+    printLabel: "In trang này (A5 ngang)",
+    eyebrow: "KOHNAN · ƯU ĐÃI THÁNG 10/2026",
+    title: "Bộ 3 Chăm Sóc Cơ Thể Mùa Thu Đông",
+    subtitle: "Dưỡng ẩm từ đầu đến tay - quà tặng 20/10 xinh xắn, giá tốt",
+    promoDates: "Khuyến mãi: 01.10 - 30.10.2026",
+    giftNote: "Quà 20/10 trọn bộ chỉ 167,000₫",
+    features: ["Thương hiệu & công nghệ Nhật Bản", "Dưỡng ẩm mùa hanh khô", "Dịu nhẹ, dùng hằng ngày", "Hộp quà có quai xách sẵn"],
+    sectionTitle: "Chọn sản phẩm phù hợp với bạn",
+    lblVariants: "2 lựa chọn", lblPoints: "Điểm nổi bật", lblFit: "Phù hợp",
+    cards: [
+      {
+        key: "avatar", cls: "pink", label: "Hộp quà có quai xách", tag: "Tặng 1 bông tắm",
+        name: "Sữa Tắm Sáng Da AVATAR", brand: "Công nghệ Nhật Bản · Hộp quà",
+        unit: "/ hộp", date: "Áp dụng: 07.10 - 30.10.2026",
+        variants: [
+          { color: "#ec4899", name: "Hộp Hồng - Ý Dĩ (Hatomugi)", desc: "Dẫn xuất Vitamin C, dưỡng ẩm, sáng da, lưu hương" },
+          { color: "#0284c7", name: "Hộp Xanh - Sữa Bò", desc: "Dưỡng ẩm tăng cường, da mềm mượt, mùi sữa bò dịu nhẹ" }
+        ],
+        points: ["Tặng kèm 1 bông tắm trong hộp", "Quai xách sẵn - làm quà không cần gói"],
+        fit: "Quà 20/10 tặng mẹ, vợ, đồng nghiệp; cả nhà dùng chung"
+      },
+      {
+        key: "cream", cls: "blue", label: "Sản phẩm mới", tag: "Tiết kiệm 40,000₫",
+        name: "Kem Dưỡng Da Tay Hatomugi", brand: "Reihaku · Nhật Bản · 65g",
+        unit: "/ tuýp",
+        points: ["Chiết xuất hạt ý dĩ tự nhiên", "Dưỡng ẩm sâu, da tay mềm mịn, hết khô ráp", "Thấm nhanh, không nhờn rít - thoa xong cầm điện thoại ngay"],
+        fit: "Người hay rửa tay, rửa chén; dân văn phòng; trời hanh khô"
+      },
+      {
+        key: "lip", cls: "green", label: "Sản phẩm mới", tag: "Nam nữ đều dùng",
+        name: "Son Dưỡng Môi Menturm", brand: "Omi Brotherhood · Nhật Bản",
+        unit: "/ thỏi",
+        points: ["Dưỡng ẩm, môi mềm, ngừa khô nứt nẻ", "Không màu, mát nhẹ, dịu nhẹ mọi loại da", "Nhỏ gọn, bỏ túi mang theo mọi lúc"],
+        fit: "Đi xe máy, ngồi máy lạnh; mua thêm làm quà nhỏ"
+      }
+    ],
+    combosTitle: "Gợi ý kết hợp",
+    combos: ["Bộ quà 3 món: AVATAR + Kem tay + Son dưỡng", "Bộ đôi chống hanh khô: Kem tay + Son dưỡng", "2 hộp AVATAR Hồng + Xanh (tặng 2 bông tắm)"]
   },
+
   en: {
-    printLabel: "Print A5 landscape",
-    title: "October Deals - Dry-Season Body Care",
-    promo: "Oct 1 - Oct 30, 2026",
-    cards: {
-      avatar: { deal: "FREE BATH SPONGE", name: "AVATAR Brightening Body Wash", brand: "Japanese technology · Gift box with handle", unit: "/ box",
-        variants: [["Pink:", "Job's tears + Vitamin C, brightening"], ["Blue:", "Cow's milk, extra moisture"]],
-        points: ["Ready to gift, no wrapping needed"] },
-      cream: { deal: "SAVE 40,000₫", name: "Hatomugi Hand Cream", brand: "Reihaku · Japan · 65g", unit: "/ tube",
-        points: ["Job's tears extract, deep moisture", "Fast-absorbing, non-greasy", "Soft, smooth hands"] },
-      lip: { deal: "FOR MEN & WOMEN", name: "Menturm Lip Balm", brand: "Omi Brotherhood · Japan", unit: "/ stick",
-        points: ["Moisturizes, prevents chapped lips", "Colorless, lightly cooling", "Pocket-size, take it anywhere"] }
-    },
-    combosTitle: "BUNDLES",
-    combos: ["AVATAR + Hand cream + Lip balm", "Hand cream + Lip balm", "Pink + Blue (2 free sponges)"]
+    printLabel: "Print this page (A5 landscape)",
+    eyebrow: "KOHNAN · OCTOBER 2026 OFFERS",
+    title: "Fall-Winter Body Care Trio",
+    subtitle: "Head-to-hand moisture - easy gifts for Vietnamese Women's Day (Oct 20)",
+    promoDates: "Promotion: Oct 1 - Oct 30, 2026",
+    giftNote: "Full Oct 20 gift set only 167,000₫",
+    features: ["Japanese brands & technology", "Moisture for the dry season", "Gentle, everyday formulas", "Gift box with built-in handle"],
+    sectionTitle: "Pick the right product for you",
+    lblVariants: "2 options", lblPoints: "Highlights", lblFit: "Best for",
+    cards: [
+      {
+        key: "avatar", cls: "pink", label: "Gift box with handle", tag: "Free bath sponge",
+        name: "AVATAR Brightening Body Wash", brand: "Japanese technology · Gift box",
+        unit: "/ box", date: "Valid: Oct 7 - Oct 30, 2026",
+        variants: [
+          { color: "#ec4899", name: "Pink - Hatomugi (Job's tears)", desc: "Vitamin C derivative, moisturizing, brightening, long-lasting scent" },
+          { color: "#0284c7", name: "Blue - Cow's Milk", desc: "Extra moisture for soft, smooth skin, gentle milky scent" }
+        ],
+        points: ["1 bath sponge included in the box", "Built-in handle - ready to gift, no wrapping"],
+        fit: "Oct 20 gifts for mom, wife, colleagues; shared family use"
+      },
+      {
+        key: "cream", cls: "blue", label: "New", tag: "Save 40,000₫",
+        name: "Hatomugi Hand Cream", brand: "Reihaku · Made in Japan · 65g",
+        unit: "/ tube",
+        points: ["Natural Job's tears (hatomugi) extract", "Deep moisture for soft, smooth hands", "Absorbs fast, non-greasy - use your phone right away"],
+        fit: "Frequent hand-washing, office workers, dry weather"
+      },
+      {
+        key: "lip", cls: "green", label: "New", tag: "For men & women",
+        name: "Menturm Medicated Lip Stick", brand: "Omi Brotherhood · Made in Japan",
+        unit: "/ stick",
+        points: ["Moisturizes and prevents chapped lips", "Colorless, lightly cooling, gentle on all skin", "Pocket-size, take it anywhere"],
+        fit: "Motorbike rides, air-conditioned rooms, small add-on gift"
+      }
+    ],
+    combosTitle: "Suggested bundles",
+    combos: ["Gift set of 3: AVATAR + Hand cream + Lip balm", "Dry-season duo: Hand cream + Lip balm", "2 AVATAR boxes: Pink + Blue (2 free sponges)"]
   },
+
   ja: {
-    printLabel: "A5横で印刷",
-    title: "10月のお得 - 乾燥シーズンのボディケア",
-    promo: "2026年10月1日〜10月30日",
-    cards: {
-      avatar: { deal: "ボディスポンジ付き", name: "AVATAR 美肌ボディソープ", brand: "日本の技術 · 持ち手付き箱", unit: "/ 箱",
-        variants: [["ピンク:", "ハトムギ + ビタミンC、美肌"], ["ブルー:", "ミルク、高保湿"]],
-        points: ["ラッピング不要で贈れる"] },
-      cream: { deal: "40,000₫ OFF", name: "ハトムギ ハンドクリーム", brand: "麗白 Reihaku · 日本製 · 65g", unit: "/ 本",
-        points: ["ハトムギエキスでしっかり保湿", "すばやくなじみ、ベタつかない", "手肌すべすべ、カサつき知らず"] },
-      lip: { deal: "男女兼用", name: "メンターム 薬用リップ", brand: "近江兄弟社 · 日本製", unit: "/ 本",
-        points: ["唇のひび割れを防ぐ保湿", "無色・ほのかな清涼感", "コンパクトで持ち運びに便利"] }
-    },
-    combosTitle: "セットで",
-    combos: ["AVATAR + ハンドクリーム + リップ", "ハンドクリーム + リップ", "ピンク + ブルー（スポンジ2個）"]
+    printLabel: "このページを印刷（A5横）",
+    eyebrow: "KOHNAN · 2026年10月 特別価格",
+    title: "秋冬のボディケア 3点セレクション",
+    subtitle: "全身しっとり保湿 - 10月20日（ベトナム女性の日）のギフトにも",
+    promoDates: "キャンペーン: 2026年10月1日〜10月30日",
+    giftNote: "10/20ギフト3点セットが167,000₫",
+    features: ["日本ブランド・日本の技術", "乾燥する季節の保湿ケア", "毎日使えるやさしい処方", "持ち手付きギフトボックス"],
+    sectionTitle: "あなたにぴったりの商品をお選びください",
+    lblVariants: "2種類から選べる", lblPoints: "ポイント", lblFit: "おすすめ",
+    cards: [
+      {
+        key: "avatar", cls: "pink", label: "持ち手付きギフトボックス", tag: "ボディスポンジ付き",
+        name: "AVATAR 美肌ボディソープ", brand: "日本の技術 · ギフトボックス",
+        unit: "/ 箱", date: "適用期間: 10月7日〜10月30日",
+        variants: [
+          { color: "#ec4899", name: "ピンク - ハトムギ", desc: "ビタミンC誘導体配合、保湿・美肌・香りが長続き" },
+          { color: "#0284c7", name: "ブルー - ミルク", desc: "高保湿でしっとりなめらか、やさしいミルクの香り" }
+        ],
+        points: ["箱の中にボディスポンジ1個付き", "持ち手付きでラッピング不要のギフトに"],
+        fit: "母・妻・同僚への10/20ギフト、家族みんなで使える"
+      },
+      {
+        key: "cream", cls: "blue", label: "新商品", tag: "40,000₫お得",
+        name: "麗白 ハトムギ ハンドクリーム", brand: "Reihaku · 日本製 · 65g",
+        unit: "/ 本",
+        points: ["天然ハトムギエキス配合", "しっかり保湿、手肌をなめらかに、カサつき知らず", "すばやくなじみベタつかない - 塗ってすぐスマホ操作OK"],
+        fit: "手洗い・食器洗いが多い方、オフィスワーク、乾燥する季節に"
+      },
+      {
+        key: "lip", cls: "green", label: "新商品", tag: "男女兼用",
+        name: "メンターム 薬用リップスティック", brand: "近江兄弟社 · 日本製",
+        unit: "/ 本",
+        points: ["しっかり保湿、唇をやわらかく、ひび割れ防止", "無色・ほのかな清涼感、どんな肌にもやさしい", "コンパクトでいつでも持ち運べる"],
+        fit: "バイク移動やエアコンの効いた室内に、ちょっとしたギフトにも"
+      }
+    ],
+    combosTitle: "おすすめの組み合わせ",
+    combos: ["3点ギフト: AVATAR + ハンドクリーム + リップ", "乾燥対策ペア: ハンドクリーム + リップ", "AVATAR 2箱 ピンク + ブルー（スポンジ2個付き）"]
   },
+
   zh: {
-    printLabel: "A5横版打印",
-    title: "十月优惠 - 干燥季节身体护理",
-    promo: "2026年10月1日 - 10月30日",
-    cards: {
-      avatar: { deal: "附赠沐浴球1个", name: "AVATAR 亮肤沐浴露", brand: "日本技术 · 手提礼盒", unit: "/ 盒",
-        variants: [["粉色：", "薏仁 + 维生素C，亮肤"], ["蓝色：", "牛奶，特强保湿"]],
-        points: ["送礼无需再包装"] },
-      cream: { deal: "立省 40,000₫", name: "薏仁护手霜", brand: "丽白 Reihaku · 日本制造 · 65克", unit: "/ 支",
-        points: ["薏仁萃取，深层保湿", "快速吸收，不黏腻", "手部柔嫩，告别干裂"] },
-      lip: { deal: "男女通用", name: "Menturm 药用润唇膏", brand: "近江兄弟社 · 日本制造", unit: "/ 支",
-        points: ["保湿，防止双唇干裂", "无色，清凉舒适", "小巧便携"] }
-    },
-    combosTitle: "搭配购买",
-    combos: ["AVATAR + 护手霜 + 润唇膏", "护手霜 + 润唇膏", "粉色 + 蓝色（送2个沐浴球）"]
+    printLabel: "打印本页（A5横版）",
+    eyebrow: "KOHNAN · 2026年10月优惠",
+    title: "秋冬身体护理三件组",
+    subtitle: "从头到手全面保湿 - 10月20日越南妇女节送礼之选",
+    promoDates: "促销：2026年10月1日 - 10月30日",
+    giftNote: "妇女节三件礼盒仅167,000₫",
+    features: ["日本品牌·日本技术", "干燥季节深层保湿", "温和配方，日常可用", "礼盒自带提手"],
+    sectionTitle: "选择适合您的产品",
+    lblVariants: "两款可选", lblPoints: "产品亮点", lblFit: "适合",
+    cards: [
+      {
+        key: "avatar", cls: "pink", label: "手提礼盒", tag: "附赠沐浴球",
+        name: "AVATAR 亮肤沐浴露", brand: "日本技术 · 礼盒装",
+        unit: "/ 盒", date: "适用：10月7日 - 10月30日",
+        variants: [
+          { color: "#ec4899", name: "粉色 - 薏仁", desc: "含维生素C衍生物，保湿、亮肤、持久留香" },
+          { color: "#0284c7", name: "蓝色 - 牛奶", desc: "特强保湿，肌肤柔滑，淡淡牛奶香" }
+        ],
+        points: ["盒内附赠1个沐浴球", "自带提手，送礼无需再包装"],
+        fit: "妇女节送妈妈、太太、同事，全家共用"
+      },
+      {
+        key: "cream", cls: "blue", label: "新品", tag: "立省40,000₫",
+        name: "丽白 薏仁护手霜", brand: "Reihaku · 日本制造 · 65克",
+        unit: "/ 支",
+        points: ["天然薏仁萃取", "深层保湿，手部柔嫩，告别干裂", "快速吸收不黏腻 - 涂完即可用手机"],
+        fit: "经常洗手洗碗、办公室人群、干燥季节"
+      },
+      {
+        key: "lip", cls: "green", label: "新品", tag: "男女通用",
+        name: "Menturm 药用润唇膏", brand: "近江兄弟社 · 日本制造",
+        unit: "/ 支",
+        points: ["深层保湿，双唇柔软，防止干裂", "无色，清凉舒适，温和适合各种肤质", "小巧便携，随时随地使用"],
+        fit: "骑摩托车、久待空调房，也适合加购送礼"
+      }
+    ],
+    combosTitle: "推荐组合",
+    combos: ["三件礼盒：AVATAR + 护手霜 + 润唇膏", "防干燥二件组：护手霜 + 润唇膏", "AVATAR两盒 粉色 + 蓝色（送2个沐浴球）"]
   },
   ko: {
-    printLabel: "A5 가로 인쇄",
-    title: "10월 특가 - 건조한 계절 바디케어",
-    promo: "2026.10.01 - 10.30",
-    cards: {
-      avatar: { deal: "바디 스펀지 1개 증정", name: "AVATAR 브라이트닝 바디워시", brand: "일본 기술 · 손잡이 선물 상자", unit: "/ 상자",
-        variants: [["핑크:", "율무 + 비타민C, 브라이트닝"], ["블루:", "우유, 고보습"]],
-        points: ["포장 없이 바로 선물 가능"] },
-      cream: { deal: "40,000₫ 할인", name: "하토무기 핸드크림", brand: "Reihaku · 일본산 · 65g", unit: "/ 개",
-        points: ["율무 추출물로 깊은 보습", "빠른 흡수, 끈적임 없음", "부드럽고 매끈한 손"] },
-      lip: { deal: "남녀 공용", name: "Menturm 립밤", brand: "Omi Brotherhood · 일본산", unit: "/ 개",
-        points: ["보습, 입술 갈라짐 예방", "무색, 은은한 청량감", "작고 휴대 간편"] }
-    },
-    combosTitle: "함께 구매",
-    combos: ["AVATAR + 핸드크림 + 립밤", "핸드크림 + 립밤", "핑크 + 블루 (스펀지 2개)"]
+    printLabel: "이 페이지 인쇄 (A5 가로)",
+    eyebrow: "KOHNAN · 2026년 10월 특가",
+    title: "가을·겨울 바디케어 3종",
+    subtitle: "머리부터 손끝까지 촉촉하게 - 10월 20일 베트남 여성의 날 선물로도 딱",
+    promoDates: "프로모션: 2026.10.01 - 10.30",
+    giftNote: "10/20 선물 3종 세트 167,000₫",
+    features: ["일본 브랜드·일본 기술", "건조한 계절 보습 케어", "순한 포뮬러, 매일 사용", "손잡이 달린 선물 상자"],
+    sectionTitle: "나에게 맞는 제품을 골라보세요",
+    lblVariants: "2가지 선택", lblPoints: "핵심 포인트", lblFit: "추천 대상",
+    cards: [
+      {
+        key: "avatar", cls: "pink", label: "손잡이 선물 상자", tag: "바디 스펀지 증정",
+        name: "AVATAR 브라이트닝 바디워시", brand: "일본 기술 · 선물 상자",
+        unit: "/ 상자", date: "적용 기간: 10.07 - 10.30",
+        variants: [
+          { color: "#ec4899", name: "핑크 - 율무 (하토무기)", desc: "비타민C 유도체, 보습·브라이트닝·은은한 잔향" },
+          { color: "#0284c7", name: "블루 - 우유", desc: "고보습으로 부드럽고 촉촉하게, 은은한 우유 향" }
+        ],
+        points: ["상자 안에 바디 스펀지 1개 포함", "손잡이 일체형 - 포장 없이 바로 선물"],
+        fit: "어머니·아내·동료를 위한 10/20 선물, 온 가족 함께 사용"
+      },
+      {
+        key: "cream", cls: "blue", label: "신제품", tag: "40,000₫ 할인",
+        name: "하토무기 핸드크림", brand: "Reihaku · 일본산 · 65g",
+        unit: "/ 개",
+        points: ["천연 율무(하토무기) 추출물", "깊은 보습으로 부드럽고 매끈한 손", "빠른 흡수, 끈적임 없음 - 바르고 바로 휴대폰 사용"],
+        fit: "손 씻기·설거지가 잦은 분, 직장인, 건조한 날씨에"
+      },
+      {
+        key: "lip", cls: "green", label: "신제품", tag: "남녀 공용",
+        name: "멘터름 메디케이티드 립스틱", brand: "Omi Brotherhood · 일본산",
+        unit: "/ 개",
+        points: ["보습으로 입술 갈라짐 예방", "무색, 은은한 청량감, 모든 피부에 순함", "작고 가벼워 언제 어디서나 휴대"],
+        fit: "오토바이 이동, 에어컨 실내, 작은 추가 선물로"
+      }
+    ],
+    combosTitle: "추천 조합",
+    combos: ["선물 3종: AVATAR + 핸드크림 + 립밤", "건조 대비 듀오: 핸드크림 + 립밤", "AVATAR 2상자 핑크 + 블루 (스펀지 2개 증정)"]
   }
 };
-
-const ORDER = [["avatar","pink",false], ["cream","blue",false], ["lip","green",true]];
 
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
@@ -289,40 +516,57 @@ function render(lang){
   const c = CONTENT[lang];
   document.documentElement.lang = lang;
   document.body.classList.remove('ja-active','zh-active','ko-active');
-  if(lang !== 'vi' && lang !== 'en') document.body.classList.add(lang + '-active');
+  if(lang === 'ja') document.body.classList.add('ja-active');
+  if(lang === 'zh') document.body.classList.add('zh-active');
+  if(lang === 'ko') document.body.classList.add('ko-active');
 
   document.getElementById('printLabel').textContent = c.printLabel;
+  document.getElementById('eyebrow').textContent = c.eyebrow;
   document.getElementById('mainTitle').textContent = c.title;
-  document.getElementById('promoDates').textContent = c.promo;
+  document.getElementById('subtitle').textContent = c.subtitle;
+  document.getElementById('promoDates').textContent = c.promoDates;
+  document.getElementById('giftNote').textContent = c.giftNote;
+  document.getElementById('sectionTitle').textContent = c.sectionTitle;
+  document.getElementById('combosTitle').textContent = c.combosTitle;
 
-  document.getElementById('cards').innerHTML = ORDER.map(([key, cls, softDeal]) => {
-    const d = c.cards[key], p = PRICES[key];
-    const variants = d.variants ? `<div>${d.variants.map((v,i) => `
-        <div class="variant"><span class="vdot" style="background:${VCOLORS[i]}"></span>
-          <div><b>${esc(v[0])}</b> ${esc(v[1])}</div></div>`).join('')}</div>` : '';
+  document.getElementById('features').innerHTML = c.features.map(f =>
+    `<span class="feature"><span class="dot"></span>${esc(f)}</span>`).join('');
+
+  document.getElementById('cards').innerHTML = c.cards.map(card => {
+    const p = PRICES[card.key];
+    const variants = card.variants ? `
+      <div class="lbl">${esc(c.lblVariants)}</div>
+      ${card.variants.map(v => `
+        <div class="variant">
+          <span class="vdot" style="background:${v.color}"></span>
+          <div><b>${esc(v.name)}</b><span>${esc(v.desc)}</span></div>
+        </div>`).join('')}` : '';
     return `
-    <div class="card ${cls}">
-      <div class="deal">${esc(d.deal)}</div>
-      <div class="body">
-        <div><h2>${esc(d.name)}</h2><div class="brand">${esc(d.brand)}</div></div>
-        <div class="price-box">
-          ${p.pct ? `<span class="pct">${p.pct}</span>` : ''}
-          <div class="price-line">
-            ${p.old ? `<span class="old mono">${p.old}</span>` : ''}
-            <span class="new mono">${p.now}</span>
-            <span class="unit">${esc(d.unit)}</span>
-          </div>
-          ${d.date ? `<div class="date">${esc(d.date)}</div>` : ''}
-        </div>
-        ${variants}
-        <ul>${d.points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
+    <div class="card ${card.cls}">
+      <div class="top-row">
+        <div class="swatch-row"><span class="swatch"></span><span class="swatch-label">${esc(card.label)}</span></div>
+        <span class="tag">${esc(card.tag)}</span>
+      </div>
+      <h2>${esc(card.name)}</h2>
+      <div class="brand">${esc(card.brand)}</div>
+      <div class="price-box">
+        ${p.old ? `<span class="old mono">${p.old}</span>` : ''}
+        <span class="new mono">${p.now}</span>
+        <span class="unit">${esc(card.unit)}</span>
+        ${card.date ? `<span class="date">${esc(card.date)}</span>` : ''}
+      </div>
+      ${variants}
+      <div class="lbl">${esc(c.lblPoints)}</div>
+      <ul>${card.points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
+      <div class="fit">
+        <div class="lbl">${esc(c.lblFit)}</div>
+        <p>${esc(card.fit)}</p>
       </div>
     </div>`;
   }).join('');
 
-  document.getElementById('combos').innerHTML =
-    `<div class="combos-title">${esc(c.combosTitle)}</div>` +
-    c.combos.map((t, i) => `<div class="combo"><span class="ctext">${esc(t)}</span><span class="cprice mono">${COMBO_PRICES[i]}</span></div>`).join('');
+  document.getElementById('combos').innerHTML = c.combos.map((t, i) => `
+    <div class="combo"><span class="ctext">${esc(t)}</span><span class="cprice mono">${COMBO_PRICES[i]}</span></div>`).join('');
 }
 
 const tabs = document.querySelectorAll('#langTabs button');
@@ -330,6 +574,7 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
   tabs.forEach(b => b.classList.toggle('active', b === btn));
   render(btn.getAttribute('data-set'));
 }));
+
 render('vi');
 </script>
 </body>
