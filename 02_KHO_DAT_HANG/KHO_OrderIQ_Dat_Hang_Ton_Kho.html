@@ -91,7 +91,7 @@
 
 </script><!--S1016-BRIDGE-END-->
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OrderIQ Kho V2.12 · PARC MALL 1016</title>
+<title>OrderIQ Kho V2.13 · PARC MALL 1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -1423,6 +1423,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 <tr><td>Tháng mới chưa đủ ngày (V2.3)</td><td>File tồn kho tháng mới &lt; 7 ngày (chỉnh ở Tham số): tool không dùng riêng tháng đó để xếp "Tồn 0 - Sale 0", xét NCC còn giao, mã thay thế. Sức bán = giao dịch 28 ngày (nếu đã nạp) hoặc tháng trước + tháng mới. Mã còn bán trong 28 ngày / tháng trước mà đang hết = Hết hàng, tính theo sức bán gần đây.</td></tr>
 <tr><td>Mã quên đặt (V2.3)</td><td>Sức bán = số cao hơn giữa bán gần đây và bán TB khi còn hàng.</td></tr>
 <tr><td>🏷️ Mã vạch quét được (V2.10)</td><td>Cửa sổ chi tiết mã có hình mã vạch (bấm để phóng to, quét trực tiếp trên màn hình bằng Handy). Mọi bảng có cột Barcode: biểu tượng ▥ cạnh barcode để xem mã vạch; nút "🏷️ In mã vạch" in tem cho các mã đang lọc (tên, mã vạch, mã hàng, SL đề xuất) - chọn 2-5 cột, In / Lưu PDF. Barcode 13 số đúng số kiểm tra in EAN-13, 8 số in EAN-8, 12 số (UPC) tự thêm 0 thành EAN-13; mã nội bộ không đúng chuẩn EAN in Code 128 (vẫn quét được).</td></tr>
+<tr><td>📦 Excel nhẹ hơn nhiều (V2.13)</td><td>File Excel xuất ra được NÉN (như file Excel lưu từ máy). Hình mã vạch trong Excel chỉ còn phần vạch (2 px/vạch, ~0,7 KB/hình thay vì ~7 KB) - số mã vạch đã có ở cột Barcode ngay bên cạnh. Quét trên màn hình / bản in như cũ; file "SKU cần đặt" và Excel tổng hợp nhẹ hơn nhiều, gửi Zalo / email nhanh hơn. Tem in (🏷️ In mã vạch) không đổi - vẫn có số dưới vạch.</td></tr>
 <tr><td>🚩 PO bất thường (V2.12)</td><td>Trang mới "PO bất thường": kiểm mọi PO đang mở (chưa nhận) - kể cả đã duyệt / đã gửi NCC, PO MD phân bổ, PO chưa duyệt. Cảnh báo: mã đang hạn chế / ngừng đặt, không có sức bán, đủ bán sau khi về quá ngưỡng (mặc định 90 ngày, có gợi ý nhầm thùng ↔ cái), SL gấp > 3 lần trung vị các lần đặt trước, giá vốn PO lệch > 20%, mã ở nhiều PO, SL ít bất thường, giá trị PO gấp > 3 lần PO thường của NCC. Có "SL nên đặt (tham khảo)" và giá trị có thể giảm. Nút ✅ Xác nhận (từng dòng / cả PO / các dòng đang lọc): Đúng hoặc Cần điều chỉnh + lý do + ghi chú (+ SL đúng). Xác nhận lưu bền (có trong Sao lưu JSON); PO đổi SL / giá thì tự hiện "xác nhận lại". Ngưỡng sửa ở Tham số → 🚩 PO bất thường.</td></tr>
 <tr><td>Mã vạch trong Excel (V2.11)</td><td>Cột "Mã hàng (Code)" đã thay bằng cột "Mã vạch (quét)": trên màn hình là hình mã vạch nhỏ (bấm để phóng to), khi xuất Excel là hình mã vạch EAN-13 / EAN-8 / Code 128 trong ô - quét trực tiếp trên màn hình hoặc bản in. Cũng có trong báo cáo tồn cao gửi MD và báo cáo SKU quên đặt. File CSV không có hình (chỉ Barcode). Tối đa 6.000 hình / file; quá mức này cột chỉ ghi số barcode.</td></tr>
 <tr><td>Mã hàng (Code) tự động (V2.9 - đã thay bằng mã vạch ở V2.11)</td><td>Mọi bảng có cột Barcode đều có thêm cột "Mã hàng (Code)" ngay sau, trên màn hình và khi xuất Excel / CSV; cửa sổ chi tiết mã, cửa sổ PO, báo cáo tồn cao gửi MD, báo cáo SKU quên đặt, file tham số cũng có. Tool tự lấy theo Barcode từ: file tồn kho (nếu có cột Item Code), PO Detail (cột Item Code), file or_plan (cột mã đặt), đơn NCC gửi. Không cần nhập tay.</td></tr>
@@ -2298,13 +2299,13 @@ const BC_XL={n:0,max:6000};const BC_PNG=new Map();
 function barcodePNG(code){
   if(BC_PNG.has(code)) return BC_PNG.get(code);
   const B=bcModules(code);if(!B){BC_PNG.set(code,null);return null;}
-  const k=4,qz=(B.type.startsWith('EAN')?11:10),W=(B.m.length+qz*2)*k,barH=120,fs=30,H=barH+fs+12;
+  // V2.13: PNG gọn cho Excel - chỉ vạch, 2 px/vạch, không vẽ chữ (số đã có ở cột Barcode kề bên) → ~0,7 KB/hình thay vì ~7 KB
+  const k=2,qz=(B.type.startsWith('EAN')?11:10),W=(B.m.length+qz*2)*k,barH=60,H=barH;
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
   g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#000';
   for(let i=0;i<B.m.length;i++) if(B.m[i]==='1') g.fillRect((qz+i)*k,0,k,barH);
-  g.font=`${fs}px "Courier New",monospace`;g.textAlign='center';g.textBaseline='top';g.fillText(B.code,W/2,barH+6);
   const d=atob(cv.toDataURL('image/png').split(',')[1]);const bytes=new Uint8Array(d.length);for(let i=0;i<d.length;i++) bytes[i]=d.charCodeAt(i);
-  const r={bytes,w:Math.round(W/2),h:Math.round(H/2),type:B.type};BC_PNG.set(code,r);return r;
+  const r={bytes,w:W,h:H,type:B.type};BC_PNG.set(code,r);return r;
 }
 function bcType(code){const B=bcModules(code);return B?B.type:'';}
 // In tem mã vạch cho danh sách mã (theo bộ lọc đang chọn của bảng)
@@ -5143,6 +5144,7 @@ ${sh.images&&sh.images.length?'<drawing r:id="rIdDr1"/>':''}
   const CRC = (() => { const t = new Uint32Array(256); for (let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
   const crc32 = b => { let c = 0xFFFFFFFF; for (let i=0;i<b.length;i++) c = CRC[(c^b[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; };
   function zip(files) {
+    zip.lastFiles = files;
     const enc = new TextEncoder(), parts = [], central = []; let off = 0;
     const u16 = v => [v&255, (v>>>8)&255], u32 = v => [v&255, (v>>>8)&255, (v>>>16)&255, (v>>>24)&255];
     files.forEach(f => {
@@ -5152,6 +5154,27 @@ ${sh.images&&sh.images.length?'<drawing r:id="rIdDr1"/>':''}
       central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), name);
       off += head.length + name.length + data.length;
     });
+    const csize = central.reduce((s,p)=>s+p.length,0);
+    const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(csize), ...u32(off), ...u16(0)]);
+    return new Blob([...parts, ...central, end], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  }
+
+  // V2.13: ZIP có NÉN (deflate) - XML nén 8-15 lần; PNG giữ nguyên (đã nén). Trình duyệt không hỗ trợ CompressionStream → dùng zip không nén như cũ.
+  async function zipDeflate(files) {
+    const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+    const u16 = v => [v&255, (v>>>8)&255], u32 = v => [v&255, (v>>>8)&255, (v>>>16)&255, (v>>>24)&255];
+    for (const f of files) {
+      const name = enc.encode(f.name), data = (f.data instanceof Uint8Array) ? f.data : enc.encode(f.data), crc = crc32(data);
+      let method = 0, out = data;
+      if (!/\.png$/i.test(f.name) && data.length > 256) {
+        const z = new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer());
+        if (z.length < data.length) { method = 8; out = z; }
+      }
+      const head = [...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(method), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(out.length), ...u32(data.length), ...u16(name.length), ...u16(0)];
+      parts.push(new Uint8Array(head), name, out);
+      central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(method), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(out.length), ...u32(data.length), ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), name);
+      off += head.length + name.length + out.length;
+    }
     const csize = central.reduce((s,p)=>s+p.length,0);
     const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(csize), ...u32(off), ...u16(0)]);
     return new Blob([...parts, ...central, end], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
@@ -5282,11 +5305,13 @@ ${sh.images&&sh.images.length?'<drawing r:id="rIdDr1"/>':''}
       sh.height(sh.r, Math.max(16, Math.ceil(String(text).length / w) * 12 + 4)); sh.r++;
     }
     function save(filename) {
-      const blob = build(sheets, sb);
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = filename;
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      const blob = build(sheets, sb), files = zip.lastFiles;
+      const dl = b => { const a = document.createElement("a");
+        a.href = URL.createObjectURL(b); a.download = filename;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); };
+      if (typeof CompressionStream === "undefined" || !files) { dl(blob); return blob; }
+      zipDeflate(files).then(dl, e => { console.warn("Nén Excel lỗi, xuất không nén:", e); dl(blob); });
       return blob;
     }
     return { addSheet, section, table, kv, note, save, sheets, blob: () => build(sheets, sb) };
@@ -5404,6 +5429,8 @@ function exportWorkbook(){try{exportWorkbook_();}catch(e){console.error(e);toast
 function exportWorkbook_(){
   if(!skus.length&&!poLines.length&&!handyRows.length){toast('Chưa có dữ liệu','warning');return;}
   try{if(!window._msaL) msaBuild();msaAuto();}catch(e){}try{if(!window._ptH) window._ptH=poHeads();}catch(e){}try{window._aMoa=aMoaPlans(T.aT.data());}catch(e){}
+  // V2.13: dựng trước dữ liệu của MỌI trang (bảng điểm CAT, DT NCC vs CAT, số liệu từng tháng, giá vốn từng đợt...) - trước đây chưa mở trang thì thiếu sheet
+  {const t0=window.toast;window.toast=()=>{};try{Object.keys(RENDER).forEach(p=>{if(p===curPage) return;try{RENDER[p]();}catch(e){}});}finally{window.toast=t0;}try{RENDER[curPage]&&RENDER[curPage]();}catch(e){}}
   const B=XW.Book(),used=new Set();const list=[];
   Object.keys(T).forEach(id=>{try{renderT(id);}catch(e){}const aoa=tableAoa(id);if(aoa.length>1) list.push({id,aoa,ttl:XWX.cardTitle(id)});});
   const sh=B.addSheet(XWX.sheetName('Mục lục',used),{title:`ORDERIQ KHO - TỔNG HỢP ${list.length} BẢNG`,subtitle:XWX.sub('Excel tổng hợp'),cols:[6,52,14],landscape:false});
