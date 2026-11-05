@@ -925,7 +925,7 @@
     // true CHỈ ở bản dành cho Netlify (index.html). Để false ở bản này (Artifact/local-only)
     // vì Chính sách bảo mật (CSP) của trang Artifact chặn gọi ra ngoài - nếu để true ở đây,
     // trang sẽ liên tục báo lỗi đồng bộ dù không có gì sai.
-    const CLOUD_SYNC_ENABLED = false;
+    const CLOUD_SYNC_ENABLED = true;
 
     function isCloudHost() {
         return CLOUD_SYNC_ENABLED && !!CLOUD_API_URL;

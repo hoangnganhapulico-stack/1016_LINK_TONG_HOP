@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kohnan Xin Hàng Miền Nam</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -223,6 +228,17 @@
     #reader video { border-radius: 0; }
     .scan-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
 
+    body:not(.admin) .admin-only { display: none !important; }
+    .sync-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .sync-bar .sync-title { font-weight: 800; color: var(--text-strong); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .sync-bar button { margin-top: 0; }
+    .sync-status { font-size: 12.5px; color: var(--text-muted); font-weight: 600; margin-top: 8px; display: flex; align-items: center; gap: 6px; line-height: 1.45; }
+    .sync-status.ok { color: var(--success); } .sync-status.err { color: var(--danger); } .sync-status.busy { color: var(--accent); }
+    .store-chip .upd { color: var(--text-faint); font-weight: 600; font-size: 11px; }
+    .admin-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--promo); color: white; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; }
+    .link-btn { background: none; border: none; box-shadow: none; color: var(--text-faint); font-size: 12px; font-weight: 700; text-decoration: underline; padding: 6px; margin: 10px auto 0; flex: none; }
+    .link-btn:hover { background: none; color: var(--accent); transform: none; box-shadow: none; }
+
     @media (prefers-reduced-motion: reduce) { .section, button, .product-card { transition: none; animation: none; } .spin { animation-duration: 2.4s; } }
 </style>
 <svg style="display:none" aria-hidden="true">
@@ -238,9 +254,14 @@
     <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
     <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
 </svg>
 
+</head>
+<body>
 <div class="container">
     <div class="header-banner">
         <div class="brand-tag"><svg class="icon" style="stroke:white"><use href="#i-truck"/></svg> KOHNAN MIỀN NAM</div>
@@ -254,19 +275,24 @@
     </div>
 
     <div class="section">
-        <label><svg class="icon"><use href="#i-upload"/></svg> 1. Tải file tồn kho các cửa hàng (InventoryPLU...csv, chọn được nhiều file cùng lúc)</label>
-        <input type="file" id="invFiles" accept=".csv,.txt,.xlsx,.xls" multiple>
-        <div id="status" class="status-msg"></div>
-        <div class="field-hint">Chọn nhiều file cùng lúc (mỗi file 1 cửa hàng) - phần mềm tự nhận diện mã &amp; tên cửa hàng, tự gộp dữ liệu. Tải lại mỗi khi có số liệu mới để không bị lệch tồn.</div>
-        <div class="store-chip-row" id="storeChipRow"></div>
-        <div class="btn-row" style="margin-top:12px;">
-            <button class="secondary" onclick="clearAllData()"><svg class="icon"><use href="#i-trash"/></svg> Xoá Toàn Bộ Dữ Liệu Đã Lưu</button>
+        <div class="sync-bar">
+            <span class="sync-title"><svg class="icon"><use href="#i-cloud"/></svg> Dữ liệu tồn các cửa hàng <span class="admin-badge admin-only" style="display:inline-flex;">QUẢN LÝ</span></span>
+            <button class="ghost small" id="syncNowBtn" onclick="syncPull(true)"><svg class="icon"><use href="#i-refresh"/></svg> Đồng Bộ Ngay</button>
         </div>
+        <div id="syncStatus" class="sync-status"></div>
+        <div class="store-chip-row" id="storeChipRow"></div>
     </div>
 
-    <div class="section">
+    <div class="section admin-only">
+        <label><svg class="icon"><use href="#i-upload"/></svg> Cập nhật file tồn kho (InventoryPLU...csv, chọn được nhiều file cùng lúc)</label>
+        <input type="file" id="invFiles" accept=".csv,.txt,.xlsx,.xls" multiple>
+        <div id="status" class="status-msg"></div>
+        <div class="field-hint">Chọn nhiều file cùng lúc (mỗi file 1 cửa hàng) - phần mềm tự nhận diện mã &amp; tên cửa hàng. Tải lên xong là <b>mọi điện thoại tự nhận dữ liệu mới</b>, nhân viên không cần tải file. Cửa hàng nào không chọn file thì giữ nguyên số liệu cũ.</div>
+    </div>
+
+    <div class="section admin-only">
         <button class="guide-toggle" id="settingsToggleBtn" aria-expanded="false" onclick="toggleBlock('settingsContent', this)">
-            <span style="display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-settings"/></svg> 2. Cấu hình cửa hàng của bạn &amp; bảng giá Sagawa</span>
+            <span style="display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-settings"/></svg> Cấu hình cửa hàng &amp; bảng giá Sagawa</span>
             <svg class="icon chev"><use href="#i-chevron-down"/></svg>
         </button>
         <div class="guide-content" id="settingsContent" style="display:none;">
@@ -302,7 +328,7 @@
     </div>
 
     <div class="section">
-        <label><svg class="icon"><use href="#i-search"/></svg> 3. Thêm mã sản phẩm cần xin hàng</label>
+        <label><svg class="icon"><use href="#i-search"/></svg> Thêm mã sản phẩm cần xin hàng</label>
         <input type="text" id="addCodeInput" placeholder="Nhập mã Barcode / SKU..." onkeypress="if(event.key==='Enter') addProduct();">
         <div class="btn-row">
             <button onclick="addProduct()"><svg class="icon"><use href="#i-box"/></svg> Thêm Vào Danh Sách</button>
@@ -316,7 +342,7 @@
     </div>
 
     <div class="section" id="shipSection" style="display:none;">
-        <label><svg class="icon"><use href="#i-truck"/></svg> 4. Phiếu xin hàng theo từng cửa hàng nguồn (nhập số KG để tính phí ship)</label>
+        <label><svg class="icon"><use href="#i-truck"/></svg> Phiếu xin hàng theo từng cửa hàng nguồn (nhập số KG để tính phí ship)</label>
         <div id="shipCards"></div>
         <div class="grand-total" id="grandTotal" style="display:none;">
             <span>Tổng phí ship (tất cả cửa hàng)</span>
@@ -334,45 +360,49 @@
             <ol>
                 <li>Mở đường link này trên trình duyệt (Chrome, Safari...).</li>
                 <li>Bấm menu trình duyệt → "Thêm vào Màn hình chính" để mở nhanh như 1 ứng dụng.</li>
-            </ol>
-            <div class="guide-note">Luôn mở bằng đường link web, không tải file HTML về máy mở trực tiếp - mở file cục bộ sẽ không lưu được dữ liệu.</div>
-
-            <h3><span class="step-no">2</span> Tải dữ liệu tồn kho</h3>
-            <ol>
-                <li>Xuất file <b>InventoryPLU...csv</b> cho từng cửa hàng miền Nam cần so tồn (không cần xuất cửa hàng 1016 của mình).</li>
-                <li>Ở mục 1, bấm "Chọn tệp", chọn <b>tất cả các file cùng lúc</b> (giữ Ctrl/Cmd để chọn nhiều file).</li>
-                <li>Phần mềm tự đọc mã cửa hàng, tên cửa hàng, tồn kho (Close Qty), giá vốn (M.A.C), số bán trong kỳ (Sales Qty), GP% (COGS) - chỉ giữ lại đúng các cột cần để nhẹ máy.</li>
+                <li>Trang <b>tự tải dữ liệu tồn các cửa hàng</b> về máy - không cần tải file gì. Lần đầu có thể mất vài giây.</li>
             </ol>
 
-            <h3><span class="step-no">3</span> Kiểm tra tồn &amp; xin hàng</h3>
+            <h3><span class="step-no">2</span> Kiểm tra tồn &amp; xin hàng</h3>
             <ul>
-                <li>Ở mục 3, gõ tay mã sản phẩm rồi bấm "Thêm Vào Danh Sách" (hoặc Enter), hoặc bấm <b>"Quét Mã Vạch"</b> để dùng camera quét trực tiếp - lần đầu trình duyệt sẽ hỏi xin quyền Camera, chọn "Cho phép". Quét được liên tiếp nhiều mã mà không cần bấm lại nút.</li>
-                <li>Mỗi mã thêm vào sẽ hiện bảng so sánh tồn/giá vốn/SL bán kỳ/GP% của các cửa hàng, <b>xếp gần cửa hàng 1016 lên trước</b>.</li>
-                <li>Ở dòng cửa hàng muốn xin, nhập số lượng cần xin vào ô "SL xin".</li>
-                <li>Có thể thêm nhiều mã sản phẩm cùng lúc, xin từ nhiều cửa hàng khác nhau cho từng mã.</li>
+                <li>Gõ mã sản phẩm rồi bấm "Thêm Vào Danh Sách" (hoặc Enter), hoặc bấm <b>"Quét Mã Vạch"</b> để dùng camera - lần đầu chọn "Cho phép" camera. Quét được liên tiếp nhiều mã.</li>
+                <li>Mỗi mã hiện bảng tồn/giá vốn/SL bán kỳ/GP% các cửa hàng, <b>xếp gần cửa hàng 1016 lên trước</b>.</li>
+                <li>Nhập số lượng cần xin vào ô "SL xin" ở dòng cửa hàng muốn xin.</li>
             </ul>
 
-            <h3><span class="step-no">4</span> Tính phí vận chuyển Sagawa</h3>
+            <h3><span class="step-no">3</span> Tính phí Sagawa &amp; gửi yêu cầu</h3>
             <ul>
-                <li>Mục 4 tự gom danh sách theo từng cửa hàng nguồn đã chọn.</li>
-                <li>Nhập tổng số KG dự kiến của đơn hàng xin từ cửa hàng đó → tự tính phí theo Quận + phụ phí xăng dầu.</li>
-                <li>Bấm "Sao chép danh sách" để dán vào Zalo/tin nhắn khi liên hệ xin hàng.</li>
+                <li>Phần "Phiếu xin hàng" tự gom theo từng cửa hàng nguồn. Nhập tổng KG dự kiến → tự tính phí theo Quận + phụ phí xăng dầu.</li>
+                <li>Bấm "Sao chép danh sách" để dán vào Zalo/tin nhắn.</li>
+                <li>Danh sách xin hàng đang nhập chỉ lưu trên máy của bạn.</li>
             </ul>
 
-            <h3><span class="step-no">5</span> Dữ liệu được lưu ở đâu</h3>
+            <h3><span class="step-no">4</span> Số liệu mới nhất</h3>
             <ul>
-                <li>Tự lưu ngay trên thiết bị/trình duyệt đang dùng - tắt mở lại hay bấm F5 vẫn còn nguyên, kể cả danh sách xin hàng đang nhập dở.</li>
-                <li>Dữ liệu <b>không tự đồng bộ</b> sang máy khác. Muốn xoá hết để làm lại: bấm "Xoá Toàn Bộ Dữ Liệu Đã Lưu".</li>
+                <li>Mỗi khi quản lý cập nhật file, trang tự nhận khi mở lại hoặc quay lại trang. Muốn chắc chắn: bấm <b>"Đồng Bộ Ngay"</b>.</li>
+                <li>Ngày cập nhật của từng cửa hàng hiện ngay trên ô tên cửa hàng.</li>
+                <li>Mất mạng vẫn tra được bằng dữ liệu đã tải lần gần nhất.</li>
             </ul>
 
-            <h3><span class="step-no">6</span> Không mở được camera?</h3>
+            <h3><span class="step-no">5</span> Không mở được camera?</h3>
             <ul>
-                <li>Kiểm tra đã cấp quyền Camera cho trang web chưa (bấm vào icon ổ khoá cạnh thanh địa chỉ → Quyền → Camera → Cho phép).</li>
+                <li>Kiểm tra quyền Camera cho trang web (icon ổ khoá cạnh thanh địa chỉ → Quyền → Camera → Cho phép).</li>
                 <li>Tắt các icon nổi/quả bóng chat đang chạy trên máy vì có thể chặn hộp thoại xin quyền.</li>
-                <li>Phải mở bằng đường link web (HTTPS) - camera không hoạt động nếu mở file HTML tải về máy trực tiếp.</li>
             </ul>
+
+            <h3><span class="step-no">6</span> Quản lý cập nhật dữ liệu</h3>
+            <ul>
+                <li>Bấm "Chế độ quản lý" cuối trang → nhập mã quản lý.</li>
+                <li>Chọn các file <b>InventoryPLU...csv</b> (nhiều file cùng lúc) → trang tự tải lên, mọi máy tự nhận.</li>
+                <li>Sửa Quận/cự ly cửa hàng và bảng giá Sagawa ở mục Cấu hình - áp dụng cho mọi máy.</li>
+            </ul>
+            <div class="btn-row" style="margin-top:12px;">
+                <button class="ghost small" onclick="clearLocalData()"><svg class="icon"><use href="#i-trash"/></svg> Xoá dữ liệu trên máy này &amp; tải lại</button>
+            </div>
         </div>
     </div>
+
+    <div style="display:flex;justify-content:center;"><button class="link-btn" id="adminToggleBtn" onclick="toggleAdmin()"><svg class="icon" style="width:13px;height:13px;"><use href="#i-lock"/></svg> <span id="adminToggleLabel">Chế độ quản lý</span></button></div>
 </div>
 
 <script>
@@ -422,13 +452,41 @@ const KNOWN_STORES = {
     '1016': { name: 'Parc Mall (CH của bạn)', tier: 'dist8' }
 };
 
+// ===================== Đồng bộ dữ liệu dùng chung (Google Apps Script) =====================
+// XH_TOKEN phải khớp với XH_TOKEN trong Code.gs.
+const XH_TOKEN = 'kohnan1016-xinhang-2026';
+const CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbw_dtAap9x7uXUvQ2S8FK0fyVGxoEdDZXMY0Z0xfsoQ5vO0fld9CkttOzOV64HC6uq4oA/exec';
+// true ở bản online (GitHub Pages). false ở bản Artifact/file cục bộ (không gọi ra ngoài được).
+const CLOUD_SYNC_ENABLED = true;
+// Mã mở "Chế độ quản lý" (tải file tồn kho, sửa cấu hình Sagawa).
+const ADMIN_PIN = '1016';
+
+function isCloud() { return CLOUD_SYNC_ENABLED && !!CLOUD_API_URL; }
+
 const store = localforage.createInstance({ name: 'kohnan_xin_hang', storeName: 'xinhang_data' });
 
-let storeData = {};      // { storeCode: { name, period, count, items: { barcode: {name, qty, mac, salesQty, gp} } } }
+// storeData: { code: { name, period, count, updatedAt, rows: [[barcode, name, qty, mac, salesQty, gp], ...] } }
+let storeData = {};
+let idx = {};            // { code: { barcode: row } } - dựng lại từ storeData
+let names = {};          // { barcode: name }
 let tierOverride = {};   // { storeCode: tierKey }
 let cart = {};           // { barcode: { name, req: { storeCode: qty } } }
 let shipKg = {};         // { storeCode: kg }
 let settings = { homeStoreCode: '1016', fuelPct: 17, extraFee: 45000, baseKgLimit: 30 };
+let isAdmin = false;
+
+function buildIndex() {
+    idx = {}; names = {};
+    Object.keys(storeData).forEach(code => {
+        const m = {};
+        (storeData[code].rows || []).forEach(r => { m[r[0]] = r; if (!names[r[0]] && r[1]) names[r[0]] = r[1]; });
+        idx[code] = m;
+    });
+}
+function getItem(code, barcode) {
+    const r = idx[code] && idx[code][barcode];
+    return r ? { qty: r[2], mac: r[3], salesQty: r[4], gp: r[5] } : null;
+}
 
 async function checkStorageAvailable() {
     try {
@@ -444,9 +502,9 @@ function showStorageWarning(msg) {
 }
 function hideStorageWarning() { document.getElementById('storageWarning').style.display = 'none'; }
 
+// Lưu phần nhẹ (giỏ xin hàng, cấu hình) - gọi thường xuyên.
 async function persistAll() {
     try {
-        await store.setItem('storeData', storeData);
         await store.setItem('tierOverride', tierOverride);
         await store.setItem('cart', cart);
         await store.setItem('shipKg', shipKg);
@@ -454,40 +512,182 @@ async function persistAll() {
         hideStorageWarning();
     } catch (e) {
         console.warn('persist failed', e);
-        showStorageWarning('KHÔNG lưu được vào bộ nhớ trình duyệt (' + (e && e.message ? e.message : 'lỗi') + '). Dữ liệu có thể mất khi tải lại trang - hãy thử xoá bớt file cửa hàng đang tải, hoặc dùng trình duyệt khác.');
+        showStorageWarning('KHÔNG lưu được vào bộ nhớ trình duyệt (' + (e && e.message ? e.message : 'lỗi') + ').');
+    }
+}
+// Lưu phần nặng (dữ liệu tồn) - chỉ gọi khi dữ liệu tồn thay đổi.
+async function persistStores() {
+    try { await store.setItem('storeData2', storeData); hideStorageWarning(); }
+    catch (e) {
+        console.warn('persist stores failed', e);
+        showStorageWarning('KHÔNG lưu được dữ liệu tồn vào máy (' + (e && e.message ? e.message : 'lỗi') + '). Vẫn dùng được khi có mạng.');
     }
 }
 
+function renderAll() { renderStoreChips(); renderTierTable(); renderProductCards(); renderShipSection(); }
+
+function applyAdminUi() {
+    document.body.classList.toggle('admin', isAdmin);
+    document.getElementById('adminToggleLabel').innerText = isAdmin ? 'Thoát chế độ quản lý' : 'Chế độ quản lý';
+}
+function toggleAdmin() {
+    if (isAdmin) { isAdmin = false; }
+    else {
+        const pin = window.prompt('Nhập mã quản lý:');
+        if (pin === null) return;
+        if (String(pin).trim() !== ADMIN_PIN) { showToast('Sai mã quản lý!'); return; }
+        isAdmin = true;
+    }
+    try { localStorage.setItem('xh_admin', isAdmin ? '1' : '0'); } catch (e) {}
+    applyAdminUi();
+    renderStoreChips();
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
+    if (!isCloud()) { isAdmin = true; }
+    else { try { isAdmin = localStorage.getItem('xh_admin') === '1'; } catch (e) {} }
+    if (!isCloud()) document.getElementById('adminToggleBtn').style.display = 'none';
+    applyAdminUi();
+
     const available = await checkStorageAvailable();
     if (!available) {
-        showStorageWarning('Trình duyệt đang CHẶN lưu trữ dữ liệu trên thiết bị này - thường do mở ở chế độ Ẩn danh/Riêng tư. Hãy mở bằng tab thường để dữ liệu không mất khi tải lại trang.');
-        return;
+        showStorageWarning('Trình duyệt đang CHẶN lưu trữ dữ liệu trên thiết bị này - thường do mở ở chế độ Ẩn danh/Riêng tư. Trang vẫn tải dữ liệu từ máy chủ nhưng phải tải lại mỗi lần mở.');
+    } else {
+        try {
+            storeData = (await store.getItem('storeData2')) || {};
+            tierOverride = (await store.getItem('tierOverride')) || {};
+            cart = (await store.getItem('cart')) || {};
+            shipKg = (await store.getItem('shipKg')) || {};
+            const savedSettings = await store.getItem('settings');
+            if (savedSettings) settings = Object.assign(settings, savedSettings);
+            await store.removeItem('storeData'); // dọn định dạng cũ
+        } catch (e) { console.error('load failed', e); }
     }
-    try {
-        storeData = (await store.getItem('storeData')) || {};
-        tierOverride = (await store.getItem('tierOverride')) || {};
-        cart = (await store.getItem('cart')) || {};
-        shipKg = (await store.getItem('shipKg')) || {};
-        const savedSettings = await store.getItem('settings');
-        if (savedSettings) settings = Object.assign(settings, savedSettings);
-    } catch (e) { console.error('load failed', e); }
+    buildIndex();
+    fillSettingsInputs();
+    renderAll();
 
+    if (isCloud()) {
+        syncPull(false);
+        // Quay lại trang (mở lại app, chuyển tab) thì tự kiểm tra dữ liệu mới, tối đa 1 lần/phút.
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && Date.now() - lastSyncAt > 60000) syncPull(false);
+        });
+    } else {
+        const n = Object.keys(storeData).length;
+        setSyncStatus(n ? `Dữ liệu lưu trên máy này (${n} cửa hàng).` : 'Chưa có dữ liệu - tải file tồn kho ở mục bên dưới.', n ? 'ok' : '', n ? 'i-check' : null);
+    }
+});
+
+function fillSettingsInputs() {
     document.getElementById('homeStoreCode').value = settings.homeStoreCode;
     document.getElementById('fuelPct').value = settings.fuelPct;
     document.getElementById('extraFee').value = settings.extraFee;
     document.getElementById('baseKgLimit').value = settings.baseKgLimit;
+}
 
-    renderStoreChips();
-    renderTierTable();
-    renderProductCards();
-    renderShipSection();
+function setSyncStatus(msg, kind, iconId, spin) {
+    const el = document.getElementById('syncStatus');
+    el.className = 'sync-status' + (kind ? ' ' + kind : '');
+    const spinClass = spin ? ' spin' : '';
+    el.innerHTML = iconId ? `<svg class="icon${spinClass}" style="width:14px;height:14px;flex-shrink:0;"><use href="#${iconId}"/></svg> <span>${msg}</span>` : msg;
+}
+function fmtTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const p = n => String(n).padStart(2, '0');
+    return `${p(d.getHours())}:${p(d.getMinutes())} ${p(d.getDate())}/${p(d.getMonth() + 1)}`;
+}
 
-    const storeCount = Object.keys(storeData).length;
-    if (storeCount > 0) {
-        setStatus(`Đã khôi phục dữ liệu đã lưu (${storeCount} cửa hàng).`, 'ok', 'i-check');
+async function apiGet(params) {
+    const q = new URLSearchParams(Object.assign({ app: 'xh', _: Date.now() }, params)).toString();
+    const r = await fetch(CLOUD_API_URL + '?' + q);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r;
+}
+async function apiPost(body) {
+    const r = await fetch(CLOUD_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ app: 'xh', token: XH_TOKEN }, body))
+    });
+    const res = await r.json();
+    if (!res || !res.ok) throw new Error((res && res.error) || 'lỗi máy chủ');
+    return res;
+}
+async function gunzipBase64(b64) {
+    const bin = atob(b64.trim());
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return await new Response(stream).text();
+}
+async function downloadStore(code) {
+    if (typeof DecompressionStream !== 'undefined') {
+        const r = await apiGet({ action: 'store', code, gz: '1' });
+        const txt = await r.text();
+        if (txt.trim().charAt(0) === '{') { const j = JSON.parse(txt); throw new Error(j.error || 'lỗi'); }
+        return JSON.parse(await gunzipBase64(txt));
     }
-});
+    const res = await (await apiGet({ action: 'store', code })).json();
+    if (!res.ok) throw new Error(res.error || 'lỗi');
+    return res.data;
+}
+
+let syncing = false;
+let lastSyncAt = 0;
+async function syncPull(manual) {
+    if (!isCloud() || syncing) return;
+    syncing = true; lastSyncAt = Date.now();
+    if (manual || Object.keys(storeData).length === 0) setSyncStatus('Đang kiểm tra dữ liệu mới...', 'busy', 'i-loader', true);
+    try {
+        const meta = await (await apiGet({ action: 'meta' })).json();
+        if (!meta.ok) throw new Error(meta.error || 'lỗi');
+
+        if (meta.config) {
+            if (meta.config.settings) settings = Object.assign(settings, meta.config.settings);
+            if (meta.config.tierOverride) tierOverride = meta.config.tierOverride;
+            fillSettingsInputs();
+        }
+        const remote = meta.stores || {};
+        let changed = false;
+        Object.keys(storeData).forEach(c => { if (!remote[c]) { delete storeData[c]; changed = true; } });
+        const need = Object.keys(remote).filter(c => !storeData[c] || storeData[c].updatedAt !== remote[c].updatedAt);
+        let i = 0, failed = 0;
+        for (const code of need) {
+            i++;
+            setSyncStatus(`Đang tải dữ liệu mới: ${escapeHtml(remote[code].name || code)} (${i}/${need.length})...`, 'busy', 'i-loader', true);
+            try {
+                const d = await downloadStore(code);
+                storeData[code] = { name: d.name || remote[code].name, period: d.period || '', count: (d.rows || []).length, updatedAt: remote[code].updatedAt, rows: d.rows || [] };
+                changed = true;
+            } catch (e) { console.error('download store failed', code, e); failed++; }
+        }
+        if (changed) { buildIndex(); await persistStores(); }
+        await persistAll();
+        renderAll();
+
+        const n = Object.keys(storeData).length;
+        if (n === 0) setSyncStatus('Chưa có dữ liệu nào trên máy chủ - quản lý cần tải file tồn kho lên.', 'err', 'i-alert');
+        else if (failed) setSyncStatus(`Tải lỗi ${failed} cửa hàng (mạng yếu?) - bấm "Đồng Bộ Ngay" để thử lại.`, 'err', 'i-alert');
+        else setSyncStatus(`Dữ liệu mới nhất (${n} cửa hàng)${need.length ? ' - vừa cập nhật ' + need.length + ' cửa hàng' : ''}.`, 'ok', 'i-check');
+    } catch (e) {
+        console.error('sync failed', e);
+        const n = Object.keys(storeData).length;
+        setSyncStatus(n ? `Không kết nối được máy chủ - đang dùng dữ liệu đã lưu trên máy (${n} cửa hàng).` : 'Không kết nối được máy chủ - kiểm tra mạng rồi bấm "Đồng Bộ Ngay".', 'err', 'i-alert');
+    } finally { syncing = false; }
+}
+
+// Quản lý: đẩy cấu hình (Sagawa + Quận từng CH) lên cho mọi máy - gom thay đổi trong 1 giây.
+let configTimer = null;
+function pushConfigSoon() {
+    if (!isCloud() || !isAdmin) return;
+    clearTimeout(configTimer);
+    configTimer = setTimeout(async () => {
+        try { await apiPost({ action: 'pushConfig', config: { settings, tierOverride } }); showToast('Đã lưu cấu hình cho mọi máy', true); }
+        catch (e) { showToast('Không lưu được cấu hình lên máy chủ: ' + e.message); }
+    }, 1000);
+}
 
 function tierKeyFor(storeCode) {
     if (tierOverride[storeCode]) return tierOverride[storeCode];
@@ -501,12 +701,13 @@ function storeLabel(storeCode) {
 }
 function isHomeStore(storeCode) { return String(storeCode) === String(settings.homeStoreCode).trim(); }
 
-// ===================== Upload & parse =====================
+// ===================== Upload & parse (quản lý) =====================
 document.getElementById('invFiles').addEventListener('change', function (e) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setStatus(`Đang đọc ${files.length} file...`, 'busy', 'i-loader', true);
-    let done = 0, okCount = 0, errCount = 0;
+    let done = 0, errCount = 0;
+    const parsed = []; // [{code, store}]
     files.forEach(file => {
         const fname = file.name.toLowerCase();
         const isExcel = fname.endsWith('.xlsx') || fname.endsWith('.xls');
@@ -518,8 +719,7 @@ document.getElementById('invFiles').addEventListener('change', function (e) {
                     const wb = XLSX.read(data, { type: 'array' });
                     const ws = wb.Sheets[wb.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-                    ingestRows(rows, file.name);
-                    okCount++;
+                    parsed.push(ingestRows(rows, file.name));
                 } catch (err) { console.error(err); errCount++; }
                 finishOne();
             };
@@ -529,7 +729,7 @@ document.getElementById('invFiles').addEventListener('change', function (e) {
             Papa.parse(file, {
                 header: true, delimiter: ',', skipEmptyLines: true,
                 complete: function (results) {
-                    try { ingestRows(results.data, file.name); okCount++; }
+                    try { parsed.push(ingestRows(results.data, file.name)); }
                     catch (err) { console.error(err); errCount++; }
                     finishOne();
                 },
@@ -537,28 +737,46 @@ document.getElementById('invFiles').addEventListener('change', function (e) {
             });
         }
     });
-    function finishOne() {
+    async function finishOne() {
         done++;
-        if (done === files.length) {
-            persistAll().then(() => {
-                renderStoreChips();
-                renderTierTable();
-                renderProductCards();
-                renderShipSection();
-                if (errCount === 0) setStatus(`Đã tải xong ${okCount} file thành công!`, 'ok', 'i-check');
-                else setStatus(`Đã tải ${okCount} file, ${errCount} file lỗi (sai định dạng?).`, 'err', 'i-alert');
-            });
+        if (done < files.length) return;
+        const now = new Date().toISOString();
+        parsed.forEach(p => { storeData[p.code] = Object.assign({ updatedAt: now }, p.store); });
+        buildIndex();
+        await persistStores();
+        renderAll();
+        const errNote = errCount ? `, ${errCount} file lỗi (sai định dạng?)` : '';
+        if (!isCloud()) {
+            setStatus(`Đã tải xong ${parsed.length} file${errNote}.`, errCount ? 'err' : 'ok', errCount ? 'i-alert' : 'i-check');
+            return;
         }
+        // Đẩy từng cửa hàng lên máy chủ
+        let ok = 0; const fail = [];
+        for (const p of parsed) {
+            setStatus(`Đang tải lên máy chủ: ${escapeHtml(storeLabel(p.code))} (${ok + fail.length + 1}/${parsed.length})...`, 'busy', 'i-loader', true);
+            try {
+                const res = await apiPost({ action: 'pushStore', code: p.code, store: p.store });
+                storeData[p.code].updatedAt = res.updatedAt;
+                ok++;
+            } catch (err) { console.error('push failed', p.code, err); fail.push(storeLabel(p.code) + ': ' + err.message); }
+        }
+        await persistStores();
+        renderStoreChips();
+        if (fail.length) setStatus(`Đã đồng bộ ${ok}/${parsed.length} cửa hàng. Lỗi: ${escapeHtml(fail.join('; '))}`, 'err', 'i-alert');
+        else setStatus(`Đã cập nhật ${ok} cửa hàng cho mọi máy${errNote}.`, errCount ? 'err' : 'ok', errCount ? 'i-alert' : 'i-check');
+        setSyncStatus(`Dữ liệu mới nhất (${Object.keys(storeData).length} cửa hàng).`, 'ok', 'i-check');
     }
     e.target.value = '';
 });
 
 function num(v) { const n = Number(v); return isNaN(n) ? 0 : n; }
 
+// Chỉ giữ mã có tồn hoặc có bán trong kỳ (mã tồn 0 & không bán thì không xin được) để dữ liệu nhẹ.
 function ingestRows(rows, fname) {
-    if (!rows || rows.length === 0) return;
+    if (!rows || rows.length === 0) throw new Error('File rỗng ' + fname);
     let storeCode = null, storeName = null, period = null;
-    const items = {};
+    const out = [];
+    const seen = new Set();
     rows.forEach(r => {
         if (!r) return;
         const barcode = String(r['Barcode'] || '').trim();
@@ -568,43 +786,47 @@ function ingestRows(rows, fname) {
             storeName = String(r['Store Name'] || '').trim();
             period = String(r['Target Month'] || '').trim();
         }
-        items[barcode] = {
-            name: r['Product Name'] || '',
-            qty: num(r['Close Qty']),
-            mac: num(r['M.A.C']),
-            salesQty: num(r['Sales Qty']),
-            gp: num(r['G.P.%(COGS)'])
-        };
+        const qty = num(r['Close Qty']), sales = num(r['Sales Qty']);
+        if (qty === 0 && sales === 0) return;
+        if (seen.has(barcode)) return;
+        seen.add(barcode);
+        out.push([barcode, String(r['Product Name'] || '').trim(), qty, num(r['M.A.C']), sales, Math.round(num(r['G.P.%(COGS)']) * 100) / 100]);
     });
     if (!storeCode) { throw new Error('Không nhận diện được mã cửa hàng trong file ' + fname); }
-    storeData[storeCode] = { name: storeName || (KNOWN_STORES[storeCode] ? KNOWN_STORES[storeCode].name : storeCode), period, count: Object.keys(items).length, items };
+    return { code: storeCode, store: { name: storeName || (KNOWN_STORES[storeCode] ? KNOWN_STORES[storeCode].name : storeCode), period, count: out.length, rows: out } };
 }
 
-function removeStore(storeCode) {
+async function removeStore(storeCode) {
+    if (!window.confirm(`Xoá dữ liệu cửa hàng ${storeLabel(storeCode)} (${storeCode})${isCloud() ? ' trên MỌI máy' : ''}?`)) return;
+    if (isCloud()) {
+        try { await apiPost({ action: 'removeStore', code: storeCode }); }
+        catch (e) { showToast('Không xoá được trên máy chủ: ' + e.message); return; }
+    }
     delete storeData[storeCode];
-    persistAll().then(() => { renderStoreChips(); renderTierTable(); renderProductCards(); renderShipSection(); });
+    buildIndex();
+    await persistStores();
+    renderAll();
 }
 
-async function clearAllData() {
+// Chỉ xoá dữ liệu trên máy này rồi tải lại từ máy chủ (không ảnh hưởng máy khác).
+async function clearLocalData() {
     storeData = {}; tierOverride = {}; cart = {}; shipKg = {};
-    await store.clear();
+    try { await store.clear(); } catch (e) {}
     settings = { homeStoreCode: '1016', fuelPct: 17, extraFee: 45000, baseKgLimit: 30 };
-    document.getElementById('homeStoreCode').value = settings.homeStoreCode;
-    document.getElementById('fuelPct').value = settings.fuelPct;
-    document.getElementById('extraFee').value = settings.extraFee;
-    document.getElementById('baseKgLimit').value = settings.baseKgLimit;
-    renderStoreChips(); renderTierTable(); renderProductCards(); renderShipSection();
-    setStatus('Đã xoá toàn bộ dữ liệu đã lưu.', 'ok', 'i-check');
+    buildIndex(); fillSettingsInputs(); renderAll();
+    if (isCloud()) syncPull(true);
+    else setSyncStatus('Đã xoá dữ liệu trên máy này.', 'ok', 'i-check');
 }
 
 function renderStoreChips() {
     const wrap = document.getElementById('storeChipRow');
-    const codes = Object.keys(storeData);
+    const codes = Object.keys(storeData).sort((a, b) => TIERS[tierKeyFor(a)].km - TIERS[tierKeyFor(b)].km);
     if (codes.length === 0) { wrap.innerHTML = ''; return; }
     wrap.innerHTML = codes.map(code => {
         const sd = storeData[code];
         const home = isHomeStore(code);
-        return `<div class="store-chip${home ? ' home' : ''}">${escapeHtml(storeLabel(code))} (${escapeHtml(code)}) - <span class="cnt">${sd.count.toLocaleString('vi-VN')}</span> mã${sd.period ? ' - kỳ ' + sd.period : ''}<button onclick="removeStore('${code}')">Xoá</button></div>`;
+        const del = isAdmin ? `<button onclick="removeStore('${code}')">Xoá</button>` : '';
+        return `<div class="store-chip${home ? ' home' : ''}"><span>${escapeHtml(storeLabel(code))} (${escapeHtml(code)}) - <span class="cnt">${num(sd.count).toLocaleString('vi-VN')}</span> mã${sd.period ? ' - kỳ ' + escapeHtml(sd.period) : ''}<br><span class="upd">Cập nhật ${fmtTime(sd.updatedAt)}</span></span>${del}</div>`;
     }).join('');
 }
 
@@ -615,6 +837,7 @@ function onSettingsChange() {
     settings.extraFee = num(document.getElementById('extraFee').value);
     settings.baseKgLimit = num(document.getElementById('baseKgLimit').value) || 30;
     persistAll();
+    pushConfigSoon();
     renderStoreChips();
     renderProductCards();
     renderShipSection();
@@ -623,6 +846,7 @@ function onSettingsChange() {
 function onTierChange(storeCode, val) {
     tierOverride[storeCode] = val;
     persistAll();
+    pushConfigSoon();
     renderTierTable();
     renderProductCards();
     renderShipSection();
@@ -704,10 +928,9 @@ function addProduct() {
     const input = document.getElementById('addCodeInput');
     const code = input.value.trim();
     if (!code) { showToast('Vui lòng nhập mã sản phẩm!'); return; }
-    if (Object.keys(storeData).length === 0) { showToast('Hãy tải file tồn kho ở mục 1 trước!'); return; }
-    let name = null;
-    Object.values(storeData).forEach(sd => { if (!name && sd.items[code]) name = sd.items[code].name; });
-    if (!name) { showToast('Không tìm thấy mã này trong dữ liệu đã tải!'); return; }
+    if (Object.keys(storeData).length === 0) { showToast(isCloud() ? 'Chưa có dữ liệu - bấm "Đồng Bộ Ngay"!' : 'Hãy tải file tồn kho trước!'); return; }
+    const name = names[code];
+    if (!name) { showToast('Không tìm thấy mã này (hoặc tất cả cửa hàng đều hết hàng)!'); return; }
     if (!cart[code]) cart[code] = { name, req: {} };
     persistAll().then(() => { renderProductCards(); renderShipSection(); });
     input.value = '';
@@ -737,13 +960,12 @@ function renderProductCards() {
         const c = cart[code];
         const storeCodes = Object.keys(storeData).sort((a, b) => TIERS[tierKeyFor(a)].km - TIERS[tierKeyFor(b)].km);
         const rows = storeCodes.map(sc => {
-            const sd = storeData[sc];
-            const item = sd.items[code];
+            const item = getItem(sc, code);
             const home = isHomeStore(sc);
             const t = TIERS[tierKeyFor(sc)];
             const reqVal = (c.req && c.req[sc]) || '';
             if (!item) {
-                return `<tr class="no-data${home ? ' home-row' : ''}"><td class="storecell">${escapeHtml(storeLabel(sc))}<span class="km">${home ? 'CH của bạn' : t.km + ' km'}</span></td><td colspan="4" style="text-align:center;">Không có dữ liệu mã này</td><td>-</td></tr>`;
+                return `<tr class="no-data${home ? ' home-row' : ''}"><td class="storecell">${escapeHtml(storeLabel(sc))}<span class="km">${home ? 'CH của bạn' : t.km + ' km'}</span></td><td colspan="4" style="text-align:center;">Tồn 0 - không bán trong kỳ</td><td>-</td></tr>`;
             }
             return `<tr${home ? ' class="home-row"' : ''}>
                 <td class="storecell">${escapeHtml(storeLabel(sc))}<span class="km">${home ? 'CH của bạn' : t.km + ' km'}</span></td>
@@ -867,14 +1089,17 @@ function setStatus(msg, kind, iconId, spin) {
 function escapeHtml(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
-function showToast(msg) {
+function showToast(msg, ok) {
     const existing = document.getElementById('customToast');
     if (existing) existing.remove();
     const el = document.createElement('div');
     el.id = 'customToast';
     el.className = 'toast';
+    if (ok) el.style.background = 'var(--success)';
     el.innerHTML = `<svg class="icon" style="width:16px;height:16px;stroke:white;"><use href="#i-alert"/></svg> ${msg}`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 2500);
 }
 </script>
+</body>
+</html>
