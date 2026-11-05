@@ -53,61 +53,8 @@
     }
   }
 
-  /* =================== 1. TỔNG QUAN =================== */
-  function renderOv() {
-    var iso = UI.date, o = M.overview(iso), h = head(1, "Tổng quan điều hành", "Ngày " + U.dmy(iso) + (o.note ? ' · <b style="color:var(--kred)">📌 ' + E(o.note) + "</b>" : "") + " - mỗi số liệu ghi rõ nguồn.");
-    var saleBudget = o.sale && o.sale.budgetByDate && o.sale.budgetByDate[iso];
-    var planBudget = window.S1016_BUDGET_2026 && window.S1016_BUDGET_2026.byDate;
-    var hasSaleBudget = Number.isFinite(saleBudget) && saleBudget > 0;
-    var target = hasSaleBudget ? saleBudget : o.budgetDay;
-    if (!Number.isFinite(target) && planBudget && Number.isFinite(planBudget[iso])) target = planBudget[iso] * 1000;
-    var targetCard = kpi("Target ngày cửa hàng", Number.isFinite(target) ? U.fmtVnd(target) : "Chưa có target", "Chưa thuế · " + U.dmy(iso), srcTag(hasSaleBudget ? "SALE" : "BUDGET"));
-    var k = [];
-    // nhân sự
-    if (o.shifts) {
-      var on = o.shifts.filter(function (s) { return s.kind === "shift"; }), act = on.filter(function (s) { return M.isActive(s, iso); });
-      k.push(kpi("Nhân sự trong ngày", on.length + " người", (iso === U.todayIso() ? act.length + " người đang trong ca · " : "") + o.shifts.filter(function (s) { return s.kind !== "shift"; }).length + " nghỉ", srcTag("LICH")));
-    } else k.push(kpi("Nhân sự trong ngày", "Chưa có dữ liệu", "Mở công cụ Lịch làm việc (bản có cầu nối)", srcTag("LICH"), true));
-    var ts = o.taskStats;
-    k.push(kpi("Công việc", ts.done + "/" + ts.total, ts.doing + " đang làm · <b style='color:var(--bad)'>" + ts.overdue + " quá hạn</b> · " + ts.unassigned + " chưa phân công", srcTag("TA")));
-    // push
-    var pp = Object.keys(o.push.pm.products);
-    if (pp.length) {
-      var pd = pp.map(function (pid) { var p = o.push.pm.products[pid], d = o.push.day.team[pid], m = o.push.mtd.team[pid]; return "<b>" + E(p.label) + "</b>: hôm nay " + U.fmt1(d.actual) + "/" + U.fmt1(d.dayTarget) + " · lũy kế " + U.fmt1(m.actual) + "/" + U.fmtInt(m.target) + " (" + U.fmtPct(U.pct(m.actual, m.target)) + ")"; }).join("<br>");
-      var p0 = o.push.mtd.team[pp[0]];
-      k.push(kpi("Push Sale " + ymLabel(iso.slice(0, 7)), U.fmtPct(U.pct(p0.actual, p0.target)), pd, o.push.pm.sources.map(function (s) { return srcTag(s.id); }).join("<br>")));
-    } else k.push(kpi("Push Sale", "Chưa có dữ liệu", "Chưa có tracker nào của tháng này trong trình duyệt", "", true));
-    // sale
-    if (o.saleDay) k.push(kpi("Doanh số ngày (chưa thuế)", U.fmtM(o.saleDay.revenue), (o.sale.budgetByDate[iso] ? "Budget " + U.fmtM(o.sale.budgetByDate[iso]) + " · đạt " + U.fmtPct(U.pct(o.saleDay.revenue, o.sale.budgetByDate[iso])) : "") + (o.sale.attainment ? "<br>Lũy kế tháng " + U.fmtPct(o.sale.attainment.attainmentPct) + " Budget đến " + U.dmy(o.sale.attainment.dateMax || o.sale.totals.dateMax) : ""), srcTag("SALE")));
-    else k.push(kpi("Doanh số ngày", "Chưa có dữ liệu", (o.budgetDay != null ? "Budget ngày (chưa thuế): <b>" + U.fmtVnd(o.budgetDay) + "</b><br>" + srcTag("BUDGET") : "") + (o.sale ? "<br>Dashboard Sale đã có số đến " + U.dmy(o.sale.totals.dateMax) : ""), o.sale ? srcTag("SALE") : "", true));
-    // kho
-    if (o.kho) k.push(kpi("Kho & đặt hàng", o.kho.counts.oos + " hết · " + o.kho.counts.low + " sắp hết", o.kho.counts.recPositive + " mã đề xuất đặt · tồn tháng " + E(o.kho.latestMonth) + (o.kho.forgot ? " · " + Object.keys(o.kho.forgotRows).length + " SKU quên đặt cần giải trình" : ""), srcTag("KHO")));
-    else k.push(kpi("Kho & đặt hàng", "Chưa có dữ liệu", "Mở OrderIQ (bản có cầu nối)", srcTag("KHO"), true));
-    h += '<div class="grid">' + k.join("") + "</div>";
-    // nhân sự đang làm
-    var staffHtml = none("Chưa có lịch ca cho ngày này.");
-    if (o.shifts && o.shifts.length) {
-      var groups = { day: [], evening: [], night: [], off: [] };
-      o.shifts.forEach(function (s) { (s.kind === "shift" ? groups[s.bucket] : groups.off).push(s); });
-      staffHtml = ["day", "evening", "night", "off"].filter(function (b) { return groups[b].length; }).map(function (b) {
-        return '<div style="margin-bottom:8px"><b class="small" style="color:var(--navy)">' + (b === "off" ? "Nghỉ" : M.BUCKET[b]) + " · " + groups[b].length + "</b><br>" + groups[b].map(function (s) { return '<span class="tag ' + (b === "off" ? "grey" : "") + '" style="margin:2px 3px 0 0">' + E(s.name) + " · " + E(s.raw) + (M.isActive(s, iso) ? " ●" : "") + "</span>"; }).join("") + "</div>";
-      }).join("");
-    }
-    // cảnh báo
-    var al = [];
-    S.sources.forEach(function (s) { var st = S.sync[s.id] || {}; if (st.status === "fail") al.push('<div class="badbox">Nguồn <b>' + E(s.name) + "</b> đồng bộ thất bại: " + E(st.lastError || "") + (S.data[s.id] ? " - đang hiện dữ liệu cũ." : "") + "</div>"); });
-    o.tasks.filter(function (t) { return t.overdue; }).slice(0, 8).forEach(function (t) { al.push('<div class="badbox">Quá hạn: <b>' + E(t.title) + "</b>" + (t.assignee ? " - " + E(t.assignee) : " - chưa phân công") + "</div>"); });
-    var offSet = {}; (o.shifts || []).forEach(function (s) { if (s.kind !== "shift") offSet[U.normName(s.name)] = s.raw; });
-    o.tasks.forEach(function (t) { if (t.assignee && offSet[U.normName(t.assignee)] && t.status !== "done") al.push('<div class="warnbox">Phân công chồng chéo: <b>' + E(t.title) + "</b> giao cho " + E(t.assignee) + " nhưng người này " + E(offSet[U.normName(t.assignee)]) + " ngày " + U.dm(iso) + ".</div>"); });
-    if (ts.unassigned) al.push('<div class="warnbox">' + ts.unassigned + ' công việc chưa phân công. <button class="btn sm" data-act="goto" data-tab="task">Phân công</button></div>');
-    if (o.push.pm.conflicts.length) al.push('<div class="warnbox">' + o.push.pm.conflicts.length + " kết quả Push Sale lệch giữa các tracker - xem mục Push Sale.</div>");
-    if (o.kho && o.kho.forgot) { var nr = Object.keys(o.kho.forgotRows).filter(function (x) { var r = o.kho.forgotRows[x]; return !r.reason && !r.reasonCode; }).length; if (nr) al.push('<div class="warnbox">' + nr + " SKU quên đặt chưa có lý do giải trình (OrderIQ).</div>"); }
-    var hand = o.tasks.filter(function (t) { return ["done", "moved", "cancelled"].indexOf(t.status) < 0; });
-    h += '<div class="grid g2" style="margin-top:14px"><div class="card"><h3 style="margin-top:0">Nhân sự theo ca</h3>' + staffHtml + srcTag("LICH") + '</div><div class="card"><h3 style="margin-top:0">Cảnh báo & việc cần xử lý</h3>' + (al.join("") || '<div class="empty">Không có cảnh báo.</div>') + "</div></div>";
-    h += '<div class="card" style="margin-top:14px"><h3 style="margin-top:0">Vấn đề chưa giải quyết & nội dung cần bàn giao (' + hand.length + ')</h3>' + (hand.length ? '<div class="tbl"><table><thead><tr><th>Công việc</th><th>Phụ trách</th><th>Trạng thái</th><th>Lý do</th></tr></thead><tbody>' +
-      hand.map(function (t) { return "<tr><td>" + E(t.title) + "</td><td>" + (t.assignee ? E(t.assignee) : '<span class="tag warn">Chưa phân công</span>') + "</td><td>" + (t.overdue ? '<span class="tag bad">Quá hạn</span> ' : "") + E(M.STATUS[t.status]) + "</td><td>" + E(t.reason || "-") + "</td></tr>"; }).join("") + "</tbody></table></div>" : none("Không có việc tồn.")) + "</div>";
-    $("m-ov").innerHTML = '<div class="grid">' + targetCard + '</div>' + S.workflow.html(iso) + '<details class="wf-legacy"><summary>Tổng quan chi tiết cũ (giữ nguyên số liệu và cảnh báo nguồn)</summary>' + h + '</details>';
-  }
+  /* =================== 1. HÔM NAY (bảng điều hành - s1016-home.js) =================== */
+  function renderOv() { $("m-ov").innerHTML = S.home.overview(UI.date); S.home.after(); }
 
   /* =================== 2. LỊCH & NHÂN SỰ =================== */
   function shiftCls(s) { return s.kind === "shift" ? (s.bucket === "evening" ? "bad" : s.bucket === "night" ? "" : "ok") : "grey"; }
@@ -355,22 +302,7 @@
     [/2026-09_GD2_Tracker/i, ["PS_T9_GD2"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_SEPT_2026_GD2_V1"], [/2026-09_GD1_Tracker/i, ["PS_T9_GD1"], "localStorage TEAM_ADMIN_POS_PUSH_SALE_SEPT_2026_V1"],
     [/sweet-gumption|Check_Ton_Gia_KM/i, ["CHECK_TON"], "localStorage trên origin Netlify (khác origin)"], [/xinhangmiennam|Xin_Hang_Lien/i, ["XIN_HANG"], "Origin Netlify (khác origin)"], [/Check_Ca_Cham_Cong/i, ["CHAM_CONG"], "Không lưu - xử lý file tạm"]];
   function toolSources(t) { var s = (t.href || "") + " " + (t.local || ""); for (var i = 0; i < TOOL_MAP.length; i++) if (TOOL_MAP[i][0].test(s)) return TOOL_MAP[i]; return null; }
-  function renderTools() {
-    var reg = window.S1016_TOOLS || { tools: [] }, h = head(8, "Trung tâm link công cụ", reg.tools.length + " công cụ lấy từ Trang chủ link tổng hợp (trích " + U.hm(reg.extractedAt) + "). <b>Mở được link ≠ đọc/ghi được dữ liệu</b> - cột trạng thái cho biết công cụ nào thực sự đã kết nối.");
-    var groups = {}; reg.tools.forEach(function (t) { (groups[t.group] = groups[t.group] || []).push(t); });
-    h += Object.keys(groups).map(function (g) {
-      return "<h3>" + E(g) + '</h3><div class="grid">' + groups[g].map(function (t) {
-        var m = toolSources(t), sts = m ? m[1].map(function (id) { return S.sync[id] || {}; }) : [];
-        var st = m ? statusTag(sts[0].status) : '<span class="tag grey">Chỉ mở link</span>';
-        var last = m ? sts.map(function (x) { return x.lastOk; }).filter(Boolean).sort().pop() : null;
-        var srcObj = m ? S.sourceById(m[1][0]) : null;
-        return '<div class="card toolcard"><div class="nm">' + E(t.name) + '</div><div class="small muted">' + E(t.desc) + '</div><div class="links">' + (/^https?:/.test(t.href || "") ? '<a class="btn sm" target="_blank" rel="noopener" href="' + E(t.href) + '">Mở ' + E(t.host || "GitHub") + "</a>" : '<span class="tag grey">Chỉ lưu trên máy (không đưa lên GitHub)</span>') + "</div>" +
-          '<div class="small"><b>Trạng thái dữ liệu:</b> ' + st + (last ? " · đồng bộ " + U.hm(last) : "") + "</div>" + (m ? '<div class="small"><b>Nguồn dữ liệu:</b> ' + E(m[2]) + "</div>" : '<div class="small muted">Tài liệu/báo cáo tĩnh - không có dữ liệu cần tổng hợp.</div>') +
-          (srcObj && srcObj.how ? '<div class="small"><b>Cách cập nhật:</b> ' + E(srcObj.how) + "</div>" : "") + '<div class="small muted">Cập nhật file: ' + E(t.updated || "-") + "</div></div>";
-      }).join("") + "</div>";
-    }).join("");
-    $("m-tools").innerHTML = h;
-  }
+  function renderTools() { $("m-tools").innerHTML = S.home.tools(); S.home.afterTools(); }
 
   /* =================== 9. NGUỒN DỮ LIỆU =================== */
   function modeLabel(st, src) { var m = st.mode || src.mode; return { local: "Trực tiếp (cùng origin)", "import": "Gói nhập (file JSON)", bundled: "Bản trích tĩnh", link: "Chỉ mở link", cloud: "Đám mây", fileOnly: "Chỉ nhập file", "local+import": "Trực tiếp + gói nhập" }[m] || (m || "-"); }
@@ -417,6 +349,7 @@
     try { R[UI.tab](); } catch (e) { console.error(e); $("m-" + UI.tab).innerHTML = '<div class="badbox">Lỗi hiển thị: ' + E(e.message) + "</div>"; }
   }
   UI.render = render;
+  UI.h = { srcTag: srcTag, kpi: kpi, none: none, statusTag: statusTag };
   var rt = null; function soon() { clearTimeout(rt); rt = setTimeout(function () { var a = document.activeElement; if (document.querySelector(".wf details[open]")) { renderHero(); return; } if (a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT" || a.tagName === "SELECT") && a.closest("section.mod")) { renderHero(); return; } render(); }, 120); }
   S.on("sync", soon); S.on("data", soon); S.on("state", soon);
   S.on("error", function (e) { toast(e.where + ": " + e.message, "bad"); });
