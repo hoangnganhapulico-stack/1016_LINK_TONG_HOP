@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OrderIQ Kho Đặt hàng V2.8.1 · PARC MALL 1016</title>
+<title>OrderIQ Kho Đặt hàng V2.12 · PARC MALL 1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -374,8 +374,8 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 .neg-bulk .nb-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .neg-bulk label{display:flex;gap:4px;align-items:center}
 .row-sel td{background:#e8f0fa!important}
-.bc-mini{display:inline-block;background:#fff;padding:2px;cursor:zoom-in;line-height:0;border-radius:2px}.bc-mini svg{max-width:150px;height:auto}
-.m-bc{background:#fff;padding:4px;margin-top:4px;line-height:0}.m-bc svg{max-width:230px;height:auto;cursor:zoom-in}
+.bc-ico{cursor:pointer;color:var(--accent,#0039a6);font-size:13px;padding:0 2px}.bc-ico:hover{color:#e8082c}
+.bc-mini{display:inline-block;background:#fff;padding:2px;cursor:zoom-in;line-height:0}.bc-mini svg{max-width:150px;height:auto}
 </style>
 </head>
 <body>
@@ -399,6 +399,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
       <div class="nav-it" data-pg="promo" onclick="goto('promo')"><span class="ico">🏷️</span><span>Khuyến mãi / Mix-Bundle</span><span class="nav-badge" id="badge-promo" style="background:#c2410c">0</span></div>
       <div class="nav-it" data-pg="consign" onclick="goto('consign')"><span class="ico">🔄</span><span>Hàng ký gửi</span><span class="nav-badge" id="badge-cons" style="background:#6741d9">0</span></div>
       <div class="nav-it" data-pg="poopen" onclick="goto('poopen')"><span class="ico">🚚</span><span>PO đang về / quá hạn</span><span class="nav-badge" id="badge-overdue">0</span></div>
+      <div class="nav-it" data-pg="poab" onclick="goto('poab')"><span class="ico">🚩</span><span>PO bất thường</span><span class="nav-badge" id="badge-poab">0</span></div>
     </div>
     <div class="nav-sec">
       <div class="nav-lbl">Cài đặt</div>
@@ -762,6 +763,33 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
   <!-- V2.7: THEO DÕI TỪNG PO -->
   
 
+  <!-- V2.12: PO BẤT THƯỜNG -->
+  <div class="page fade" id="pg-poab">
+    <div class="alert a-disc"><span>🚩</span><div><b>Kiểm mọi PO đang mở (chưa nhận) - kể cả đã duyệt / đã gửi NCC, PO MD phân bổ và PO chưa duyệt</b> để kịp báo sửa trước khi NCC giao. Một dòng bị cảnh báo khi: mã đang hạn chế / ngừng đặt · mã không có sức bán · tồn + đang về đủ bán quá lâu · SL gấp nhiều lần các lần đặt trước · giá vốn PO lệch · mã có ở nhiều PO · SL ít bất thường. Cấp PO: giá trị PO gấp nhiều lần PO thường của NCC. Bấm <b>✅ Xác nhận</b> để ghi <b>Đúng</b> (kèm lý do) hoặc <b>Cần điều chỉnh</b>; PO đổi SL / giá sau khi xác nhận sẽ tự hiện lại "xác nhận lại".<div class="sm muted" id="pa-par" style="margin-top:4px"></div><div id="pa-info" style="margin-top:4px"></div></div></div>
+    <div class="stats-grid five" id="pa-kpi"></div>
+    <div class="filters">
+      <div class="search"><span>🔍</span><input type="text" id="pa-q" placeholder="Tìm PO, barcode, tên hàng, NCC, người duyệt..." oninput="paRerender()"></div>
+      <select id="pa-st" onchange="paRerender()"><option value="todo">⏳ Chưa xác nhận / cần xác nhận lại</option><option value="">Mọi trạng thái xác nhận</option><option value="ok">✅ Đã xác nhận đúng</option><option value="fix">✏️ Cần điều chỉnh</option></select>
+      <select id="pa-lvl" onchange="paRerender()"><option value="">Mọi mức</option><option value="red">🔴 Cao</option><option value="orange">🟠 Xem lại</option></select>
+      <select id="pa-f" onchange="paRerender()"><option value="">Mọi loại bất thường</option><option value="restr">Mã đang hạn chế / ngừng đặt</option><option value="nosale">Mã không có sức bán</option><option value="cover">Đủ bán quá lâu sau khi về</option><option value="xhist">SL gấp nhiều lần các lần đặt trước</option><option value="cost">Giá vốn PO lệch</option><option value="povalue">Giá trị PO cao bất thường so với NCC</option><option value="dup">Mã có ở nhiều PO đang mở</option><option value="low">SL đặt ít bất thường</option><option value="newsku">Mã chưa có trong tồn kho</option></select>
+      <select id="pa-type" onchange="paRerender()"><option value="">Mọi loại PO</option><option value="store">🏪 Cửa hàng tự đặt</option><option value="md">🏢 MD phân bổ</option><option value="supply">📦 Supply (600)</option></select>
+      <select id="pa-when" onchange="paRerender()"><option value="">Mọi ngày về</option><option value="week">Về trong 7 ngày (gồm quá hạn)</option><option value="late">Quá hạn giao</option><option value="appr">PO đã duyệt / đã gửi</option><option value="unappr">PO chưa duyệt</option></select>
+      <select id="pa-sup" class="f-posup" onchange="paRerender()"></select>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">📑 PO bất thường (theo PO) <span class="badge b-gray" id="paPT-cnt"></span></div><div class="exp" data-t="paPT"></div></div>
+      <div class="sm muted" style="padding:0 16px 8px">Bấm 1 PO để chỉ xem các dòng của PO đó bên dưới. "✅ Xác nhận PO" = xác nhận một lần mọi dòng bất thường của PO (cùng kết luận + lý do).</div>
+      <div class="tbl-wrap"><table><thead id="paPT-h"></thead><tbody id="paPT"></tbody></table></div>
+      <div class="pag"><span class="pag-info" id="paPT-info"></span><div class="pag-btns" id="paPT-pag"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">🔎 Dòng PO bất thường <span id="pa-sel" class="sm muted"></span> <span class="badge b-gray" id="paLT-cnt"></span></div><div style="display:flex;gap:6px;align-items:center"><button class="btn btn-sm" onclick="paConfirmFiltered()">✅ Xác nhận các dòng đang lọc</button><div class="exp" data-t="paLT"></div></div></div>
+      <div class="sm muted" style="padding:0 16px 8px">"SL nên đặt (tham khảo)" = SL sau khi bỏ phần vượt mức tồn cần của tool (tồn + mọi PO đang mở − mức tồn cần, trừ vào PO mới nhất trước). "Có thể đúng vì" = dấu hiệu tool thấy (KM, MD phân bổ, mã mới, bội số NCC, MOA) - chị vẫn chọn lý do khi xác nhận.</div>
+      <div class="tbl-wrap"><table><thead id="paLT-h"></thead><tbody id="paLT"></tbody></table></div>
+      <div class="pag"><span class="pag-info" id="paLT-info"></span><div class="pag-btns" id="paLT-pag"></div></div>
+    </div>
+  </div>
+
   <!-- V2.8: NCC MOA GIAO THIẾU -->
   
 
@@ -943,7 +971,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
     </div>
     <div class="card"><div class="card-body guide" id="guide-content">
 <h1>Hướng dẫn sử dụng OrderIQ Đặt hàng - Store 1016 PARC MALL</h1>
-<p>Bản chia sẻ của OrderIQ Kho V2.8.1, chỉ gồm các trang phục vụ đặt hàng: Dashboard, Cần đặt hàng, Mã Tồn 0 - Sale 0, Kiểm tra đơn Senior (Handy), Gợi ý đặt (or_plan), Quản lý SKU, Kiểm tra MOA, Khuyến mãi / Mix-Bundle, Hàng ký gửi, PO đang về / quá hạn. File nhập, cách tính và file xuất giống hệt bản đầy đủ.</p>
+<p>Bản chia sẻ của OrderIQ Kho V2.12, chỉ gồm các trang phục vụ đặt hàng: Dashboard, Cần đặt hàng, Mã Tồn 0 - Sale 0, Kiểm tra đơn Senior (Handy), Gợi ý đặt (or_plan), Quản lý SKU, Kiểm tra MOA, Khuyến mãi / Mix-Bundle, Hàng ký gửi, PO đang về / quá hạn, 🚩 PO bất thường. File nhập, cách tính và file xuất giống hệt bản đầy đủ.</p>
 
 <h2>1. Bắt đầu nhanh</h2>
 <div class="step"><b>Bước 1 - Mở file.</b> Mở bằng Chrome hoặc Edge. Lần đầu mở cần có mạng để tải phần đọc file Excel (.csv đọc được cả khi không có mạng). Dữ liệu lưu trong trình duyệt, dùng chung với bản đầy đủ OrderIQ Kho V2 trên cùng máy - nạp ở bản nào, bản kia cũng thấy.</div>
@@ -966,6 +994,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 <tr><td>Sau khi Senior up đơn Handy</td><td>Nạp PO Detail mới → Lấy đơn chưa duyệt từ PO → xem dòng dư / thiếu / bỏ sót → chốt SL → Xuất danh sách điều chỉnh → sửa và duyệt trên hệ thống</td><td>✅ Kiểm tra đơn Senior (Handy)</td></tr>
 <tr><td>Ngày đặt hàng</td><td>Kiểm tra NCC chưa đủ MOA, chọn mã bù hoặc chuyển tuần sau</td><td>💵 Kiểm tra MOA</td></tr>
 <tr><td>Khi có KM mới</td><td>Nạp sale_list / bulk_sale_list → kiểm tra tồn đủ bán hết chương trình, đặt thêm</td><td>🏷️ Khuyến mãi / Mix-Bundle</td></tr>
+<tr><td>Mỗi lần nạp PO mới</td><td>Xác nhận PO bất thường trước khi NCC giao, nhất là PO về trong 3 ngày</td><td>🚩 PO bất thường</td></tr>
 <tr><td>Hằng tuần</td><td>Nạp PO mới; nhắc NCC giao PO trễ; theo dõi hàng MD phân bổ sắp về</td><td>🚚 PO đang về / quá hạn</td></tr>
 <tr><td>Hằng tuần</td><td>Nhắc NCC ký gửi bổ sung mã bán chạy / đang KM</td><td>🔄 Hàng ký gửi</td></tr>
 <tr><td>Cuối tháng</td><td>Gửi MD danh sách mã đề xuất ngừng; cập nhật trạng thái cung ứng, tồn âm</td><td>🔎 Mã Tồn 0 - Sale 0 · 🛠️ Quản lý SKU</td></tr></table>
@@ -981,7 +1010,8 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 <tr><td>💵 Kiểm tra MOA</td><td>Giá trị đặt tối thiểu theo NCC</td><td>Thiếu MOA → bù mã cùng NCC (sắp tới điểm đặt → đang KM → bán chạy), tồn sau nhập ≤ mức tối đa. Không bù được → "MOA quá cao" + phương án: gộp đơn, xin miễn MOA, qua Supply, báo MD</td></tr>
 <tr><td>🏷️ Khuyến mãi / Mix-Bundle</td><td>Đặt đủ hàng push sale</td><td>Sức bán trong khung KM × hệ số tăng; Mix &amp; Match / Bundle giữ thêm bộ deal. Đã loại mã NCC ký gửi</td></tr>
 <tr><td>🔄 Hàng ký gửi</td><td>Nhắc NCC ký gửi chuẩn bị hàng</td><td>Không dùng số tồn (tồn âm là bình thường). 🔴 Có thể đã hết = từng bán đều nhưng ≥ 14 ngày không bán. Bảng mã ký gửi đang / sắp KM với SL NCC nên chuẩn bị</td></tr>
-<tr><td>🏷️ Mã vạch (mọi bảng có Barcode)</td><td>Quét bằng Handy / máy quét, in tem</td><td>Cột "Mã vạch (quét)" ngay sau Barcode: bấm hình để phóng to quét trên màn hình. Nút "🏷️ In mã vạch" cạnh Excel / CSV: in tem A4 (chọn 2-5 cột) các mã theo bộ lọc. File Excel xuất ra có hình mã vạch trong ô (tối đa 6.000 hình / file); CSV chỉ có số barcode. 13 số đúng số kiểm tra = EAN-13, 12 số = UPC-A (thêm 0), 8 số = EAN-8, còn lại = Code 128</td></tr>
+<tr><td>🚩 PO bất thường</td><td>Chặn PO sai trước khi NCC giao</td><td>Kiểm mọi PO đang mở (đã duyệt / đã gửi NCC, MD phân bổ, Supply, chưa duyệt; không gồm ký gửi). 🔴 Cao / 🟠 Xem lại: mã hạn chế / ngừng đặt, không có sức bán, đủ bán quá lâu sau khi về (&gt; 90 ngày, nghi nhập nhầm thùng ↔ cái), SL gấp nhiều lần các lần trước, giá vốn PO lệch &gt; 20%, mã ở nhiều PO, SL ít bất thường, mã chưa có trong tồn; cấp PO: giá trị PO &gt; 3 lần trung vị cùng NCC. Mỗi dòng có SL nên đặt (tham khảo), giá trị có thể giảm, "Có thể đúng vì". Bấm ✅ (từng dòng / cả PO / các dòng đang lọc) → Đúng - giữ nguyên hoặc Cần điều chỉnh + lý do + ghi chú + SL đúng. PO đổi SL / giá sau khi nạp lại → "🔄 xác nhận lại". Ngưỡng sửa ở Tham số</td></tr>
+<tr><td>🏷️ Mã vạch</td><td>Quét bằng Handy / máy quét, in tem</td><td>Cột "Mã vạch (quét)" trên bảng, ▥ phóng to để quét màn hình, nút 🏷️ In mã vạch (tem A4); file Excel xuất ra có hình mã vạch</td></tr>
 <tr><td>🚚 PO đang về / quá hạn</td><td>Theo dõi giao hàng</td><td>Lọc Quá hạn → 📋 Tạo tin nhắc NCC → gửi Zalo / email. Bảng PO MD phân bổ sắp về: 🟢 về kịp bù · 🟠 về nhiều · ⚫ không có sức bán</td></tr></table>
 
 <h2>4. Tình huống ứng dụng</h2>
@@ -991,6 +1021,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 <tr><td>Khách hỏi hàng, kệ trống</td><td>Mã Tồn 0 - Sale 0 → biết do quên đặt, hàng đang về hay NCC không giao</td></tr>
 <tr><td>NCC chưa đủ MOA</td><td>Cần đặt hàng → bảng Giá trị cần đặt theo NCC → Đề xuất MOA; hoặc trang Kiểm tra MOA → chọn mã bù / chuyển tuần sau</td></tr>
 <tr><td>Chuẩn bị chương trình KM</td><td>Khuyến mãi / Mix-Bundle → lọc mã tồn không đủ bán hết chương trình → đặt thêm</td></tr>
+<tr><td>Trước khi NCC giao hàng</td><td>🚩 PO bất thường → lọc "PO sắp về ≤ 3 ngày chưa xác nhận" → xem từng dòng → ✅ Đúng (ghi lý do) hoặc Cần điều chỉnh (ghi SL đúng) → báo NCC / sửa PO trên hệ thống</td></tr>
 <tr><td>NCC giao trễ / thiếu</td><td>PO đang về / quá hạn → lọc Quá hạn → tin nhắc NCC</td></tr>
 <tr><td>Làm việc với NCC ký gửi</td><td>Hàng ký gửi → lọc NCC → tin nhắc hoặc xuất Excel</td></tr>
 <tr><td>Chuẩn bị kiểm kê</td><td>Quản lý SKU → Tồn âm → chọn tất cả → chuyển "chờ kiểm kê" 1 lần</td></tr>
@@ -1042,6 +1073,12 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
           <label>Tỷ lệ hết hàng cao nếu > (%)<input type="number" id="s-ooshigh" min="1"></label>
           <label>PO "đặt dư" nếu TOD tháng nhận > (ngày)<input type="number" id="s-overtod" min="15"></label>
           <label>LAYER1 loại khỏi phân tích (dịch vụ, không KD)<input type="text" id="s-excl"></label>
+          <div class="set-sec">🚩 PO bất thường (V2.12)</div>
+          <label>Cảnh báo nếu sau khi về đủ bán > (ngày)<input type="number" id="s-pacover" min="15"></label>
+          <label>SL gấp > (lần) trung vị các lần đặt trước<input type="number" id="s-pax" min="1.5" step="0.5"></label>
+          <label>Giá vốn PO lệch > (%) so với giá vốn hiện tại<input type="number" id="s-pacost" min="5"></label>
+          <label>Giá trị PO gấp > (lần) PO thường của NCC<input type="number" id="s-papox" min="1.5" step="0.5"></label>
+          <label>Bỏ qua dòng có giá trị dư / giá trị dòng < (đ)<input type="number" id="s-paminv" min="0" step="50000"></label>
           <div class="set-sec">🛒 Đặt hàng Handy</div>
           <label>Chu kỳ đặt hàng (ngày giữa 2 lần đặt)<input type="number" id="s-hdcycle" min="1"></label>
           <label>Cột 7 của file Handy là<select id="s-hdcol6" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px"><option value="lot">Bội số / SL đặt tối thiểu (cột 6 = quy cách thùng)</option><option value="min">Tồn trưng bày tối thiểu (cột 6 = bội số đặt)</option></select></label>
@@ -1122,7 +1159,7 @@ let layer1Manual = {};   // mã LAYER1 -> tên
 const OG_NO_ORDER_DEFAULTS = ['discontinued','consignment sale','back order item','consignment','backorder','back order'];
 let noOrderGroups = new Set(OG_NO_ORDER_DEFAULTS);
 let cfg = {slowMo:1, shortDays:7, lead:5, safeA:7, safeB:5, safeC:3, lowDays:7, noPo:60, t1:90, t2:180, todHigh:90, oosHigh:10, overTod:90,
-  consDays:14,cycle:14,roundPack:true,hdCycle:7,hdCol6:'lot',minDisp:0,wkHigh:1.2,wkLow:0.8,catMin:{},promo:[],store:'1016',prAhead:14,upSale:1.5,upBulk:1.3,bundleSets:2,vat:8,moaMaxDays:45,holdPct:1.5,bigCover:60,countUnapproved:false,reorderDays:30,forgotLook:7,userName:'',defPack:'',defPackOk:false,alCycle:7,abcA:80,abcB:95,abcBasis:'rev',fcW:0.6,spikeX:3,leadMinObs:3,numDec:'auto',moa:{},excl:'26,13,24,30', appr:'LIEN VU,LOAN TRAN,PHU LE,NGAN DUONG'};
+  consDays:14,cycle:14,roundPack:true,hdCycle:7,hdCol6:'lot',minDisp:0,wkHigh:1.2,wkLow:0.8,catMin:{},promo:[],store:'1016',prAhead:14,upSale:1.5,upBulk:1.3,bundleSets:2,vat:8,moaMaxDays:45,holdPct:1.5,bigCover:60,countUnapproved:false,reorderDays:30,forgotLook:7,userName:'',defPack:'',defPackOk:false,alCycle:7,abcA:80,abcB:95,abcBasis:'rev',fcW:0.6,spikeX:3,leadMinObs:3,numDec:'auto',moa:{},poAbCover:90,poAbX:3,poAbCost:20,poAbPoX:3,poAbMinV:300000,excl:'26,13,24,30', appr:'LIEN VU,LOAN TRAN,PHU LE,NGAN DUONG'};
 let curPage = 'dashboard';
 let supMaster = {};   // mã NCC -> tên (file danh sách NCC)
 let supManual = {};   // mã NCC -> tên (nhập tay)
@@ -1379,7 +1416,7 @@ function autoMap(headers,KW){
   return map;
 }
 const KW_TON={
-  barcode:['barcode'],name:['product name','item name','tên hàng'],
+  barcode:['barcode'],item_code:['item code','plu code','mã hàng','ma hang'],name:['product name','item name','tên hàng'],
   supplier:['supplier code','vendor code'],supplier_name:['supplier name','vendor name'],
   layer1:['layer1','layer 1'],layer1_name:['layer1 name','layer 1 name'],
   order_group:['order group name','order group'],brand:['brand division name','brand name'],
@@ -1388,7 +1425,7 @@ const KW_TON={
   gp_pct:['g.p.%(cogs)','gp%','g.p.%'],gp_amt:['g.p.amt(cogs)','gp amt','g.p.amt'],
   loss_qty:['loss qty'],mac:['m.a.c','mac'],last_sales_date:['last sales date','last sales'],target_month:['target month']
 };
-const LBL_TON={barcode:'Barcode *',name:'Product Name *',supplier:'Supplier Code',supplier_name:'Supplier Name',layer1:'LAYER1 (CAT)',layer1_name:'Layer1 Name',order_group:'Order Group Name',brand:'Brand',open_qty:'Open Qty',open_cst:'Open Cst',income_qty:'Income Qty',income_cst:'Income Cst',sales_qty:'Sales Qty *',sales_amt:'Sales Amt',close_qty:'Close Qty *',close_cst:'Close Cst',gp_pct:'G.P.%(COGS)',gp_amt:'G.P.Amt(COGS)',loss_qty:'Loss Qty',mac:'M.A.C',last_sales_date:'Last Sales Date',target_month:'Target Month'};
+const LBL_TON={barcode:'Barcode *',item_code:'Item Code / Mã hàng',name:'Product Name *',supplier:'Supplier Code',supplier_name:'Supplier Name',layer1:'LAYER1 (CAT)',layer1_name:'Layer1 Name',order_group:'Order Group Name',brand:'Brand',open_qty:'Open Qty',open_cst:'Open Cst',income_qty:'Income Qty',income_cst:'Income Cst',sales_qty:'Sales Qty *',sales_amt:'Sales Amt',close_qty:'Close Qty *',close_cst:'Close Cst',gp_pct:'G.P.%(COGS)',gp_amt:'G.P.Amt(COGS)',loss_qty:'Loss Qty',mac:'M.A.C',last_sales_date:'Last Sales Date',target_month:'Target Month'};
 const REQ_TON=['barcode','name','sales_qty','close_qty'];
 const KW_DET={
   trading_dt:['trading datetime','trading date','sales day'],barcode:['barcode'],item_name:['item name','product name'],
@@ -1576,7 +1613,7 @@ async function ingest(job,headers,body,map,month,days,st){
       const bc=idCell(job,i,map,'barcode',body);if(!bc){noBc++;return;}
       const lsd=parseDate(g(r,'last_sales_date'));
       const row={
-        barcode:bc,name:str(g(r,'name'))||'(Không tên)',supplier:idCell(job,i,map,'supplier',body),supplier_name:str(g(r,'supplier_name')),
+        barcode:bc,item_code:map.item_code!==undefined?idCell(job,i,map,'item_code',body):'',name:str(g(r,'name'))||'(Không tên)',supplier:idCell(job,i,map,'supplier',body),supplier_name:str(g(r,'supplier_name')),
         layer1:str(g(r,'layer1')),layer1_name:str(g(r,'layer1_name')),order_group:str(g(r,'order_group'))||'(Không rõ)',brand:str(g(r,'brand')),
         open_qty:nn(r,'open_qty',i),open_cst:nn(r,'open_cst',i),income_qty:nn(r,'income_qty',i),income_cst:nn(r,'income_cst',i),
         sales_qty:nn(r,'sales_qty',i),sales_amt:nn(r,'sales_amt',i),close_qty:nn(r,'close_qty',i),close_cst:nn(r,'close_cst',i),
@@ -1759,6 +1796,90 @@ function demandOf(s,days){
 }
 let detRate={},detCover=0;
 function roundMult(q,m){return (cfg.roundPack!==false&&m>1&&q>0)?Math.ceil(q/m)*m:q;}
+
+// ============================================================
+// V2.10 - MÃ VẠCH QUÉT ĐƯỢC: EAN-13 / EAN-8 (đúng số kiểm tra) - còn lại Code 128 (không cần thư viện, chạy offline)
+// ============================================================
+const BC_L=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+const BC_G=['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
+const BC_R=['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
+const BC_P=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+const C128=['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
+function eanCheck(d){let s=0;for(let i=0;i<d.length;i++){const n=+d[d.length-1-i];s+=(i%2===0?3:1)*n;}return (10-s%10)%10;}
+function bcModules(code){
+  code=String(code||'').trim();
+  if(/^\d{13}$/.test(code)&&eanCheck(code.slice(0,12))===+code[12]){
+    const f=+code[0],par=BC_P[f];let m='101';for(let i=1;i<=6;i++){const d=+code[i];m+=par[i-1]==='L'?BC_L[d]:BC_G[d];}m+='01010';for(let i=7;i<=12;i++) m+=BC_R[+code[i]];m+='101';
+    return {type:'EAN-13',m,code,guard:[[0,3],[45,50],[92,95]]};}
+  if(/^\d{12}$/.test(code)){const c='0'+code;if(eanCheck(c.slice(0,12))===+c[12]) return bcModules(c);}
+  if(/^\d{8}$/.test(code)&&eanCheck(code.slice(0,7))===+code[7]){
+    let m='101';for(let i=0;i<4;i++) m+=BC_L[+code[i]];m+='01010';for(let i=4;i<8;i++) m+=BC_R[+code[i]];m+='101';return {type:'EAN-8',m,code,guard:[[0,3],[31,36],[64,67]]};}
+  if(!code) return null;
+  // Code 128: số chẵn → bộ C, còn lại bộ B
+  const vals=[];if(/^\d+$/.test(code)&&code.length>=4){vals.push(105);const n=code.length-(code.length%2);for(let i=0;i<n;i+=2) vals.push(+code.substr(i,2));if(n<code.length){vals.push(100);vals.push(code.charCodeAt(n)-32);}}
+  else{vals.push(104);for(const ch of code){const v=ch.charCodeAt(0)-32;if(v<0||v>94) return null;vals.push(v);}}
+  let sum=vals[0];for(let i=1;i<vals.length;i++) sum+=vals[i]*i;vals.push(sum%103);vals.push(106);
+  let m='';vals.forEach(v=>{const w=C128[v];for(let i=0;i<w.length;i++) m+=(i%2===0?'1':'0').repeat(+w[i]);});
+  return {type:'Code 128',m,code,guard:null};
+}
+// SVG mã vạch: x = độ rộng 1 module (px), h = chiều cao vạch
+function barcodeSVG(code,o={}){
+  const B=bcModules(code);if(!B) return '<span class="muted sm">Không tạo được mã vạch</span>';
+  const x=o.x||2,h=o.h||60,qz=(B.type.startsWith('EAN')?11:10)*x,txt=o.text!==false,fs=Math.max(10,Math.round(x*7));
+  const W=B.m.length*x+qz*2,H=h+(txt?fs+6:4);let r='';let i=0;
+  while(i<B.m.length){if(B.m[i]==='1'){let j=i;while(j<B.m.length&&B.m[j]==='1') j++;const g=B.guard&&B.guard.some(([a,b])=>i>=a&&i<b);r+=`<rect x="${qz+i*x}" y="0" width="${(j-i)*x}" height="${h+(g&&txt?fs*0.6:0)}"/>`;i=j;}else i++;}
+  let t='';if(txt){if(B.type==='EAN-13') t=`<text x="${qz-x*7}" y="${h+fs}" font-size="${fs}">${B.code[0]}</text><text x="${qz+3*x+21*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(1,7)}</text><text x="${qz+50*x+21*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(7)}</text>`;
+    else if(B.type==='EAN-8') t=`<text x="${qz+3*x+14*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(0,4)}</text><text x="${qz+36*x+14*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(4)}</text>`;
+    else t=`<text x="${W/2}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${esc(B.code)}</text>`;}
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="bc-svg" width="${W}" height="${H}" style="max-width:100%;height:auto;background:#fff" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges" data-type="${B.type}"><rect width="${W}" height="${H}" fill="#fff"/><g fill="#000">${r}</g><g fill="#000" font-family="'Courier New',monospace">${t}</g></svg>`;
+}
+// PNG mã vạch (vẽ canvas, nét 4px/module, hiển thị 1/2 = 2px/module → quét được trên màn hình và bản in) - dùng khi xuất Excel
+const BC_XL={n:0,max:6000};const BC_PNG=new Map();
+function barcodePNG(code){
+  if(BC_PNG.has(code)) return BC_PNG.get(code);
+  const B=bcModules(code);if(!B){BC_PNG.set(code,null);return null;}
+  const k=4,qz=(B.type.startsWith('EAN')?11:10),W=(B.m.length+qz*2)*k,barH=120,fs=30,H=barH+fs+12;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#000';
+  for(let i=0;i<B.m.length;i++) if(B.m[i]==='1') g.fillRect((qz+i)*k,0,k,barH);
+  g.font=`${fs}px "Courier New",monospace`;g.textAlign='center';g.textBaseline='top';g.fillText(B.code,W/2,barH+6);
+  const d=atob(cv.toDataURL('image/png').split(',')[1]);const bytes=new Uint8Array(d.length);for(let i=0;i<d.length;i++) bytes[i]=d.charCodeAt(i);
+  const r={bytes,w:Math.round(W/2),h:Math.round(H/2),type:B.type};BC_PNG.set(code,r);return r;
+}
+function bcType(code){const B=bcModules(code);return B?B.type:'';}
+// In tem mã vạch cho danh sách mã (theo bộ lọc đang chọn của bảng)
+function printBarcodes(id){
+  const rows=(LAST[id]||[]).filter(r=>r&&(r.barcode||r.bc));if(!rows.length){toast('Bảng không có mã nào','warning');return;}
+  const seen=new Set();const list=[];rows.forEach(r=>{const bc=String(r.barcode||r.bc);if(seen.has(bc)) return;seen.add(bc);const s=skuMap.get(bc);
+    list.push({bc,code:codeOf(bc),name:r.name||r.item_name||(s&&s.name)||'',qty:r.rec_qty??r.fin??r.qty??r.sug??null,sup:r.supplier||(s&&s.supplier)||''});});
+  if(list.length>1500&&!confirm(`In ${fmt(list.length)} tem mã vạch? (nên lọc bớt để in nhanh hơn)`)) return;
+  const ttl=XWX.cardTitle(id);const cols=+(cfg.bcCols||3);
+  const html=`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Mã vạch - ${esc(ttl)}</title><style>
+  @page{size:A4;margin:8mm}body{font-family:Arial,sans-serif;margin:0;color:#000}
+  .bar{position:sticky;top:0;background:#0039a6;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:13px}.bar button,.bar select{font-size:13px;padding:4px 10px}
+  .grid{display:grid;grid-template-columns:repeat(var(--c),1fr);gap:4mm;padding:4mm}.lb{border:1px dashed #999;padding:2mm 2mm 1mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
+  .nm{font-size:10px;font-weight:700;line-height:1.2;height:2.4em;overflow:hidden}.cd{font-size:9px;margin-top:1px}.lb svg{max-width:100%;height:auto}
+  @media print{.bar{display:none}.lb{border-color:#ccc}}</style></head><body style="--c:${cols}">
+  <div class="bar"><b>🏷️ ${esc(ttl)} · ${fmt(list.length)} mã</b><label>Số cột <select onchange="document.body.style.setProperty('--c',this.value)">${[2,3,4,5].map(n=>`<option ${n===cols?'selected':''}>${n}</option>`).join('')}</select></label><button onclick="print()">🖨️ In / Lưu PDF</button><span>Quét được bằng máy Handy / máy quét mã vạch. EAN-13 / EAN-8 đúng chuẩn; mã khác in Code 128.</span></div>
+  <div class="grid">${list.map(x=>`<div class="lb"><div class="nm">${esc(x.name)}</div>${barcodeSVG(x.bc,{x:2,h:48})}<div class="cd">${x.qty?`SL: <b>${fmt(x.qty)}</b>`:''}${x.sup?(x.qty?' · ':'')+'NCC '+esc(x.sup):''}</div></div>`).join('')}</div></body></html>`;
+  const w=window.open('','_blank');if(!w){toast('Trình duyệt chặn cửa sổ mới - cho phép popup rồi bấm lại','danger');return;}
+  w.document.open();w.document.write(html);w.document.close();
+}
+function bcZoom(bc){
+  const B_=bcModules(bc);const zx=B_?Math.max(1,Math.min(4,Math.floor(640/(B_.m.length+22)))):3;
+  const h=`<div style="text-align:center;padding:12px;background:#fff;overflow:auto">${barcodeSVG(bc,{x:zx,h:140})}<div class="sm" style="margin-top:8px">${esc(bcType(bc))} · Barcode <b>${esc(bc)}</b></div><div class="sm muted">Đưa máy quét / Handy vào màn hình để quét. Tăng độ sáng màn hình nếu quét chậm.</div></div><div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">${skuMap.get(bc)?`<button class="btn" onclick="showModal('${esc(bc)}')">← Chi tiết mã</button>`:''}<button class="btn" onclick="closeModal()">Đóng</button></div>`;
+  document.getElementById('modal-title').textContent='Mã vạch '+bc;document.getElementById('modal-body').innerHTML=h;document.getElementById('modal').classList.add('open');}
+
+// V2.9: MÃ HÀNG (Item Code) tự lấy theo Barcode - nguồn: file tồn kho (cột Item Code nếu có) → PO Detail → or_plan → đơn NCC gửi
+let ITEMCODE={};
+function buildItemCodes(){const m={};const put=(bc,c)=>{bc=String(bc||'').trim();c=String(c||'').trim();if(bc&&c&&c!==bc&&!m[bc]) m[bc]=c;};
+  try{monthsLoaded.slice().reverse().forEach(mm=>(tonHistory[mm]||[]).forEach(r=>put(r.barcode,r.item_code)));}catch(e){}
+  try{poData.slice().sort((a,b)=>(b.od||'').localeCompare(a.od||'')).forEach(p=>put(p.barcode,p.item_code));}catch(e){}
+  try{if(handy&&handy.rows) handy.rows.forEach(r=>put(r.barcode,r.code));}catch(e){}
+  try{supOrders.forEach(b=>b.lines.forEach(l=>put(l.barcode,l.item_code)));}catch(e){}
+  ITEMCODE=m;}
+function codeOf(bc){return ITEMCODE[String(bc||'').trim()]||'';}
+function injectCodeCols(){Object.values(T).forEach(t=>{if(!t||!t.cols||t.cols.some(c=>c.isCode)) return;const i=t.cols.findIndex(c=>c.h==='Barcode');if(i>=0) t.cols.splice(i+1,0,C('Mã vạch (quét)',r=>String(r.barcode||r.bc||''),{xt:'barcode',isCode:true,nosort:true,td:r=>{const bc=r.barcode||r.bc;return bc?`<span class="bc-mini" title="Bấm để phóng to và quét" onclick="event.stopPropagation();bcZoom('${esc(bc)}')">${barcodeSVG(bc,{x:1,h:26,text:false})}</span>`:'—';}}));});}
 let SHORTM=null; // V2.3: tháng mới nhất chưa đủ ngày (vd file tồn ngày 01) → {m,prev,days}
 function buildDetRate(){
   detRate={};detCover=0;if(!detData.length||!refDate) return;
@@ -1804,7 +1925,7 @@ function catAgg(m){
   return out;
 }
 
-function compute(){window._msaL=null;window._msaByPo=null;window._ptH=null;
+function compute(){try{buildItemCodes();}catch(e){}window._msaL=null;window._msaByPo=null;window._ptH=null;
   monthsLoaded=Object.keys(tonHistory).sort();
   latestMonth=monthsLoaded[monthsLoaded.length-1]||'';
   const apprSet=new Set(String(cfg.appr||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean));
@@ -2138,6 +2259,7 @@ function updateBadges(){
     const sp=Object.values(MS.supply);const m=sp.filter(x=>supplyOverdue(x)||supplyStale(x)).length+negRows().filter(r=>r.st==='new').length;document.getElementById('badge-ms').textContent=m;}catch(e){}
   document.getElementById('badge-cons').textContent=consRows.filter(r=>r.cs_st==='out'||r.cs_st==='risk').length;
   document.getElementById('badge-overdue').textContent=poOpen.filter(l=>l.late>0).length;
+  try{const b=document.getElementById('badge-poab');const n=paTodo();b.textContent=n;b.style.display=n?'':'none';}catch(e){}
   document.getElementById('data-chip').textContent=monthsLoaded.length||detData.length||poData.length||handy?`${handy?'📲 Handy '+dmyK(handy.date)+' · ':''}● ${fmt(skus.length)} SKU · ${monthsLoaded.length} tháng · ${fmt(detData.length)} GD · ${fmt(new Set(poData.map(p=>p.po_no)).size)} PO`:'Chưa có dữ liệu';
   document.getElementById('empty-state').style.display=(!monthsLoaded.length&&!poData.length&&!handy&&curPage!=='handy'&&curPage!=='import'&&curPage!=='settings'&&curPage!=='guide')?'block':'none';
 }
@@ -2278,93 +2400,6 @@ function soMissing(b){
   return skus.filter(s=>s.orderable&&s.rec_qty>0&&(catSet?catSet.has(s.layer1):sc.has(s.supplier))&&!inList.has(s.barcode));
 }
 
-// ====== MÃ VẠCH: EAN-13 / EAN-8 / Code 128 ======
-const BC_L=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
-const BC_G=['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
-const BC_R=['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
-const BC_P=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
-const C128=['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
-function eanCheck(d){let s=0;for(let i=0;i<d.length;i++){const n=+d[d.length-1-i];s+=(i%2===0?3:1)*n;}return (10-s%10)%10;}
-function bcModules(code){
-  code=String(code||'').trim();
-  if(/^\d{13}$/.test(code)&&eanCheck(code.slice(0,12))===+code[12]){
-    const f=+code[0],par=BC_P[f];let m='101';for(let i=1;i<=6;i++){const d=+code[i];m+=par[i-1]==='L'?BC_L[d]:BC_G[d];}m+='01010';for(let i=7;i<=12;i++) m+=BC_R[+code[i]];m+='101';
-    return {type:'EAN-13',m,code,guard:[[0,3],[45,50],[92,95]]};}
-  if(/^\d{12}$/.test(code)){const c='0'+code;if(eanCheck(c.slice(0,12))===+c[12]) return bcModules(c);}
-  if(/^\d{8}$/.test(code)&&eanCheck(code.slice(0,7))===+code[7]){
-    let m='101';for(let i=0;i<4;i++) m+=BC_L[+code[i]];m+='01010';for(let i=4;i<8;i++) m+=BC_R[+code[i]];m+='101';return {type:'EAN-8',m,code,guard:[[0,3],[31,36],[64,67]]};}
-  if(!code) return null;
-  const vals=[];if(/^\d+$/.test(code)&&code.length>=4){vals.push(105);const n=code.length-(code.length%2);for(let i=0;i<n;i+=2) vals.push(+code.substr(i,2));if(n<code.length){vals.push(100);vals.push(code.charCodeAt(n)-32);}}
-  else{vals.push(104);for(const ch of code){const v=ch.charCodeAt(0)-32;if(v<0||v>94) return null;vals.push(v);}}
-  let sum=vals[0];for(let i=1;i<vals.length;i++) sum+=vals[i]*i;vals.push(sum%103);vals.push(106);
-  let m='';vals.forEach(v=>{const w=C128[v];for(let i=0;i<w.length;i++) m+=(i%2===0?'1':'0').repeat(+w[i]);});
-  return {type:'Code 128',m,code,guard:null};
-}
-function barcodeSVG(code,o={}){
-  const B=bcModules(code);if(!B) return '<span class="muted sm">Không tạo được mã vạch</span>';
-  const x=o.x||2,h=o.h||60,qz=(B.type.startsWith('EAN')?11:10)*x,txt=o.text!==false,fs=Math.max(10,Math.round(x*7));
-  const W=B.m.length*x+qz*2,H=h+(txt?fs+6:4);let r='';let i=0;
-  while(i<B.m.length){if(B.m[i]==='1'){let j=i;while(j<B.m.length&&B.m[j]==='1') j++;const g=B.guard&&B.guard.some(([a,b])=>i>=a&&i<b);r+=`<rect x="${qz+i*x}" y="0" width="${(j-i)*x}" height="${h+(g&&txt?fs*0.6:0)}"/>`;i=j;}else i++;}
-  let t='';if(txt){if(B.type==='EAN-13') t=`<text x="${qz-x*7}" y="${h+fs}" font-size="${fs}">${B.code[0]}</text><text x="${qz+3*x+21*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(1,7)}</text><text x="${qz+50*x+21*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(7)}</text>`;
-    else if(B.type==='EAN-8') t=`<text x="${qz+3*x+14*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(0,4)}</text><text x="${qz+36*x+14*x}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${B.code.slice(4)}</text>`;
-    else t=`<text x="${W/2}" y="${h+fs}" font-size="${fs}" text-anchor="middle">${esc(B.code)}</text>`;}
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="bc-svg" width="${W}" height="${H}" style="max-width:100%;height:auto;background:#fff" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges" data-type="${B.type}"><rect width="${W}" height="${H}" fill="#fff"/><g fill="#000">${r}</g><g fill="#000" font-family="'Courier New',monospace">${t}</g></svg>`;
-}
-const BC_XL={n:0,max:6000};const BC_PNG=new Map();
-function barcodePNG(code){
-  if(BC_PNG.has(code)) return BC_PNG.get(code);
-  const B=bcModules(code);if(!B){BC_PNG.set(code,null);return null;}
-  const k=4,qz=(B.type.startsWith('EAN')?11:10),W=(B.m.length+qz*2)*k,barH=120,fs=30,H=barH+fs+12;
-  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
-  g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#000';
-  for(let i=0;i<B.m.length;i++) if(B.m[i]==='1') g.fillRect((qz+i)*k,0,k,barH);
-  g.font=`${fs}px "Courier New",monospace`;g.textAlign='center';g.textBaseline='top';g.fillText(B.code,W/2,barH+6);
-  const d=atob(cv.toDataURL('image/png').split(',')[1]);const bytes=new Uint8Array(d.length);for(let i=0;i<d.length;i++) bytes[i]=d.charCodeAt(i);
-  const r={bytes,w:Math.round(W/2),h:Math.round(H/2),type:B.type};BC_PNG.set(code,r);return r;
-}
-function bcType(code){const B=bcModules(code);return B?B.type:'';}
-// --- Hiển thị trong bảng / phóng to / chi tiết mã
-function bcMini(bc){bc=String(bc??'').trim();if(!bc) return '—';return `<span class="bc-mini" title="Bấm để phóng to quét" onclick="event.stopPropagation();bcZoom('${esc(bc).replace(/'/g,'&#39;')}')">${barcodeSVG(bc,{x:1,h:26,text:false})}</span>`;}
-function bcZoomHtml(bc){const B=bcModules(bc);const zx=B?Math.max(1,Math.min(4,Math.floor(640/(B.m.length+22)))):3;
-  return `<div style="text-align:center;padding:12px;background:#fff;overflow:auto">${barcodeSVG(bc,{x:zx,h:140})}<div class="sm muted" style="margin-top:6px">${bcType(bc)} · ${esc(bc)}${bcType(bc)==='EAN-13'&&bc[0]==='0'?' · máy quét có thể đọc thành 12 số (UPC-A)':''}</div></div>`;}
-function bcZoom(bc){const s=skuMap&&skuMap.get?skuMap.get(bc):null;
-  document.getElementById('modal-title').textContent='Mã vạch · '+bc;
-  document.getElementById('modal-body').innerHTML=(s?`<div style="text-align:center;font-weight:700;margin-bottom:6px">${esc(s.name)}</div>`:'')+bcZoomHtml(bc)+`<div style="text-align:center;margin-top:8px"><button class="btn btn-sm" onclick="printBarcodeLabels([{bc:'${esc(bc)}',name:${esc(JSON.stringify(s?s.name:''))},sup:'${esc(s?s.supplier||'':'')}'}],'Mã ${esc(bc)}',3)">🏷️ In tem mã này</button>${s?` <button class="btn btn-sm" onclick="showModal('${esc(bc)}')">Xem chi tiết mã</button>`:''}</div>`;
-  document.getElementById('modal').classList.add('open');}
-// --- Tự thêm cột "Mã vạch (quét)" ngay sau cột Barcode của mọi bảng
-function bcAug(t){
-  if(!t||t._bc) return t;t._bc=1;
-  const i=t.cols.findIndex(c=>/^barcode$/i.test(String(c.h).trim()));
-  if(i<0||t.cols.some(c=>c.xt==='barcode')) return t;
-  const src=t.cols[i];
-  t.cols.splice(i+1,0,C('Mã vạch (quét)',r=>{const v=src.v(r);return v===null||v===undefined?'':String(v).trim();},{xt:'barcode',nosort:true,td:r=>bcMini(src.v(r))}));
-  return t;
-}
-function bcCol(id){const t=bcAug(T[id]);return t?t.cols.filter(c=>!c.noExp).findIndex(c=>c.xt==='barcode'):-1;}
-// --- In tem mã vạch (A4, 2-5 cột)
-function printBarcodeLabels(list,title,cols=3){
-  if(!list.length) return alert('Không có mã nào');
-  const html=`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Mã vạch - ${esc(title)}</title><style>
-  @page{size:A4;margin:8mm}body{font-family:Arial,sans-serif;margin:0}
-  .bar{position:sticky;top:0;background:#0039a6;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:13px}
-  .bar button,.bar select{font-size:13px}
-  .grid{display:grid;grid-template-columns:repeat(var(--c),1fr);gap:4mm;padding:4mm}
-  .lb{border:1px dashed #999;padding:2mm;text-align:center;break-inside:avoid}.nm{font-size:10px;font-weight:700;height:2.4em;overflow:hidden}
-  .cd{font-size:9px}.lb svg{max-width:100%;height:auto}@media print{.bar{display:none}}</style></head><body style="--c:${cols}">
-  <div class="bar"><b>🏷️ ${esc(title)} · ${list.length} mã</b><span>Số cột:</span><select onchange="document.body.style.setProperty('--c',this.value)">${[2,3,4,5].map(n=>`<option ${n===cols?'selected':''}>${n}</option>`).join('')}</select><button onclick="print()">🖨️ In / Lưu PDF</button></div>
-  <div class="grid">${list.map(x=>`<div class="lb"><div class="nm">${esc(x.name||'')}</div>${barcodeSVG(x.bc,{x:2,h:48})}<div class="cd">${x.qty?'SL: <b>'+esc(x.qty)+'</b>':''}${x.sup?(x.qty?' · ':'')+'NCC '+esc(x.sup):''}</div></div>`).join('')}</div></body></html>`;
-  const w=window.open('','_blank');if(!w) return alert('Trình duyệt chặn cửa sổ mới - cho phép popup rồi bấm lại');
-  w.document.open();w.document.write(html);w.document.close();}
-function printTableBarcodes(id){
-  renderT(id);const t=T[id];const data=LAST[id]||[];const ci=t.cols.findIndex(c=>c.xt==='barcode');if(ci<0) return;
-  const bcF=t.cols[ci].v;const qc=t.cols.find(c=>/^(SL chốt|SL đề xuất|Đề xuất|SL đặt|SL nên)/i.test(String(c.h)));
-  const seen=new Set(),list=[];
-  data.forEach(r=>{const bc=String(bcF(r)||'').trim();if(!bc||seen.has(bc)) return;seen.add(bc);const s=skuMap.get(bc);
-    const q=qc?qc.v(r):'';list.push({bc,name:r.name||r.item_name||(s&&s.name)||'',sup:r.supplier||(s&&s.supplier)||'',qty:typeof q==='number'&&q>0?fmt(q):''});});
-  if(!list.length){toast('Bảng không có mã nào theo bộ lọc đang chọn','warning');return;}
-  printBarcodeLabels(list,XWX.cardTitle(id),3);
-}
-
 // ============================================================
 // TABLE ENGINE - 1 định nghĩa cột dùng chung cho hiển thị, sắp xếp, xuất Excel/CSV
 // ============================================================
@@ -2381,13 +2416,13 @@ const cP=(h,v,o={})=>C(h,v,{xt:'pct100',cls:'num',td:r=>fmtPct(v(r)),x:r=>{const
 const cD=(h,v,o={})=>C(h,v,{xt:'dec',cls:'num',td:r=>{const x=v(r);return x===null||x===undefined?'—':fmt1(x);},x:r=>{const x=v(r);return x===null||x===undefined?'':Math.round(x*10)/10;},...o});
 const cT=(h,v,o={})=>C(h,v,{xt:'dec',cls:'num',td:r=>{const x=v(r);if(x===null||x===undefined) return '—';const c=x>cfg.todHigh?'var(--danger)':x>30?'var(--warning)':'var(--success)';return `<b style="color:${c}">${fmtTod(x)}</b>`;},x:r=>{const x=v(r);return x===null||x===undefined?'':Math.round(x*10)/10;},...o});
 const cName=(h='Tên sản phẩm',v=r=>r.name)=>C(h,v,{xt:'wrap',td:r=>`<span class="clip" title="${esc(v(r))}">${esc(v(r))}</span>`});
-const cBc=()=>C('Barcode',r=>r.barcode,{xt:'code',td:r=>`<code>${esc(r.barcode)}</code>`});
+const cBc=()=>C('Barcode',r=>r.barcode,{xt:'code',td:r=>`<code>${esc(r.barcode)}</code> <span class="bc-ico" title="Xem mã vạch để quét" onclick="event.stopPropagation();bcZoom('${esc(r.barcode)}')">▥</span>`});
 const cCat=()=>C('CAT (LAYER1)',r=>r.layer1,{td:r=>`<span class="clip sm" title="${esc(r.layer1)}">${esc(r.layer1||'—')}</span>`});
 const cSupC=()=>C('Mã NCC',r=>r.supplier,{xt:'code',td:r=>`<code>${esc(r.supplier||'—')}</code>`});
 const cSupN=()=>C('Tên NCC',r=>r.supplier_name,{xt:'text',td:r=>{const sh=r.supplier?supShort(r.supplier):'';return `<span class="clip sm" title="${esc(r.supplier_name)}${sh?' ('+esc(sh)+')':''}">${sh?`<b>${esc(sh)}</b> · `:''}${esc(r.supplier_name||'—')}</span>`;}});
 
 function renderT(id){
-  const t=bcAug(T[id]);if(!t) return;
+  const t=T[id];if(!t) return;
   let data=t.data();
   const s=SORT[id];
   if(s&&t.cols[s.i]){const c=t.cols[s.i];const f=c.s||c.v;data=[...data].sort((a,b)=>{let x=f(a),y=f(b);if(x===null||x===undefined||x==='') x=s.asc?Infinity:-Infinity;if(y===null||y===undefined||y==='') y=s.asc?Infinity:-Infinity;return typeof x==='number'&&typeof y==='number'?(s.asc?x-y:y-x):(s.asc?String(x).localeCompare(String(y),'vi'):String(y).localeCompare(String(x),'vi'));});}
@@ -2421,7 +2456,7 @@ function renderPag(id,cur,tot){
 // XUẤT EXCEL / CSV
 // ============================================================
 function tableAoa(id){
-  const t=bcAug(T[id]);const data=LAST[id]||[];
+  const t=T[id];const data=LAST[id]||[];
   const cols=t.cols.filter(c=>!c.noExp);
   return [cols.map(c=>c.h),...data.map(r=>cols.map(c=>{const x=c.x?c.x(r):c.v(r);return x===null||x===undefined?'':(typeof x==='number'&&!isFinite(x)?'':x);}))];
 }
@@ -2429,7 +2464,7 @@ function stamp(){const d=new Date();return ymd(d)+'_'+String(d.getHours()).padSt
 function slug(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_|_$/g,'');}
 function download(blob,fn){const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);}
 function sheetOf(aoa){const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=aoa[0].map((h,i)=>({wch:Math.min(45,Math.max(8,String(h).length+2,...aoa.slice(1,200).map(r=>String(r[i]??'').length+1)))}));return ws;}
-function wireExportButtons(){document.querySelectorAll('.exp').forEach(el=>{const id=el.dataset.t;el.innerHTML=`<button class="btn btn-sm" onclick="exportTable('${id}','xlsx')">⬇ Excel</button><button class="btn btn-sm" onclick="exportTable('${id}','csv')">⬇ CSV</button>`+(bcCol(id)>=0?`<button class="btn btn-sm" onclick="printTableBarcodes('${id}')" title="In tem mã vạch các mã theo bộ lọc đang chọn">🏷️ In mã vạch</button>`:'');});}
+function wireExportButtons(){document.querySelectorAll('.exp').forEach(el=>{const id=el.dataset.t;const hasBc=T[id]&&T[id].cols&&T[id].cols.some(c=>c.h==='Barcode');el.innerHTML=`<button class="btn btn-sm" onclick="exportTable('${id}','xlsx')">⬇ Excel</button><button class="btn btn-sm" onclick="exportTable('${id}','csv')">⬇ CSV</button>${hasBc?`<button class="btn btn-sm" title="In tem mã vạch (EAN-13) các mã đang lọc - quét bằng Handy" onclick="printBarcodes('${id}')">🏷️ In mã vạch</button>`:''}`;});}
 
 // ============================================================
 // BADGES / CELLS
@@ -4377,7 +4412,7 @@ function showModal(bc){
   let h='';
   if(s){
     h+=`<div class="mgrid">${[
-      ['Barcode',`<code>${esc(s.barcode)}</code><div class="m-bc" onclick="bcZoom('${esc(s.barcode)}')" title="Bấm để phóng to quét">${barcodeSVG(s.barcode,{x:2,h:50})}</div>`],['CAT (LAYER1)',esc(s.layer1)],['NCC',`<code>${esc(s.supplier||'—')}</code> ${esc(s.supplier_name)}`],['Order Group',esc(s.order_group)],
+      ['Barcode',`<code>${esc(s.barcode)}</code><div style="margin-top:6px;cursor:zoom-in;background:#fff;display:inline-block;padding:4px" title="Bấm để phóng to và quét" onclick="bcZoom('${esc(s.barcode)}')">${barcodeSVG(s.barcode,{x:2,h:50})}</div><div class="sm muted">${esc(bcType(s.barcode))} · bấm vào mã vạch để phóng to quét</div>`],['CAT (LAYER1)',esc(s.layer1)],['NCC',`<code>${esc(s.supplier||'—')}</code> ${esc(s.supplier_name)}`],['Order Group',esc(s.order_group)],
       ['ABC · Trạng thái',abcBadge(s.abc)+' '+stBadge(s)],['Tồn đầu → Nhập → Bán → Tồn cuối',`${fmt(s.open_qty)} → ${fmt(s.income_qty)} → ${fmt(s.sales_qty)} → <b>${fmt(s.close_qty)}</b>`],
       ['Tồn cuối GT',fmtAmt(s.close_cst)],['Doanh thu · GP%',`${fmtAmt(s.sales_amt)} · ${fmtPct(s.gp_pct)}`],
       ['TOD',s.isNewItem?'Mới nhập - đã bán '+fmtPct(s.sellThrough)+' số nhập':fmtTod(s.tod)+' ngày'],['Sales/ngày · Còn',`${fmt1(s.sales_day)} · ${s.days_left>=999?'∞':s.days_left} ngày`],
@@ -4418,7 +4453,7 @@ function toggleOG(og,on){const k=og.trim().toLowerCase();if(on) noOrderGroups.ad
 // ============================================================
 // SETTINGS
 // ============================================================
-const SET_IDS={userName:'s-username',defPack:'s-defpack',countUnapproved:'s-countunappr',reorderDays:'s-reorderdays',forgotLook:'s-forgotlook',alCycle:'s-alcycle',leadMinObs:'s-leadminobs',abcA:'s-abca',abcB:'s-abcb',abcBasis:'s-abcbasis',fcW:'s-fcw',spikeX:'s-spikex',numDec:'s-numdec',bigCover:'s-bigcover',holdPct:'s-holdpct',store:'s-store',prAhead:'s-prahead',upSale:'s-upsale',upBulk:'s-upbulk',bundleSets:'s-bsets',vat:'s-vat',moaMaxDays:'s-moadays',hdCol6:'s-hdcol6',hdCycle:'s-hdcycle',consDays:'s-consdays',cycle:'s-cycle',lead:'s-lead',lowDays:'s-low',safeA:'s-sa',safeB:'s-sb',safeC:'s-sc',noPo:'s-nopo',t1:'s-t1',t2:'s-t2',slowMo:'s-slowmo',shortDays:'s-shortdays',todHigh:'s-todhigh',oosHigh:'s-ooshigh',overTod:'s-overtod',excl:'s-excl',appr:'s-appr'};
+const SET_IDS={poAbCover:'s-pacover',poAbX:'s-pax',poAbCost:'s-pacost',poAbPoX:'s-papox',poAbMinV:'s-paminv',userName:'s-username',defPack:'s-defpack',countUnapproved:'s-countunappr',reorderDays:'s-reorderdays',forgotLook:'s-forgotlook',alCycle:'s-alcycle',leadMinObs:'s-leadminobs',abcA:'s-abca',abcB:'s-abcb',abcBasis:'s-abcbasis',fcW:'s-fcw',spikeX:'s-spikex',numDec:'s-numdec',bigCover:'s-bigcover',holdPct:'s-holdpct',store:'s-store',prAhead:'s-prahead',upSale:'s-upsale',upBulk:'s-upbulk',bundleSets:'s-bsets',vat:'s-vat',moaMaxDays:'s-moadays',hdCol6:'s-hdcol6',hdCycle:'s-hdcycle',consDays:'s-consdays',cycle:'s-cycle',lead:'s-lead',lowDays:'s-low',safeA:'s-sa',safeB:'s-sb',safeC:'s-sc',noPo:'s-nopo',t1:'s-t1',t2:'s-t2',slowMo:'s-slowmo',shortDays:'s-shortdays',todHigh:'s-todhigh',oosHigh:'s-ooshigh',overTod:'s-overtod',excl:'s-excl',appr:'s-appr'};
 function fillSettings(){Object.entries(SET_IDS).forEach(([k,id])=>document.getElementById(id).value=k==='countUnapproved'?(cfg[k]?'1':'0'):(cfg[k]??''));renderCatMap();renderSupMap();renderMinDisp();}
 function saveSettings(){
   Object.entries(SET_IDS).forEach(([k,id])=>{const v=document.getElementById(id).value;cfg[k]=(k==='excl'||k==='appr'||k==='hdCol6'||k==='store'||k==='abcBasis'||k==='numDec'||k==='userName')?v:k==='countUnapproved'?v==='1':(v===''?(k==='defPack'?'':cfg[k]):+v);});
@@ -4438,8 +4473,8 @@ function saveCatMap(){document.querySelectorAll('#cat-map input').forEach(i=>{co
 // ============================================================
 // NAV + INIT
 // ============================================================
-const TITLES={skumgr:'Quản lý SKU: trạng thái cung ứng · tồn âm · nhóm SKU · quy cách & trưng bày',promo:'Khuyến mãi & Mix and Match / Bundle - đặt đủ hàng push sale',moa:'Kiểm tra MOA - giá trị đặt tối thiểu theo NCC',handy:'Gợi ý đặt theo file or_plan',guide:'Hướng dẫn sử dụng',supord:'Kiểm tra đơn Senior đặt bằng Handy - Sale Chief điều chỉnh',consign:'Hàng ký gửi - theo dõi NCC chuẩn bị hàng',dashboard:'Dashboard',alerts:'Cần đặt hàng',zombie:'Mã Tồn 0 - Sale 0: quên đặt hay nên ngừng?',poopen:'PO đang về / quá hạn',import:'Import dữ liệu',settings:'Tham số'};
-const RENDER={skumgr:()=>showMgrTab(window._mgrTab||'sup'),promo:renderPromo,moa:renderMoa,handy:renderHandy,guide:()=>{document.querySelectorAll('.v-wkhigh').forEach(e=>e.textContent=fmt1(cfg.wkHigh));document.querySelectorAll('.v-wklow').forEach(e=>e.textContent=fmt1(cfg.wkLow));},supord:()=>{document.querySelectorAll('.v-hdcycle').forEach(e=>e.textContent=cfg.hdCycle||7);renderT('soT');renderT('soMT');renderT('soST');renderSupOrdHead();renderSoSteps();const b=curBatch();document.getElementById('so-seller').value=b?(b.seller||''):'';},consign:()=>{renderConsHead();renderT('csST');renderT('csT');renderT('csPrT');},dashboard:renderDash,alerts:()=>{renderT('aT');renderT('aST');renderT('aMT');document.querySelectorAll('.v-moadays').forEach(e=>e.textContent=cfg.moaMaxDays);renderMdNote();},zombie:()=>{renderZombieHead();renderT('zT');},poopen:()=>{renderPoOpenHead();renderT('poWT');{const el=document.getElementById('md-sup');const v=el.value;const ks=[...new Set(mdRows().map(l=>l.supplier))].sort();el.innerHTML='<option value="">Tất cả NCC</option>'+ks.map(k=>`<option value="${esc(k)}">${esc(k)} - ${esc(supName[k]||'')}</option>`).join('');el.value=ks.includes(v)?v:'';}renderT('mdPT');renderT('mdT');renderT('poOT');},
+const TITLES={poab:'PO bất thường - SL / giá trị đặt bất thường trên PO đang mở (kể cả đã duyệt / đã gửi)',skumgr:'Quản lý SKU: trạng thái cung ứng · tồn âm · nhóm SKU · quy cách & trưng bày',promo:'Khuyến mãi & Mix and Match / Bundle - đặt đủ hàng push sale',moa:'Kiểm tra MOA - giá trị đặt tối thiểu theo NCC',handy:'Gợi ý đặt theo file or_plan',guide:'Hướng dẫn sử dụng',supord:'Kiểm tra đơn Senior đặt bằng Handy - Sale Chief điều chỉnh',consign:'Hàng ký gửi - theo dõi NCC chuẩn bị hàng',dashboard:'Dashboard',alerts:'Cần đặt hàng',zombie:'Mã Tồn 0 - Sale 0: quên đặt hay nên ngừng?',poopen:'PO đang về / quá hạn',import:'Import dữ liệu',settings:'Tham số'};
+const RENDER={poab:renderPa,skumgr:()=>showMgrTab(window._mgrTab||'sup'),promo:renderPromo,moa:renderMoa,handy:renderHandy,guide:()=>{document.querySelectorAll('.v-wkhigh').forEach(e=>e.textContent=fmt1(cfg.wkHigh));document.querySelectorAll('.v-wklow').forEach(e=>e.textContent=fmt1(cfg.wkLow));},supord:()=>{document.querySelectorAll('.v-hdcycle').forEach(e=>e.textContent=cfg.hdCycle||7);renderT('soT');renderT('soMT');renderT('soST');renderSupOrdHead();renderSoSteps();const b=curBatch();document.getElementById('so-seller').value=b?(b.seller||''):'';},consign:()=>{renderConsHead();renderT('csST');renderT('csT');renderT('csPrT');},dashboard:renderDash,alerts:()=>{renderT('aT');renderT('aST');renderT('aMT');document.querySelectorAll('.v-moadays').forEach(e=>e.textContent=cfg.moaMaxDays);renderMdNote();},zombie:()=>{renderZombieHead();renderT('zT');},poopen:()=>{renderPoOpenHead();renderT('poWT');{const el=document.getElementById('md-sup');const v=el.value;const ks=[...new Set(mdRows().map(l=>l.supplier))].sort();el.innerHTML='<option value="">Tất cả NCC</option>'+ks.map(k=>`<option value="${esc(k)}">${esc(k)} - ${esc(supName[k]||'')}</option>`).join('');el.value=ks.includes(v)?v:'';}renderT('mdPT');renderT('mdT');renderT('poOT');},
   import:renderImportInfo,settings:fillSettings};
 function goto(id){
   if(!document.getElementById('pg-'+id)) id='dashboard';
@@ -4454,11 +4489,11 @@ function renderCurrent(){goto(curPage);}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal') closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();}});
 (async function init(){
+  injectCodeCols();
   wireExportButtons();
   busy(true,'Đang mở dữ liệu đã lưu...');
   let ok=false;try{ok=await restore();}catch(e){}
   try{seedMoa();}catch(e){}
-  wireExportButtons();
   compute();busy(false);
   goto(ok||monthsLoaded.length?'dashboard':'guide');
   if(window._migrated) toast(`Bản V2: đã SAO CHÉP dữ liệu từ bản gốc (${window._migrated} khối) sang CSDL riêng của V2. Dữ liệu bản gốc giữ nguyên.`);
@@ -4638,7 +4673,7 @@ ${sh.merges.length?`<mergeCells count="${sh.merges.length}">${sh.merges.map(m=>`
 <pageMargins left="0.4" right="0.4" top="0.5" bottom="0.6" header="0.3" footer="0.3"/>
 <pageSetup paperSize="9" orientation="${sh.landscape?"landscape":"portrait"}" fitToWidth="1" fitToHeight="0"/>
 <headerFooter><oddFooter>&amp;L&amp;8KOHNAN Parc Mall - ${xmlEsc(sh.name)}&amp;R&amp;8Trang &amp;P / &amp;N</oddFooter></headerFooter>
-${sh.images.length?'<drawing r:id="rIdDr1"/>':''}
+${sh.images&&sh.images.length?'<drawing r:id="rIdDr1"/>':''}
 </worksheet>`;
   }
 
@@ -4666,37 +4701,32 @@ ${sh.images.length?'<drawing r:id="rIdDr1"/>':''}
     const defNames = sheets.map((s,i) => s.printTitle ? `<definedName name="_xlnm.Print_Titles" localSheetId="${i}">'${xmlEsc(s.name).replace(/'/g,"''")}'!$${s.printTitle}:$${s.printTitle}</definedName>` : "")
       .concat(sheets.map((s,i) => s.filter ? `<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${xmlEsc(s.name).replace(/'/g,"''")}'!${s.filter.replace(/([A-Z]+)(\d+)/g,"$$$1$$$2")}</definedName>` : "")).join("");
     const files = [
-      {name:"[Content_Types].xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${ws.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`},
+      {name:"[Content_Types].xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${ws.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}${sheets.map((s,i)=>s.images&&s.images.length?`<Override PartName="/xl/drawings/drawing${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`:"").join("")}</Types>`},
       {name:"_rels/.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
       {name:"xl/workbook.xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${names.map((n,i)=>`<sheet name="${xmlEsc(n)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets>${defNames?`<definedNames>${defNames}</definedNames>`:""}</workbook>`},
       {name:"xl/_rels/workbook.xml.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${ws.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId${ws.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
       {name:"xl/styles.xml", data:sb.xml()},
       ...ws.map((d,i)=>({name:`xl/worksheets/sheet${i+1}.xml`, data:d})),
     ];
-    // Hình mã vạch: mỗi sheet có hình → 1 drawing; ảnh dùng chung theo barcode
-    const media = new Map(); let dn = 0; const ovr = [];
-    sheets.forEach((sh, i) => {
-      if (!sh.images.length) return; dn++;
-      const rels = []; const relOf = new Map(); let anchors = "";
-      sh.images.forEach((im, k) => {
-        if (!media.has(im.key)) { media.set(im.key, media.size + 1); files.push({name:`xl/media/image${media.size}.png`, data:im.bytes}); }
-        const mi = media.get(im.key);
-        if (!relOf.has(mi)) { relOf.set(mi, `rId${relOf.size + 1}`); rels.push(`<Relationship Id="${relOf.get(mi)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image${mi}.png"/>`); }
-        const E = 9525, cx = im.w * E, cy = im.h * E;
-        anchors += `<xdr:oneCellAnchor><xdr:from><xdr:col>${im.c}</xdr:col><xdr:colOff>${4*E}</xdr:colOff><xdr:row>${im.r}</xdr:row><xdr:rowOff>${3*E}</xdr:rowOff></xdr:from><xdr:ext cx="${cx}" cy="${cy}"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${k+2}" name="Barcode ${xmlEsc(im.key)}"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="${relOf.get(mi)}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor>`;
-      });
-      files.push({name:`xl/worksheets/_rels/sheet${i+1}.xml.rels`, data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdDr1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${dn}.xml"/></Relationships>`});
-      files.push({name:`xl/drawings/drawing${dn}.xml`, data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${anchors}</xdr:wsDr>`});
-      files.push({name:`xl/drawings/_rels/drawing${dn}.xml.rels`, data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${rels.join("")}</Relationships>`});
-      ovr.push(`<Override PartName="/xl/drawings/drawing${dn}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`);
-    });
-    if (dn) files[0].data = files[0].data.replace('<Default Extension="xml"', '<Default Extension="png" ContentType="image/png"/><Default Extension="xml"').replace('</Types>', ovr.join("") + '</Types>');
+    // Hình ảnh (mã vạch): drawing cho từng sheet + file PNG dùng chung theo mã
+    const media=new Map();let mi=0;
+    sheets.forEach((sh,si)=>{if(!sh.images||!sh.images.length) return;
+      const rels=[];const used=new Map();let anchors="";let id=1;
+      const colPx=c=>Math.floor(((sh.cols[c]||10)*7+5));
+      sh.images.forEach(im=>{let m=media.get(im.key);if(!m){m={file:`image${++mi}.png`,bytes:im.bytes};media.set(im.key,m);}
+        let rid=used.get(m.file);if(!rid){rid=`rId${used.size+1}`;used.set(m.file,rid);rels.push(`<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${m.file}"/>`);}
+        const E=9525,offX=Math.max(2,Math.floor((colPx(im.c)-im.w)/2)),offY=3;
+        anchors+=`<xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>${im.c}</xdr:col><xdr:colOff>${offX*E}</xdr:colOff><xdr:row>${im.r}</xdr:row><xdr:rowOff>${offY*E}</xdr:rowOff></xdr:from><xdr:to><xdr:col>${im.c}</xdr:col><xdr:colOff>${(offX+im.w)*E}</xdr:colOff><xdr:row>${im.r}</xdr:row><xdr:rowOff>${(offY+im.h)*E}</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${++id}" name="Barcode ${id}" descr="${xmlEsc(im.alt||'')}"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${im.w*E}" cy="${im.h*E}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`;});
+      files.push({name:`xl/worksheets/_rels/sheet${si+1}.xml.rels`,data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdDr1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${si+1}.xml"/></Relationships>`});
+      files.push({name:`xl/drawings/drawing${si+1}.xml`,data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">${anchors}</xdr:wsDr>`});
+      files.push({name:`xl/drawings/_rels/drawing${si+1}.xml.rels`,data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${rels.join("")}</Relationships>`});});
+    media.forEach(m=>files.push({name:`xl/media/${m.file}`,data:m.bytes}));
     return zip(files);
   }
 
   // API cấp cao: dựng sổ báo cáo theo mẫu Kohnan
   function Book() {
-    BC_XL.n = 0;
+    if (typeof BC_XL !== "undefined") BC_XL.n = 0;
     const sb = StyleBook(), sheets = [];
     const S = {
       title:   sb.get({b:true, sz:15, color:C.white, fill:C.blue, h:"left", indent:1}),
@@ -4743,17 +4773,17 @@ ${sh.images.length?'<drawing r:id="rIdDr1"/>':''}
       }
       rows.forEach((row, i) => {
         const z = o.zebra !== false && i % 2 === 1;
-        let imH = 0;
+        let imgH = 0;
         row.forEach((v, c) => {
-          if (columns[c].t === "barcode") {
-            const im = (v && BC_XL.n < BC_XL.max) ? barcodePNG(String(v)) : null;
-            if (im) { BC_XL.n++; sh.images.push({r:sh.r, c:c0+c, key:String(v), bytes:im.bytes, w:im.w, h:im.h}); imH = Math.max(imH, im.h); sh.set(sh.r, c0+c, "", cellStyle("barcode", z)); }
-            else sh.set(sh.r, c0+c, v, cellStyle("code", z));
-          } else sh.set(sh.r, c0+c, v, cellStyle(columns[c].t, z, columns[c].x));
+          if (columns[c].t === "barcode" && v !== "" && v != null && typeof barcodePNG === "function" && (BC_XL.n < BC_XL.max)) {
+            const im = barcodePNG(String(v));
+            if (im) { BC_XL.n++; sh.images.push({r:sh.r, c:c0+c, key:String(v), bytes:im.bytes, w:im.w, h:im.h, alt:String(v)}); imgH = Math.max(imgH, im.h); sh.set(sh.r, c0+c, "", cellStyle("barcode", z, columns[c].x)); return; }
+          }
+          sh.set(sh.r, c0+c, v, cellStyle(columns[c].t, z, columns[c].x));
         });
         let lines = 1;
         row.forEach((v, c) => { if ((columns[c].t === "wrap" || (columns[c].x && columns[c].x.wrap)) && v) { const w = (sh.cols[c0+c] || 20) * 1.15; lines = Math.max(lines, String(v).split("\n").reduce((n, seg) => n + Math.max(1, Math.ceil(seg.length / w)), 0)); } });
-        if (o.rowH || lines > 1 || imH) sh.height(sh.r, Math.max(o.rowH || 18, lines * 13.5 + 5, imH ? Math.ceil((imH + 6) * 0.75) : 0));
+        if (o.rowH || lines > 1 || imgH) sh.height(sh.r, Math.max(o.rowH || 18, lines * 13.5 + 5, imgH ? Math.ceil((imgH + 6) * 0.75) : 0));
         sh.r++;
       });
       if (o.total) { o.total.forEach((v, c) => sh.set(sh.r, c0+c, v, totStyle(columns[c].t === "stt" ? "textB" : columns[c].t))); sh.height(sh.r, 22); sh.r++; }
@@ -4846,7 +4876,7 @@ const XWX={
   width(t,h,vals){
     const hl=String(h).length,ml=Math.max(0,...vals.slice(0,300).map(x=>String(x??'').length));
     const hw=Math.min(22,Math.ceil(hl/2)+2);
-    const base={barcode:36,stt:6,code:15,money:14,moneyB:15,int:10,dec:10,pct:10,pct100:10}[t];
+    const base={stt:6,code:15,money:14,moneyB:15,int:10,dec:10,pct:10,pct100:10,barcode:36}[t];
     if(base) return Math.max(base,hw);
     if(t==='wrap') return Math.max(hw,Math.min(42,Math.max(24,ml*0.6)));
     return Math.max(hw,Math.min(30,ml+2),9);
@@ -4900,8 +4930,8 @@ function exportTable_(id,kind){
   const aoa=tableAoa(id);if(aoa.length<2){toast('Bảng không có dữ liệu theo bộ lọc đang chọn - đổi bộ lọc (kỳ, loại PO, NCC) rồi xuất lại','warning');return;}
   const ttl=XWX.cardTitle(id);
   if(kind==='csv'){
-    const bi=bcCol(id);const aoaC=bi<0?aoa:aoa.map(r=>r.filter((_,k)=>k!==bi));
-    const csv='﻿'+aoaC.map(r=>r.map(v=>{const s=String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');
+    const keep=T[id].cols.filter(c=>!c.noExp).map(c=>c.xt!=='barcode');const aoa2=aoa.map(r=>r.filter((_,i)=>keep[i]));
+    const csv='﻿'+aoa2.map(r=>r.map(v=>{const s=String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');
     download(new Blob([csv],{type:'text/csv;charset=utf-8'}),XWX.fname(ttl).replace(/\.xlsx$/,'.csv'));
   } else {
     const B=XW.Book();XWX.listSheet(B,new Set(),aoa,{title:ttl,name:ttl,types:XWX.colTypes(id),sub:TITLES[curPage]});XWX.save(B,ttl);
@@ -4941,9 +4971,9 @@ function exportMDxlsx(D){
   XWX.subTable(B,sh,[['CAT','Số mã','Giá trị tồn (đ)','Giá trị dư (đ)','Doanh thu tháng (đ)'],...Object.entries(byCat).sort((a,b)=>b[1].v-a[1].v).map(([k,g])=>[k,g.n,g.v,g.ex,g.sales])],{types:['textB','int','money','moneyB','money'],shareOf:2});
   B.section(sh,'3. THEO NCC');
   XWX.subTable(B,sh,[['NCC','Số mã','Giá trị tồn (đ)','Giá trị dư (đ)','Doanh thu tháng (đ)'],...Object.entries(bySup).sort((a,b)=>b[1].v-a[1].v).map(([k,g])=>[k.trim(),g.n,g.v,g.ex,g.sales])],{types:['textB','int','money','moneyB','money'],shareOf:2});
-  const H=['Barcode','Tên sản phẩm','CAT (LAYER1)','Mã NCC','Tên NCC','Order Group','ABC','Tồn đầu kỳ','Nhập trong kỳ','Bán trong kỳ','Tồn cuối','Tồn cuối GT (đ)','Giá vốn/đơn vị (đ)','Doanh thu kỳ (đ)','GP%','TOD (ngày)','GMROI tháng','Sales/ngày','Tồn đủ bán (ngày)','TB bán/tháng (lịch sử)','Tổng bán các tháng đã nạp','Ngày bán gần nhất','Số ngày chưa bán','Mức tồn cần (Lead+Safety+chu kỳ)','SL dư','Giá trị dư (đ)','Nhập 90 ngày (SL)','Trong đó MD phân bổ','Lần nhập gần nhất','Số ngày từ lần nhập','PO gần nhất','Loại đặt PO gần nhất','Người duyệt PO gần nhất','SL đặt PO gần nhất','Đang về (PO mở)','Nhận xét','Đề xuất xử lý',...ms.flatMap(m=>['Bán '+fmtMonth(m),'Tồn '+fmtMonth(m)])];
-  const TY=['code','wrap','text','code','text','center','center','int','int','int','int','money','money','moneyB','pct100','int','dec','dec','int','dec','int','center','int','int','int','moneyB','int','int','center','int','code','center','text','int','int','wrap','wrap',...ms.flatMap(()=>['int','int'])];
-  const det=[H,...D.map(d=>{const s=d.s,l=d.lastPO;return [s.barcode,s.name,s.layer1,s.supplier,s.supplier_name,s.order_group,s.abc,s.open_qty,s.income_qty,s.sales_qty,s.close_qty,Math.round(s.close_cst),Math.round(d.uc),Math.round(s.sales_amt),Math.round(s.gp_pct*10)/10,
+  const H=['Barcode','Mã vạch (quét)','Tên sản phẩm','CAT (LAYER1)','Mã NCC','Tên NCC','Order Group','ABC','Tồn đầu kỳ','Nhập trong kỳ','Bán trong kỳ','Tồn cuối','Tồn cuối GT (đ)','Giá vốn/đơn vị (đ)','Doanh thu kỳ (đ)','GP%','TOD (ngày)','GMROI tháng','Sales/ngày','Tồn đủ bán (ngày)','TB bán/tháng (lịch sử)','Tổng bán các tháng đã nạp','Ngày bán gần nhất','Số ngày chưa bán','Mức tồn cần (Lead+Safety+chu kỳ)','SL dư','Giá trị dư (đ)','Nhập 90 ngày (SL)','Trong đó MD phân bổ','Lần nhập gần nhất','Số ngày từ lần nhập','PO gần nhất','Loại đặt PO gần nhất','Người duyệt PO gần nhất','SL đặt PO gần nhất','Đang về (PO mở)','Nhận xét','Đề xuất xử lý',...ms.flatMap(m=>['Bán '+fmtMonth(m),'Tồn '+fmtMonth(m)])];
+  const TY=['code','barcode','wrap','text','code','text','center','center','int','int','int','int','money','money','moneyB','pct100','int','dec','dec','int','dec','int','center','int','int','int','moneyB','int','int','center','int','code','center','text','int','int','wrap','wrap',...ms.flatMap(()=>['int','int'])];
+  const det=[H,...D.map(d=>{const s=d.s,l=d.lastPO;return [s.barcode,s.barcode,s.name,s.layer1,s.supplier,s.supplier_name,s.order_group,s.abc,s.open_qty,s.income_qty,s.sales_qty,s.close_qty,Math.round(s.close_cst),Math.round(d.uc),Math.round(s.sales_amt),Math.round(s.gp_pct*10)/10,
     s.tod===null?'':Math.round(s.tod),s.gmroi===null?'':Math.round(s.gmroi*100)/100,Math.round(d.sd*100)/100,d.cover===null?'':d.cover,Math.round(s.h_avg*10)/10,d.soldH,s.lsdK?dmyK(s.lsdK):'',s.z_days??'',
     d.target,d.excess,Math.round(d.excessV),d.recv90Q,d.mdQ,d.last?dmyK(d.last.pd):'',d.lastDays??'',l?l.po_no:'',l?PT_LABEL[l.type].slice(2).trim():'',l?l.approver:'',l?l.order_qty:'',s.on_order||0,d.why,d.action,
     ...ms.flatMap(m=>{const r=mIdx[m].get(s.barcode);return r?[r.sales_qty,r.close_qty]:['',''];})];})];
@@ -5099,7 +5129,7 @@ function renderDQ(){
 // Không bị ghi đè / xoá khi nạp file mới. "Xoá toàn bộ dữ liệu" KHÔNG xoá khối này.
 // ============================================================
 let MS=msEmpty();
-function msEmpty(){return {v:1,supply:{},supplyHist:[],neg:{},groups:{},params:{},supByCat:{},supMult:{},forgot:{periods:{},order:[]}};}
+function msEmpty(){return {v:1,supply:{},supplyHist:[],neg:{},groups:{},params:{},supByCat:{},supMult:{},forgot:{periods:{},order:[]},poAb:{}};}
 function msNorm(x){const e=msEmpty();x=x||{};Object.keys(e).forEach(k=>{if(x[k]===undefined) x[k]=e[k];});if(!x.forgot.periods) x.forgot.periods={};if(!x.forgot.order) x.forgot.order=[];return x;}
 function msSave(){markDirty('manual');try{updateBadges();}catch(e){}}
 function nowISO(){return new Date().toISOString();}
@@ -5366,10 +5396,10 @@ function renderSupByCat(){const el=document.getElementById('fg-supcat');if(!el) 
 function exportForgot(){
   const R=(renderT('fgT'),LAST['fgT']||[]);if(!R.length){toast('Không có dòng nào theo bộ lọc','warning');return;}
   const P=R[0].P;const B=XW.Book();const sub=`Báo cáo giải trình · Kỳ ${dmyK(P.ref)} (dữ liệu tồn kho tháng ${fmtMonth(P.month)}) · Ngày lập ${dmyISO(P.created)} · Xuất lúc ${XWX.now()}`;
-  const H=['Mã dòng (không sửa)','Kỳ báo cáo','Ngày lập','Barcode','Tên hàng','CAT','Mã NCC','Tên NCC','SUP phụ trách','Tồn khi lập','Bán TB/ngày','Đang chờ giao (PO còn hiệu lực)','Đề xuất đặt (công thức)','Ngày phát hiện','Dấu hiệu','Trạng thái cung ứng','Trạng thái kiểm tra','Lý do gợi ý','Lý do quên đặt / không đặt (SUP ghi rõ)','Ghi chú SUP','PO mới thực tế','Người cập nhật','Ngày cập nhật'];
-  const rows=R.map(r=>[r.P.pid+'|'+r.bc,r.P.pid,dmyK(r.P.ref),r.bc,r.name,r.cat,r.sup,r.supName,r.sup_person||'',r.stock,r.rate,r.onOrder,r.rec,dmyK(r.detected),r.types.map(t=>FG_TYPE[t]).join('; '),r.supplyNow?SUP_ST[r.supplyNow.status]:'',FG_ST[r.eff],r.reasonCode||'',r.reason||'',r.note||'',r.poNew.map(l=>l.po_no+' ('+dmyK(l.od)+')').join(', '),r.by||'',r.at?dmyISO(r.at):'']);
-  const sh=B.addSheet('SKU quên đặt',{title:`BÁO CÁO SKU QUÊN ĐẶT / KHÔNG ĐẶT HÀNG (${fmt(rows.length)} MÃ)`,subtitle:sub,cols:[22,11,11,16,32,16,10,24,16,9,9,11,11,11,30,20,18,26,36,28,18,14,15]});
-  const ty=['code','code','center','code','wrap','text','code','text','textB','int','dec','int','int','center','wrap','text','center','wrap','wrap','wrap','wrap','text','center'];
+  const H=['Mã dòng (không sửa)','Kỳ báo cáo','Ngày lập','Barcode','Tên hàng','CAT','Mã NCC','Tên NCC','SUP phụ trách','Tồn khi lập','Bán TB/ngày','Đang chờ giao (PO còn hiệu lực)','Đề xuất đặt (công thức)','Ngày phát hiện','Dấu hiệu','Trạng thái cung ứng','Trạng thái kiểm tra','Lý do gợi ý','Lý do quên đặt / không đặt (SUP ghi rõ)','Ghi chú SUP','PO mới thực tế','Người cập nhật','Ngày cập nhật','Mã vạch (quét)'];
+  const rows=R.map(r=>[r.P.pid+'|'+r.bc,r.P.pid,dmyK(r.P.ref),r.bc,r.name,r.cat,r.sup,r.supName,r.sup_person||'',r.stock,r.rate,r.onOrder,r.rec,dmyK(r.detected),r.types.map(t=>FG_TYPE[t]).join('; '),r.supplyNow?SUP_ST[r.supplyNow.status]:'',FG_ST[r.eff],r.reasonCode||'',r.reason||'',r.note||'',r.poNew.map(l=>l.po_no+' ('+dmyK(l.od)+')').join(', '),r.by||'',r.at?dmyISO(r.at):'',r.bc]);
+  const sh=B.addSheet('SKU quên đặt',{title:`BÁO CÁO SKU QUÊN ĐẶT / KHÔNG ĐẶT HÀNG (${fmt(rows.length)} MÃ)`,subtitle:sub,cols:[22,11,11,16,32,16,10,24,16,9,9,11,11,11,30,20,18,26,36,28,18,14,15,36]});
+  const ty=['code','code','center','code','wrap','text','code','text','textB','int','dec','int','int','center','wrap','text','center','wrap','wrap','wrap','wrap','text','center','barcode'];
   B.table(sh,H.map((h,i)=>({h,t:ty[i],x:i===18||i===19||i===17||i===8?{fill:'FFF6D6'}:undefined})),rows.map(r=>r.map((v,i)=>ty[i]==='code'?String(v):v)),{main:true,freezeCol:5});
   B.note(sh,'Cột nền vàng: SUP điền / sửa (SUP phụ trách, Lý do gợi ý, Lý do ghi rõ, Ghi chú) và cột Trạng thái kiểm tra. KHÔNG sửa cột "Mã dòng". Nạp lại file ở trang Báo cáo SKU quên đặt → "Nạp phản hồi SUP": chỉ cập nhật các cột phản hồi, không đổi số tồn / bán / PO.');
   const s2=B.addSheet('Danh mục lựa chọn',{title:'DANH MỤC LÝ DO VÀ TRẠNG THÁI',subtitle:sub,cols:[6,60],landscape:false});
@@ -5488,6 +5518,141 @@ function poWarnings(){
 T.poWT={title:'Canh bao PO',sheet:'Canh bao PO',click:r=>showModal(r.barcode),cnt:d=>fmt(d.length)+' cảnh báo',
   data:()=>{const f=V('pow-f');return poWarnings().filter(w=>!f||w.t===f).sort((a,b)=>Object.keys(POW).indexOf(a.t)-Object.keys(POW).indexOf(b.t));},
   cols:[C('Loại cảnh báo',r=>POW[r.t],{td:r=>`<span class="badge ${['newlate','dup','blocked'].includes(r.t)?'b-danger':r.t==='short'||r.t==='unappr'?'b-gray':'b-warning'}">${esc(POW[r.t])}</span>`}),C('PO No.',r=>r.po_no,{xt:'code',td:r=>r.po_no?`<code>${esc(r.po_no)}</code>`:'—'}),cBc(),cName(),cSupC(),cSupN(),C('Chi tiết đối chiếu',r=>r.info,{xt:'wrap',td:r=>`<span class="sm" style="display:inline-block;min-width:280px;white-space:normal">${esc(r.info)}</span>`})]};
+
+// ============================================================
+// V2.12 - PO BẤT THƯỜNG: SL / GIÁ TRỊ đặt bất thường trên PO ĐANG MỞ (kể cả đã duyệt / đã gửi NCC) + xác nhận đúng có lý do
+// ============================================================
+const PA_F={restr:'Mã đang hạn chế / ngừng đặt',nosale:'Mã không có sức bán',cover:'Đủ bán quá lâu sau khi về',xhist:'SL gấp nhiều lần các lần đặt trước',cost:'Giá vốn PO lệch',povalue:'Giá trị PO cao bất thường so với NCC',dup:'Mã có ở nhiều PO đang mở',low:'SL đặt ít bất thường',newsku:'Mã chưa có trong tồn kho'};
+const PA_ST={new:'⏳ Chưa xác nhận',changed:'🔄 PO đã đổi - xác nhận lại',ok:'✅ Đúng - giữ nguyên',fix:'✏️ Cần điều chỉnh'};
+const PA_RSN={km:'Push Sale / khuyến mãi sắp chạy',md:'MD phân bổ / chỉ đạo cấp trên',season:'Hàng mùa vụ / Tết / sự kiện',display:'Trưng bày mới / sảnh / đầu kệ',newsku:'Mã mới - nhập lần đầu',mult:'NCC bắt buộc thùng / MOA',price:'Giá NCC thay đổi - đã xác nhận',cust:'Đơn khách đặt / khách sỉ',stock:'Tồn hệ thống sai - đã kiểm thực tế',wrong:'Nhập sai SL / giá - đã báo sửa',other:'Khác (ghi chú)'};
+function paPar(){return {cover:+cfg.poAbCover||90,x:+cfg.poAbX||3,cost:+cfg.poAbCost||20,pox:+cfg.poAbPoX||3,minV:+cfg.poAbMinV||0};}
+function paKey(po,bc){return po+'|'+bc;}
+function paState(key,qty,uc){const c=(MS.poAb||{})[key];if(!c) return 'new';if(Math.round(c.qty)!==Math.round(qty)||Math.round(c.uc||0)!==Math.round(uc||0)) return 'changed';return c.st;}
+function paBuild(){
+  const P=paPar();const today=parseDate(ymd(new Date()));
+  const open=poLines.filter(l=>l.open&&!l.isCons);
+  const byBc={};poLines.forEach(l=>{if(!l.cancel&&!l.isCons)(byBc[l.barcode]=byBc[l.barcode]||[]).push(l);});
+  const ucL=l=>l.unit_cost>0?l.unit_cost:ucOf(l.barcode);
+  // giá trị từng PO (để so với PO thường của NCC)
+  const poV={};poLines.forEach(l=>{if(l.cancel||l.isCons) return;const p=poV[l.po_no]=poV[l.po_no]||{sup:l.supplier,v:0};p.v+=l.order_qty*ucL(l);});
+  const supPos={};Object.entries(poV).forEach(([po,p])=>{(supPos[p.sup]=supPos[p.sup]||[]).push([po,p.v]);});
+  // phần dư theo mã: tồn + mọi PO đang mở − mức tồn cần; chia cho PO mới nhất trước
+  const exQ={};const openBc={};open.forEach(l=>{(openBc[l.barcode]=openBc[l.barcode]||[]).push(l);});
+  Object.entries(openBc).forEach(([bc,ls])=>{const s=skuMap.get(bc);if(!s) return;const tgt=Math.max(s.target||0,s.op||0,s.minD||0);
+    let rem=Math.max(0,s.close_qty)+ls.reduce((a,l)=>a+l.order_qty,0)-tgt;
+    ls.slice().sort((a,b)=>(b.od||'').localeCompare(a.od||'')).forEach(l=>{const r=Math.max(0,Math.min(l.order_qty,rem));exQ[paKey(l.po_no,bc)]=r;rem-=r;});});
+  const lines=open.map(l=>{
+    const s=skuMap.get(l.barcode);const uc=ucL(l);const val=l.order_qty*uc;const key=paKey(l.po_no,l.barcode);
+    const others=(byBc[l.barcode]||[]).filter(x=>x!==l);const otherOpen=others.filter(x=>x.open);
+    const stock=s?Math.max(0,s.close_qty):null;const rate=s?s.sales_day||0:0;const otherQ=otherOpen.reduce((a,x)=>a+x.order_qty,0);
+    const after=(stock||0)+otherQ+l.order_qty;const cover=rate>0?Math.round(after/rate):null;
+    const target=s?Math.max(s.target||0,s.op||0,s.minD||0):null;
+    const past=others.filter(x=>x.order_qty>0&&(x.received||(x.od&&l.od&&x.od<l.od))).map(x=>x.order_qty);const med_=past.length>=2?med(past):null;
+    const pack=l.pack>1?l.pack:(s&&s.pack>1?s.pack:0);const mult=s?s.mult||0:0;
+    const ex=exQ[key]||0;const sugg=s?Math.max(0,l.order_qty-ex):null;const exV=ex*uc;
+    const F=[];const add=(t,red,txt)=>F.push({t,red,txt});
+    if(s&&(s.restricted||s.isDisc||s.isNoOrder)) add('restr',true,s.restricted||(s.isDisc?'Order Group Discontinued':'Order Group không đặt hàng')+` - vẫn có PO ${fmt(l.order_qty)} cái`);
+    if(s&&rate<=0&&!(s.minD>0)&&val>=P.minV) add('nosale',stock>0,`Không bán trong kỳ dữ liệu · tồn ${fmt(stock)} · PO thêm ${fmt(l.order_qty)} (${fmtM(val)})`);
+    if(rate>0&&cover>P.cover&&exV>=P.minV){let t=`Tồn ${fmt(stock)} + PO khác ${fmt(otherQ)} + PO này ${fmt(l.order_qty)} = ${fmt(after)} → đủ bán ~${fmt(cover)} ngày (ngưỡng ${fmt(P.cover)}) · mức tồn cần ${fmt(target)}`;
+      if(pack>1&&l.order_qty%pack===0&&l.order_qty>=pack*2){const alt=Math.round(((stock||0)+otherQ+l.order_qty/pack)/rate);if(alt<=P.cover) t+=` · ⚠️ Có thể nhập nhầm thùng ↔ cái: ${fmt(l.order_qty)} = ${fmt(l.order_qty/pack)} × ${fmt(pack)}; nếu chỉ cần ${fmt(l.order_qty/pack)} cái thì đủ bán ~${fmt(alt)} ngày`;}
+      add('cover',cover>2*P.cover,t);}
+    if(med_&&l.order_qty>P.x*med_&&l.order_qty-med_>=Math.max(pack,2)&&val>=P.minV) add('xhist',l.order_qty>2*P.x*med_,`SL ${fmt(l.order_qty)} = ${fmt1(l.order_qty/med_)} lần trung vị ${fmt(med_)} của ${fmt(past.length)} lần đặt trước`);
+    if(l.unit_cost>0){let ref=s?unitCost(s):0;let src='giá vốn hiện tại';
+      if(!(ref>0)){const lr=others.filter(x=>x.received&&x.unit_cost>0).sort((a,b)=>(b.pd||'').localeCompare(a.pd||''))[0];if(lr){ref=lr.unit_cost;src='giá PO nhận gần nhất ('+lr.po_no+')';}}
+      if(ref>0){const dev=(l.unit_cost-ref)/ref*100;if(Math.abs(dev)>P.cost) add('cost',Math.abs(dev)>2*P.cost,`Giá PO ${fmt(Math.round(l.unit_cost))} so với ${src} ${fmt(Math.round(ref))} (${dev>0?'+':''}${fmt1(dev)}%) · chênh ${fmtM((l.unit_cost-ref)*l.order_qty)}`);}}
+    if(otherOpen.length&&ex>0) add('dup',false,`Còn ở PO ${otherOpen.map(x=>`${x.po_no} (${fmt(x.order_qty)}${x.unapproved?', chưa duyệt':''})`).join(', ')} · cộng lại vượt mức tồn cần`);
+    if(s&&rate>0&&!s.restricted&&((s.op>0&&after<s.op)||(med_&&l.order_qty*P.x<med_))) add('low',false,(s.op>0&&after<s.op)?`Về xong tồn ${fmt(after)} vẫn dưới điểm đặt ${fmt(s.op)} - kiểm tra có thiếu số 0 / đặt thiếu`:`SL ${fmt(l.order_qty)} chỉ bằng ${fmt1(l.order_qty/med_*100)}% trung vị ${fmt(med_)} các lần trước`);
+    if(!s&&monthsLoaded.length) add('newsku',false,'Không có trong file tồn kho mới nhất - mã mới hoặc sai barcode');
+    const hint=[];if(s&&s.promo) hint.push('Có KM: '+s.promo);if(l.type==='md') hint.push('PO MD phân bổ');if(!s||s.abc==='N'||s.isNewItem) hint.push('Mã mới');
+    if(mult>1) hint.push(`NCC bắt buộc bội số ${fmt(mult)}`);const moa=+((cfg.moa||{})[l.supplier]||0);if(moa>0&&poV[l.po_no]&&poV[l.po_no].v<=moa*1.2) hint.push(`PO ~ MOA ${fmtM(moa)}`);
+    const dd=l.ed?daysBetween(today,parseDate(l.ed)):null;
+    return {...l,s,uc,val,key,stock,rate,otherQ,after,cover,target,med:med_,nPast:past.length,pack,ex,exV,sugg,F,red:F.some(f=>f.red),hint:hint.join(' · '),dd,
+      name:l.item_name||(s&&s.name)||'',layer1:s?s.layer1:'',abc:s?s.abc:'',st:paState(key,l.order_qty,uc),conf:(MS.poAb||{})[key]||null};});
+  const flagged=lines.filter(r=>r.F.length);
+  // theo PO
+  const g={};lines.forEach(r=>{const p=g[r.po_no]=g[r.po_no]||{po_no:r.po_no,supplier:r.supplier,supplier_name:r.supplier_name,type:r.type,approver:r.approver||'',status:r.status||'',unapproved:r.unapproved,od:r.od,ed:r.ed,dd:r.dd,n:0,nF:0,nRed:0,qty:0,val:0,exV:0,lines:[]};
+    p.n++;p.qty+=r.order_qty;p.val+=r.val;if(r.ed&&(!p.ed||r.ed<p.ed)){p.ed=r.ed;p.dd=r.dd;}if(r.F.length){p.nF++;p.exV+=r.exV;p.lines.push(r);if(r.red) p.nRed++;}});
+  const heads=Object.values(g).map(p=>{const hist=(supPos[p.supplier]||[]).filter(([po])=>po!==p.po_no).map(x=>x[1]);const m=hist.length>=3?med(hist):null;p.supMed=m;
+    p.pf=null;if(m&&p.val>P.pox*m&&p.val-m>=P.minV) p.pf={t:'povalue',red:p.val>2*P.pox*m,txt:`Giá trị PO ${fmtM(p.val)} = ${fmt1(p.val/m)} lần trung vị ${fmtM(m)} của ${fmt(hist.length)} PO khác cùng NCC`};
+    p.pkey=paKey(p.po_no,'*');p.pst=p.pf?paState(p.pkey,p.val,0):null;
+    const sts=p.lines.map(r=>r.st).concat(p.pst?[p.pst]:[]);p.nAll=sts.length;p.nTodo=sts.filter(x=>x==='new'||x==='changed').length;p.nOk=sts.filter(x=>x==='ok').length;p.nFix=sts.filter(x=>x==='fix').length;
+    p.lvl=p.nRed||(p.pf&&p.pf.red)?'red':'orange';return p;}).filter(p=>p.nF||p.pf);
+  window._pa={lines:flagged,heads,byPo:Object.fromEntries(heads.map(p=>[p.po_no,p]))};return window._pa;
+}
+function paTodo(){try{const A=paBuild();return A.heads.reduce((a,p)=>a+p.nTodo,0);}catch(e){return 0;}}
+const paLvl=r=>r.red?'<span class="badge b-danger">🔴 Cao</span>':'<span class="badge b-warning">🟠 Xem lại</span>';
+const paStB=(st,c)=>`<span class="badge ${st==='ok'?'b-success':st==='fix'?'b-accent':st==='changed'?'b-warning':'b-gray'}">${PA_ST[st]}</span>${c&&st!=='new'?`<div class="sm muted" style="white-space:normal;min-width:160px">${esc(PA_RSN[c.reason]||'')}${c.note?' - '+esc(c.note):''}${c.fixQty!==undefined&&c.fixQty!==''&&c.fixQty!==null?` · SL đúng: <b>${fmt(c.fixQty)}</b>`:''}<br>${esc(c.by||'')} ${c.at?dmyK(ymd(new Date(c.at))):''}</div>`:''}`;
+const paStX=(st,c)=>PA_ST[st].slice(2).trim()+(c&&st!=='new'?` - ${PA_RSN[c.reason]||''}${c.note?' - '+c.note:''}${c.fixQty!==undefined&&c.fixQty!==''&&c.fixQty!==null?' · SL đúng: '+c.fixQty:''} (${c.by||''} ${c.at?dmyK(ymd(new Date(c.at))):''})`:'');
+const paDd=x=>x.ed?`${dmyK(x.ed)}<div class="sm" style="color:${x.dd<0?'var(--danger)':x.dd<=3?'var(--warning)':'var(--text3)'}">${x.dd<0?'quá hạn '+fmt(-x.dd)+' ngày':x.dd===0?'về hôm nay':'còn '+fmt(x.dd)+' ngày'}</div>`:'—';
+function paFilt(r){const q=(V('pa-q')||'').toLowerCase(),ty=V('pa-type'),lv=V('pa-lvl'),f=V('pa-f'),st=V('pa-st'),sup=V('pa-sup'),wh=V('pa-when');
+  return (!q||[r.po_no,r.barcode,r.name,r.supplier,r.supplier_name,r.approver].join(' ').toLowerCase().includes(q))&&(!ty||r.type===ty)&&(!sup||r.supplier===sup)&&
+    (!wh||(wh==='late'?r.dd!==null&&r.dd<0:wh==='week'?r.dd!==null&&r.dd<=7:wh==='unappr'?r.unapproved:!r.unapproved));}
+function paStOk(st){const v=V('pa-st');return !v||(v==='todo'?(st==='new'||st==='changed'):st===v);}
+T.paPT={title:'PO bat thuong theo PO',sheet:'PO bat thuong',click:p=>{window._paSel=window._paSel===p.po_no?'':p.po_no;paRerender();},
+  rowCls:p=>p.po_no===window._paSel?'row-sel':'',
+  cnt:d=>`${fmt(d.length)} PO · ${fmt(d.filter(p=>p.lvl==='red').length)} 🔴 · dư ~${fmtM(sumVal(d,p=>p.exV))}`,empty:'Không có PO đang mở nào bất thường theo bộ lọc',
+  data:()=>{const A=window._pa||paBuild();const lv=V('pa-lvl'),f=V('pa-f');return A.heads.filter(p=>paFilt(p)&&(!lv||p.lvl===lv)&&(!f||(f==='povalue'?!!p.pf:p.lines.some(r=>r.F.some(x=>x.t===f))))&&(!V('pa-st')||(V('pa-st')==='todo'?p.nTodo>0:p.lines.some(r=>r.st===V('pa-st'))||p.pst===V('pa-st'))))
+    .sort((a,b)=>(a.lvl==='red'?0:1)-(b.lvl==='red'?0:1)||(a.dd??999)-(b.dd??999)||b.exV-a.exV);},
+  cols:[C('Mức',p=>p.lvl==='red'?'Cao':'Xem lại',{td:p=>paLvl({red:p.lvl==='red'})}),C('PO No.',p=>p.po_no,{xt:'code',td:p=>`<code>${esc(p.po_no)}</code>${p.unapproved?' <span class="badge b-gray">Chưa duyệt</span>':''}`}),
+    C('Loại',p=>PT_LABEL[p.type]||p.type,{td:p=>`<span class="sm">${PT_LABEL[p.type]||esc(p.type)}</span>`}),C('Trạng thái PO',p=>p.status),C('Người duyệt',p=>p.approver),cSupC(),cSupN(),
+    C('Ngày đặt',p=>p.od?dmyK(p.od):''),C('Dự kiến về',p=>p.ed?dmyK(p.ed):'',{s:p=>p.dd??999,td:paDd}),
+    cN('Số mã',p=>p.n),cN('Mã bất thường',p=>p.nF,{td:p=>`<b>${fmt(p.nF)}</b>${p.nRed?` <span class="sm" style="color:var(--danger)">(${fmt(p.nRed)} 🔴)</span>`:''}`}),
+    cVal('Giá trị PO (đ)',p=>p.val),cVal('Giá trị có thể giảm (đ)',p=>p.exV),
+    C('Bất thường cấp PO',p=>p.pf?p.pf.txt:'',{xt:'wrap',td:p=>p.pf?`<span class="sm" style="display:inline-block;min-width:220px;white-space:normal;color:${p.pf.red?'var(--danger)':'var(--warning)'}">${esc(p.pf.txt)}</span>`:'—'}),
+    C('Xác nhận',p=>`${p.nAll-p.nTodo}/${p.nAll} đã xác nhận (${p.nOk} đúng, ${p.nFix} cần sửa)`,{td:p=>p.nTodo?`<span class="badge b-warning">${fmt(p.nTodo)}/${fmt(p.nAll)} chưa xác nhận</span>`:`<span class="badge ${p.nFix?'b-accent':'b-success'}">${p.nFix?'✏️ '+fmt(p.nFix)+' cần sửa':'✅ Đã xác nhận đúng'}</span>`}),
+    C('',p=>'',{noExp:true,nosort:true,td:p=>`<button class="btn btn-sm" onclick="event.stopPropagation();paConfirmPo('${esc(p.po_no)}')">✅ Xác nhận PO</button> <button class="btn btn-sm" onclick="event.stopPropagation();showPo('${esc(p.po_no)}')">🔎</button>`})]};
+T.paLT={title:'Dong PO bat thuong',sheet:'Dong PO bat thuong',click:r=>r.s?showModal(r.barcode):showSkuPos(r.barcode,r.po_no),
+  cnt:d=>`${fmt(d.length)} dòng · ${fmt(d.filter(r=>r.red).length)} 🔴 · giá trị ${fmtM(sumVal(d,r=>r.val))} · có thể giảm ~${fmtM(sumVal(d,r=>r.exV))}`,empty:'Không có dòng PO bất thường theo bộ lọc',
+  data:()=>{const A=window._pa||paBuild();const lv=V('pa-lvl'),f=V('pa-f'),sel=window._paSel;
+    return A.lines.filter(r=>(!sel||r.po_no===sel)&&paFilt(r)&&(!lv||(lv==='red')===r.red)&&(!f||r.F.some(x=>x.t===f))&&paStOk(r.st))
+      .sort((a,b)=>(b.red?1:0)-(a.red?1:0)||(a.dd??999)-(b.dd??999)||b.exV-a.exV||b.val-a.val);},
+  cols:[C('Mức',r=>r.red?'Cao':'Xem lại',{td:paLvl}),C('PO No.',r=>r.po_no,{xt:'code',td:r=>`<a href="#" onclick="event.stopPropagation();showPo('${esc(r.po_no)}');return false"><code>${esc(r.po_no)}</code></a>${r.unapproved?' <span class="badge b-gray">Chưa duyệt</span>':''}`}),
+    C('Loại',r=>PT_LABEL[r.type]||r.type,{td:r=>`<span class="sm">${PT_LABEL[r.type]||esc(r.type)}</span>`}),C('Dự kiến về',r=>r.ed?dmyK(r.ed):'',{s:r=>r.dd??999,td:paDd}),
+    cBc(),cName(),cSupC(),cSupN(),
+    cN('SL đặt',r=>r.order_qty,{td:r=>`<b>${fmt(r.order_qty)}</b>${r.pack>1?`<div class="sm muted">${fmt1(r.order_qty/r.pack)} thùng × ${fmt(r.pack)}</div>`:''}`}),
+    cUC(r=>Math.round(r.uc)),cVal('Giá trị dòng (đ)',r=>r.val),
+    cN('Tồn hiện tại',r=>r.stock),cN('PO khác đang mở',r=>r.otherQ||null),cD('Bán TB/ngày',r=>r.rate),cN('Đủ bán sau khi về (ngày)',r=>r.cover,{td:r=>r.cover===null?'—':`<b style="color:${r.cover>2*paPar().cover?'var(--danger)':r.cover>paPar().cover?'var(--warning)':'inherit'}">${fmt(r.cover)}</b>`}),
+    cN('Mức tồn cần',r=>r.target),cN('SL các lần trước (trung vị)',r=>r.med,{td:r=>r.med?`${fmt(r.med)}<div class="sm muted">${fmt(r.nPast)} lần</div>`:'—'}),
+    cN('SL nên đặt (tham khảo)',r=>r.sugg,{td:r=>r.sugg===null?'—':r.sugg<r.order_qty?`<b class="rec">${fmt(r.sugg)}</b><div class="sm" style="color:var(--danger)">−${fmt(r.order_qty-r.sugg)}</div>`:fmt(r.sugg)}),cVal('Giá trị có thể giảm (đ)',r=>r.exV),
+    C('Bất thường',r=>r.F.map(f=>PA_F[f.t]+': '+f.txt).join(' | '),{xt:'wrap',td:r=>`<div class="sm" style="min-width:320px;white-space:normal">${r.F.map(f=>`<div style="margin-bottom:3px"><span class="badge ${f.red?'b-danger':'b-warning'}">${esc(PA_F[f.t])}</span> ${esc(f.txt)}</div>`).join('')}</div>`}),
+    C('Có thể đúng vì',r=>r.hint,{xt:'wrap',td:r=>r.hint?`<span class="sm" style="display:inline-block;min-width:140px;white-space:normal;color:var(--success)">${esc(r.hint)}</span>`:'—'}),
+    C('Xác nhận',r=>paStX(r.st,r.conf),{xt:'wrap',td:r=>paStB(r.st,r.conf)}),
+    C('',r=>'',{noExp:true,nosort:true,td:r=>`<button class="btn btn-sm" onclick="event.stopPropagation();paConfirm(['${esc(r.key)}'])">${r.st==='new'||r.st==='changed'?'✅ Xác nhận':'✏️ Sửa'}</button>`})]};
+function paRow(key){const A=window._pa||paBuild();if(key.endsWith('|*')){const p=A.byPo[key.slice(0,-2)];return p?{po:true,p}:null;}return A.lines.find(r=>r.key===key)||null;}
+function paConfirmPo(po){const p=(window._pa||paBuild()).byPo[po];if(!p) return;paConfirm(p.lines.map(r=>r.key).concat(p.pf?[p.pkey]:[]),'PO '+po);}
+function paConfirmFiltered(){const keys=(LAST.paLT||[]).map(r=>r.key);if(!keys.length){toast('Không có dòng nào đang lọc','warning');return;}paConfirm(keys,`${fmt(keys.length)} dòng đang lọc`);}
+function paConfirm(keys,label){
+  const rows=keys.map(paRow).filter(Boolean);if(!rows.length) return;const one=rows.length===1&&!rows[0].po;const c0=(MS.poAb||{})[keys[0]]||{};
+  const info=rows.slice(0,8).map(r=>r.po?`<div>• <b>PO ${esc(r.p.po_no)}</b> - ${esc(r.p.pf.txt)}</div>`:`<div>• <code>${esc(r.po_no)}</code> ${esc((r.name||r.barcode).slice(0,36))} - SL <b>${fmt(r.order_qty)}</b> · ${fmtM(r.val)}<br><span class="muted">${r.F.map(f=>esc(PA_F[f.t])).join(' · ')}${r.hint?' · <span style="color:var(--success)">'+esc(r.hint)+'</span>':''}</span></div>`).join('')+(rows.length>8?`<div class="muted">+ ${fmt(rows.length-8)} dòng khác</div>`:'');
+  const autoR=one&&rows[0].s&&rows[0].s.promo?'km':one&&rows[0].type==='md'?'md':one&&rows[0].hint.includes('Mã mới')?'newsku':one&&rows[0].hint.includes('bội số')?'mult':'';
+  const fields=[['info',label||(one?'Dòng PO':'Các dòng'),info],
+    ['select','st','Kết luận',c0.st||'ok',[['ok','✅ Đúng - giữ nguyên SL / giá'],['fix','✏️ Cần điều chỉnh - báo MD / NCC sửa PO']]],
+    ['select','reason','Lý do',c0.reason||autoR||'',[['','- Chọn lý do -'],...Object.entries(PA_RSN)]]];
+  if(one) fields.push(['text','fixQty','SL đúng nên là (nếu cần điều chỉnh)',c0.fixQty??(rows[0].sugg!==null&&rows[0].sugg<rows[0].order_qty?String(rows[0].sugg):'')]);
+  fields.push(['textarea','note','Ghi chú (người / ngày đã báo, nội dung trao đổi...)',c0.note||'']);
+  formModal('Xác nhận PO bất thường',fields,v=>{
+    if(!v.reason){toast('Chọn lý do','warning');return false;}if(v.reason==='other'&&!v.note.trim()){toast('Lý do "Khác" - ghi rõ ở Ghi chú','warning');return false;}
+    MS.poAb=MS.poAb||{};const at=nowISO(),by=whoAmI();
+    rows.forEach((r,i)=>{const k=r.po?r.p.pkey:r.key;MS.poAb[k]={st:v.st,reason:v.reason,note:v.note.trim(),by,at,qty:r.po?r.p.val:r.order_qty,uc:r.po?0:r.uc,po:r.po?r.p.po_no:r.po_no,bc:r.po?'*':r.barcode,fixQty:one&&v.st==='fix'&&v.fixQty!==''?+v.fixQty:undefined};});
+    msSave();paRerender();toast(`Đã xác nhận ${fmt(rows.length)} mục: ${v.st==='ok'?'Đúng':'Cần điều chỉnh'} - ${PA_RSN[v.reason]}`);});
+  if(Object.keys(c0).length){const b=document.createElement('button');b.className='btn';b.textContent='↩ Bỏ xác nhận';b.onclick=()=>{keys.forEach(k=>delete MS.poAb[k]);msSave();closeModal();paRerender();toast('Đã bỏ xác nhận');};document.querySelector('#modal-body .fm-act').appendChild(b);}
+}
+function paKpi(){const el=document.getElementById('pa-kpi');if(!el) return;const A=window._pa;const H=A.heads,L=A.lines;
+  const todo=L.filter(r=>r.st==='new'||r.st==='changed');const soon=H.filter(p=>p.nTodo&&p.dd!==null&&p.dd<=3);
+  el.innerHTML=tile('danger','PO đang mở bất thường',fmt(H.length),`${fmt(H.filter(p=>p.lvl==='red').length)} PO mức 🔴 cao`,"document.getElementById('pa-lvl').value='red';paRerender()")+
+    tile('warning','Dòng chưa xác nhận',fmt(todo.length),`${fmt(todo.filter(r=>r.red).length)} 🔴 · ${fmtM(sumVal(todo,r=>r.val))}`,"document.getElementById('pa-st').value='todo';paRerender()")+
+    tile('danger','Giá trị có thể giảm',fmtM(sumVal(todo,r=>r.exV)),'Phần vượt mức tồn cần - dòng chưa xác nhận')+
+    tile('warning','Sắp về ≤ 3 ngày, chưa xác nhận',fmt(soon.length),soon.length?'Xử lý trước: '+soon.slice(0,3).map(p=>p.po_no).join(', '):'Không có',"document.getElementById('pa-when').value='week';paRerender()")+
+    tile('success','Đã xác nhận',fmt(L.filter(r=>r.st==='ok'||r.st==='fix').length),`${fmt(L.filter(r=>r.st==='ok').length)} đúng · ${fmt(L.filter(r=>r.st==='fix').length)} cần sửa`,"document.getElementById('pa-st').value='';paRerender()");}
+function paRerender(){paBuild();['paPT','paLT'].forEach(rerender);paKpi();const s=document.getElementById('pa-sel');if(s) s.innerHTML=window._paSel?`· PO <code>${esc(window._paSel)}</code> <a href="#" onclick="window._paSel='';paRerender();return false">bỏ chọn</a>`:'';try{updateBadges();}catch(e){}}
+function renderPa(){const A=paBuild();const el=document.getElementById('pa-sup');const v=el.value;const ks=[...new Set(A.heads.map(p=>p.supplier))].sort();
+  el.innerHTML='<option value="">Tất cả NCC</option>'+ks.map(k=>`<option value="${esc(k)}">${esc(k)} - ${esc(supName[k]||'')}</option>`).join('');el.value=ks.includes(v)?v:'';
+  const P=paPar();const n=document.getElementById('pa-par');if(n) n.textContent=`Ngưỡng: đủ bán > ${P.cover} ngày · SL > ${P.x} lần trung vị lần đặt trước · giá lệch > ${P.cost}% · giá trị PO > ${P.pox} lần PO thường của NCC · bỏ qua dòng dư < ${fmtM(P.minV)} (sửa ở Tham số)`;
+  const inf=document.getElementById('pa-info');if(inf) inf.innerHTML=!poData.length?'<span class="rt rt-warn">Chưa có dữ liệu PO - nạp file PO Detail ở trang Import.</span>':!monthsLoaded.length?'<span class="rt rt-warn">Chưa có file tồn kho - chỉ kiểm được giá trị PO, chưa kiểm được sức bán / đủ bán.</span>':'';
+  paRerender();}
+// bảng khai báo sau init: gắn cột Mã vạch (quét) + nút In mã vạch (idempotent)
+try{injectCodeCols();wireExportButtons();}catch(e){}
+
 </script>
 </body>
 </html>

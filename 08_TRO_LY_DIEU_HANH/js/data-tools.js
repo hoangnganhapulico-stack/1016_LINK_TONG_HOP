@@ -1,6 +1,6 @@
 window.S1016_TOOLS = {
   "extractedAt": "2026-10-29T00:00:00+07:00",
-  "count": 63,
+  "count": 64,
   "tools": [
     {
       "name": "Trợ Lý Điều Hành 1016",
@@ -17,10 +17,10 @@ window.S1016_TOOLS = {
       "desc": "Quét barcode tra tồn kho, giá bán, Mix and Match, Bundle",
       "group": "Dùng hằng ngày",
       "groupId": "hay-dung",
-      "href": "https://sweet-gumption-b0280b.netlify.app/",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Check_Ton_Gia_KM.html",
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Check_Ton_Gia_KM.html",
-      "host": "Netlify",
-      "updated": "23/10/2026"
+      "host": "GitHub",
+      "updated": "05/11/2026"
     },
     {
       "name": "Xin Hàng Các Cửa Hàng",
@@ -127,10 +127,10 @@ window.S1016_TOOLS = {
       "desc": "Quét barcode tra tồn kho, giá bán, Mix and Match, Bundle",
       "group": "Kho - Đặt hàng - Trưng bày",
       "groupId": "kho",
-      "href": "https://sweet-gumption-b0280b.netlify.app/",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Check_Ton_Gia_KM.html",
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Check_Ton_Gia_KM.html",
-      "host": "Netlify",
-      "updated": "23/10/2026"
+      "host": "GitHub",
+      "updated": "05/11/2026"
     },
     {
       "name": "OrderIQ - Đặt hàng & tồn kho",
@@ -140,7 +140,7 @@ window.S1016_TOOLS = {
       "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_OrderIQ_Dat_Hang_Ton_Kho.html",
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_OrderIQ_Dat_Hang_Ton_Kho.html",
       "host": "GitHub",
-      "updated": "04/11/2026"
+      "updated": "05/11/2026"
     },
     {
       "name": "Xin Hàng Các Cửa Hàng",
@@ -630,7 +630,17 @@ window.S1016_TOOLS = {
       "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_OrderIQ_Dat_Hang_Chia_Se.html",
       "local": "",
       "host": "GitHub",
-      "updated": "04/11/2026"
+      "updated": "05/11/2026"
+    },
+    {
+      "name": "Hướng dẫn Thu ngân - Staff Voucher",
+      "desc": "Hướng dẫn xử lý Staff Voucher tại Store 1016",
+      "group": "Vận hành Team",
+      "groupId": "van-hanh",
+      "local": "",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/01_VAN_HANH_TEAM/VH_Huong_Dan_Staff_Voucher.html",
+      "host": "GitHub",
+      "updated": "05/11/2026"
     }
   ]
 };
