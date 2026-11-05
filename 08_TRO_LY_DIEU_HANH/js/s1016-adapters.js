@@ -273,7 +273,7 @@
   });
 
   /* ================= 8. NGUỒN CHỈ MỞ LINK / CHỈ NHẬP FILE ================= */
-  S.registerSource({ id: "CHECK_TON", name: "CHECK TỒN (Netlify)", group: "Kho - Đặt hàng", mode: "link", entity: "Tra tồn, giá, KM", keys: [], how: "Khác origin (Netlify) - trình duyệt không cho đọc dữ liệu. Mở link để tra cứu.", read: function () { return null; } });
-  S.registerSource({ id: "XIN_HANG", name: "Xin hàng các cửa hàng (Netlify)", group: "Kho - Đặt hàng", mode: "link", entity: "Tồn liên cửa hàng", keys: [], how: "Khác origin (Netlify) - chỉ mở link.", read: function () { return null; } });
+  S.registerSource({ id: "CHECK_TON", name: "CHECK TỒN (tra tồn, giá, KM)", group: "Kho - Đặt hàng", mode: "link", entity: "Tra tồn, giá, KM", keys: [], how: "Mở link để tra cứu - dữ liệu dùng chung qua Google Apps Script.", read: function () { return null; } });
+  S.registerSource({ id: "XIN_HANG", name: "Xin hàng các cửa hàng", group: "Kho - Đặt hàng", mode: "link", entity: "Tồn liên cửa hàng", keys: [], how: "Mở link để xin hàng - dữ liệu dùng chung qua Google Apps Script.", read: function () { return null; } });
   S.registerSource({ id: "CHAM_CONG", name: "Check ca & chấm công", group: "Vận hành", mode: "link", entity: "Đối chiếu ca - chấm công", keys: [], how: "Công cụ không lưu dữ liệu (chỉ xử lý file tạm) - chỉ mở link.", read: function () { return null; } });
 })();

@@ -27,9 +27,9 @@ window.S1016_TOOLS = {
       "desc": "Tồn - giá vốn - GP% các store miền Nam, đồng bộ dữ liệu, phí ship Sagawa",
       "group": "Dùng hằng ngày",
       "groupId": "hay-dung",
-      "href": "https://1016xinhangmiennam.netlify.app/",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Xin_Hang_Lien_Cua_Hang.html",
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Xin_Hang_Lien_Cua_Hang.html",
-      "host": "Netlify",
+      "host": "GitHub",
       "updated": "25/10/2026"
     },
     {
@@ -147,9 +147,9 @@ window.S1016_TOOLS = {
       "desc": "Tồn - giá vốn - GP% các store miền Nam, đồng bộ dữ liệu, phí ship Sagawa",
       "group": "Kho - Đặt hàng - Trưng bày",
       "groupId": "kho",
-      "href": "https://1016xinhangmiennam.netlify.app/",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Xin_Hang_Lien_Cua_Hang.html",
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Xin_Hang_Lien_Cua_Hang.html",
-      "host": "Netlify",
+      "host": "GitHub",
       "updated": "25/10/2026"
     },
     {
