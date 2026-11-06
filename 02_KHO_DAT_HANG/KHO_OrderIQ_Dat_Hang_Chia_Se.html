@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OrderIQ Kho Đặt hàng V2.13 · PARC MALL 1016</title>
+<title>OrderIQ Kho Đặt hàng V2.14 · PARC MALL 1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -653,8 +653,8 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
     <div class="steps">
       <div class="step-c" id="stp1"><div class="step-n">1</div><div class="step-b"><b>File or_plan (chuẩn đối chiếu)</b><div class="sm muted" id="stp1-s"></div>
         <button class="btn btn-sm" onclick="document.getElementById('fi-handy2').click()">📲 Tải file or_plan</button><input type="file" id="fi-handy2" accept=".csv,.txt,.xlsx,.xls" style="display:none" onchange="queueFiles(this.files,'handy');this.value=''"></div></div>
-      <div class="step-c" id="stp2"><div class="step-n">2</div><div class="step-b"><b>Đơn Senior đã đặt</b><div class="sm muted" id="stp2-s">Lấy từ file PO Detail (các dòng chưa duyệt / chưa nhận) hoặc tải file đơn (Barcode + SL).</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="loadFromPO()">🚚 Lấy đơn chưa duyệt từ PO</button><button class="btn btn-sm" onclick="document.getElementById('fi-po2').click()">📂 Tải file PO Detail mới</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📝 Tải file đơn khác</button></div>
+      <div class="step-c" id="stp2"><div class="step-n">2</div><div class="step-b"><b>Đơn Senior đã đặt</b><div class="sm muted" id="stp2-s"><b>Nhanh nhất: tải thẳng file đơn Handy (order.csv)</b> nhân viên vừa up lên cloud. Hoặc lấy từ PO Detail (dòng chưa duyệt / chưa nhận), hoặc file đơn khác (Barcode + SL).</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="loadFromPO()">🚚 Lấy đơn chưa duyệt từ PO</button><button class="btn btn-sm" onclick="document.getElementById('fi-po2').click()">📂 Tải file PO Detail mới</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📲 Tải file đơn Handy (order.csv)</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📝 File đơn khác</button></div>
         <input type="file" id="fi-po2" accept=".csv,.xlsx,.xls" style="display:none" onchange="window._poThenLoad=true;queueFiles(this.files,'po');this.value=''">
         <input type="file" id="fi-sord" accept=".csv,.xlsx,.xls" multiple style="display:none" onchange="queueFiles(this.files,'sord');this.value=''">
         <div class="up-status" id="st-sord"></div></div></div>
@@ -1016,6 +1016,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 
 <h2>4. Tình huống ứng dụng</h2>
 <table><tr><th>Tình huống</th><th>Làm gì</th></tr>
+<tr><td>Kiểm tra đơn Handy (V2.14)</td><td>① Nạp <b>or_plan.csv</b> cùng ngày (file tải vào máy Handy) → ② nhân viên đặt xong up đơn lên cloud, tải file <b>order.csv</b> về → trang ✅ Kiểm tra đơn Senior bấm <b>📲 Tải file đơn Handy (order.csv)</b> (hoặc thả vào ô nạp bất kỳ - tool tự nhận: 12 cột, không tiêu đề, cột 9 = SL đặt) → ③ ghi tên nhân viên ở ô Senior, xem 🟠 Dư / 🔴 Thiếu / ⚫ Không nên đặt / 🟣 Bỏ sót, sửa SL chốt → ④ Xuất danh sách điều chỉnh. Mã trùng trong file được cộng SL; nạp lại cùng file thì cập nhật, giữ SL chốt đã sửa.</td></tr>
 <tr><td>Duyệt đơn Senior đặt bằng Handy</td><td>① Senior tải or_plan vào Handy → ② nhân viên ra line bấm SL → ③ up lên hệ thống → ④ Sale Chief: nạp cùng file or_plan + PO Detail mới → Lấy đơn chưa duyệt từ PO → chốt SL → Xuất danh sách điều chỉnh → sửa trên hệ thống</td></tr>
 <tr><td>Xem gợi ý trước khi Senior ra line</td><td>Nạp or_plan → 📲 Gợi ý đặt → chỉnh SL chốt → 📦 Xuất danh sách đặt theo NCC cho nhân viên bấm Handy</td></tr>
 <tr><td>Khách hỏi hàng, kệ trống</td><td>Mã Tồn 0 - Sale 0 → biết do quên đặt, hàng đang về hay NCC không giao</td></tr>
@@ -1506,6 +1507,7 @@ async function nextFile(){
       if(isBulkHeader(h0)){ingestPromo('bulk',job,rows,document.getElementById('st-promo')||st);nextFile();return;}}}
     if(job.type!=='moa'){const h0=rows.slice(0,5).find(r=>r&&r.some(v=>/^supplier code/i.test(str(v)))&&r.some(v=>/^moa$/i.test(str(v).trim())));if(h0) job.type='moa';}
     if(job.type==='moa'){const hi=rows.findIndex(r=>r&&r.some(v=>/moa|supplier code|mã ncc|ma ncc/i.test(str(v))));if(hi<0) throw new Error('Cần 2 cột: Mã NCC (Supplier Code) và MOA');ingestMoa(job,rows[hi].map(h=>str(h)),rows.slice(hi+1),st);nextFile();return;}
+    if(isHandyOrderAoa(rows)&&!isHandyAoa(rows)){ingestHandyOrder(job,rows,document.getElementById('st-sord')||st);nextFile();return;}
     if(job.type==='promo') throw new Error('Không nhận ra file: cần sale_list (cột Rate/Amount) hoặc bulk_sale_list (cột Bulk Sale)');
     if(isHandyAoa(rows)){ingestHandy(job,rows,document.getElementById('st-handy')||st);nextFile();return;}
     if(job.type==='handy') throw new Error('Không phải file Handy (or_plan): cần 26 cột, cột 12 = "this w"');
@@ -3380,6 +3382,35 @@ function mdButtons(id){return `<button class="btn btn-sm btn-primary" onclick="e
 // ============================================================
 let handy=null;          // {date, sched, fname, weeks:[...], rows:[...], chot:{barcode:qty}}
 let handyRows=[];
+// ==== V2.14: FILE ĐƠN HANDY (order.csv) - không dòng tiêu đề, 12 cột ====
+// Cột: 1 Ngày plan · 2 Barcode · 3 Mã hàng · 4 Tên · 5 Quy cách · 6 Bội số · 7 Mã NCC · 8 Tên NCC · 9 SL ĐẶT · 10 (0) · 11 Ngày đặt · 12 Giờ đặt
+function isHandyOrderAoa(rows){
+  const r=rows.filter(x=>x&&x.length>=9&&x.length<26&&String(x[0]||'').trim()).slice(0,20);
+  if(!r.length) return false;
+  return r.every(x=>/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(x[0]).trim())&&/^\d{6,14}$/.test(String(x[1]).trim())&&/^\d{6}$/.test(String(x[6]).trim())&&/^-?\d+(\.\d+)?$/.test(String(x[8]).trim()));
+}
+function ingestHandyOrder(job,rows,st){
+  const byBc=new Map();let d='',t0='',t1='',dup=0,zero=0;
+  rows.forEach(r=>{
+    if(!r||r.length<9) return;const bc=str(r[1])||str(r[2]);if(!bc||!/^\d{4}\//.test(str(r[0]))) return;
+    const q=num(r[8]);if(!(q>0)){zero++;return;}
+    if(!d) d=str(r[0]);const tm=(r.slice(9).map(v=>str(v)).find(v=>/^\d{1,2}:\d{2}/.test(v)))||'';if(tm){if(!t0||tm<t0)t0=tm;if(!t1||tm>t1)t1=tm;}
+    const sup=str(r[6]),sn=str(r[7]);if(sup&&sn&&!supName[sup]) supName[sup]=sn;
+    const ex=byBc.get(bc);
+    if(ex){ex.qty+=q;dup++;return;}
+    byBc.set(bc,{barcode:bc,item_code:str(r[2])!==bc?str(r[2]):'',name:str(r[3]),qty:q,pack:num(r[5]),supplier:sup,supplier_name:sn});
+  });
+  const lines=[...byBc.values()];
+  if(!lines.length) throw new Error('File đơn Handy không có dòng nào có SL đặt > 0');
+  const dk=d.replace(/\//g,'');const key='hdo|'+dk+'|'+t0+'|'+t1+'|'+lines.length+'|'+lines.reduce((a,l)=>a+l.qty,0);
+  const sups=[...new Set(lines.map(l=>l.supplier).filter(Boolean))];
+  const old=supOrders.find(x=>x.key===key);
+  const b={id:old?old.id:'so'+Date.now(),key,fname:`Đơn Handy ${dmyK(dk)}${t0?' '+t0.slice(0,5)+(t1&&t1!==t0?'-'+t1.slice(0,5):''):''} (${job.file.name})`,date:new Date().toLocaleString('vi-VN'),supplier:sups.length===1?sups[0]:'',seller:old?old.seller||'':'',scope:old?old.scope:(sups.length>1?'all':undefined),lines};
+  if(old){const ch={};old.lines.forEach(l=>{if(l.chot!==undefined&&l.chot!==null) ch[l.barcode]=l.chot;});b.lines.forEach(l=>{if(ch[l.barcode]!==undefined) l.chot=ch[l.barcode];});old.lines.filter(l=>l.missing).forEach(l=>b.lines.push(l));supOrders=supOrders.filter(x=>x!==old);}
+  supOrders.unshift(b);window._curSord=b.id;window._afterSord=true;markDirty('sord','meta');
+  const warn=!handy?' · ⚠️ Chưa nạp or_plan - tool đang so theo file tồn kho tháng, nên nạp or_plan cùng ngày':(handy.date!==dk?` · ⚠️ or_plan đang nạp là ngày ${dmyK(handy.date)}, đơn ngày ${dmyK(dk)} - nên nạp or_plan cùng ngày`:'');
+  st.innerHTML=`✅ ${esc(job.file.name)}: đơn Handy ngày ${dmyK(dk)} · ${fmt(lines.length)} mã · ${fmt(sups.length)} NCC${dup?` · gộp ${dup} dòng trùng mã (cộng SL)`:''}${zero?` · bỏ ${zero} dòng SL 0`:''}${old?' · đã nạp file này trước đó → cập nhật, giữ SL chốt':''}${warn}`;
+}
 function isHandyAoa(rows){const r=rows.find(x=>x&&x.length>=26);return !!r&&String(r[11]).trim().toLowerCase()==='this w'&&/^\d{4}\/\d{2}\/\d{2}$/.test(String(r[0]).trim());}
 function ingestHandy(job,rows,st){
   const out=[];let date='',sched='',weeks=[];
