@@ -600,6 +600,8 @@
   @media (max-width:640px){ .psec h2{ font-size:20px; } .tl-item{ grid-template-columns:80px 1fr; } .tl-cat{ grid-column:2; justify-self:start; } .kv{ grid-template-columns:1fr; } }
   .psec .meta, #t11DiagBlock .meta{ color:var(--muted); font-size:12.5px; margin:8px 0 0; line-height:1.55; }
   #pDiag .camp-s{ font-size:13px; line-height:1.55; }
+  .t11-sync{ display:inline-flex; align-items:center; gap:7px; margin-top:6px; font-size:12px; color:var(--ink-2); }
+  .t11-sync i{ width:8px; height:8px; border-radius:50%; display:inline-block; flex:none; }
   .diag-calc{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); align-items:end; }
   .diag-calc label{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:600; color:var(--ink-2); }
   .diag-calc input{ font:inherit; font-size:15px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; color:var(--ink); }
@@ -650,6 +652,7 @@
 <div class="wrap">
 <div id="planPage">
 <div class="plan-tick" id="planTickBar"></div>
+<div class="t11-sync" id="t11SyncStatus"></div>
 <div class="plan-status" id="planStatus">Kế hoạch đầy đủ cho tháng 11. Nhập file POS tháng 11 ở trên - các ô "Thực tế" trong trang này tự điền số.</div>
 <section class="psec" id="p01"><div class="sec-head"><span class="pnum">01</span><h2>Bối cảnh chung tháng 11</h2></div><p class="lead">MD Plan Nov: Giá mạnh × Nhu cầu trước tăng thuế × Black Friday. Miền Nam hết mùa mưa sớm, nắng nóng hơn bình thường.</p><div class="t11-kpis"><div class="tile t11-tile"><div class="label">Budget Store 1016 T11</div><div class="value">4,480 tỷ</div><div class="sub">LY T11/2025 3,914 tỷ</div></div><div class="tile t11-tile"><div class="label">So với T11/2025</div><div class="value">+14,5%</div><div class="sub">+566 triệu</div></div><div class="tile t11-tile"><div class="label">2 ngành lớn nhất</div><div class="value">Cat 06 · Cat 15</div><div class="sub">999,0 tr (93% LY) · 998,6 tr (136% LY)</div></div><div class="tile t11-tile"><div class="label">Tăng mạnh nhất</div><div class="value">Cat 20 · 165% LY</div><div class="sub">Đồ mưa / giày dép / khăn 251,3 tr</div></div></div><div class="kmsg"><b>KEY MESSAGE MD:</b> "Thắng bằng GIÁ trong tháng 11 - nắm 3 cơ hội doanh số". Không chỉ là đợt giảm giá: làm khách nhớ Kohnan là nơi giá thấp suốt 30 ngày tháng 11.</div>
 <div class="pillars">
@@ -800,6 +803,7 @@
       <div class="block-head">
         <h2>Tổng hợp hiệu quả kế hoạch tháng 11</h2>
         <span class="sub" id="t11SummarySub"></span>
+        <span class="t11-sync" id="t11SyncStatus2"></span>
       </div>
       <div id="t11SummaryBody"></div>
     </section>
@@ -4766,7 +4770,7 @@
     while (c.pelican.codes.length < 3) c.pelican.codes.push('');
     return c;
   }
-  function t11SaveCfg(){ try { localStorage.setItem(T11_CFG_KEY, JSON.stringify(T11CFG)); return true; } catch (e) { return false; } }
+  function t11SaveCfg(){ t11SyncMark('cfg', T11CFG); try { localStorage.setItem(T11_CFG_KEY, JSON.stringify(T11CFG)); return true; } catch (e) { return false; } }
   var T11CFG = t11LoadCfg();
 
   function t11p2(n){ n = +n; return n < 10 ? '0' + n : '' + n; }
@@ -5260,7 +5264,7 @@
   var T11DIAG_KEY = 'kohnan1016_t11_diag_v1';
   var T11DIAG_TIPS = { '06': 'Sảnh / khu chăn ga gối, bán theo bộ ≥500k', '05': 'Khu 11.11 111K, ly thủy tinh 99k, bán theo bộ', '15': 'Bán thùng/combo trước tăng VAT, đồ ở quầy thu ngân', '14': 'Khu quà Nhà giáo ở lối vào', '21': 'Trưng đủ khối lượng, combo túi rác / cây lau', '25': 'Nước, bánh ở quầy thu ngân', '20': 'Khăn EDLP → Premium, dép nhà tắm', '02': 'Demo máy làm sạch, chuẩn bị BF', '23': 'Vali + phụ kiện xe đạp', '19': 'Quà sức khỏe 20/11', '08': 'Pin / đèn ở thu ngân' };
   function t11DiagLoad(){ try { return JSON.parse(localStorage.getItem(T11DIAG_KEY) || '{}') || {}; } catch (e) { return {}; } }
-  function t11DiagSave(o){ try { localStorage.setItem(T11DIAG_KEY, JSON.stringify(o)); } catch (e) {} }
+  function t11DiagSave(o){ var old = ''; try { old = localStorage.getItem(T11DIAG_KEY) || ''; localStorage.setItem(T11DIAG_KEY, JSON.stringify(o)); } catch (e) {} if (old !== JSON.stringify(o)) t11SyncMark('diag', o); }
   function t11DiagData(){
     var mk = '2026-11', D = t11LastDay(mk); if (!D) return null;
     var day = {}, cat = {}, skuName = {}, catSku = {};
@@ -5389,6 +5393,122 @@
     }).join('');
   }
 
+  // =====================================================================================
+  // ĐỒNG BỘ NHIỀU MÁY (laptop ↔ điện thoại) qua Google Apps Script riêng (_HE_THONG/APPS_SCRIPT_DONG_BO/Code.gs)
+  // Đồng bộ: tick việc · cấu hình T11 (Pelican, Push Sale, lịch sảnh, mục tiêu Topaz) · ô Tính thử · ghi chú 11.11
+  // KHÔNG đồng bộ file POS / tồn kho / file Topaz (nặng và có dữ liệu khách).
+  // =====================================================================================
+  var T11SYNC = { url: 'https://script.google.com/macros/s/AKfycbzo-GXaLWkkfBDPOL6nyYM-_BdFPOcxBmpXSpdFH3qUmUdS3mYA6WDzalC9UlbNqzBl/exec', ns: 't11_2026_1016', token: 'k1016-0c5d3c02df924ab9' };
+  var T11SYNC_KEY = 'kohnan1016_t11_sync_v1', T11SYNC_ST = null, T11SYNC_TIMER = null, T11SYNC_BUSY = false, T11SYNC_MSG = { t: 'Chưa kết nối đồng bộ - tick chỉ lưu trên máy này', k: 'off' };
+  function t11SyncOn(){ return !!T11SYNC.url; }
+  function t11SyncState(){
+    if (T11SYNC_ST) return T11SYNC_ST;
+    try { T11SYNC_ST = JSON.parse(localStorage.getItem(T11SYNC_KEY) || 'null'); } catch (e) {}
+    if (!T11SYNC_ST || typeof T11SYNC_ST !== 'object') T11SYNC_ST = {};
+    T11SYNC_ST.stamps = T11SYNC_ST.stamps || {}; T11SYNC_ST.pending = T11SYNC_ST.pending || {};
+    return T11SYNC_ST;
+  }
+  function t11SyncPersist(){ try { localStorage.setItem(T11SYNC_KEY, JSON.stringify(t11SyncState())); } catch (e) {} }
+  function t11SyncDevice(){ return (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Điện thoại' : 'Máy tính') + ' ' + (t11SyncState().dev || (t11SyncState().dev = Math.random().toString(36).slice(2, 6))); }
+  function t11SyncStatus(t, k){
+    T11SYNC_MSG = { t: t, k: k };
+    var c = { ok: 'var(--good)', busy: '#b88a00', err: 'var(--critical)', off: 'var(--muted)' }[k] || 'var(--muted)';
+    ['t11SyncStatus', 't11SyncStatus2'].forEach(function(id){ var el = document.getElementById(id); if (el) el.innerHTML = '<i style="background:' + c + '"></i>' + esc(t); });
+  }
+  // Gọi mỗi khi dữ liệu trên máy này thay đổi
+  function t11SyncMark(key, val){
+    var S = t11SyncState(), at = Date.now();
+    S.stamps[key] = at; S.pending[key] = { v: val === undefined ? null : JSON.parse(JSON.stringify(val)), at: at };
+    t11SyncPersist();
+    if (!t11SyncOn()) return;
+    clearTimeout(T11SYNC_TIMER); T11SYNC_TIMER = setTimeout(t11SyncPush, 1200);
+    t11SyncStatus('Đang chờ gửi thay đổi...', 'busy');
+  }
+  function t11SyncApply(key, rec){
+    var v = rec.v;
+    if (key.indexOf('tick:') === 0) {
+      var k = key.slice(5);
+      if (v) T11TICKS[k] = v; else delete T11TICKS[k];
+      try { localStorage.setItem(T11_TICK_KEY, JSON.stringify(T11TICKS)); } catch (e) {}
+      Array.prototype.forEach.call(document.querySelectorAll('.kchk li[data-k="' + k + '"]'), function(li){ li.classList.toggle('done', !!v); });
+      return 'tick';
+    }
+    if (key === 'cfg' && v && typeof v === 'object') { try { localStorage.setItem(T11_CFG_KEY, JSON.stringify(v)); } catch (e) {} T11CFG = t11LoadCfg(); return 'cfg'; }
+    if (key === 'diag' && v && typeof v === 'object') { try { localStorage.setItem(T11DIAG_KEY, JSON.stringify(v)); } catch (e) {} return 'diag'; }
+    if (key === 'd1111') {
+      try { localStorage.setItem(D1111_NOTE_KEY, v || ''); } catch (e) {}
+      var ta = document.getElementById('d1111Note'); if (ta && document.activeElement !== ta) ta.value = v || '';
+      return 'd1111';
+    }
+    return '';
+  }
+  function t11SyncMerge(data){
+    var S = t11SyncState(), what = {};
+    Object.keys(data || {}).forEach(function(key){
+      var rec = data[key]; if (!rec) return;
+      if (S.pending[key] && S.pending[key].at >= rec.at) return; // thay đổi trên máy này mới hơn, đang chờ gửi
+      if ((S.stamps[key] || 0) >= rec.at) return;
+      var w = t11SyncApply(key, rec); if (w) what[w] = 1;
+      S.stamps[key] = rec.at;
+    });
+    // Lần đầu kết nối: đẩy những gì máy này đã có mà máy chủ chưa có
+    if (!S.migrated) {
+      Object.keys(T11TICKS).forEach(function(k){ if (!data['tick:' + k]) t11SyncMark('tick:' + k, T11TICKS[k]); });
+      try {
+        if (!data.cfg && localStorage.getItem(T11_CFG_KEY)) t11SyncMark('cfg', T11CFG);
+        if (!data.diag && localStorage.getItem(T11DIAG_KEY)) t11SyncMark('diag', t11DiagLoad());
+        if (!data.d1111 && localStorage.getItem(D1111_NOTE_KEY)) t11SyncMark('d1111', localStorage.getItem(D1111_NOTE_KEY));
+      } catch (e) {}
+      S.migrated = true;
+    }
+    t11SyncPersist();
+    if (what.tick) renderT11TickBar();
+    var typing = document.activeElement && /^diag/.test(document.activeElement.id || '');
+    if (what.cfg || what.tick || (what.diag && !typing)) { try { t11Rerender(); } catch (e) { console.error(e); } }
+    return what;
+  }
+  function t11SyncTime(){ return new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }); }
+  function t11SyncPull(){
+    if (!t11SyncOn() || T11SYNC_BUSY) return;
+    T11SYNC_BUSY = true;
+    fetch(T11SYNC.url + '?ns=' + encodeURIComponent(T11SYNC.ns) + '&_=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        T11SYNC_BUSY = false;
+        if (!res || !res.ok) throw new Error(res && res.error || 'lỗi máy chủ');
+        t11SyncMerge(res.data);
+        if (Object.keys(t11SyncState().pending).length) t11SyncPush();
+        else t11SyncStatus('Đã đồng bộ lúc ' + t11SyncTime() + ' · tick trên máy nào cũng hiện ở máy khác', 'ok');
+      })
+      .catch(function(err){ T11SYNC_BUSY = false; console.warn('[T11 sync] pull', err); t11SyncStatus('Chưa đồng bộ được (mất mạng?) - vẫn lưu trên máy này, sẽ tự gửi lại', 'err'); });
+  }
+  function t11SyncPush(){
+    if (!t11SyncOn()) return;
+    if (T11SYNC_BUSY) { clearTimeout(T11SYNC_TIMER); T11SYNC_TIMER = setTimeout(t11SyncPush, 1500); return; }
+    var S = t11SyncState(), keys = Object.keys(S.pending); if (!keys.length) return;
+    var sent = {}; keys.forEach(function(k){ sent[k] = S.pending[k]; });
+    T11SYNC_BUSY = true; t11SyncStatus('Đang gửi ' + keys.length + ' thay đổi...', 'busy');
+    fetch(T11SYNC.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ token: T11SYNC.token, ns: T11SYNC.ns, by: t11SyncDevice(), set: sent }) })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        T11SYNC_BUSY = false;
+        if (!res || !res.ok) throw new Error(res && res.error || 'lỗi máy chủ');
+        keys.forEach(function(k){ if (S.pending[k] && S.pending[k].at === sent[k].at) delete S.pending[k]; });
+        t11SyncPersist();
+        t11SyncMerge(res.data);
+        t11SyncStatus('Đã đồng bộ lúc ' + t11SyncTime() + ' · tick trên máy nào cũng hiện ở máy khác', 'ok');
+      })
+      .catch(function(err){ T11SYNC_BUSY = false; console.warn('[T11 sync] push', err); t11SyncStatus('Chưa gửi được thay đổi (mất mạng?) - vẫn lưu trên máy này, sẽ tự gửi lại', 'err'); });
+  }
+  function t11SyncStart(){
+    if (!t11SyncOn()) { t11SyncStatus(T11SYNC_MSG.t, 'off'); return; }
+    t11SyncStatus('Đang tải tick từ máy khác...', 'busy');
+    t11SyncPull();
+    setInterval(function(){ if (!document.hidden) t11SyncPull(); }, 45000);
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) t11SyncPull(); });
+    window.addEventListener('online', t11SyncPull);
+  }
+
   function renderT11Modules(){
     [renderT11Summary, renderT11Diag, renderT11Pelican, renderT11Topaz, renderT11Sanh, renderT11PushCfg, renderPlanLive, renderT11Campaigns, renderD1111].forEach(function(fn){ try { fn(); } catch (e) { console.error('[T11] ' + fn.name, e); } });
   }
@@ -5424,6 +5544,7 @@
         var on = !li.classList.contains('done'); li.classList.toggle('done', on);
         if (on) T11TICKS[k] = new Date().toISOString().slice(0,10); else delete T11TICKS[k];
         try { localStorage.setItem(T11_TICK_KEY, JSON.stringify(T11TICKS)); } catch (e) {}
+        t11SyncMark('tick:' + k, on ? T11TICKS[k] : null);
         renderT11TickBar(); if (STATE.saleAgg) { renderT11Summary(); renderT11Campaigns(); }
       });
     });
@@ -5572,6 +5693,7 @@
     wrap.innerHTML = h;
   }
   setTimeout(function(){ try { renderT11Modules(); } catch (e) { console.error(e); } }, 0);
+  setTimeout(function(){ try { t11SyncStart(); } catch (e) { console.error(e); } }, 50);
   (function(){ var b = document.getElementById('planUploadBtn'); if (b) b.addEventListener('click', function(){ document.getElementById('fileInput').click(); }); })();
 
   var D1111 = [{"cat": "05", "bc": "4522831992188", "name": "Khăn lau nhà bếp KHK05-2188", "np": 149000, "pp": 111000, "gpmd": 0.3666, "off": 0.255, "type": "Clearance", "md": 31, "st": 31, "oct": 3, "mac": 61316, "og": "Discontinued"}, {"cat": "05", "bc": "4522831986699", "name": "Hộp băm gia vị 900ml", "np": 169000, "pp": 111000, "gpmd": 0.39, "off": 0.3432, "type": "Clearance", "md": 35, "st": 34, "oct": 9, "mac": 62034, "og": "Discontinued"}, {"cat": "05", "bc": "4522831041787", "name": "Nồi nhôm phủ ceramic ĐK24", "np": 629000, "pp": 111000, "gpmd": -1.8645, "off": 0.8235, "type": "Clearance", "md": 11, "st": 11, "oct": 0, "mac": 357915, "og": "Discontinued"}, {"cat": "05", "bc": "4522831933075", "name": "Kéo Nhà Bếp KHK05-3075", "np": 199000, "pp": 111000, "gpmd": 0.4146, "off": 0.4422, "type": "Clearance", "md": 18, "st": 18, "oct": 0, "mac": 74800, "og": "Discontinued"}, {"cat": "05", "bc": "4522831181421", "name": "Miếng lót thớt 5M", "np": 149000, "pp": 111000, "gpmd": 0.3692, "off": 0.255, "type": "Clearance", "md": 49, "st": 49, "oct": 1, "mac": 62322, "og": "Discontinued"}, {"cat": "05", "bc": "4522831041770", "name": "Quánh Nhôm Phủ Ceramic 22cm", "np": 579000, "pp": 111000, "gpmd": -1.9364, "off": 0.8083, "type": "Clearance", "md": 9, "st": 9, "oct": 2, "mac": 315685, "og": "Discontinued"}, {"cat": "05", "bc": "4522831986705", "name": "Hộp băm thực phẩm- 3 cách", "np": 249000, "pp": 111000, "gpmd": -0.1, "off": 0.5542, "type": "Clearance", "md": 68, "st": 68, "oct": 2, "mac": 112010, "og": "Discontinued"}, {"cat": "05", "bc": "4522831138593", "name": "Hộp cơm GN inox 620ml", "np": 429000, "pp": 111000, "gpmd": -1.1279, "off": 0.7413, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 216453, "og": "Discontinued"}, {"cat": "05", "bc": "4522831458851", "name": "Dao Santoku Inox Lưỡi 16.5Cm", "np": 179000, "pp": 111000, "gpmd": 0.2744, "off": 0.3799, "type": "Clearance", "md": 4, "st": 4, "oct": 1, "mac": 92601, "og": "Discontinued"}, {"cat": "05", "bc": "4522831953080", "name": "Nồi bếp từ 20cm", "np": 549000, "pp": 111000, "gpmd": -1.9121, "off": 0.7978, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 293557, "og": "Discontinued"}, {"cat": "05", "bc": "4522831985838", "name": "Bình Giữ Nhiệt Đen 2.2L", "np": 699000, "pp": 111000, "gpmd": -2.0471, "off": 0.8412, "type": "Clearance", "md": 2, "st": 2, "oct": 3, "mac": 377000, "og": "Discontinued"}, {"cat": "05", "bc": "4522831198375", "name": "Hộp TP Giữ Nhiệt 300ml Trắng", "np": 249000, "pp": 111000, "gpmd": -0.3213, "off": 0.5542, "type": "Clearance", "md": 5, "st": 5, "oct": 2, "mac": 132769, "og": "Discontinued"}, {"cat": "05", "bc": "4522831041756", "name": "Quánh Nhôm Phủ Ceramic 16cm", "np": 429000, "pp": 111000, "gpmd": -1.0806, "off": 0.7413, "type": "Clearance", "md": 0, "st": 0, "oct": 2, "mac": 213839, "og": "Discontinued"}, {"cat": "05", "bc": "4522831412037", "name": "Nồi hấp  26cm 3 tầng", "np": 899000, "pp": 111000, "gpmd": -3.9292, "off": 0.8765, "type": "Clearance", "md": 7, "st": 7, "oct": 0, "mac": 506612, "og": "Discontinued"}, {"cat": "05", "bc": "4522831458844", "name": "Dao Santoku Inox Lưỡi 18Cm", "np": 179000, "pp": 111000, "gpmd": 0.187, "off": 0.3799, "type": "Clearance", "md": 5, "st": 5, "oct": 2, "mac": 103254, "og": "Discontinued"}, {"cat": "05", "bc": "4522831957200", "name": "Khăn Giấy Nhà Bếp 6P KHK05-7", "np": 199000, "pp": 111000, "gpmd": 0.2909, "off": 0.4422, "type": "Clearance", "md": 61, "st": 61, "oct": 0, "mac": 96720, "og": "Discontinued"}, {"cat": "05", "bc": "4522831138609", "name": "Hộp cơm GN inox 800ml", "np": 459000, "pp": 111000, "gpmd": -0.7154, "off": 0.7582, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 250374, "og": "Discontinued"}, {"cat": "05", "bc": "4522831042128", "name": "Nồi Nhôm Dày Phủ Ceramic18cm", "np": 799000, "pp": 111000, "gpmd": -3.5099, "off": 0.8611, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 415700, "og": "Discontinued"}, {"cat": "05", "bc": "4522831182954", "name": "Hộp đựng đồ bếp có nam châm", "np": 349000, "pp": 111000, "gpmd": -0.593, "off": 0.6819, "type": "Clearance", "md": 11, "st": 11, "oct": 1, "mac": 186936, "og": "Discontinued"}, {"cat": "05", "bc": "4522831510269", "name": "Đá Mài Dao", "np": 319000, "pp": 111000, "gpmd": -0.6852, "off": 0.652, "type": "Clearance", "md": 4, "st": 4, "oct": 2, "mac": 162081, "og": "Discontinued"}, {"cat": "05", "bc": "4548927024243", "name": "Tấm Thoát Nước Bồn Rửa Chén", "np": 149000, "pp": 111000, "gpmd": 0.6243, "off": 0.255, "type": "Clearance", "md": 16, "st": 16, "oct": 0, "mac": 49550, "og": "Discontinued"}, {"cat": "05", "bc": "4522831270491", "name": "LIFELEX Thớt Cho Nhà Bếp L", "np": 189000, "pp": 111000, "gpmd": 0.2703, "off": 0.4127, "type": "Clearance", "md": 9, "st": 9, "oct": 0, "mac": 99908, "og": "Discontinued"}, {"cat": "05", "bc": "4522831377015", "name": "Thớt nhựa kháng khuẩn L", "np": 249000, "pp": 111000, "gpmd": -0.344, "off": 0.5542, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 138136, "og": "Discontinued"}, {"cat": "05", "bc": "4522831042111", "name": "Nồi Nhôm Dày Phủ Ceramic16cm", "np": 749000, "pp": 111000, "gpmd": -3.0659, "off": 0.8518, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 396694, "og": "Discontinued"}, {"cat": "05", "bc": "4522831134656", "name": "Bình GN inox miệng rộng350pk", "np": 279000, "pp": 111000, "gpmd": -0.0918, "off": 0.6022, "type": "Clearance", "md": 1, "st": 1, "oct": 0, "mac": 108541, "og": "Discontinued"}, {"cat": "05", "bc": "4522831198382", "name": "Hộp TP Giữ Nhiệt 400ml Đen", "np": 299000, "pp": 111000, "gpmd": -0.4517, "off": 0.6288, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 146496, "og": "Discontinued"}, {"cat": "05", "bc": "4522831378159", "name": "Nồi INOX Hấp Đa Năng 18cm", "np": 549000, "pp": 111000, "gpmd": -1.8169, "off": 0.7978, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 268236, "og": "Discontinued"}, {"cat": "05", "bc": "4522831920150", "name": "Bình nước cao 1L", "np": 249000, "pp": 111000, "gpmd": -0.0923, "off": 0.5542, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 84184, "og": "Discontinued"}, {"cat": "05", "bc": "4522831988204", "name": "Bình GN inox nắp màu gỗ350", "np": 269000, "pp": 111000, "gpmd": -0.2973, "off": 0.5874, "type": "Clearance", "md": 3, "st": 2, "oct": 1, "mac": 128164, "og": "Discontinued"}, {"cat": "05", "bc": "4522831270514", "name": "LIFELEX Thớt Nhà Bếp Jumbo", "np": 399000, "pp": 111000, "gpmd": -0.4347, "off": 0.7218, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 205326, "og": "Discontinued"}, {"cat": "05", "bc": "4522831988181", "name": "Bình GN inox nắp màu gỗ350ml", "np": 269000, "pp": 111000, "gpmd": -0.4551, "off": 0.5874, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 149553, "og": "Discontinued"}, {"cat": "05", "bc": "4522831042135", "name": "Nồi Nhôm Dày Phủ Ceramic20cm", "np": 829000, "pp": 111000, "gpmd": -2.4911, "off": 0.8661, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 394848, "og": "Discontinued"}, {"cat": "05", "bc": "4522831050239", "name": "Giá treo khăn nhà bếp", "np": 189000, "pp": 111000, "gpmd": 0.4972, "off": 0.4127, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 51681, "og": "Discontinued"}, {"cat": "05", "bc": "4522831079773", "name": "CLR Nắp nồi 24~26cm", "np": 229000, "pp": 111000, "gpmd": 0.2564, "off": 0.5153, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 130629, "og": "Discontinued"}, {"cat": "05", "bc": "4522831079780", "name": "Nắp nồi 26~30cm", "np": 299000, "pp": 111000, "gpmd": -0.4918, "off": 0.6288, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 153324, "og": "Discontinued"}, {"cat": "05", "bc": "4522831477883", "name": "Đá Mài Dao", "np": 199000, "pp": 111000, "gpmd": 0.2464, "off": 0.4422, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 98264, "og": "Discontinued"}, {"cat": "05", "bc": "4522831651184", "name": "Kệ nhiều ngăn", "np": 349000, "pp": 111000, "gpmd": -0.7332, "off": 0.6819, "type": "Clearance", "md": 5, "st": 5, "oct": 0, "mac": 228391, "og": "Discontinued"}, {"cat": "05", "bc": "4522831988198", "name": "Bình GN inox nắp màu gỗ480ml", "np": 349000, "pp": 111000, "gpmd": -0.4789, "off": 0.6819, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 152003, "og": "Discontinued"}, {"cat": "05", "bc": "4522831992720", "name": "Hũ Nhựa Vuông Đựng TP1900ml", "np": 199000, "pp": 111000, "gpmd": 0.6458, "off": 0.4422, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 36406, "og": "Discontinued"}, {"cat": "05", "bc": "4522831168897", "name": "Bình nước nhựa có đồ lọc1.1L", "np": 249000, "pp": 111000, "gpmd": -0.1421, "off": 0.5542, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 117378, "og": "Discontinued"}, {"cat": "05", "bc": "4522831183036", "name": "Thanh Hít Nhà Bếp Có 3 Nhánh", "np": 229000, "pp": 111000, "gpmd": -0.2245, "off": 0.5153, "type": "Clearance", "md": 3, "st": 3, "oct": 1, "mac": 108683, "og": "Discontinued"}, {"cat": "05", "bc": "4522831886678", "name": "Nắp chảo đk 24-26-28cm", "np": 199000, "pp": 111000, "gpmd": 0.0092, "off": 0.4422, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 101835, "og": "Discontinued"}, {"cat": "05", "bc": "4522831953615", "name": "Nồi bếp từ 24cm", "np": 649000, "pp": 111000, "gpmd": -2.4347, "off": 0.829, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 353014, "og": "Discontinued"}, {"cat": "05", "bc": "4522831988211", "name": "Bình GN inox  nắp màu gỗ480", "np": 349000, "pp": 111000, "gpmd": -0.7176, "off": 0.6819, "type": "Clearance", "md": 7, "st": 7, "oct": 0, "mac": 176531, "og": "Discontinued"}, {"cat": "05", "bc": "4522831050246", "name": "Kệ úp chén đĩa KFY05-0246", "np": 249000, "pp": 111000, "gpmd": 0.2, "off": 0.5542, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 74409, "og": "Discontinued"}, {"cat": "05", "bc": "4522831182992", "name": "Rổ nhựa đựng đồ có nam châmM", "np": 169000, "pp": 111000, "gpmd": 0.1615, "off": 0.3432, "type": "Clearance", "md": 1, "st": 1, "oct": 0, "mac": 85811, "og": "Discontinued"}, {"cat": "05", "bc": "4522831229802", "name": "Bình Giữ Lạnh Đen", "np": 199000, "pp": 111000, "gpmd": -0.0104, "off": 0.4422, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 81250, "og": "Discontinued"}, {"cat": "05", "bc": "4522831378258", "name": "Kệ nhà bếp 2 tầng KHM05-8258", "np": 649000, "pp": 111000, "gpmd": -2.2601, "off": 0.829, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 310020, "og": "Discontinued"}, {"cat": "05", "bc": "4522831378265", "name": "Kệ nhà bếp 3 tầng KHM05-8258", "np": 799000, "pp": 111000, "gpmd": -3.4102, "off": 0.8611, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 445491, "og": "Discontinued"}, {"cat": "05", "bc": "4522831761982", "name": "Màng Nhôm TP 30cmx50m", "np": 149000, "pp": 111000, "gpmd": 0.2197, "off": 0.255, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 80194, "og": "Discontinued"}, {"cat": "05", "bc": "4522831886654", "name": "Nắp chảo đk 18-20cm", "np": 169000, "pp": 111000, "gpmd": 0.1945, "off": 0.3432, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 82787, "og": "Discontinued"}, {"cat": "05", "bc": "4522831886661", "name": "Nắp chảo đk 20-24-26cm", "np": 189000, "pp": 111000, "gpmd": 0.0392, "off": 0.4127, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 98746, "og": "Discontinued"}, {"cat": "05", "bc": "4522831042142", "name": "Nồi Nhôm Dày Phủ Ceramic22cm", "np": 999000, "pp": 111000, "gpmd": -4.2468, "off": 0.8889, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 496287, "og": "Discontinued"}, {"cat": "05", "bc": "4522831043279", "name": "Ấm Đun Đa Năng Phủ Ceramic", "np": 549000, "pp": 111000, "gpmd": -1.8052, "off": 0.7978, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 276842, "og": "Discontinued"}, {"cat": "05", "bc": "4522831050178", "name": "Ống đũa", "np": 149000, "pp": 111000, "gpmd": 0.5988, "off": 0.255, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 41239, "og": "Discontinued"}, {"cat": "05", "bc": "4522831050253", "name": "Kệ úp chén đĩa KFY05-0253", "np": 249000, "pp": 111000, "gpmd": 0.1058, "off": 0.5542, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 91901, "og": "Discontinued"}, {"cat": "05", "bc": "4522831095674", "name": "Tấm chắn bếp chống dầu mỡ", "np": 169000, "pp": 111000, "gpmd": 0.5055, "off": 0.3432, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 50821, "og": "Discontinued"}, {"cat": "05", "bc": "4522831364251", "name": "kệ để lò vi sóng", "np": 549000, "pp": 111000, "gpmd": -0.8053, "off": 0.7978, "type": "Clearance", "md": 6, "st": 6, "oct": 0, "mac": 240878, "og": "Discontinued"}, {"cat": "05", "bc": "4522831399253", "name": "kệ để dụng cụ", "np": 699000, "pp": 111000, "gpmd": -2.1511, "off": 0.8412, "type": "Clearance", "md": 7, "st": 7, "oct": 0, "mac": 326422, "og": "Discontinued"}, {"cat": "05", "bc": "4522831458097", "name": "Kệ đa chức năng", "np": 659000, "pp": 111000, "gpmd": -2.6284, "off": 0.8316, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 372917, "og": "Discontinued"}, {"cat": "05", "bc": "4522831458813", "name": "Tủ bếp 2TIER", "np": 799000, "pp": 111000, "gpmd": -1.4313, "off": 0.8611, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 249886, "og": "Discontinued"}, {"cat": "05", "bc": "4522831510245", "name": "Đá mài dao 2 lớp", "np": 429000, "pp": 111000, "gpmd": -1.2501, "off": 0.7413, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 219808, "og": "Discontinued"}, {"cat": "05", "bc": "4522831537105", "name": "Kệ chén dĩa W", "np": 449000, "pp": 111000, "gpmd": -1.35, "off": 0.7528, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 241482, "og": "Discontinued"}, {"cat": "05", "bc": "4522831652990", "name": "Kệ đa chức năng", "np": 749000, "pp": 111000, "gpmd": -1.4297, "off": 0.8518, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 249716, "og": "Discontinued"}, {"cat": "05", "bc": "4522831954155", "name": "Nồi bếp từ 27cm", "np": 799000, "pp": 111000, "gpmd": -3.1932, "off": 0.8611, "type": "Clearance", "md": 1, "st": 1, "oct": 0, "mac": 430963, "og": "Discontinued"}, {"cat": "05", "bc": "4522831986675", "name": "Hộp quay rau 4.3L", "np": 179000, "pp": 111000, "gpmd": 0.1585, "off": 0.3799, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 84413, "og": "Discontinued"}, {"cat": "05", "bc": "4522831987122", "name": "Ly caphe inox 300ml xám", "np": 229000, "pp": 111000, "gpmd": -0.1076, "off": 0.5153, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 113832, "og": "Discontinued"}, {"cat": "05", "bc": "4522831987139", "name": "Ly caphe inox 300ml xanh", "np": 229000, "pp": 111000, "gpmd": -0.1076, "off": 0.5153, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 126159, "og": "Discontinued"}, {"cat": "05", "bc": "4522831987146", "name": "Ly caphe inox 300ml trắng", "np": 229000, "pp": 111000, "gpmd": -0.1415, "off": 0.5153, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 127938, "og": "Discontinued"}, {"cat": "05", "bc": "4522831987177", "name": "Ly Giữ Nhiệt Inox 415ml", "np": 299000, "pp": 111000, "gpmd": -0.4032, "off": 0.6288, "type": "Clearance", "md": 0, "st": 0, "oct": 0, "mac": 129624, "og": "Discontinued"}, {"cat": "05", "bc": "8935273494886", "name": "Set 6 Ly Y5075E", "np": 169000, "pp": 111000, "gpmd": 0.54, "off": 0.3432, "type": "Clearance", "md": 53, "st": 53, "oct": 0, "mac": 47000, "og": "Discontinued"}, {"cat": "05", "bc": "4522831161379", "name": "Khăn Giấy Bếp Đa Năng 100S 6R", "np": 199000, "pp": 111000, "gpmd": 0.3893, "off": 0.4422, "type": "Hàng thường", "md": 0, "st": 0, "oct": 9, "mac": 67130, "og": "Warehouse Order ( Import)"}, {"cat": "05", "bc": "4522831412624", "name": "Giấy Thấm Dầu KHM05 2624", "np": 179000, "pp": 111000, "gpmd": 0.307, "off": 0.3799, "type": "Hàng thường", "md": 41, "st": 41, "oct": 17, "mac": 85799, "og": "Warehouse Order ( Import)"}, {"cat": "05", "bc": "4522831161362", "name": "LIFELEX K.Giấy Bếp 6R/ 180 Tờ", "np": 249000, "pp": 111000, "gpmd": 0.0666, "off": 0.5542, "type": "Hàng thường", "md": 22, "st": 21, "oct": 11, "mac": 116573, "og": "Warehouse Order ( Import)"}, {"cat": "05", "bc": "4522831909209", "name": "Giấy Vệ Sinh Nhà Bếp 60CUTx2", "np": 169000, "pp": 111000, "gpmd": 0.33, "off": 0.3432, "type": "Hàng thường", "md": 56, "st": 56, "oct": 7, "mac": 91649, "og": "Warehouse Order ( Import)"}, {"cat": "05", "bc": "4522831244317", "name": "CUỘN 2 KHĂN ĐA NĂNG XÁM 20x40", "np": 149000, "pp": 111000, "gpmd": 0.5676, "off": 0.255, "type": "Hàng thường", "md": 0, "st": 24, "oct": 0, "mac": 50028, "og": "Warehouse Order ( Import)"}, {"cat": "05", "bc": "4548927073487", "name": "Bình Đựng NC Nắp Có Khóa 3.1L", "np": 249000, "pp": 111000, "gpmd": 0.05, "off": 0.5542, "type": "Hàng thường", "md": 23, "st": 23, "oct": 3, "mac": 135167, "og": "Warehouse Order ( Import)"}, {"cat": "21", "bc": "8935350808605", "name": "XÔNG TINH DẦU MINI 420ML", "np": 149000, "pp": 111000, "gpmd": 0.5841, "off": 0.255, "type": "Hàng thường", "md": 0, "st": 4, "oct": 0, "mac": 42750, "og": "NB Normal"}, {"cat": "21", "bc": "8935350808612", "name": "XÔNG TINH DẦU 2L SD03 2000ML", "np": 249000, "pp": 111000, "gpmd": -0.2941, "off": 0.5542, "type": "Hàng thường", "md": 0, "st": 1, "oct": 0, "mac": 133000, "og": "Discontinued"}, {"cat": "21", "bc": "8935350808629", "name": "XÔNG TINH DẦU MINI A5 300ML", "np": 149000, "pp": 111000, "gpmd": 0.3992, "off": 0.255, "type": "Hàng thường", "md": 0, "st": 3, "oct": 0, "mac": 61750, "og": "NB Normal"}, {"cat": "21", "bc": "6923529588313", "name": "Kệ Xà Bông Dài 58831", "np": 149000, "pp": 111000, "gpmd": 0.279, "off": 0.255, "type": "Hàng thường", "md": 0, "st": 5, "oct": 0, "mac": 74100, "og": "NB Normal"}, {"cat": "21", "bc": "6923529588412", "name": "Kệ Xà Bông 2 Tầng 58841", "np": 199000, "pp": 111000, "gpmd": 0.0479, "off": 0.4422, "type": "Hàng thường", "md": 0, "st": 4, "oct": 1, "mac": 97850, "og": "NB Normal"}, {"cat": "21", "bc": "6923529588504", "name": "Kệ Treo Tường Chữ Nhật 58850", "np": 199000, "pp": 111000, "gpmd": -0.0352, "off": 0.4422, "type": "Hàng thường", "md": 0, "st": 2, "oct": 1, "mac": 106400, "og": "NB Normal"}, {"cat": "21", "bc": "6923529588337", "name": "Kệ Treo Tường Tam Giác 58833", "np": 199000, "pp": 111000, "gpmd": -0.0075, "off": 0.4422, "type": "Hàng thường", "md": 0, "st": 7, "oct": 0, "mac": 103550, "og": "NB Normal"}, {"cat": "21", "bc": "6923529588375", "name": "Giá Treo Khăn 43cm 58837", "np": 199000, "pp": 111000, "gpmd": 0.1311, "off": 0.4422, "type": "Hàng thường", "md": 0, "st": 3, "oct": 1, "mac": 89300, "og": "NB Normal"}];
@@ -5662,7 +5784,7 @@
     var ta = document.getElementById('d1111Note');
     if (ta) { try { ta.value = localStorage.getItem(D1111_NOTE_KEY) || ''; } catch (e) {} }
     var sv = document.getElementById('d1111NoteSave');
-    if (sv) sv.addEventListener('click', function(){ var ok = true; try { localStorage.setItem(D1111_NOTE_KEY, ta.value); } catch (e) { ok = false; } document.getElementById('d1111NoteMsg').textContent = ok ? 'Đã lưu trên máy này.' : 'Đã ghi nhận - sẽ có trong báo cáo khi xuất.'; });
+    if (sv) sv.addEventListener('click', function(){ var ok = true; try { localStorage.setItem(D1111_NOTE_KEY, ta.value); } catch (e) { ok = false; } t11SyncMark('d1111', ta.value); document.getElementById('d1111NoteMsg').textContent = ok ? 'Đã lưu trên máy này.' : 'Đã ghi nhận - sẽ có trong báo cáo khi xuất.'; });
     var ex = document.getElementById('d1111Export');
     if (ex) ex.addEventListener('click', exportD1111);
   })();
