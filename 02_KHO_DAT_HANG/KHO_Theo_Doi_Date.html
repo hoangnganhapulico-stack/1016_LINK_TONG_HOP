@@ -62,6 +62,7 @@ tr.click{cursor:pointer}tr.click:hover{background:var(--blue-soft)}
 input,select,textarea{font:400 15px 'Be Vietnam Pro',sans-serif;border:1px solid #cfd7e3;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--navy);border-color:var(--navy)}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--ink2)}
+.srcbox{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink2)}.srcopt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;font-weight:500;color:var(--ink);cursor:pointer}.srcopt input{margin-top:3px;flex:none}.srcopt:has(input:checked){border-color:var(--navy);background:var(--blue-soft)}
 .drow{display:flex;gap:6px;align-items:stretch}.drow>input{flex:1;min-width:0;font-size:17px;letter-spacing:.04em}
 .dpick{position:relative;flex:none;width:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:20px;cursor:pointer}.dpick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
 .form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
@@ -573,7 +574,7 @@ function afterLogin() {
   $('#navSetup').style.display = USER.role === 'QL' ? '' : 'none';
   const uc = userCats(); CATF = uc.length === 1 ? uc[0] : 'ALL';
   if (USER.role === 'QL' && !DB.NCC.length) seedNcc();
-  flush(); render();
+  flush(); render(); setTimeout(() => ctLoad(), 1500);
 }
 function seedNcc() {
   put('NCC', NCC_SEED.map(o => Object.assign({}, o)));
@@ -663,12 +664,12 @@ BIND.home = () => bindCatChips();
 // ---------------- 2. NHẬP DATE THEO CAT ----------------
 let INF = 'ALL', INQ = '', INLIMIT = 150;
 function vInput() {
-  const F = { ALL: 'Tất cả', TODO: 'Chưa kiểm / quá chu kỳ', NEAR: 'Có lô cận date', PENDING: 'Chờ phân loại', OK: 'Đã kiểm' };
+  const F = { ALL: 'Tất cả', TODO: 'Chưa kiểm / quá chu kỳ', GAP: 'Thiếu date so với tồn', NEAR: 'Có lô cận date', PENDING: 'Chờ phân loại', OK: 'Đã kiểm' };
   return `<section>${secHead(1, 'Nhập date theo CAT', 'Chọn CAT của bạn, quét hoặc gõ mã, nhập date gần nhất đang có trên kệ + kho (mỗi date là 1 lô).')}
     ${catChips()}
     <div class="row" style="margin-top:12px"><input id="q" placeholder="Quét / gõ barcode hoặc tên hàng" value="${esc(INQ)}" style="flex:1;min-width:200px" autocomplete="off"><button class="btn" id="btnScan">Quét bằng camera</button><button class="btn sub" id="btnAddNew">+ Mã ngoài danh sách</button></div>
     <div class="row" style="margin-top:10px"><button class="btn sub sm" id="btnStock">Cập nhật tồn - giá</button><button class="btn sub sm" id="btnImpLots">Nhập file date đã có</button><span class="small muted" id="stockInfo">${stockInfoTxt()}</span></div>
-    ${DB.SanPham.length ? '' : '<div class="action" style="margin-top:10px"><b>Chưa có danh mục hàng.</b> Bấm <b>Cập nhật tồn - giá</b> > nạp file items.csv từ POS (có CAT) để hiện mã cần theo dõi.</div>'}
+    ${DB.SanPham.length ? warnLine() : '<div class="action" style="margin-top:10px"><b>Chưa có danh mục hàng.</b> Bấm <b>Cập nhật tồn - giá</b> > nạp file items.csv từ POS (có CAT) để hiện mã cần theo dõi.</div>'}
     <div class="row" style="margin-top:10px" id="inf">${Object.keys(F).map(k => `<button class="chip ${INF === k ? 'on' : ''}" data-f="${k}">${F[k]} (<span data-n="${k}">0</span>)</button>`).join('')}</div>
     <div class="syncbar" id="sync"></div>
     <div id="bulkBar"></div>
@@ -679,6 +680,7 @@ function skuFilter(s) {
   if (!inCat(s.cat)) return false;
   if (INF === 'TODO' && !(s.state === 'CHUA_KIEM' || s.state === 'QUA_CHU_KY')) return false;
   if (INF === 'NEAR' && !(s.worst && s.worst.level !== 'ok')) return false;
+  if (INF === 'GAP' && !(s.lots.length && recon(s).gap > 0)) return false;
   if (INF === 'PENDING' && s.state !== 'PENDING') return false;
   if (INF === 'OK' && s.state !== 'DA_KIEM') return false;
   if (INF !== 'PENDING' && INF !== 'ALL' && s.state === 'PENDING') return false;
@@ -695,8 +697,8 @@ function stateTag(s) {
 }
 function drawSkus() {
   const all = AN.skus.filter(s => inCat(s.cat));
-  const cnt = { ALL: 0, TODO: 0, NEAR: 0, PENDING: 0, OK: 0 };
-  all.forEach(s => { if (s.state !== 'PENDING') cnt.ALL++; if (s.state === 'CHUA_KIEM' || s.state === 'QUA_CHU_KY') cnt.TODO++; if (s.worst && s.worst.level !== 'ok') cnt.NEAR++; if (s.state === 'PENDING') cnt.PENDING++; if (s.state === 'DA_KIEM') cnt.OK++; });
+  const cnt = { ALL: 0, TODO: 0, GAP: 0, NEAR: 0, PENDING: 0, OK: 0 };
+  all.forEach(s => { if (s.state !== 'PENDING') cnt.ALL++; if (s.state !== 'PENDING' && s.lots.length && recon(s).gap > 0) cnt.GAP++; if (s.state === 'CHUA_KIEM' || s.state === 'QUA_CHU_KY') cnt.TODO++; if (s.worst && s.worst.level !== 'ok') cnt.NEAR++; if (s.state === 'PENDING') cnt.PENDING++; if (s.state === 'DA_KIEM') cnt.OK++; });
   cnt.ALL += cnt.PENDING;
   $$('[data-n]').forEach(el => el.textContent = cnt[el.dataset.n]);
   const rank = s => s.state === 'PENDING' ? 3 : (s.worst && s.worst.level !== 'ok') ? 0 : s.state === 'CHUA_KIEM' ? 1 : s.state === 'QUA_CHU_KY' ? 2 : 4;
@@ -721,9 +723,9 @@ BIND.input = () => {
   bindCatChips(); drawSkus();
   const q = $('#q');
   q.oninput = () => { INQ = q.value; drawSkus(); };
-  q.onkeydown = e => { if (e.key === 'Enter') { const v = q.value.trim(); const hit = AN.skus.find(s => s.barcode === v); if (hit) openSku(v); else if (/^\d{6,14}$/.test(v)) openNewSku(v); } };
+  q.onkeydown = e => { if (e.key === 'Enter') { const v = q.value.trim(); if (/^\d{6,14}$/.test(v)) scanHit(v); else { const hit = AN.skus.find(s => s.barcode === v); if (hit) openSku(v); } } };
   $$('#inf [data-f]').forEach(b => b.onclick = () => { INF = b.dataset.f; INLIMIT = 150; render(); });
-  $('#btnScan').onclick = () => scan(code => { q.value = code; INQ = code; drawSkus(); const hit = AN.skus.find(s => s.barcode === code) || DB.SanPham.find(p => p.barcode === code); if (hit) openSku(code); else openNewSku(code); });
+  $('#btnScan').onclick = () => scan(code => { q.value = code; INQ = code; drawSkus(); scanHit(code); });
   $('#btnAddNew').onclick = () => openNewSku(/^\d+$/.test(INQ.trim()) ? INQ.trim() : '');
   $('#btnStock').onclick = openStock; $('#btnImpLots').onclick = openLotImport;
   if (window.innerWidth > 640) q.focus();
@@ -781,12 +783,13 @@ function policyTxt(n, cat) {
   return `<span class="tag ${n.policy === 'DOI_TRA' ? 'ok' : n.policy === 'HO_TRO_GG' ? 'blue' : 'warn'}">${E.POLICY_NAME[n.policy] || n.policy}</span>${n.minPct ? ` <span class="small muted">Nhận hàng ≥ ${Math.round(n.minPct * 100)}% hạn dùng</span>` : ''}${n.notifyDays ? ` <span class="small muted">· Báo NCC trước ${Math.round(n.notifyDays / 30)} tháng</span>` : n.notifyPct ? ` <span class="small muted">· Báo NCC khi còn ${Math.round(n.notifyPct * 100)}% hạn dùng</span>` : ''}`;
 }
 function openSku(bc) {
-  const p = prodOf(bc); if (!p) return openNewSku(bc);
+  const p = prodOf(bc); if (!p) return scanHit(bc);
   const n = nccOf(p.cat, p.vendorCode), sk = AN.skus.find(s => s.barcode === bc);
   const lots = AN.lots.filter(s => s.barcode === bc && s.open).sort((a, b) => a.exp - b.exp);
   const closed = AN.lots.filter(s => s.barcode === bc && !s.open).length;
-  const cc = E.catCfg(CFG, p.cat);
+  const cc = E.catCfg(CFG, p.cat), rc = sk ? recon(sk) : { st: p.stock === '' ? null : +p.stock || 0, inQ: 0, newQ: 0, gap: +p.stock || 0 };
   modal(esc(p.name), `<div class="small muted">CAT ${esc(p.cat)} · ${esc(p.barcode)} · ${esc(p.vendorCode)} ${esc(p.vendorName)} · Tồn hệ thống ${esc(p.stock)} · Giá ${money(p.price)}đ</div>
+    ${rc && rc.st != null ? `<div class="small" style="margin-top:6px">Tồn hệ thống <b>${rc.st}</b> (đến hết ${stockAsOf()}) · Đã có date <b>${rc.inQ}</b>${rc.newQ ? ` + hàng mới về <b>${rc.newQ}</b>` : ''} ${rc.gap > 0 ? `<span class="tag bad">Còn ${rc.gap} sp chưa có date</span>` : rc.gap < 0 && rc.inQ ? `<span class="tag warn">SL các lô nhiều hơn tồn ${-rc.gap} - kiểm lại lô đã bán</span>` : rc.inQ ? '<span class="tag ok">Khớp tồn</span>' : ''}</div>` : ''}
     <div style="margin:8px 0">${policyTxt(n, p.cat)} ${sk ? stateTag(sk) : ''}${p.flag ? ` <span class="tag gray">${p.flag === 'KHONG_DATE' ? 'Không có date' : p.flag === 'THEO_DOI' ? 'Đã đưa vào theo dõi' : p.flag}</span>` : ''}</div>
     ${n && n.note ? `<div class="action small" style="margin-bottom:10px">${esc(n.note)}${n.contact ? '<br>Liên hệ: ' + esc(n.contact) : ''}</div>` : ''}
     <h3 style="margin-top:12px">Lô đang có (${lots.length})</h3>
@@ -794,7 +797,10 @@ function openSku(bc) {
     ${closed ? `<p class="small muted">${closed} lô đã đóng (bán hết / trả / discard).</p>` : ''}
     <div class="card" style="margin-top:12px;background:#fafbfc"><h3>Thêm lô date</h3>
       <div class="form">${dateField('fExp', 'Hạn sử dụng (HSD) *', true)}${dateField('fMfg', 'Ngày sản xuất (NSX)', false)}
-        <label class="f">Số lượng *<input id="fQty" type="number" min="0" inputmode="numeric"></label>
+        <label class="f">Số lượng của date này *<span class="drow"><input id="fQty" type="number" min="0" inputmode="numeric">${rc.st > 0 ? `<button type="button" class="btn sub sm" id="fQtySt" title="Điền bằng tồn hệ thống">= Tồn ${rc.st}</button>` : ''}${rc.gap > 0 && rc.inQ ? `<button type="button" class="btn sub sm" id="fQtyGap" title="Phần tồn chưa có date">= ${rc.gap}</button>` : ''}</span></label>
+        <div class="srcbox">Số lượng này là
+          <label class="srcopt"><input type="radio" name="fSrc" value="TON" checked><span><b>Hàng đang có</b> - đã nằm trong tồn hệ thống (tồn đến hết ${stockAsOf()})</span></label>
+          <label class="srcopt"><input type="radio" name="fSrc" value="MOI"><span><b>Hàng mới về</b> sau ngày tồn - tồn chưa có, lần cập nhật tồn sau sẽ cộng vào</span></label></div>
         <label class="f">Vị trí<select id="fLoc"><option>Kệ</option><option>Kho</option><option>Kệ + Kho</option><option>Mâm / Layer khuyến mãi</option></select></label>
         <label class="f">Hạn dùng (tháng)<input id="fSl" type="number" min="0" value="${esc(p.slMonths)}" placeholder="VD 18"></label>
         <label class="f">Ghi chú<input id="fNote"></label></div>
@@ -810,6 +816,9 @@ function openSku(bc) {
     $('#fInfo').innerHTML = `${leftTxt(st)} · ${lvlTag(st.level)} ${st.task ? 'Việc ngay: <b>' + esc(st.task.label) + '</b>' : st.next ? 'Mốc tới: ' + esc(st.next.label) + ' ngày ' + E.fmt(st.next.due) : ''}`;
   };
   bindDate('fExp', info); bindDate('fMfg', info); $('#fSl').oninput = info;
+  if ($('#fQtySt')) $('#fQtySt').onclick = () => { $('#fQty').value = rc.st; $$('[name=fSrc]')[0].checked = true; };
+  if ($('#fQtyGap')) $('#fQtyGap').onclick = () => { $('#fQty').value = rc.gap; };
+  const src = () => ($$('[name=fSrc]').find(x => x.checked) || {}).value || 'TON';
   $('#fSave').onclick = () => {
     const exp = $('#fExp').dataset.iso, mfg = $('#fMfg').dataset.iso || '', qty = $('#fQty').value;
     if (!exp) return toast('Nhập HSD hợp lệ', true);
@@ -819,8 +828,8 @@ function openSku(bc) {
     if ($('#fSl').value !== String(p.slMonths || '')) put('SanPham', Object.assign({}, p, { slMonths: $('#fSl').value }));
     const dup = DB.LoDate.find(l => l.barcode === bc && l.exp === exp && l.status === 'MO');
     const now = Date.now();
-    if (dup) put('LoDate', Object.assign({}, dup, { qty, mfg: mfg || dup.mfg, location: $('#fLoc').value, checkedBy: USER.name, checkedAt: now }));
-    else put('LoDate', { id: uid(), barcode: bc, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp, mfg, qty, qtyStart: qty, location: $('#fLoc').value, note: $('#fNote').value, status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now });
+    if (dup) put('LoDate', Object.assign({}, dup, { qty, mfg: mfg || dup.mfg, location: $('#fLoc').value, checkedBy: USER.name, checkedAt: now, qtySrc: src(), createdAt: src() === 'MOI' ? now : dup.createdAt }));
+    else put('LoDate', { id: uid(), barcode: bc, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp, mfg, qty, qtyStart: qty, location: $('#fLoc').value, note: $('#fNote').value, status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: src() });
     toast(dup ? 'Đã cập nhật lô cùng HSD' : 'Đã lưu lô date'); openSku(bc); refreshBehind();
   };
   $('#fNone').onclick = () => markCheck(p, 'KHONG_HANG');
@@ -832,17 +841,23 @@ function markCheck(p, result) {
   toast('Đã ghi nhận kiểm: không còn hàng'); closeModal(); refreshBehind();
 }
 function refreshBehind() { if (VIEW === 'input') drawSkus(); else render(); }
-function openNewSku(bc) {
-  modal('Thêm mã ngoài danh sách', `<p class="muted small">Dùng khi mã chưa có trong danh mục POS đã nhập (hàng mới về).</p>
-    <div class="form"><label class="f">Barcode *<input id="nBc" value="${esc(bc || '')}" inputmode="numeric"></label><label class="f">Tên hàng *<input id="nName"></label>
-    <label class="f">CAT *<select id="nCat">${CFG.cats.map(c => `<option value="${esc(c.cat)}" ${CATF === c.cat ? 'selected' : ''}>CAT ${esc(c.cat)} ${esc(c.name)}</option>`).join('')}</select></label>
-    <label class="f">Mã NCC<input id="nV" list="nccList" placeholder="VD 100540"></label><label class="f">Giá bán<input id="nPrice" type="number"></label></div>
+function openNewSku(bc, pre, g, msg) {
+  pre = pre || {};
+  modal(pre.name ? 'Xác nhận mã mới từ CHECK TỒN' : 'Thêm mã ngoài danh sách', `${msg ? `<div class="action small" style="margin-bottom:10px">${esc(msg)}</div>` : ''}
+    ${pre.name ? `<p class="small">Đã lấy từ CHECK TỒN: <b>${esc(pre.name)}</b> · ${esc(pre.vendorName)} · Giá ${money(pre.price)}đ · Tồn ${esc(pre.stock)}. ${g && !g.sure ? '<b>Kiểm tra CAT</b> (' + esc(g.why) + ') rồi bấm Lưu.' : ''}</p>` : '<p class="muted small">Gõ barcode: nếu có trong CHECK TỒN máy tự điền tên, NCC, giá.</p>'}
+    <div class="form"><label class="f">Barcode *<input id="nBc" value="${esc(bc || '')}" inputmode="numeric"></label><label class="f">Tên hàng *<input id="nName" value="${esc(pre.name || '')}"></label>
+    <label class="f">CAT *<select id="nCat">${CFG.cats.map(c => `<option value="${esc(c.cat)}" ${(pre.cat || (CATF !== 'ALL' ? CATF : '')) === c.cat ? 'selected' : ''}>CAT ${esc(c.cat)} ${esc(c.name)}</option>`).join('')}</select></label>
+    <label class="f">Mã NCC<input id="nV" list="nccList" placeholder="VD 100540" value="${esc(pre.vendorCode || '')}"></label><label class="f">Giá bán<input id="nPrice" type="number" value="${esc(pre.price || '')}"></label></div>
     <datalist id="nccList">${[...new Map(DB.NCC.map(n => [n.vendorCode, n])).values()].map(n => `<option value="${esc(n.vendorCode)}">${esc(n.vendorName)}</option>`).join('')}</datalist>
     <div class="row" style="margin-top:10px"><button class="btn" id="nSave">Lưu & nhập date</button></div>`);
+  let cur = Object.assign({}, pre);
+  $('#nBc').onchange = async () => { const b = $('#nBc').value.trim(); if (!/^\d{6,14}$/.test(b) || prodOf(b)) return prodOf(b) && openSku(b);
+    const x = ctFind(await ctLoad(), b); if (!x) return; const gg = guessCat(x); cur = ctProd(b, x, gg.cat);
+    $('#nName').value = cur.name; $('#nV').value = cur.vendorCode; $('#nPrice').value = cur.price; if (E.catCfg(CFG, gg.cat)) $('#nCat').value = gg.cat; toast('Đã điền theo CHECK TỒN'); };
   $('#nSave').onclick = () => {
     const b = $('#nBc').value.trim(), nm = $('#nName').value.trim(); if (!b || !nm) return toast('Nhập barcode và tên', true);
     const v = $('#nV').value.trim(), n = DB.NCC.find(x => x.vendorCode === v);
-    put('SanPham', { id: b, barcode: b, itemCode: '', name: nm, cat: $('#nCat').value, vendorCode: v, vendorName: n ? n.vendorName : '', price: $('#nPrice').value, cost: '', stock: '', slMonths: '', flag: '', flagBy: USER.name });
+    put('SanPham', { id: b, barcode: b, itemCode: cur.itemCode || '', name: nm, cat: $('#nCat').value, vendorCode: v, vendorName: cur.vendorCode === v && cur.vendorName ? cur.vendorName : n ? n.vendorName : '', price: $('#nPrice').value, cost: '', stock: cur.barcode === b ? cur.stock || '' : '', slMonths: '', flag: '', flagBy: USER.name });
     openSku(b);
   };
 }
@@ -1013,7 +1028,7 @@ BIND.recv = () => {
     if (!R) return toast('Chưa đủ thông tin', true);
     const now = Date.now(), p = R.p;
     put('NhanHang', { id: uid(), barcode: R.bc, name: p ? p.name : '', cat: p ? p.cat : '', vendorCode: p ? p.vendorCode : '', mfg: R.mfg, exp: R.exp, pct: R.pc.toFixed(3), minPct: R.min, pass: R.pass ? 1 : 0, qty: $('#rQty').value, po: $('#rPo').value, note: '', by: USER.name, at: now });
-    if (mkLot && p && R.pass) put('LoDate', { id: uid(), barcode: p.barcode, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp: R.exp, mfg: R.mfg, qty: $('#rQty').value || 0, qtyStart: $('#rQty').value || 0, location: 'Kho', note: 'Nhận hàng PO ' + $('#rPo').value, status: +$('#rQty').value > 0 ? 'MO' : 'DONG', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now });
+    if (mkLot && p && R.pass) put('LoDate', { id: uid(), barcode: p.barcode, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp: R.exp, mfg: R.mfg, qty: $('#rQty').value || 0, qtyStart: $('#rQty').value || 0, location: 'Kho', note: 'Nhận hàng PO ' + $('#rPo').value, status: +$('#rQty').value > 0 ? 'MO' : 'DONG', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now , qtySrc: 'MOI' });
     toast('Đã lưu kết quả nhận hàng'); render();
   };
   $('#rSave').onclick = () => save(false); $('#rLot').onclick = () => save(true);
@@ -1148,10 +1163,51 @@ function vSetup() {
 }
 BIND.setup = () => { $$('[data-t]').forEach(b => b.onclick = () => { STAB = b.dataset.t; render(); }); (SB[STAB] || (() => {}))(); };
 const SB = {};
+// ---- Đối chiếu tồn hệ thống với SL đã có date ----
+// Tồn (CHECK TỒN / POS) tính đến hết ngày TRƯỚC ngày cập nhật. Lô "hàng mới về" nhập từ ngày cập nhật trở đi chưa nằm trong tồn.
+function stockAtInfo() { const r = DB.CauHinh.find(x => x.id === 'stockAt'); try { return r && JSON.parse(r.value); } catch (e) { return null; } }
+function stockDay() { const i = stockAtInfo(); return i && i.at ? E.msDay(new Date(i.at).getTime()) : null; }
+function stockAsOf() { const d = stockDay(); return d == null ? 'lần cập nhật gần nhất' : E.fmt(d - 1); }
+function recon(s) {
+  const sd = stockDay(); let inQ = 0, newQ = 0;
+  (s.lots || []).forEach(l => { const q = +l.lot.qty || 0; if (l.lot.qtySrc === 'MOI' && sd != null && E.msDay(+l.lot.createdAt) >= sd) newQ += q; else inQ += q; });
+  const st = s.p.stock === '' || s.p.stock == null ? null : +s.p.stock || 0;
+  return { st, inQ, newQ, gap: st == null ? 0 : st - inQ };
+}
+function coverage(cats) {
+  const by = {}; cats.forEach(c => by[c] = { noDate: 0, cycle: 0, gap: 0, gapQ: 0, pending: 0 });
+  AN.skus.forEach(s => { const b = by[s.cat]; if (!b) return; if (s.state === 'PENDING') { b.pending++; return; }
+    if (s.state === 'CHUA_KIEM' && !s.lots.length) b.noDate++; else if (s.state === 'QUA_CHU_KY') b.cycle++;
+    if (s.lots.length) { const r = recon(s); if (r.gap > 0) { b.gap++; b.gapQ += r.gap; } } });
+  return by;
+}
+function warnCats() { return CATF !== 'ALL' ? [CATF] : liCats(); }
+function warnLine() {
+  const by = coverage(warnCats()), t = { noDate: 0, cycle: 0, gap: 0, gapQ: 0, pending: 0 };
+  Object.values(by).forEach(b => Object.keys(t).forEach(k => t[k] += b[k]));
+  if (!AN.skus.length) return '';
+  if (!t.noDate && !t.gap && !t.cycle && !t.pending) return '<div class="action" style="margin-top:10px;border-left-color:var(--ok)"><b>Tất cả mã còn tồn đã có date.</b></div>';
+  return `<div class="action" style="margin-top:10px;border-left-color:var(--bad);background:var(--kred-soft)"><b>⚠ Mã cũ chưa cập nhật date${CATF !== 'ALL' ? ' - CAT ' + esc(CATF) : ''}:</b>
+    ${t.noDate ? `<a href="#" onclick="INF='TODO';render();return false"><b>${t.noDate}</b> mã còn tồn chưa có date</a>` : ''}
+    ${t.gap ? ` · <a href="#" onclick="INF='GAP';render();return false"><b>${t.gap}</b> mã tồn nhiều hơn SL đã có date (${t.gapQ} sp)</a>` : ''}
+    ${t.cycle ? ` · <a href="#" onclick="INF='TODO';render();return false"><b>${t.cycle}</b> mã quá chu kỳ kiểm</a>` : ''}
+    ${t.pending ? ` · <a href="#" onclick="INF='PENDING';render();return false"><b>${t.pending}</b> mã chờ phân loại</a>` : ''}</div>`;
+}
+// Bảng cảnh báo sau mỗi lần cập nhật mã / tồn / nhập file
+function showUpdateResult(title, lines) {
+  const cats = warnCats(), by = coverage(cats), rows = cats.filter(c => { const b = by[c]; return b.noDate || b.cycle || b.gap || b.pending; });
+  modal(esc(title), `${lines ? `<p>${lines}</p>` : ''}
+    ${rows.length ? `<div class="action" style="border-left-color:var(--bad);background:var(--kred-soft)"><b>⚠ SUP cần cập nhật date cho các mã cũ sau:</b>
+      <div class="tbl" style="margin-top:8px"><table><thead><tr><th>CAT</th><th>Còn tồn chưa có date</th><th>Tồn nhiều hơn SL có date</th><th>Quá chu kỳ kiểm</th><th>Chờ phân loại</th></tr></thead>
+      <tbody>${rows.map(c => { const b = by[c]; return `<tr><td><b>CAT ${esc(c)}</b> ${esc((E.catCfg(CFG, c) || {}).name || '')}</td><td><b style="color:var(--bad)">${b.noDate}</b></td><td>${b.gap ? b.gap + ' mã (' + b.gapQ + ' sp)' : 0}</td><td>${b.cycle}</td><td>${b.pending}</td></tr>`; }).join('')}</tbody></table></div>
+      <p class="small muted" style="margin:6px 0 0">"Tồn nhiều hơn SL có date": hàng mới về hoặc số lô nhập thiếu - cần nhập thêm date. Tồn tính đến hết ${stockAsOf()}.</p></div>
+      <div class="row" style="margin-top:10px"><button class="btn" onclick="closeModal();INF='TODO';setView('input')">Xem mã chưa có date</button><button class="btn sub" onclick="closeModal();INF='GAP';setView('input')">Xem mã thiếu date so với tồn</button></div>`
+    : '<div class="action" style="border-left-color:var(--ok)"><b>Tất cả mã còn tồn đã có date.</b></div>'}`, true);
+}
 function stockInfoTxt() {
   const r = DB.CauHinh.find(x => x.id === 'stockAt'); let i = null; try { i = r && JSON.parse(r.value); } catch (e) {}
   if (!i) return DB.SanPham.length ? `${DB.SanPham.length.toLocaleString('vi-VN')} mã trong danh mục` : '';
-  const t = new Date(i.at); return `Tồn - giá theo CHECK TỒN lúc ${t.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} ${t.toLocaleDateString('vi-VN')}`;
+  const t = new Date(i.at); return `Tồn - giá theo ${i.src === 'POS' ? 'file POS' : 'CHECK TỒN'} lúc ${t.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} ${t.toLocaleDateString('vi-VN')}`;
 }
 // Cập nhật tồn: 1 chạm lấy từ CHECK TỒN, hoặc nạp file items.csv (có CAT) từ POS
 function openStock() {
@@ -1162,9 +1218,10 @@ function openStock() {
   SB.import();
   $('#stGo').onclick = async () => {
     $('#stGo').disabled = true; $('#stInfo').textContent = 'Đang lấy dữ liệu CHECK TỒN (khoảng 10-30 giây)...';
-    try { const r = await srv('apiStock', AUTH); toast(`Đã cập nhật tồn - giá ${(r.info.n || 0).toLocaleString('vi-VN')} mã`); await load(true); $('#stInfo').textContent = `Đã cập nhật ${(r.info.n || 0).toLocaleString('vi-VN')}/${(r.info.total || 0).toLocaleString('vi-VN')} mã. ` + stockInfoTxt(); refreshBehind(); }
-    catch (e) { $('#stInfo').textContent = 'Lỗi: ' + (e.message || e); }
-    $('#stGo').disabled = false;
+    try { const r = await srv('apiStock', AUTH); await load(true); refreshBehind(); ctLoad(true);
+      showUpdateResult('Đã cập nhật tồn - giá', `Cập nhật <b>${(r.info.n || 0).toLocaleString('vi-VN')}</b> mã${r.info.added ? `, thêm mới <b>${r.info.added.toLocaleString('vi-VN')}</b> mã còn tồn thuộc CAT theo dõi` : ''}. ${stockInfoTxt()}.${r.info.hasCat === false ? ' <br><span class="small muted">CHECK TỒN chưa có cột CAT: mã mới chỉ tự thêm sau khi CHECK TỒN tải lại file items (bản mới). Hiện vẫn nạp items.csv ở mục 2 để thêm mã mới.</span>' : ''}`); }
+    catch (e) { if ($('#stInfo')) $('#stInfo').textContent = 'Lỗi: ' + (e.message || e); }
+    if ($('#stGo')) $('#stGo').disabled = false;
   };
 }
 function sImport(inModal) {
@@ -1197,7 +1254,7 @@ SB.import = () => {
         const openBc = new Set(DB.LoDate.filter(l => l.status === 'MO').map(l => l.barcode));
         rows.forEach(r => { if (cats2.includes(r.cat) && os && !(+r.stock > 0) && openBc.has(r.barcode)) sel2.push(r); });
         $('#impGo').disabled = true; $('#impInfo').textContent = 'Đang gửi lên hệ thống...';
-        try { await srv('apiImportProducts', AUTH, sel2, cats2); toast('Đã nhập ' + sel2.length + ' mã'); await load(true); if ($('#mbg').classList.contains('on')) { closeModal(); } render(); }
+        try { await srv('apiImportProducts', AUTH, sel2, cats2); await load(true); render(); showUpdateResult('Đã nạp danh mục POS', `Đã nhập <b>${sel2.length.toLocaleString('vi-VN')}</b> mã.`); }
         catch (err) { toast('Lỗi: ' + (err.message || err), true); $('#impGo').disabled = false; }
       };
     } catch (err) { $('#impInfo').textContent = 'Không đọc được file: ' + err.message; }
@@ -1329,6 +1386,51 @@ SB.other = () => {
   };
 };
 
+// ---------------- Dữ liệu CHECK TỒN trên máy (tra mã ngay khi quét) ----------------
+const CT_API = 'https://script.google.com/macros/s/AKfycbw_dtAap9x7uXUvQ2S8FK0fyVGxoEdDZXMY0Z0xfsoQ5vO0fld9CkttOzOV64HC6uq4oA/exec';
+const CT = { map: null, at: null, loading: null };
+function idb(mode, fn) { return new Promise((ok, no) => { try { const r = indexedDB.open('kdate', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onerror = () => no(r.error);
+  r.onsuccess = () => { const tx = r.result.transaction('kv', mode), st = tx.objectStore('kv'), q = fn(st); tx.oncomplete = () => ok(q && q.result); tx.onerror = () => no(tx.error); }; } catch (e) { no(e); } }); }
+const idbGet = k => idb('readonly', st => st.get(k)).catch(() => null), idbSet = (k, v) => idb('readwrite', st => st.put(v, k)).catch(() => null);
+function ctLoad(force) {
+  if (CT.map && !force) return Promise.resolve(CT.map);
+  if (CT.loading) return CT.loading;
+  CT.loading = (async () => {
+    const c = await idbGet('ct');
+    if (c && !force && Date.now() - c.t < 4 * 3600e3) { CT.map = c.d; CT.at = c.at; return CT.map; }
+    try { const j = await (await fetch(CT_API + '?action=data&_=' + Date.now())).json();
+      if (j && j.productData) { CT.map = j.productData; CT.at = j.updatedAt; idbSet('ct', { t: Date.now(), at: j.updatedAt, d: j.productData }); } }
+    catch (e) { if (c) { CT.map = c.d; CT.at = c.at; } }
+    return CT.map;
+  })().finally(() => { CT.loading = null; });
+  return CT.loading;
+}
+function ctFind(m, bc) { if (!m || !bc) return null; bc = String(bc).trim(); return m[bc] || m[bc.replace(/^0+/, '')] || m[bc.padStart(13, '0')] || m[bc.padStart(12, '0')] || m[bc.padStart(8, '0')] || null; }
+const catNorm = c => String(parseInt(c, 10) || c || '').trim();
+// Đoán CAT: CHECK TỒN có CAT -> chắc chắn; không có thì theo NCC (các mã cùng NCC đang ở CAT nào), rồi CAT của SUP
+function guessCat(x) {
+  if (x.cat !== undefined && x.cat !== null && x.cat !== '') return { cat: catNorm(x.cat), sure: true, why: 'CAT theo CHECK TỒN' };
+  const mine = liCats(), cnt = {};
+  DB.SanPham.forEach(p => { if (String(p.vendorCode) === String(x.suppCode) && mine.includes(p.cat)) cnt[p.cat] = (cnt[p.cat] || 0) + 1; });
+  const ks = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]);
+  if (ks.length === 1) return { cat: ks[0], sure: true, why: 'theo NCC ' + (x.suppName || x.suppCode) };
+  if (ks.length) return { cat: ks[0], sure: false, why: 'NCC có hàng ở nhiều CAT' };
+  const u = userCats(); if (u.length === 1) return { cat: u[0], sure: true, why: 'CAT bạn phụ trách' };
+  return { cat: CATF !== 'ALL' ? CATF : mine[0], sure: false, why: 'chưa biết CAT' };
+}
+function ctProd(bc, x, cat) { return { id: bc, barcode: bc, itemCode: x.code || '', name: x.name || bc, cat, vendorCode: String(x.suppCode || ''), vendorName: x.suppName || '', price: String(x.price || ''), cost: '', stock: String(x.stock == null ? '' : x.stock), slMonths: '', flag: '', flagBy: USER.name }; }
+// Quét / gõ 1 mã: có trong danh mục -> mở; chưa có -> tra CHECK TỒN, tự tạo mã (tên, NCC, giá, tồn, CAT)
+async function scanHit(code) {
+  code = String(code || '').trim(); if (!code) return;
+  if (prodOf(code)) return openSku(code);
+  modal('Đang tìm mã ' + esc(code), '<p class="muted">Đang tra dữ liệu CHECK TỒN... (lần đầu trong ngày mất vài giây)</p>');
+  const x = ctFind(await ctLoad(), code);
+  if (!x) return openNewSku(code, null, null, 'Mã không có trong CHECK TỒN - nhập tay thông tin.');
+  const g = guessCat(x), inCfg = !!E.catCfg(CFG, g.cat), p = ctProd(code, x, g.cat);
+  if (g.sure && inCfg) { put('SanPham', p); toast(`Đã thêm mã từ CHECK TỒN (CAT ${g.cat})`); return openSku(code); }
+  openNewSku(code, p, g, inCfg ? '' : `CAT ${g.cat} chưa nằm trong danh sách CAT theo dõi - chọn CAT hoặc thêm CAT trong Cài đặt.`);
+}
+
 // ---------------- Nhập file date đã theo dõi từ trước ----------------
 const LI_FIELDS = { bc: ['Barcode', /^(barcode|ma vach|jan|ean|upc|ma barcode)$|barcode|ma vach/], code: ['Mã hàng', /^(item code|ma hang|sku|ma sp|ma san pham|item)$/], name: ['Tên hàng', /^ten|item name|^name$|san pham|mo ta|description/],
   exp: ['HSD *', /^hsd|han su dung|han dung|het han|exp|expiry|^date$|ngay hh|^han$/], mfg: ['NSX', /^nsx|ngay san xuat|mfg|^sx$|production/], qty: ['Số lượng', /so luong|^sl|qty|quantity|^ton thuc|^sl ton/],
@@ -1374,12 +1476,14 @@ function liSheet(i) {
     ${LI.sheets.length > 1 ? `<label class="f" style="max-width:320px">Sheet<select id="liSh">${LI.sheets.map((x, j) => `<option value="${j}" ${j === i ? 'selected' : ''}>${esc(x.n)}</option>`).join('')}</select></label>` : ''}
     <div class="form" style="margin-top:6px">${Object.keys(LI_FIELDS).map(k => `<label class="f">${LI_FIELDS[k][0]}<select data-lf="${k}"><option value="-1">- Không có -</option>${Array.from({ length: width }, (_, j) => `<option value="${j}" ${LI.map[k] === j ? 'selected' : ''}>${esc(colName(j))}</option>`).join('')}</select></label>`).join('')}
       <label class="f">Dòng tiêu đề<input id="liHdr" type="number" min="0" value="${h.row + 1}"></label>
+      <label class="f">Số lượng trong file là<select id="liSrc"><option value="TON" ${LI.src !== 'MOI' ? 'selected' : ''}>Hàng đang có - đã nằm trong tồn (đến hết ${stockAsOf()})</option><option value="MOI" ${LI.src === 'MOI' ? 'selected' : ''}>Hàng mới về sau ngày tồn - tồn chưa có</option></select></label>
       <label class="f">CAT cho mã chưa có trong danh mục<select id="liCat">${cats.map(c => `<option value="${esc(c)}" ${c === LI.cat ? 'selected' : ''}>CAT ${esc(c)}</option>`).join('')}</select></label></div>
     <p class="small muted" style="margin:6px 0 0">Máy tự nhận cột theo tiêu đề; kiểm tra lại nếu chọn chưa đúng.</p></div>`;
   const sel = $('#liSh'); if (sel) sel.onchange = () => liSheet(+sel.value);
   $$('[data-lf]').forEach(x => x.onchange = () => { LI.map[x.dataset.lf] = +x.value; liPreview(); });
   $('#liHdr').onchange = () => { LI.hdr = Math.max(0, +$('#liHdr').value - 1); liPreview(); };
   $('#liCat').onchange = () => { LI.cat = $('#liCat').value; LI.catAuto = false; liPreview(); };
+  $('#liSrc').onchange = () => { LI.src = $('#liSrc').value; };
   liPreview();
 }
 function liDate(v, eom) {
@@ -1416,7 +1520,7 @@ function liPreview() {
     let prod = p;
     if (!prod) { prod = newP.get(bc) || { id: bc, barcode: bc, itemCode: String(rawCode || ''), name: name || bc, cat: LI.cat, vendorCode: '', vendorName: '', price: '', cost: '', stock: '', slMonths: '', flag: 'THEO_DOI', flagBy: USER.name }; newP.set(bc, prod); }
     let qty = Number(String(g(row, 'qty')).replace(/[^\d.]/g, ''));
-    if (!(qty > 0)) { qty = +prod.stock > 0 ? +prod.stock : 1; fromStock++; }
+    if (!(qty > 0)) { const first = ![...ok.values()].some(o => o.bc === bc); qty = first && +prod.stock > 0 ? +prod.stock : 1; fromStock++; }
     const k = bc + '|' + exp, loc = String(g(row, 'loc') || '').trim(), note = String(g(row, 'note') || '').trim(), o = ok.get(k);
     if (o) { o.qty += qty; if (loc && !o.location.includes(loc)) o.location = o.location ? o.location + ' + ' + loc : loc; if (note) o.note = (o.note ? o.note + '; ' : '') + note; }
     else ok.set(k, { bc, p: prod, isNew: !p, exp, mfg: mfg && mfg < exp ? mfg : '', qty, location: loc, note, line });
@@ -1425,7 +1529,7 @@ function liPreview() {
   const upd = list.filter(x => DB.LoDate.some(l => l.barcode === x.bc && l.exp === x.exp && l.status === 'MO')).length;
   const expd = list.filter(x => E.dn(x.exp) < td).length, skus = new Set(list.map(x => x.bc)).size;
   LI.list = list; LI.newP = newP;
-  $('#liPrev').innerHTML = `<div class="row">${[['ok', `${list.length} lô hợp lệ (${skus} mã)`], upd ? ['blue', `${upd} lô cùng HSD đã có - sẽ cập nhật SL`] : 0, newP.size ? ['warn', `${newP.size} mã chưa có trong danh mục - thêm vào CAT ${esc(LI.cat)}`] : 0, expd ? ['bad', `${expd} lô đã quá HSD`] : 0, fromStock ? ['gray', `${fromStock} dòng không có SL - lấy theo tồn`] : 0, errs.length ? ['bad', `${errs.length} dòng lỗi - bỏ qua`] : 0].filter(Boolean).map(x => `<span class="tag ${x[0]}">${x[1]}</span>`).join(' ')}</div>
+  $('#liPrev').innerHTML = `<div class="row">${[['ok', `${list.length} lô hợp lệ (${skus} mã)`], upd ? ['blue', `${upd} lô cùng HSD đã có - sẽ cập nhật SL`] : 0, newP.size ? ['warn', `${newP.size} mã chưa có trong danh mục - thêm vào CAT ${esc(LI.cat)}`] : 0, expd ? ['bad', `${expd} lô đã quá HSD`] : 0, fromStock ? ['gray', `${fromStock} dòng không có SL - lấy theo tồn (date sớm nhất), date khác ghi 1`] : 0, errs.length ? ['bad', `${errs.length} dòng lỗi - bỏ qua`] : 0].filter(Boolean).map(x => `<span class="tag ${x[0]}">${x[1]}</span>`).join(' ')}</div>
     ${list.length ? `<div class="tbl" style="margin-top:10px;max-height:300px;overflow:auto"><table><thead><tr><th>Dòng</th><th>Barcode</th><th>Tên hàng</th><th>HSD</th><th>SL</th><th class="hide-m">Vị trí</th><th class="hide-m">NSX</th></tr></thead><tbody>${list.slice(0, 200).map(x => `<tr><td>${x.line}</td><td>${esc(x.bc)}</td><td>${esc(x.p.name)}${x.isNew ? ' <span class="tag warn">mới</span>' : ''}</td><td>${E.fmt(x.exp)}</td><td>${x.qty}</td><td class="hide-m">${esc(x.location)}</td><td class="hide-m">${x.mfg ? E.fmt(x.mfg) : ''}</td></tr>`).join('')}</tbody></table></div>${list.length > 200 ? `<p class="small muted">Đang hiện 200/${list.length} lô.</p>` : ''}` : ''}
     ${errs.length ? `<details style="margin-top:8px"><summary class="small"><b>Xem ${errs.length} dòng lỗi</b></summary><div class="tbl" style="max-height:220px;overflow:auto"><table><thead><tr><th>Dòng</th><th>Mã</th><th>Lý do</th></tr></thead><tbody>${errs.slice(0, 300).map(e => `<tr><td>${e[0]}</td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
     <div class="row" style="margin-top:12px"><button class="btn" id="liGo" ${list.length ? '' : 'disabled'}>Nhập ${list.length} lô vào hệ thống</button></div>`;
@@ -1441,10 +1545,10 @@ function liSave() {
     if (x.p.flag === 'KHONG_DATE' || (sk && sk.state === 'PENDING')) prods.push(Object.assign({}, x.p, { flag: 'THEO_DOI', flagBy: USER.name })); });
   if (prods.length) put('SanPham', prods);
   const lots = list.map(x => { const dup = DB.LoDate.find(l => l.barcode === x.bc && l.exp === x.exp && l.status === 'MO');
-    if (dup) return Object.assign({}, dup, { qty: String(x.qty), mfg: x.mfg || dup.mfg, location: x.location || dup.location, checkedBy: USER.name, checkedAt: now });
-    return { id: uid(), barcode: x.bc, name: x.p.name, cat: x.p.cat, vendorCode: x.p.vendorCode, exp: x.exp, mfg: x.mfg, qty: String(x.qty), qtyStart: String(x.qty), location: x.location, note: x.note ? x.note + ' (nhập file)' : 'Nhập file', status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now }; });
+    if (dup) return Object.assign({}, dup, { qty: String(x.qty), mfg: x.mfg || dup.mfg, location: x.location || dup.location, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : (dup.qtySrc || 'TON') });
+    return { id: uid(), barcode: x.bc, name: x.p.name, cat: x.p.cat, vendorCode: x.p.vendorCode, exp: x.exp, mfg: x.mfg, qty: String(x.qty), qtyStart: String(x.qty), location: x.location, note: x.note ? x.note + ' (nhập file)' : 'Nhập file', status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : 'TON' }; });
   for (let i = 0; i < lots.length; i += 200) put('LoDate', lots.slice(i, i + 200));
-  toast(`Đã nhập ${lots.length} lô - đang gửi lên hệ thống`); closeModal(); render();
+  render(); showUpdateResult('Đã nhập file date', `Đã nhập <b>${lots.length}</b> lô date - đang gửi lên hệ thống.`);
 }
 function liTemplate(cat) {
   const skus = AN.skus.filter(s => s.cat === cat).sort((a, b) => (a.p.vendorName || '').localeCompare(b.p.vendorName || '') || a.name.localeCompare(b.name));
