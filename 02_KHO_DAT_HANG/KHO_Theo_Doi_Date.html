@@ -489,7 +489,7 @@ function srv(fn, ...args) {
       .then(r => { if (!r.ok) throw new Error('Máy chủ lỗi ' + r.status); return r.text(); })
       .then(t => { try { return JSON.parse(t); } catch (e) { throw new Error('Máy chủ Apps Script chưa cập nhật Code.gs bản mới (Triển khai > Quản lý triển khai > Phiên bản mới)'); } })
       .then(j => { if (j && j.error) throw new Error(j.error); res(j); })
-      .catch(e => rej(/Failed to fetch|NetworkError|Load failed/i.test(String(e && e.message)) ? new Error('Không kết nối được máy chủ (kiểm tra mạng)') : e));
+      .catch(e => rej(/Failed to fetch|NetworkError|Load failed/i.test(String(e && e.message)) ? new Error('Không kết nối được máy chủ - kiểm tra mạng, hoặc Apps Script chưa cập nhật Code.gs bản mới') : e));
     else setTimeout(() => { try { res(JSON.parse(LOCAL[fn](...args))); } catch (e) { rej(e); } }, 60);
   });
 }
