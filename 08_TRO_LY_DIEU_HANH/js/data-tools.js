@@ -34,12 +34,12 @@ window.S1016_TOOLS = {
     },
     {
       "name": "Theo Dõi Date Cửa Hàng",
-      "desc": "SUP nhập date theo CAT, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
+      "desc": "Quét mã nhập date theo CAT, nhập file date cũ, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
       "group": "Dùng hằng ngày",
       "groupId": "hay-dung",
-      "href": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
-      "local": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
-      "host": "Apps Script",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Theo_Doi_Date.html",
+      "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Theo_Doi_Date.html",
+      "host": "GitHub",
       "updated": "07/11/2026"
     },
     {
@@ -154,12 +154,12 @@ window.S1016_TOOLS = {
     },
     {
       "name": "Theo Dõi Date Cửa Hàng",
-      "desc": "SUP nhập date theo CAT, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
+      "desc": "Quét mã nhập date theo CAT, nhập file date cũ, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
       "group": "Kho - Đặt hàng - Trưng bày",
       "groupId": "kho",
-      "href": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
-      "local": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
-      "host": "Apps Script",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Theo_Doi_Date.html",
+      "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Theo_Doi_Date.html",
+      "host": "GitHub",
       "updated": "07/11/2026"
     },
     {
