@@ -1,6 +1,6 @@
 window.S1016_TOOLS = {
   "extractedAt": "2026-10-29T00:00:00+07:00",
-  "count": 64,
+  "count": 66,
   "tools": [
     {
       "name": "Trợ Lý Điều Hành 1016",
@@ -31,6 +31,16 @@ window.S1016_TOOLS = {
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Xin_Hang_Lien_Cua_Hang.html",
       "host": "GitHub",
       "updated": "25/10/2026"
+    },
+    {
+      "name": "Theo Dõi Date Cửa Hàng",
+      "desc": "SUP nhập date theo CAT, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
+      "group": "Dùng hằng ngày",
+      "groupId": "hay-dung",
+      "href": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
+      "local": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
+      "host": "Apps Script",
+      "updated": "07/11/2026"
     },
     {
       "name": "Lịch Làm Việc & Điều Phối Ca",
@@ -141,6 +151,16 @@ window.S1016_TOOLS = {
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_OrderIQ_Dat_Hang_Ton_Kho.html",
       "host": "GitHub",
       "updated": "05/11/2026"
+    },
+    {
+      "name": "Theo Dõi Date Cửa Hàng",
+      "desc": "SUP nhập date theo CAT, cảnh báo báo NCC - giảm giá - rút kệ - Discard, chấm điểm SUP & NCC",
+      "group": "Kho - Đặt hàng - Trưng bày",
+      "groupId": "kho",
+      "href": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
+      "local": "https://script.google.com/macros/s/AKfycbylSTN_LKNKxv8UDvAyZeAWuF8Tc8WryyLMrdX9smr_8JgeUuJEui8dyX-i2bvEx2kg/exec",
+      "host": "Apps Script",
+      "updated": "07/11/2026"
     },
     {
       "name": "Xin Hàng Các Cửa Hàng",
