@@ -62,6 +62,9 @@ tr.click{cursor:pointer}tr.click:hover{background:var(--blue-soft)}
 input,select,textarea{font:400 15px 'Be Vietnam Pro',sans-serif;border:1px solid #cfd7e3;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--navy);border-color:var(--navy)}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--ink2)}
+.more{margin-top:10px}.more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--navy)}
+.pobar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--navy);color:#fff;border-radius:12px;padding:10px 14px;margin-top:10px}.pobar .btn{background:#fff;color:var(--navy);border-color:#fff}
+.poin{width:118px;font-size:16px}.poq{width:70px}
 .srcbox{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink2)}.srcopt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;font-weight:500;color:var(--ink);cursor:pointer}.srcopt input{margin-top:3px;flex:none}.srcopt:has(input:checked){border-color:var(--navy);background:var(--blue-soft)}
 .drow{display:flex;gap:6px;align-items:stretch}.drow>input{flex:1;min-width:0;font-size:17px;letter-spacing:.04em}
 .dpick{position:relative;flex:none;width:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:20px;cursor:pointer}.dpick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
@@ -184,7 +187,7 @@ var ENGINE = (function () {
   function slClass(sl) { return sl == null ? 'A' : sl >= 365 ? 'A' : sl >= 210 ? 'B' : sl >= 30 ? 'C' : 'D'; }
   var POLICY_NAME = { DOI_TRA: 'Được đổi/trả', KHONG_DOI_TRA: 'Không đổi trả - Store giảm giá', HO_TRO_GG: 'NCC hỗ trợ giảm giá' };
 
-  // Lập các mốc xử lý cho 1 lô: d = số ngày trước HSD
+  // Lập các mốc xử lý cho 1 date: d = số ngày trước HSD
   function plan(lot, prod, ncc, cfg) {
     var cc = catCfg(cfg, lot.cat) || { ladder: 'FOOD' };
     var exp = dn(lot.exp), mfg = dn(lot.mfg);
@@ -369,7 +372,7 @@ var ENGINE = (function () {
         var eff = Math.max(st.due, created);
         if (eff < ms || eff > me) return;
         if (st.doneAt == null && eff + cfg.grace >= td) return;      // chưa tới hạn chấm
-        if (s.closeAt != null && s.closeAt < st.due) return;          // lô đã đóng trước mốc
+        if (s.closeAt != null && s.closeAt < st.due) return;          // date đã đóng trước mốc
         if (st.doneAt == null && !s.open) return;
         if (c) c.steps++;
         var ok = st.doneAt != null && st.doneAt <= eff + cfg.grace;
@@ -434,7 +437,7 @@ const NCC_SEED = [{"id": "12_100122", "cat": "12", "vendorCode": "100122", "vend
 </script>
 <script>
 const E = ENGINE;
-const TABLES = ['SanPham', 'LoDate', 'XuLy', 'KiemTra', 'NhanHang', 'NCC', 'NhanSu', 'CauHinh'];
+const TABLES = ['SanPham', 'LoDate', 'XuLy', 'KiemTra', 'NhanHang', 'NCC', 'NhanSu', 'CauHinh', 'PO'];
 let DB = {}; TABLES.forEach(t => DB[t] = []);
 let CFG = E.config(null), AN = null, USER = null, AUTH = null, VIEW = 'home', CATF = 'ALL';
 const IS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
@@ -475,6 +478,8 @@ const LOCAL = { // Chế độ chạy thử khi mở file ngoài Apps Script: l�
   apiDelete(a, t, ids) { const u = this.auth(a); if (u.role !== 'QL') throw new Error('Chỉ Quản lý được xoá'); const d = this.db(); d[t] = d[t].filter(r => !ids.includes(r.id)); this.save(d); return JSON.stringify({ ok: true }); },
   apiStock(a) { this.auth(a); const d = this.db(), info = { at: new Date().toISOString(), n: 0, total: d.SanPham.length, pulledAt: Date.now(), demo: 1 };
     d.CauHinh = d.CauHinh.filter(r => r.id !== 'stockAt').concat([{ id: 'stockAt', value: JSON.stringify(info) }]); this.save(d); return JSON.stringify({ ok: true, info }); },
+  apiImportPO(a, rows) { this.auth(a); const d = this.db(), ids = new Set(rows.map(r => r.id)), min = rows.reduce((m, r) => r.date && r.date < m ? r.date : m, '99999999');
+    d.PO = (d.PO || []).filter(r => !ids.has(r.id) && r.date < min && r.status !== 'CHO').concat(rows.map(r => { const o = {}; Object.keys(r).forEach(k => o[k] = String(r[k] == null ? '' : r[k])); return o; })); this.save(d); return JSON.stringify({ ok: true, n: rows.length }); },
   apiImportProducts(a, rows, cats) {
     this.auth(a);
     const d = this.db(), old = new Map(d.SanPham.map(p => [p.id, p]));
@@ -613,7 +618,7 @@ function taskLine(s, withBtn = true) {
     : s.task ? `Việc: <b>${esc(s.task.label)}</b>${s.overdue ? ` - trễ ${AN.td - s.due - CFG.grace} ngày` : ''}`
     : s.nccWait ? '<b>NCC chưa phản hồi</b> - nhắc lại NCC, báo Buyer' : s.recheck ? '<b>Đến hạn kiểm lại</b> số lượng & date' : s.next ? `Mốc tới: ${esc(s.next.label)} sau ${s.daysToNext} ngày` : '';
   return `<div class="it"><div class="main"><div class="row"><span class="nm">${esc(s.name)}</span>${lvlTag(s.level)}${s.recheck && s.level !== 'expired' ? '<span class="tag blue">Kiểm lại</span>' : ''}${s.nccWait ? '<span class="tag or">Chờ NCC</span>' : ''}</div>
-    <div class="small muted">CAT ${esc(s.cat)} · ${esc(s.barcode)} · ${esc(s.vendorName || s.vendorCode)} · HSD <b>${E.fmt(s.exp)}</b> · ${leftTxt(s)} · SL ${s.qty}${s.lot.location ? ' · ' + esc(s.lot.location) : ''}</div>
+    <div class="small muted">CAT ${esc(s.cat)} · ${esc(s.barcode)} · ${esc(s.vendorName || s.vendorCode)} · HSD <b>${E.fmt(s.exp)}</b> · ${leftTxt(s)} · SL ${s.qty}${s.lot.po ? ' · PO ' + esc(s.lot.po) : ''}${s.lot.location ? ' · ' + esc(s.lot.location) : ''}</div>
     <div class="small">${why}</div></div>${withBtn ? `<button class="btn sm" onclick="openLot('${s.id}')">Xử lý</button>` : ''}</div>`;
 }
 
@@ -623,7 +628,7 @@ function vHome() {
   const t = { scope: 0, covered: 0, unchecked: 0, pending: 0, due: 0, overdue: 0, expired: 0, soon: 0, recheck: 0, risk: 0, nccWait: 0 };
   cats.forEach(c => { const b = AN.byCat[c]; if (b) Object.keys(t).forEach(k => t[k] += b[k] || 0); });
   const cov = t.scope ? t.covered / t.scope : 0, tasks = myTasks();
-  const grp = (title, arr, empty) => `<div class="card"><h3>${title} <span class="muted">(${arr.length})</span></h3>${arr.length ? `<div class="list">${arr.slice(0, 60).map(s => taskLine(s)).join('')}</div>${arr.length > 60 ? `<p class="muted small">Còn ${arr.length - 60} lô - xem tab Cảnh báo & xử lý.</p>` : ''}` : `<p class="muted">${empty}</p>`}</div>`;
+  const grp = (title, arr, empty) => `<div class="card"><h3>${title} <span class="muted">(${arr.length})</span></h3>${arr.length ? `<div class="list">${arr.slice(0, 60).map(s => taskLine(s)).join('')}</div>${arr.length > 60 ? `<p class="muted small">Còn ${arr.length - 60} date - xem tab Cảnh báo & xử lý.</p>` : ''}` : `<p class="muted">${empty}</p>`}</div>`;
   const urgent = tasks.filter(s => s.level === 'expired' || s.level === 'overdue');
   const due = tasks.filter(s => s.level === 'due');
   const re = tasks.filter(s => (s.level === 'soon' || s.level === 'ok') && (s.recheck || s.nccWait));
@@ -641,7 +646,7 @@ function vHome() {
       <div class="card kpi"><div class="v">${t.scope}</div><div class="d">Mã cần theo dõi date</div></div>
       <div class="card kpi ${cov >= .95 ? 'ok' : 'red'}"><div class="v">${pct(cov)}</div><div class="d">Độ phủ: mã đã kiểm trong chu kỳ</div></div>
       <div class="card kpi ${t.unchecked ? 'red' : 'ok'}"><div class="v">${t.unchecked}</div><div class="d">Mã chưa kiểm / quá chu kỳ</div></div>
-      <div class="card kpi"><div class="v">${t.due}</div><div class="d">Lô đến mốc cần xử lý</div></div>
+      <div class="card kpi"><div class="v">${t.due}</div><div class="d">Date đến mốc cần xử lý</div></div>
       <div class="card kpi red"><div class="v">${t.overdue + t.expired}</div><div class="d">Quá hạn xử lý + hết hạn</div></div>
       <div class="card kpi"><div class="v">${money(t.risk)}</div><div class="d">Giá trị hàng cận date (đ)</div></div>
     </div>
@@ -649,10 +654,10 @@ function vHome() {
   </section>
   <section>${secHead(2, 'Danh sách việc', '')}
     <div class="grid2">
-      ${grp('Hết hạn & quá hạn xử lý', urgent, 'Không có lô trễ - giữ vững!')}
-      ${grp('Đến mốc - cần xử lý', due, 'Không có lô đến mốc.')}
-      ${grp('Kiểm lại / nhắc NCC', re, 'Không có lô cần kiểm lại.')}
-      ${grp('Sắp đến mốc (' + CFG.soonDays + ' ngày tới)', soon, 'Không có lô sắp đến mốc.')}
+      ${grp('Hết hạn & quá hạn xử lý', urgent, 'Không có date trễ - giữ vững!')}
+      ${grp('Đến mốc - cần xử lý', due, 'Không có date đến mốc.')}
+      ${grp('Kiểm lại / nhắc NCC', re, 'Không có date cần kiểm lại.')}
+      ${grp('Sắp đến mốc (' + CFG.soonDays + ' ngày tới)', soon, 'Không có date sắp đến mốc.')}
     </div>
     <div class="card" style="margin-top:16px"><div class="row sp"><h3>Mã chưa kiểm date <span class="muted">(${unchecked.length})</span></h3><button class="btn sub sm" onclick="INF='TODO';setView('input')">Mở danh sách nhập</button></div>
       ${unchecked.length ? `<div class="tbl"><table><thead><tr><th>CAT</th><th>Barcode</th><th>Tên hàng</th><th class="hide-m">NCC</th><th>Tồn</th><th>Lần kiểm cuối</th></tr></thead><tbody>${unchecked.slice(0, 40).map(s => `<tr class="click" onclick="openSku('${esc(s.barcode)}')"><td>${esc(s.cat)}</td><td>${esc(s.barcode)}</td><td>${esc(s.name)}</td><td class="hide-m">${esc(s.p.vendorName)}</td><td>${esc(s.p.stock)}</td><td>${s.last ? E.fmt(s.last) : '<span class="tag bad">Chưa kiểm</span>'}</td></tr>`).join('')}</tbody></table></div>${unchecked.length > 40 ? `<p class="muted small">Còn ${unchecked.length - 40} mã.</p>` : ''}` : '<p class="muted">Tất cả mã đã được kiểm trong chu kỳ.</p>'}
@@ -664,11 +669,12 @@ BIND.home = () => bindCatChips();
 // ---------------- 2. NHẬP DATE THEO CAT ----------------
 let INF = 'ALL', INQ = '', INLIMIT = 150;
 function vInput() {
-  const F = { ALL: 'Tất cả', TODO: 'Chưa kiểm / quá chu kỳ', GAP: 'Thiếu date so với tồn', NEAR: 'Có lô cận date', PENDING: 'Chờ phân loại', OK: 'Đã kiểm' };
-  return `<section>${secHead(1, 'Nhập date theo CAT', 'Chọn CAT của bạn, quét hoặc gõ mã, nhập date gần nhất đang có trên kệ + kho (mỗi date là 1 lô).')}
+  const F = { ALL: 'Tất cả', TODO: 'Chưa kiểm / quá chu kỳ', GAP: 'Thiếu date so với tồn', NEAR: 'Có hàng cận date', PENDING: 'Chờ phân loại', OK: 'Đã kiểm' };
+  return `<section>${secHead(1, 'Nhập date theo CAT', 'Chọn CAT của bạn, quét hoặc gõ mã, nhập date gần nhất đang có trên kệ + kho.')}
     ${catChips()}
     <div class="row" style="margin-top:12px"><input id="q" placeholder="Quét / gõ barcode hoặc tên hàng" value="${esc(INQ)}" style="flex:1;min-width:200px" autocomplete="off"><button class="btn" id="btnScan">Quét bằng camera</button><button class="btn sub" id="btnAddNew">+ Mã ngoài danh sách</button></div>
-    <div class="row" style="margin-top:10px"><button class="btn sub sm" id="btnStock">Cập nhật tồn - giá</button><button class="btn sub sm" id="btnImpLots">Nhập file date đã có</button><span class="small muted" id="stockInfo">${stockInfoTxt()}</span></div>
+    ${poBar()}
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="btnPO">Nhập date theo PO</button><button class="btn sub sm" id="btnStock">Cập nhật tồn - giá</button><button class="btn sub sm" id="btnImpLots">Nhập file date đã có</button><span class="small muted" id="stockInfo">${stockInfoTxt()}</span></div>
     ${DB.SanPham.length ? warnLine() : '<div class="action" style="margin-top:10px"><b>Chưa có danh mục hàng.</b> Bấm <b>Cập nhật tồn - giá</b> > nạp file items.csv từ POS (có CAT) để hiện mã cần theo dõi.</div>'}
     <div class="row" style="margin-top:10px" id="inf">${Object.keys(F).map(k => `<button class="chip ${INF === k ? 'on' : ''}" data-f="${k}">${F[k]} (<span data-n="${k}">0</span>)</button>`).join('')}</div>
     <div class="syncbar" id="sync"></div>
@@ -703,7 +709,7 @@ function drawSkus() {
   $$('[data-n]').forEach(el => el.textContent = cnt[el.dataset.n]);
   const rank = s => s.state === 'PENDING' ? 3 : (s.worst && s.worst.level !== 'ok') ? 0 : s.state === 'CHUA_KIEM' ? 1 : s.state === 'QUA_CHU_KY' ? 2 : 4;
   const list = AN.skus.filter(skuFilter).sort((a, b) => rank(a) - rank(b) || (a.worst ? a.worst.exp : 1e9) - (b.worst ? b.worst.exp : 1e9) || a.name.localeCompare(b.name));
-  $('#skuBody').innerHTML = list.slice(0, INLIMIT).map(s => `<tr class="click" onclick="openSku('${esc(s.barcode)}')"><td><b>${esc(s.name)}</b><div class="small muted">CAT ${esc(s.cat)}<span class="hide-d"> · ${esc(s.barcode)}${s.p.price ? ' · ' + money(s.p.price) + 'đ' : ''}</span></div></td><td class="hide-m">${esc(s.barcode)}</td><td class="hide-m small">${esc(s.p.vendorName)}</td><td class="hide-m">${s.p.price ? money(s.p.price) : ''}</td><td>${esc(s.p.stock)}</td><td>${s.worst ? E.fmt(s.worst.exp) + `<div class="small muted">${s.lots.length} lô</div>` : '-'}</td><td>${stateTag(s)}</td></tr>`).join('') || `<tr><td colspan="7" class="muted">Không có mã phù hợp.${INQ ? ' Bấm "+ Mã ngoài danh sách" để thêm mã ' + esc(INQ) + '.' : ''}</td></tr>`;
+  $('#skuBody').innerHTML = list.slice(0, INLIMIT).map(s => `<tr class="click" onclick="openSku('${esc(s.barcode)}')"><td><b>${esc(s.name)}</b><div class="small muted">CAT ${esc(s.cat)}<span class="hide-d"> · ${esc(s.barcode)}${s.p.price ? ' · ' + money(s.p.price) + 'đ' : ''}</span></div></td><td class="hide-m">${esc(s.barcode)}</td><td class="hide-m small">${esc(s.p.vendorName)}</td><td class="hide-m">${s.p.price ? money(s.p.price) : ''}</td><td>${esc(s.p.stock)}</td><td>${s.worst ? E.fmt(s.worst.exp) + `<div class="small muted">${s.lots.length} date</div>` : '-'}</td><td>${stateTag(s)}</td></tr>`).join('') || `<tr><td colspan="7" class="muted">Không có mã phù hợp.${INQ ? ' Bấm "+ Mã ngoài danh sách" để thêm mã ' + esc(INQ) + '.' : ''}</td></tr>`;
   drawBulk(list);
   $('#skuMore').innerHTML = list.length > INLIMIT ? `<p class="row"><span class="muted">Đang hiện ${INLIMIT}/${list.length} mã.</span><button class="btn sub sm" onclick="INLIMIT+=300;drawSkus()">Xem thêm</button></p>` : '';
 }
@@ -727,7 +733,7 @@ BIND.input = () => {
   $$('#inf [data-f]').forEach(b => b.onclick = () => { INF = b.dataset.f; INLIMIT = 150; render(); });
   $('#btnScan').onclick = () => scan(code => { q.value = code; INQ = code; drawSkus(); scanHit(code); });
   $('#btnAddNew').onclick = () => openNewSku(/^\d+$/.test(INQ.trim()) ? INQ.trim() : '');
-  $('#btnStock').onclick = openStock; $('#btnImpLots').onclick = openLotImport;
+  $('#btnStock').onclick = openStock; $('#btnImpLots').onclick = openLotImport; $('#btnPO').onclick = () => openPO();
   if (window.innerWidth > 640) q.focus();
 };
 
@@ -789,23 +795,25 @@ function openSku(bc) {
   const closed = AN.lots.filter(s => s.barcode === bc && !s.open).length;
   const cc = E.catCfg(CFG, p.cat), rc = sk ? recon(sk) : { st: p.stock === '' ? null : +p.stock || 0, inQ: 0, newQ: 0, gap: +p.stock || 0 };
   modal(esc(p.name), `<div class="small muted">CAT ${esc(p.cat)} · ${esc(p.barcode)} · ${esc(p.vendorCode)} ${esc(p.vendorName)} · Tồn hệ thống ${esc(p.stock)} · Giá ${money(p.price)}đ</div>
-    ${rc && rc.st != null ? `<div class="small" style="margin-top:6px">Tồn hệ thống <b>${rc.st}</b> (đến hết ${stockAsOf()}) · Đã có date <b>${rc.inQ}</b>${rc.newQ ? ` + hàng mới về <b>${rc.newQ}</b>` : ''} ${rc.gap > 0 ? `<span class="tag bad">Còn ${rc.gap} sp chưa có date</span>` : rc.gap < 0 && rc.inQ ? `<span class="tag warn">SL các lô nhiều hơn tồn ${-rc.gap} - kiểm lại lô đã bán</span>` : rc.inQ ? '<span class="tag ok">Khớp tồn</span>' : ''}</div>` : ''}
+    ${rc && rc.st != null ? `<div class="small" style="margin-top:6px">Tồn hệ thống <b>${rc.st}</b> (đến hết ${stockAsOf()}) · Đã có date <b>${rc.inQ}</b>${rc.newQ ? ` + hàng mới về <b>${rc.newQ}</b>` : ''} ${rc.gap > 0 ? `<span class="tag bad">Còn ${rc.gap} sp chưa có date</span>` : rc.gap < 0 && rc.inQ ? `<span class="tag warn">SL đã có date nhiều hơn tồn ${-rc.gap} - kiểm lại date đã bán hết</span>` : rc.inQ ? '<span class="tag ok">Khớp tồn</span>' : ''}</div>` : ''}
     <div style="margin:8px 0">${policyTxt(n, p.cat)} ${sk ? stateTag(sk) : ''}${p.flag ? ` <span class="tag gray">${p.flag === 'KHONG_DATE' ? 'Không có date' : p.flag === 'THEO_DOI' ? 'Đã đưa vào theo dõi' : p.flag}</span>` : ''}</div>
     ${n && n.note ? `<div class="action small" style="margin-bottom:10px">${esc(n.note)}${n.contact ? '<br>Liên hệ: ' + esc(n.contact) : ''}</div>` : ''}
-    <h3 style="margin-top:12px">Lô đang có (${lots.length})</h3>
-    ${lots.length ? `<div class="list">${lots.map(s => taskLine(s) + stepsHtml(s)).join('')}</div>` : '<p class="muted">Chưa có lô nào. Nhập date bên dưới.</p>'}
-    ${closed ? `<p class="small muted">${closed} lô đã đóng (bán hết / trả / discard).</p>` : ''}
-    <div class="card" style="margin-top:12px;background:#fafbfc"><h3>Thêm lô date</h3>
-      <div class="form">${dateField('fExp', 'Hạn sử dụng (HSD) *', true)}${dateField('fMfg', 'Ngày sản xuất (NSX)', false)}
+    <h3 style="margin-top:12px">Các date đang có (${lots.length})</h3>
+    ${lots.length ? `<div class="list">${lots.map(s => taskLine(s) + stepsHtml(s)).join('')}</div>` : '<p class="muted">Chưa có date nào. Nhập date bên dưới.</p>'}
+    ${closed ? `<p class="small muted">${closed} date đã đóng (bán hết / trả / discard).</p>` : ''}
+    <div class="card" style="margin-top:12px;background:#fafbfc"><h3>Thêm date</h3>
+      <div class="form">${dateField('fExp', 'Hạn sử dụng (HSD) *', true)}
         <label class="f">Số lượng của date này *<span class="drow"><input id="fQty" type="number" min="0" inputmode="numeric">${rc.st > 0 ? `<button type="button" class="btn sub sm" id="fQtySt" title="Điền bằng tồn hệ thống">= Tồn ${rc.st}</button>` : ''}${rc.gap > 0 && rc.inQ ? `<button type="button" class="btn sub sm" id="fQtyGap" title="Phần tồn chưa có date">= ${rc.gap}</button>` : ''}</span></label>
         <div class="srcbox">Số lượng này là
           <label class="srcopt"><input type="radio" name="fSrc" value="TON" checked><span><b>Hàng đang có</b> - đã nằm trong tồn hệ thống (tồn đến hết ${stockAsOf()})</span></label>
           <label class="srcopt"><input type="radio" name="fSrc" value="MOI"><span><b>Hàng mới về</b> sau ngày tồn - tồn chưa có, lần cập nhật tồn sau sẽ cộng vào</span></label></div>
+        <label class="f">Số PO nhận hàng<input id="fPo" inputmode="numeric" value="${esc(poSticky() || poLatest(bc) || '')}" placeholder="VD 356909"></label></div>
+      <details class="more"><summary>Thêm chi tiết (không bắt buộc): NSX, vị trí, hạn dùng, ghi chú</summary><div class="form" style="margin-top:8px">${dateField('fMfg', 'Ngày sản xuất (NSX)', false)}
         <label class="f">Vị trí<select id="fLoc"><option>Kệ</option><option>Kho</option><option>Kệ + Kho</option><option>Mâm / Layer khuyến mãi</option></select></label>
         <label class="f">Hạn dùng (tháng)<input id="fSl" type="number" min="0" value="${esc(p.slMonths)}" placeholder="VD 18"></label>
-        <label class="f">Ghi chú<input id="fNote"></label></div>
+        <label class="f">Ghi chú<input id="fNote"></label></div></details>
       <div class="hint" id="fInfo"></div>
-      <div class="row" style="margin-top:8px"><button class="btn" id="fSave">Lưu lô</button>
+      <div class="row" style="margin-top:8px"><button class="btn" id="fSave">Lưu date</button>
         <button class="btn sub" id="fNone">Đã kiểm - không còn hàng</button>
         <button class="btn sub" id="fNoDate">${p.flag === 'KHONG_DATE' ? 'Bỏ đánh dấu "không có date"' : 'Sản phẩm không có date'}</button>
         ${sk && sk.state === 'PENDING' || (cc && cc.mode === 'POLICY' && !n && p.flag !== 'THEO_DOI') ? '<button class="btn sub" id="fTrack">Đưa vào theo dõi date</button>' : ''}</div>
@@ -826,11 +834,12 @@ function openSku(bc) {
     if (mfg && mfg >= exp) return toast('NSX phải trước HSD', true);
     if (+qty === 0) return markCheck(p, 'KHONG_HANG');
     if ($('#fSl').value !== String(p.slMonths || '')) put('SanPham', Object.assign({}, p, { slMonths: $('#fSl').value }));
-    const dup = DB.LoDate.find(l => l.barcode === bc && l.exp === exp && l.status === 'MO');
+    const dup = DB.LoDate.find(l => l.barcode === bc && l.exp === exp && l.status === 'MO' && (!$('#fPo').value.trim() || !l.po || l.po === $('#fPo').value.trim()));
     const now = Date.now();
-    if (dup) put('LoDate', Object.assign({}, dup, { qty, mfg: mfg || dup.mfg, location: $('#fLoc').value, checkedBy: USER.name, checkedAt: now, qtySrc: src(), createdAt: src() === 'MOI' ? now : dup.createdAt }));
-    else put('LoDate', { id: uid(), barcode: bc, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp, mfg, qty, qtyStart: qty, location: $('#fLoc').value, note: $('#fNote').value, status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: src() });
-    toast(dup ? 'Đã cập nhật lô cùng HSD' : 'Đã lưu lô date'); openSku(bc); refreshBehind();
+    const po = $('#fPo').value.trim(), pr = po ? poRow(po, bc) : null;
+    if (dup && (!po || !dup.po || dup.po === po)) put('LoDate', Object.assign({}, dup, { qty, mfg: mfg || dup.mfg, location: $('#fLoc').value, checkedBy: USER.name, checkedAt: now, qtySrc: src(), createdAt: src() === 'MOI' ? now : dup.createdAt, po: po || dup.po || '', poDate: pr ? pr.date : dup.poDate || '' }));
+    else put('LoDate', { id: uid(), barcode: bc, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp, mfg, qty, qtyStart: qty, location: $('#fLoc').value, note: $('#fNote').value, status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: src(), po, poDate: pr ? pr.date : '' });
+    toast(dup ? 'Đã cập nhật date cùng HSD' : 'Đã lưu date'); openSku(bc); refreshBehind();
   };
   $('#fNone').onclick = () => markCheck(p, 'KHONG_HANG');
   $('#fNoDate').onclick = () => { put('SanPham', Object.assign({}, p, { flag: p.flag === 'KHONG_DATE' ? '' : 'KHONG_DATE', flagBy: USER.name })); toast('Đã cập nhật'); closeModal(); refreshBehind(); };
@@ -862,7 +871,7 @@ function openNewSku(bc, pre, g, msg) {
   };
 }
 
-// ---------------- Lô: ghi nhận xử lý ----------------
+// ---------------- Date: ghi nhận xử lý ----------------
 function openLot(id) {
   const s = AN.lots.find(x => x.id === id); if (!s) return;
   const acts = (AN.ix.acts[id] || []).slice().sort((a, b) => b.at - a.at);
@@ -881,7 +890,7 @@ function openLot(id) {
       <div class="row" style="margin-top:8px"><button class="btn" id="aSave">Lưu</button>
         ${s.plan.pol !== 'KHONG_DOI_TRA' ? '<button class="btn sub" id="aMail">Soạn email báo NCC</button>' : ''}
         ${/^GG/.test(def) ? '<button class="btn sub" id="aLbl">In tem giảm giá</button>' : ''}
-        ${USER.role === 'QL' ? '<button class="btn sub" id="aDel">Huỷ lô nhập nhầm</button>' : ''}</div>
+        ${USER.role === 'QL' ? '<button class="btn sub" id="aDel">Huỷ date nhập nhầm</button>' : ''}</div>
       <p class="small muted" id="aHelp"></p></div>
     <h3 style="margin-top:12px">Lịch sử (${acts.length})</h3>
     ${acts.length ? `<div class="tbl"><table><thead><tr><th>Thời gian</th><th>Việc</th><th>SL</th><th>Người</th><th>Ghi chú</th></tr></thead><tbody>${acts.map(a => `<tr><td>${new Date(+a.at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}</td><td>${/^GG/.test(a.step) ? 'Giảm ' + esc(a.pct) + '%' : STEP_NAME[a.step] || a.step}${a.result ? ' - ' + NCC_RESULT[a.result] : ''}</td><td>${esc(a.qty)}</td><td>${esc(a.by)}</td><td class="small">${esc(a.note)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Chưa có.</p>'}`);
@@ -892,7 +901,7 @@ function openLot(id) {
     $('#aResW').style.display = k === 'NCC_PH' ? '' : 'none';
     if (/^GG/.test(k) && st) $('#aPct').value = Math.round(st.pct * 100);
     $('#aQty').value = k === 'KIEM' ? s.qty : s.qty;
-    $('#aHelp').textContent = { KIEM: 'Đếm lại số lượng còn của lô này trên kệ + kho.', DOI_DATE: 'SL được NCC đổi sang date mới - trừ khỏi lô.', TRA_NCC: 'SL xuất trả NCC - trừ khỏi lô.', DISCARD: 'SL làm Discard (huỷ) - trừ khỏi lô, tính vào tổn thất.', BAN_HET: 'Lô đã bán hết - đóng lô.', CLAIM: 'SL NCC claimback (không trừ tồn lô).', RUT_KE: 'Đã gỡ hàng khỏi kệ bán.' }[k] || '';
+    $('#aHelp').textContent = { KIEM: 'Đếm lại số lượng còn của date này trên kệ + kho.', DOI_DATE: 'SL được NCC đổi sang date mới - trừ khỏi date.', TRA_NCC: 'SL xuất trả NCC - trừ khỏi date.', DISCARD: 'SL làm Discard (huỷ) - trừ khỏi date, tính vào tổn thất.', BAN_HET: 'Date đã bán hết - đóng date.', CLAIM: 'SL NCC claimback (không trừ tồn date).', RUT_KE: 'Đã gỡ hàng khỏi kệ bán.' }[k] || '';
   };
   $('#aStep').onchange = upd; upd();
   $('#aSave').onclick = () => {
@@ -910,15 +919,15 @@ function openLot(id) {
   };
   const m = $('#aMail'); if (m) m.onclick = () => mailNcc([id]);
   const l = $('#aLbl'); if (l) l.onclick = () => printLabels([id]);
-  const d = $('#aDel'); if (d) d.onclick = () => { if (confirm('Huỷ lô này (nhập nhầm)?')) { put('LoDate', Object.assign({}, s.lot, { status: 'HUY', closedReason: 'NHAP_NHAM' })); closeModal(); render(); } };
+  const d = $('#aDel'); if (d) d.onclick = () => { if (confirm('Huỷ date này (nhập nhầm)?')) { put('LoDate', Object.assign({}, s.lot, { status: 'HUY', closedReason: 'NHAP_NHAM' })); closeModal(); render(); } };
 }
 
 // ---------------- 3. CẢNH BÁO & XỬ LÝ ----------------
 let AL = { lv: 'ACT', q: '', v: '', sel: new Set() };
 function vAlert() {
   const vendors = [...new Map(AN.lots.filter(s => s.open && inCat(s.cat)).map(s => [s.vendorCode, s.vendorName || s.vendorCode])).entries()].sort((a, b) => String(a[1]).localeCompare(b[1]));
-  const LV = { ACT: 'Cần làm (hết hạn, quá hạn, đến mốc)', soon: 'Sắp đến mốc', RECHECK: 'Cần kiểm lại', NCC: 'Chờ NCC phản hồi', ALL: 'Tất cả lô đang mở' };
-  return `<section>${secHead(1, 'Cảnh báo & xử lý', 'Các mốc theo chính sách: báo NCC → giảm giá → rút khỏi kệ → trả NCC / Discard. Tick nhiều lô để soạn email NCC hoặc in tem giảm giá.')}
+  const LV = { ACT: 'Cần làm (hết hạn, quá hạn, đến mốc)', soon: 'Sắp đến mốc', RECHECK: 'Cần kiểm lại', NCC: 'Chờ NCC phản hồi', ALL: 'Tất cả date đang mở' };
+  return `<section>${secHead(1, 'Cảnh báo & xử lý', 'Các mốc theo chính sách: báo NCC → giảm giá → rút khỏi kệ → trả NCC / Discard. Tick nhiều date để soạn email NCC hoặc in tem giảm giá.')}
     ${catChips()}
     <div class="row" style="margin-top:12px"><select id="alLv">${Object.keys(LV).map(k => `<option value="${k}" ${AL.lv === k ? 'selected' : ''}>${LV[k]}</option>`).join('')}</select>
       <select id="alV"><option value="">Tất cả NCC</option>${vendors.map(v => `<option value="${esc(v[0])}" ${AL.v === v[0] ? 'selected' : ''}>${esc(v[1])}</option>`).join('')}</select>
@@ -940,9 +949,9 @@ function alList() {
 }
 function drawAlert() {
   const list = alList();
-  $('#alBody').innerHTML = list.map(s => `<tr><td><input type="checkbox" data-id="${s.id}" ${AL.sel.has(s.id) ? 'checked' : ''}></td><td class="click" onclick="openLot('${s.id}')"><b>${esc(s.name)}</b><div class="small muted">CAT ${esc(s.cat)} · ${esc(s.barcode)}</div></td><td>${E.fmt(s.exp)}</td><td>${s.left}</td><td>${s.qty}</td><td>${lvlTag(s.level)}<div class="small">${esc(s.task ? s.task.label : s.next ? s.next.label + ' ' + E.fmt(s.next.due) : '')}</div></td><td class="hide-m small">${esc(s.vendorName)}</td><td class="hide-m">${money(s.value)}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Không có lô.</td></tr>';
-  $$('#alBody [data-id]').forEach(c => c.onchange = () => { c.checked ? AL.sel.add(c.dataset.id) : AL.sel.delete(c.dataset.id); $('#alSel').textContent = AL.sel.size ? 'Đã chọn ' + AL.sel.size + ' lô' : ''; });
-  $('#alSel').textContent = AL.sel.size ? 'Đã chọn ' + AL.sel.size + ' lô' : '';
+  $('#alBody').innerHTML = list.map(s => `<tr><td><input type="checkbox" data-id="${s.id}" ${AL.sel.has(s.id) ? 'checked' : ''}></td><td class="click" onclick="openLot('${s.id}')"><b>${esc(s.name)}</b><div class="small muted">CAT ${esc(s.cat)} · ${esc(s.barcode)}</div></td><td>${E.fmt(s.exp)}</td><td>${s.left}</td><td>${s.qty}</td><td>${lvlTag(s.level)}<div class="small">${esc(s.task ? s.task.label : s.next ? s.next.label + ' ' + E.fmt(s.next.due) : '')}</div></td><td class="hide-m small">${esc(s.vendorName)}</td><td class="hide-m">${money(s.value)}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Không có date.</td></tr>';
+  $$('#alBody [data-id]').forEach(c => c.onchange = () => { c.checked ? AL.sel.add(c.dataset.id) : AL.sel.delete(c.dataset.id); $('#alSel').textContent = AL.sel.size ? 'Đã chọn ' + AL.sel.size + ' date' : ''; });
+  $('#alSel').textContent = AL.sel.size ? 'Đã chọn ' + AL.sel.size + ' date' : '';
 }
 BIND.alert = () => {
   bindCatChips(); drawAlert();
@@ -950,15 +959,15 @@ BIND.alert = () => {
   $('#alV').onchange = e => { AL.v = e.target.value; drawAlert(); };
   $('#alQ').oninput = e => { AL.q = e.target.value; drawAlert(); };
   $('#alAll').onclick = () => { const l = alList(); const all = l.every(s => AL.sel.has(s.id)); l.forEach(s => all ? AL.sel.delete(s.id) : AL.sel.add(s.id)); drawAlert(); };
-  const need = () => { if (!AL.sel.size) { toast('Tick chọn lô trước', true); return null; } return [...AL.sel]; };
+  const need = () => { if (!AL.sel.size) { toast('Tick chọn date trước', true); return null; } return [...AL.sel]; };
   $('#alMail').onclick = () => { const ids = need(); if (ids) mailNcc(ids); };
   $('#alLbl').onclick = () => { const ids = need(); if (ids) printLabels(ids); };
   $('#alNotified').onclick = () => { const ids = need(); if (ids) markNotified(ids); };
-  $('#alXls').onclick = () => exportLots(alList(), 'DANH SÁCH LÔ CẬN DATE');
+  $('#alXls').onclick = () => exportLots(alList(), 'DANH SÁCH HÀNG CẬN DATE');
 };
 function markNotified(ids) {
   const now = Date.now(), rows = ids.map(id => AN.lots.find(s => s.id === id)).filter(Boolean).map(s => { const st = s.plan.steps.find(x => x.k === 'BAO_NCC'); return { id: uid(), lotId: s.id, barcode: s.barcode, cat: s.cat, vendorCode: s.vendorCode, step: 'BAO_NCC', qty: s.qty, pct: '', result: '', note: 'Email NCC', dueDate: st ? E.iso(st.due) : '', by: USER.name, at: now }; });
-  put('XuLy', rows); AL.sel.clear(); toast('Đã ghi nhận báo NCC cho ' + rows.length + ' lô'); closeModal(); render();
+  put('XuLy', rows); AL.sel.clear(); toast('Đã ghi nhận báo NCC cho ' + rows.length + ' date'); closeModal(); render();
 }
 function mailNcc(ids) {
   const lots = ids.map(id => AN.lots.find(s => s.id === id)).filter(Boolean), by = {};
@@ -971,12 +980,12 @@ function mailNcc(ids) {
       `\n\nVui lòng phản hồi trước ngày ${E.fmt(AN.td + 3)}.\nTrân trọng,\n${USER.name} - Kohnan Parc Mall Store 1016`;
     const subj = `[Kohnan 1016] Thông báo hàng cận date - ${name} - ${E.fmt(AN.td)}`;
     const href = `mailto:${encodeURIComponent((n && n.email) || '')}?cc=${encodeURIComponent(CFG.ccEmails || '')}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-    return `<div class="card" style="margin-bottom:10px"><div class="row sp"><h3>${esc(name)} <span class="muted">(${L.length} lô)</span></h3><span class="small muted">${n ? esc(n.contact || '') + ' ' + esc(n.email || '') : ''}</span></div>
+    return `<div class="card" style="margin-bottom:10px"><div class="row sp"><h3>${esc(name)} <span class="muted">(${L.length} date)</span></h3><span class="small muted">${n ? esc(n.contact || '') + ' ' + esc(n.email || '') : ''}</span></div>
       <textarea style="width:100%;height:170px" readonly>${esc(body)}</textarea>
       <div class="row" style="margin-top:6px"><button class="btn sm" onclick="navigator.clipboard.writeText(this.closest('.card').querySelector('textarea').value).then(()=>toast('Đã chép nội dung'))">Chép nội dung</button><a class="btn sub sm" href="${href}" target="_blank" style="text-decoration:none">Mở email</a><button class="btn sub sm" onclick="exportNccSheet('${k}')">Tải Excel đính kèm</button></div></div>`;
   });
   window._mailGroups = by;
-  modal('Soạn email báo NCC', `<p class="muted small">CC Buyer + Purad (cài trong Cài đặt > Email CC). Gửi xong bấm "Ghi nhận đã báo NCC" để tính mốc.</p>${blocks.join('')}<button class="btn" onclick="markNotified(${JSON.stringify(ids).replace(/"/g, '&quot;')})">Ghi nhận đã báo NCC (${lots.length} lô)</button>`);
+  modal('Soạn email báo NCC', `<p class="muted small">CC Buyer + Purad (cài trong Cài đặt > Email CC). Gửi xong bấm "Ghi nhận đã báo NCC" để tính mốc.</p>${blocks.join('')}<button class="btn" onclick="markNotified(${JSON.stringify(ids).replace(/"/g, '&quot;')})">Ghi nhận đã báo NCC (${lots.length} date)</button>`);
 }
 function printLabels(ids) {
   const lots = ids.map(id => AN.lots.find(s => s.id === id)).filter(Boolean);
@@ -1001,7 +1010,7 @@ function vRecv() {
       <label class="f">Số lượng nhận<input id="rQty" type="number"></label><label class="f">Số PO<input id="rPo"></label></div>
       <div id="rInfo" class="small" style="margin:8px 0"></div>
       <div id="rRes"></div>
-      <div class="row"><button class="btn" id="rSave">Lưu kết quả</button><button class="btn sub" id="rLot">Lưu & tạo lô theo dõi</button></div></div>
+      <div class="row"><button class="btn" id="rSave">Lưu kết quả</button><button class="btn sub" id="rLot">Lưu & tạo date theo dõi</button></div></div>
   </section>
   <section>${secHead(2, 'Đã kiểm hôm nay', '')}
     <div class="tbl"><table><thead><tr><th>Giờ</th><th>Tên hàng</th><th>NCC</th><th>HSD</th><th>% còn</th><th>Kết quả</th><th>Người</th></tr></thead><tbody>${todayRows.map(h => `<tr><td>${new Date(+h.at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</td><td>${esc(h.name)}<div class="small muted">${esc(h.barcode)}</div></td><td class="small">${esc(h.vendorCode)}</td><td>${E.fmt(h.exp)}</td><td>${Math.round(h.pct * 100)}% / ${Math.round(h.minPct * 100)}%</td><td>${String(h.pass) === '1' ? '<span class="tag ok">Nhận</span>' : '<span class="tag bad">Từ chối</span>'}</td><td>${esc(h.by)}</td></tr>`).join('') || '<tr><td colspan="7" class="muted">Chưa có.</td></tr>'}</tbody></table></div></section>`;
@@ -1049,13 +1058,13 @@ function vScore() {
     ${S.cats.map((c, i) => { const cc = E.catCfg(CFG, c.cat); return `<tr><td><span class="rank ${i === 0 && c.score ? 'r1' : ''}">${i + 1}</span></td><td><b>CAT ${esc(c.cat)}</b> ${cc ? esc(cc.name) : ''}</td><td class="small">${esc(supsOf(c.cat)) || '-'}</td><td>${scTag(c.score)}</td><td>${bar(c.m.coverage)}<div class="small muted">${c.raw.covered}/${c.raw.scope} mã</div></td><td>${bar(c.m.ontime)}<div class="small muted">${c.raw.ontime}/${c.raw.steps} mốc</div></td><td>${c.avgDelay == null ? '-' : c.avgDelay.toFixed(1) + ' ngày'}</td><td>${bar(c.m.complete)}</td><td>${bar(c.m.loss)}<div class="small muted">${c.raw.discardQty} discard / ${c.raw.closeQty}</div></td></tr>`; }).join('')}
     </tbody></table></div>
   </section>
-  <section>${secHead(2, 'Điểm cá nhân', 'Đúng hạn 50 · Tốc độ 25 · Nhập đủ thông tin 25. Lượt kiểm và số lô nhập thể hiện mức chăm chỉ.')}
-    <div class="tbl"><table><thead><tr><th>#</th><th>Nhân sự</th><th>Điểm</th><th>Lượt kiểm</th><th>Lô nhập</th><th>Lượt xử lý</th><th>Đúng hạn</th><th>Trễ TB</th><th>Đủ thông tin</th></tr></thead><tbody>
+  <section>${secHead(2, 'Điểm cá nhân', 'Đúng hạn 50 · Tốc độ 25 · Nhập đủ thông tin 25. Lượt kiểm và số date nhập thể hiện mức chăm chỉ.')}
+    <div class="tbl"><table><thead><tr><th>#</th><th>Nhân sự</th><th>Điểm</th><th>Lượt kiểm</th><th>Date nhập</th><th>Lượt xử lý</th><th>Đúng hạn</th><th>Trễ TB</th><th>Đủ thông tin</th></tr></thead><tbody>
     ${S.people.map((p, i) => `<tr><td><span class="rank ${i === 0 && p.score ? 'r1' : ''}">${i + 1}</span></td><td><b>${esc(p.name)}</b></td><td>${scTag(p.score)}</td><td>${p.raw.checks}</td><td>${p.raw.lots}</td><td>${p.raw.acts}</td><td>${bar(p.m.ontime)}</td><td>${p.avgDelay == null ? '-' : p.avgDelay.toFixed(1) + ' ngày'}</td><td>${bar(p.m.complete)}</td></tr>`).join('') || '<tr><td colspan="9" class="muted">Chưa có hoạt động trong tháng.</td></tr>'}
     </tbody></table></div>
   </section>
   <section>${secHead(3, 'Chấm điểm NCC hỗ trợ xử lý date', '90 ngày gần nhất. Phản hồi 30 · Tốc độ phản hồi 20 · Giải quyết (đổi/trả/claimback/hỗ trợ GG) 30 · Giao hàng đạt date tối thiểu 20.')}
-    <div class="tbl"><table><thead><tr><th>#</th><th>NCC</th><th>CAT</th><th>Điểm</th><th>Lô đã báo</th><th>Phản hồi</th><th>Phản hồi TB</th><th>Giải quyết</th><th>Nhận hàng đạt</th></tr></thead><tbody>
+    <div class="tbl"><table><thead><tr><th>#</th><th>NCC</th><th>CAT</th><th>Điểm</th><th>Date đã báo</th><th>Phản hồi</th><th>Phản hồi TB</th><th>Giải quyết</th><th>Nhận hàng đạt</th></tr></thead><tbody>
     ${S.nccs.map((n, i) => `<tr><td><span class="rank ${i === 0 && n.score ? 'r1' : ''}">${i + 1}</span></td><td><b>${esc(n.vendorName || n.vendorCode)}</b><div class="small muted">${esc(n.vendorCode)} · ${esc(E.POLICY_NAME[n.policy] || 'Chưa có chính sách')}</div></td><td>${esc(n.cat)}</td><td>${scTag(n.score)}</td><td>${n.raw.notified}</td><td>${bar(n.m.resp)}</td><td>${n.avgResp == null ? '-' : n.avgResp.toFixed(1) + ' ngày'}</td><td>${bar(n.m.resolve)}</td><td>${bar(n.m.recv)}<div class="small muted">${n.raw.recvPass}/${n.raw.recv} lần</div></td></tr>`).join('') || '<tr><td colspan="9" class="muted">Chưa có dữ liệu báo NCC / nhận hàng.</td></tr>'}
     </tbody></table></div>
     <div class="row" style="margin-top:12px"><button class="btn" id="scXls">Xuất bảng điểm Excel</button></div>
@@ -1067,10 +1076,10 @@ BIND.score = () => { $('#scM').onchange = e => { SCM = e.target.value; render();
 function vReport() {
   return `<section>${secHead(1, 'Báo cáo & xuất Excel', 'File xuất định dạng sẵn, gửi Buyer / NCC / Quản lý ngay.')}
     <div class="grid2">
-      <div class="card"><h3>Form cận date tháng (nộp Buyer ngày 25)</h3><p class="muted small">Theo mẫu INFORMATION EXPIRED DATE FORM: lô đang mở sẽ đến mốc giảm giá/hết hạn trong 60 ngày, giá sau giảm 20/50/70%, phần Buyer phản hồi để trống.</p><button class="btn" onclick="exportForm25()">Tải form</button></div>
-      <div class="card"><h3>Toàn bộ lô đang theo dõi</h3><p class="muted small">Tất cả lô đang mở, trạng thái, mốc tiếp theo.</p><button class="btn" onclick="exportLots(AN.lots.filter(s=>s.open&&inCat(s.cat)),'TOÀN BỘ LÔ ĐANG THEO DÕI')">Tải danh sách</button></div>
+      <div class="card"><h3>Form cận date tháng (nộp Buyer ngày 25)</h3><p class="muted small">Theo mẫu INFORMATION EXPIRED DATE FORM: date đang mở sẽ đến mốc giảm giá/hết hạn trong 60 ngày, giá sau giảm 20/50/70%, phần Buyer phản hồi để trống.</p><button class="btn" onclick="exportForm25()">Tải form</button></div>
+      <div class="card"><h3>Toàn bộ date đang theo dõi</h3><p class="muted small">Tất cả date đang mở, trạng thái, mốc tiếp theo.</p><button class="btn" onclick="exportLots(AN.lots.filter(s=>s.open&&inCat(s.cat)),'TOÀN BỘ DATE ĐANG THEO DÕI')">Tải danh sách</button></div>
       <div class="card"><h3>Lịch sử xử lý tháng</h3><p class="muted small">Báo NCC, giảm giá, rút kệ, trả, discard - kèm người làm, đúng hạn hay trễ.</p><div class="row"><input type="month" id="rpM" value="${E.ym(AN.td)}"><button class="btn" onclick="exportActs($('#rpM').value)">Tải</button></div></div>
-      <div class="card"><h3>Bán giảm giá NCC hỗ trợ (ngày 5)</h3><p class="muted small">Lô NCC hỗ trợ giảm 50% (Đông Á, Blackmores): SL lúc giảm, SL còn, SL đã bán để email NCC + CC MD làm claimback.</p><div class="row"><input type="month" id="rpM2" value="${E.ym(AN.td - 10)}"><button class="btn" onclick="exportHoTro($('#rpM2').value)">Tải</button></div></div>
+      <div class="card"><h3>Bán giảm giá NCC hỗ trợ (ngày 5)</h3><p class="muted small">Hàng NCC hỗ trợ giảm 50% (Đông Á, Blackmores): SL lúc giảm, SL còn, SL đã bán để email NCC + CC MD làm claimback.</p><div class="row"><input type="month" id="rpM2" value="${E.ym(AN.td - 10)}"><button class="btn" onclick="exportHoTro($('#rpM2').value)">Tải</button></div></div>
       <div class="card"><h3>Mã chưa kiểm date</h3><p class="muted small">Danh sách mã cần theo dõi chưa kiểm / quá chu kỳ, theo CAT - giao việc cho SUP.</p><button class="btn" onclick="exportUnchecked()">Tải danh sách</button></div>
       <div class="card"><h3>Bảng điểm SUP & NCC</h3><p class="muted small">Tháng đang chọn ở tab Chấm điểm.</p><button class="btn" onclick="exportScore()">Tải bảng điểm</button></div>
     </div></section>`;
@@ -1079,11 +1088,11 @@ const fnDate = () => E.fmt(AN.td).replace(/\//g, '-');
 const nowTxt = () => new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + E.fmt(AN.td);
 function exportLots(list, title) {
   const B = XW.Book();
-  const sh = B.addSheet('Lô date', { title: `${title} (${list.length} LÔ)`, subtitle: `Theo dõi Date · Ngày ${E.fmt(AN.td)} · Xuất lúc ${nowTxt()}`, cols: [6, 7, 16, 36, 22, 12, 9, 8, 14, 26, 14, 12] });
-  B.table(sh, [{ h: 'STT', t: 'stt' }, { h: 'CAT', t: 'center' }, { h: 'Barcode', t: 'code' }, { h: 'Tên hàng', t: 'wrap' }, { h: 'NCC', t: 'wrap' }, { h: 'HSD', t: 'center' }, { h: 'Còn (ngày)', t: 'int' }, { h: 'SL', t: 'int' }, { h: 'Trạng thái', t: 'center' }, { h: 'Việc cần làm / mốc tới', t: 'wrap' }, { h: 'Giá trị (đ)', t: 'money' }, { h: 'Người nhập', t: 'center' }],
-    list.map((s, i) => [i + 1, s.cat, s.barcode, s.name, s.vendorName || s.vendorCode, E.fmt(s.exp), s.left, s.qty, LEVEL[s.level][1], s.task ? s.task.label : s.next ? s.next.label + ' ' + E.fmt(s.next.due) : '', Math.round(s.value), s.lot.createdBy]),
-    { main: true, freezeCol: 4, total: ['', '', '', 'TỔNG', '', '', '', list.reduce((a, s) => a + s.qty, 0), '', '', Math.round(list.reduce((a, s) => a + s.value, 0)), ''], emptyText: 'Không có lô' });
-  B.save(`Kohnan_TheoDoiDate_DanhSachLo_${fnDate()}.xlsx`);
+  const sh = B.addSheet('Date', { title: `${title} (${list.length} DATE)`, subtitle: `Theo dõi Date · Ngày ${E.fmt(AN.td)} · Xuất lúc ${nowTxt()}`, cols: [6, 7, 16, 36, 22, 12, 9, 8, 14, 26, 14, 12, 14] });
+  B.table(sh, [{ h: 'STT', t: 'stt' }, { h: 'CAT', t: 'center' }, { h: 'Barcode', t: 'code' }, { h: 'Tên hàng', t: 'wrap' }, { h: 'NCC', t: 'wrap' }, { h: 'HSD', t: 'center' }, { h: 'Còn (ngày)', t: 'int' }, { h: 'SL', t: 'int' }, { h: 'Trạng thái', t: 'center' }, { h: 'Việc cần làm / mốc tới', t: 'wrap' }, { h: 'Giá trị (đ)', t: 'money' }, { h: 'Số PO', t: 'code' }, { h: 'Người nhập', t: 'center' }],
+    list.map((s, i) => [i + 1, s.cat, s.barcode, s.name, s.vendorName || s.vendorCode, E.fmt(s.exp), s.left, s.qty, LEVEL[s.level][1], s.task ? s.task.label : s.next ? s.next.label + ' ' + E.fmt(s.next.due) : '', Math.round(s.value), s.lot.po || '', s.lot.createdBy]),
+    { main: true, freezeCol: 4, total: ['', '', '', 'TỔNG', '', '', '', list.reduce((a, s) => a + s.qty, 0), '', '', Math.round(list.reduce((a, s) => a + s.value, 0)), '', ''], emptyText: 'Không có date' });
+  B.save(`Kohnan_TheoDoiDate_DanhSachDate_${fnDate()}.xlsx`);
 }
 function exportForm25() {
   const list = AN.lots.filter(s => s.open && inCat(s.cat) && (s.left <= 60 || s.level !== 'ok')).sort((a, b) => a.cat.localeCompare(b.cat) || a.left - b.left);
@@ -1091,7 +1100,7 @@ function exportForm25() {
   const sh = B.addSheet('Form cận date', { title: `INFORMATION EXPIRED DATE FORM - STORE 1016 (${list.length} DÒNG)`, subtitle: `Hạn nộp: ngày 25 · Ngày lập ${E.fmt(AN.td)} · Phần Buyer phản hồi để trống`, cols: [7, 22, 16, 34, 11, 11, 8, 12, 12, 8, 11, 11, 11, 13, 9, 10, 10, 11] });
   B.table(sh, [{ h: 'CAT', t: 'center' }, { h: 'Supplier', t: 'wrap' }, { h: 'Barcode', t: 'code' }, { h: 'Name', t: 'wrap' }, { h: 'Standard price', t: 'money' }, { h: 'Normal cost', t: 'money' }, { h: 'Stock', t: 'int' }, { h: 'Date', t: 'center' }, { h: 'Today', t: 'center' }, { h: 'Remain', t: 'int' }, { h: 'Discount 20%', t: 'money' }, { h: 'Discount 50%', t: 'money' }, { h: 'Discount 70%', t: 'money' }, { h: 'LOSS (đ)', t: 'money' }, { h: 'RETURN', t: 'center' }, { h: 'EXCHANGE', t: 'center' }, { h: 'DAMAGED', t: 'center' }, { h: 'CLAIMBACK %', t: 'center' }],
     list.map(s => { const p = s.price, cur = s.steps.filter(x => /^GG/.test(x.k) && x.reached).pop(), lp = cur ? cur.pct : 0; return [s.cat, `${s.vendorCode} ${s.vendorName}`, s.barcode, s.name, Math.round(p), s.prod && s.prod.cost ? Math.round(+s.prod.cost) : '', s.qty, E.fmt(s.exp), E.fmt(AN.td), s.left, Math.round(p * .8), Math.round(p * .5), Math.round(p * .3), -Math.round(p * lp * s.qty), '', '', '', '']; }),
-    { main: true, freezeCol: 4, emptyText: 'Không có lô cận date' });
+    { main: true, freezeCol: 4, emptyText: 'Không có hàng cận date' });
   B.note(sh, 'LOSS = giá bán × % giảm đang áp dụng × số lượng (âm). Buyer điền RETURN / EXCHANGE / DAMAGED / CLAIMBACK.');
   B.save(`Kohnan_TheoDoiDate_FormCanDate_${fnDate()}.xlsx`);
 }
@@ -1118,8 +1127,8 @@ function exportHoTro(ymStr) {
   const B = XW.Book();
   const sh = B.addSheet('NCC hỗ trợ GG', { title: `BÁN GIẢM GIÁ NCC HỖ TRỢ - THÁNG ${ymStr.slice(5)}/${ymStr.slice(0, 4)} (${rows.length} MÃ)`, subtitle: `Gửi NCC + CC MD ngày 5 để làm biên bản claimback · Xuất lúc ${nowTxt()}`, cols: [7, 26, 16, 32, 12, 13, 9, 11, 10, 11, 12, 15] });
   B.table(sh, [{ h: 'CAT', t: 'center' }, { h: 'NCC', t: 'wrap' }, { h: 'Barcode', t: 'code' }, { h: 'Tên hàng', t: 'wrap' }, { h: 'HSD', t: 'center' }, { h: 'Ngày giảm', t: 'center' }, { h: '% giảm', t: 'int' }, { h: 'SL lúc giảm', t: 'int' }, { h: 'SL còn', t: 'int' }, { h: 'SL đã bán', t: 'int' }, { h: 'Giá bán (đ)', t: 'money' }, { h: 'Đề nghị claim (đ)', t: 'moneyB' }], rows,
-    { main: true, freezeCol: 4, emptyText: 'Chưa có lô NCC hỗ trợ giảm giá', total: rows.length ? ['', '', '', 'TỔNG', '', '', '', '', '', rows.reduce((a, r) => a + r[9], 0), '', rows.reduce((a, r) => a + r[11], 0)] : null });
-  B.note(sh, 'SL đã bán = SL lúc bắt đầu giảm (lần kiểm gần nhất trước ngày giảm, hoặc SL nhập lô) - SL còn hiện tại. Kiểm lại SL trước khi gửi.');
+    { main: true, freezeCol: 4, emptyText: 'Chưa có hàng NCC hỗ trợ giảm giá', total: rows.length ? ['', '', '', 'TỔNG', '', '', '', '', '', rows.reduce((a, r) => a + r[9], 0), '', rows.reduce((a, r) => a + r[11], 0)] : null });
+  B.note(sh, 'SL đã bán = SL lúc bắt đầu giảm (lần kiểm gần nhất trước ngày giảm, hoặc SL nhập date) - SL còn hiện tại. Kiểm lại SL trước khi gửi.');
   B.save(`Kohnan_TheoDoiDate_NCCHoTroGG_${ymStr}.xlsx`);
 }
 function exportUnchecked() {
@@ -1138,17 +1147,17 @@ function exportScore() {
     S.cats.map((c, i) => [i + 1, 'CAT ' + c.cat, supsOf(c.cat), c.score ?? '', E.grade(c.score), c.m.coverage ?? '', c.m.ontime ?? '', c.avgDelay ?? '', c.m.complete ?? '', c.m.loss ?? '']), { main: true });
   B.note(sh, 'Điểm 100 = Độ phủ 35 + Đúng hạn 30 + Tốc độ 15 + Đủ thông tin 10 + Hạn chế Discard 10. Tiêu chí chưa có dữ liệu được bỏ qua và chia lại trọng số.');
   sh = B.addSheet('Điểm cá nhân', { title: `ĐIỂM CÁ NHÂN - ${T.toUpperCase()} (${S.people.length} NGƯỜI)`, subtitle: `Theo dõi Date · Xuất lúc ${nowTxt()}`, cols: [6, 22, 9, 14, 11, 10, 11, 11, 12, 12] });
-  B.table(sh, [{ h: 'Hạng', t: 'stt' }, { h: 'Nhân sự', t: 'textB' }, { h: 'Điểm', t: 'int' }, { h: 'Xếp loại', t: 'center' }, { h: 'Lượt kiểm', t: 'int' }, { h: 'Lô nhập', t: 'int' }, { h: 'Lượt xử lý', t: 'int' }, { h: 'Đúng hạn', t: 'pct' }, { h: 'Trễ TB (ngày)', t: 'dec' }, { h: 'Đủ thông tin', t: 'pct' }],
+  B.table(sh, [{ h: 'Hạng', t: 'stt' }, { h: 'Nhân sự', t: 'textB' }, { h: 'Điểm', t: 'int' }, { h: 'Xếp loại', t: 'center' }, { h: 'Lượt kiểm', t: 'int' }, { h: 'Date nhập', t: 'int' }, { h: 'Lượt xử lý', t: 'int' }, { h: 'Đúng hạn', t: 'pct' }, { h: 'Trễ TB (ngày)', t: 'dec' }, { h: 'Đủ thông tin', t: 'pct' }],
     S.people.map((p, i) => [i + 1, p.name, p.score ?? '', E.grade(p.score), p.raw.checks, p.raw.lots, p.raw.acts, p.m.ontime ?? '', p.avgDelay ?? '', p.m.complete ?? '']), { main: true, emptyText: 'Chưa có hoạt động' });
   sh = B.addSheet('Điểm NCC', { title: `ĐIỂM NCC HỖ TRỢ XỬ LÝ DATE (${S.nccs.length} NCC)`, subtitle: `90 ngày đến ${E.fmt(S.asOf)} · Xuất lúc ${nowTxt()}`, cols: [6, 30, 10, 7, 9, 14, 10, 11, 13, 11, 13] });
-  B.table(sh, [{ h: 'Hạng', t: 'stt' }, { h: 'NCC', t: 'wrap' }, { h: 'Mã NCC', t: 'code' }, { h: 'CAT', t: 'center' }, { h: 'Điểm', t: 'int' }, { h: 'Xếp loại', t: 'center' }, { h: 'Lô đã báo', t: 'int' }, { h: 'Phản hồi', t: 'pct' }, { h: 'Phản hồi TB (ngày)', t: 'dec' }, { h: 'Giải quyết', t: 'pct' }, { h: 'Nhận hàng đạt', t: 'pct' }],
+  B.table(sh, [{ h: 'Hạng', t: 'stt' }, { h: 'NCC', t: 'wrap' }, { h: 'Mã NCC', t: 'code' }, { h: 'CAT', t: 'center' }, { h: 'Điểm', t: 'int' }, { h: 'Xếp loại', t: 'center' }, { h: 'Date đã báo', t: 'int' }, { h: 'Phản hồi', t: 'pct' }, { h: 'Phản hồi TB (ngày)', t: 'dec' }, { h: 'Giải quyết', t: 'pct' }, { h: 'Nhận hàng đạt', t: 'pct' }],
     S.nccs.map((n, i) => [i + 1, n.vendorName, n.vendorCode, n.cat, n.score ?? '', E.grade(n.score), n.raw.notified, n.m.resp ?? '', n.avgResp ?? '', n.m.resolve ?? '', n.m.recv ?? '']), { main: true, emptyText: 'Chưa có dữ liệu' });
   B.save(`Kohnan_TheoDoiDate_BangDiem_${SCM}.xlsx`);
 }
 function exportNccSheet(k) {
   const L = (window._mailGroups || {})[k] || []; if (!L.length) return;
   const B = XW.Book(), name = L[0].vendorName || L[0].vendorCode;
-  const sh = B.addSheet('Hàng cận date', { title: `HÀNG CẬN DATE - ${String(name).toUpperCase()} (${L.length} LÔ)`, subtitle: `Store 1016 · Ngày ${E.fmt(AN.td)}`, cols: [6, 16, 38, 12, 9, 10, 12], landscape: false });
+  const sh = B.addSheet('Hàng cận date', { title: `HÀNG CẬN DATE - ${String(name).toUpperCase()} (${L.length} DATE)`, subtitle: `Store 1016 · Ngày ${E.fmt(AN.td)}`, cols: [6, 16, 38, 12, 9, 10, 12], landscape: false });
   B.table(sh, [{ h: 'STT', t: 'stt' }, { h: 'Barcode', t: 'code' }, { h: 'Tên hàng', t: 'wrap' }, { h: 'HSD', t: 'center' }, { h: 'SL', t: 'int' }, { h: 'Còn (ngày)', t: 'int' }, { h: 'Giá bán (đ)', t: 'money' }],
     L.map((s, i) => [i + 1, s.barcode, s.name, E.fmt(s.exp), s.qty, s.left, Math.round(s.price)]), { main: true, total: ['', '', 'TỔNG', '', L.reduce((a, s) => a + s.qty, 0), '', ''] });
   B.save(`Kohnan_1016_HangCanDate_${String(L[0].vendorCode)}_${fnDate()}.xlsx`);
@@ -1164,7 +1173,7 @@ function vSetup() {
 BIND.setup = () => { $$('[data-t]').forEach(b => b.onclick = () => { STAB = b.dataset.t; render(); }); (SB[STAB] || (() => {}))(); };
 const SB = {};
 // ---- Đối chiếu tồn hệ thống với SL đã có date ----
-// Tồn (CHECK TỒN / POS) tính đến hết ngày TRƯỚC ngày cập nhật. Lô "hàng mới về" nhập từ ngày cập nhật trở đi chưa nằm trong tồn.
+// Tồn (CHECK TỒN / POS) tính đến hết ngày TRƯỚC ngày cập nhật. Date "hàng mới về" nhập từ ngày cập nhật trở đi chưa nằm trong tồn.
 function stockAtInfo() { const r = DB.CauHinh.find(x => x.id === 'stockAt'); try { return r && JSON.parse(r.value); } catch (e) { return null; } }
 function stockDay() { const i = stockAtInfo(); return i && i.at ? E.msDay(new Date(i.at).getTime()) : null; }
 function stockAsOf() { const d = stockDay(); return d == null ? 'lần cập nhật gần nhất' : E.fmt(d - 1); }
@@ -1200,7 +1209,7 @@ function showUpdateResult(title, lines) {
     ${rows.length ? `<div class="action" style="border-left-color:var(--bad);background:var(--kred-soft)"><b>⚠ SUP cần cập nhật date cho các mã cũ sau:</b>
       <div class="tbl" style="margin-top:8px"><table><thead><tr><th>CAT</th><th>Còn tồn chưa có date</th><th>Tồn nhiều hơn SL có date</th><th>Quá chu kỳ kiểm</th><th>Chờ phân loại</th></tr></thead>
       <tbody>${rows.map(c => { const b = by[c]; return `<tr><td><b>CAT ${esc(c)}</b> ${esc((E.catCfg(CFG, c) || {}).name || '')}</td><td><b style="color:var(--bad)">${b.noDate}</b></td><td>${b.gap ? b.gap + ' mã (' + b.gapQ + ' sp)' : 0}</td><td>${b.cycle}</td><td>${b.pending}</td></tr>`; }).join('')}</tbody></table></div>
-      <p class="small muted" style="margin:6px 0 0">"Tồn nhiều hơn SL có date": hàng mới về hoặc số lô nhập thiếu - cần nhập thêm date. Tồn tính đến hết ${stockAsOf()}.</p></div>
+      <p class="small muted" style="margin:6px 0 0">"Tồn nhiều hơn SL có date": hàng mới về hoặc số lượng date nhập thiếu - cần nhập thêm date. Tồn tính đến hết ${stockAsOf()}.</p></div>
       <div class="row" style="margin-top:10px"><button class="btn" onclick="closeModal();INF='TODO';setView('input')">Xem mã chưa có date</button><button class="btn sub" onclick="closeModal();INF='GAP';setView('input')">Xem mã thiếu date so với tồn</button></div>`
     : '<div class="action" style="border-left-color:var(--ok)"><b>Tất cả mã còn tồn đã có date.</b></div>'}`, true);
 }
@@ -1214,8 +1223,13 @@ function openStock() {
   modal('Cập nhật tồn - giá', `<div class="card" style="background:#fafbfc"><h3>1. Lấy tồn + giá mới nhất từ CHECK TỒN</h3>
       <p class="small muted">Lấy giá bán, tồn, tên, NCC cho các mã đã có trong danh mục, từ dữ liệu dùng chung của CHECK TỒN. Hệ thống cũng tự lấy lúc 7:00 mỗi sáng.</p>
       <div class="row"><button class="btn" id="stGo">Lấy tồn từ CHECK TỒN</button><span class="small muted" id="stInfo">${stockInfoTxt()}</span></div></div>
-    <div style="margin-top:14px">${sImport(true)}</div>`, true);
+    <div style="margin-top:14px">${sImport(true)}</div>
+    <div class="card" style="margin-top:14px"><h3>3. Nạp file PO Detail (POS) - số PO nhận hàng</h3>
+      <p class="small muted">File PODetail_....csv. Máy lấy PO đã nhận (Purchased Qty, ngày nhận) và PO đang chờ về của các mã thuộc CAT theo dõi, trong 12 tháng. Sau khi nạp, máy tự gán PO nhận hàng gần nhất cho các date cũ chưa có PO (trừ dần số lượng theo từng PO).</p>
+      <div class="row"><input type="file" id="poFile" accept=".csv,.txt,.xlsx,.xls"><button class="btn sub sm" id="poAssignBtn">Gán PO cho date cũ</button></div><div id="poInfo" class="small" style="margin-top:8px">${DB.PO.length ? `Đang có ${DB.PO.length.toLocaleString('vi-VN')} dòng PO.` : ''}</div></div>`, true);
   SB.import();
+  $('#poFile').onchange = e => poImportFile(e.target.files[0]);
+  $('#poAssignBtn').onclick = () => { const r = poAssign(); showUpdateResult('Gán PO cho date cũ', `Đã gán PO cho <b>${r.n}</b> date (${r.skus} mã)${r.none ? `; ${r.none} date không tìm thấy PO nhận hàng trong 12 tháng` : ''}.`); };
   $('#stGo').onclick = async () => {
     $('#stGo').disabled = true; $('#stInfo').textContent = 'Đang lấy dữ liệu CHECK TỒN (khoảng 10-30 giây)...';
     try { const r = await srv('apiStock', AUTH); await load(true); refreshBehind(); ctLoad(true);
@@ -1250,7 +1264,7 @@ SB.import = () => {
       $('#impGo').onclick = async () => {
         const cats2 = $$('.impCat').filter(c => c.checked).map(c => c.value), os = $('#impStock').checked;
         const sel2 = rows.filter(r => cats2.includes(r.cat) && (!os || +r.stock > 0));
-        // giữ lại mã có lô đang mở dù tồn = 0
+        // giữ lại mã có date đang mở dù tồn = 0
         const openBc = new Set(DB.LoDate.filter(l => l.status === 'MO').map(l => l.barcode));
         rows.forEach(r => { if (cats2.includes(r.cat) && os && !(+r.stock > 0) && openBc.has(r.barcode)) sel2.push(r); });
         $('#impGo').disabled = true; $('#impInfo').textContent = 'Đang gửi lên hệ thống...';
@@ -1353,7 +1367,7 @@ function sRule() {
     <div class="card" style="margin-top:14px"><h3>Thời hạn xử lý</h3><div class="form">
       <label class="f">Được trễ tối đa (ngày) sau khi đến mốc<input id="rGrace" type="number" value="${CFG.grace}"></label>
       <label class="f">Báo "Sắp đến mốc" trước (ngày)<input id="rSoon" type="number" value="${CFG.soonDays}"></label>
-      <label class="f">Lô cận date: kiểm lại mỗi (ngày)<input id="rRe" type="number" value="${CFG.recheckNear}"></label>
+      <label class="f">Hàng cận date: kiểm lại mỗi (ngày)<input id="rRe" type="number" value="${CFG.recheckNear}"></label>
       <label class="f">Nhắc NCC nếu chưa phản hồi sau (ngày)<input id="rFu" type="number" value="${CFG.nccFollowUp}"></label>
       <label class="f">HSD tối thiểu nhận hàng VN (%)<input id="rVN" type="number" value="${Math.round(CFG.minVN * 100)}"></label>
       <label class="f">HSD tối thiểu hàng nhập khẩu (%)<input id="rNK" type="number" value="${Math.round(CFG.minNK * 100)}"></label></div>
@@ -1429,6 +1443,149 @@ async function scanHit(code) {
   const g = guessCat(x), inCfg = !!E.catCfg(CFG, g.cat), p = ctProd(code, x, g.cat);
   if (g.sure && inCfg) { put('SanPham', p); toast(`Đã thêm mã từ CHECK TỒN (CAT ${g.cat})`); return openSku(code); }
   openNewSku(code, p, g, inCfg ? '' : `CAT ${g.cat} chưa nằm trong danh sách CAT theo dõi - chọn CAT hoặc thêm CAT trong Cài đặt.`);
+}
+
+// ---------------- PO nhận hàng ----------------
+const ymd2iso = d => { d = String(d || ''); return /^\d{8}$/.test(d) ? d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6) : ''; };
+const ymdTxt = d => { const i = ymd2iso(d); return i ? E.fmt(i) : ''; };
+function poSticky() { return LS.get('kdate_po', null) ? LS.get('kdate_po').no : ''; }
+function poRow(po, bc) { return DB.PO.find(r => r.po === po && r.barcode === bc) || null; }
+function poLatest(bc) { const r = DB.PO.filter(x => x.barcode === bc && x.status !== 'CHO').sort((a, b) => b.date.localeCompare(a.date))[0]; return r ? r.po : ''; }
+function poBar() {
+  const st = LS.get('kdate_po', null); if (!st) return '';
+  const L = poLines(st.no), done = L.filter(l => poDone(st.no, l.bc) > 0).length;
+  return `<div class="pobar"><b>Đang nhập PO ${esc(st.no)}</b><span class="small">${done}/${L.length} mã đã có date</span><span style="flex:1"></span><button class="btn sm" onclick="openPO()">Tiếp tục PO</button><button class="btn sm" onclick="poEnd()">Kết thúc PO</button></div>`;
+}
+function poEnd() { LS.set('kdate_po', null); PODRAFT = {}; toast('Đã kết thúc PO - nhập PO mới khi có hàng về'); closeModal(); render(); }
+// Đọc file PO Detail: PO đã nhận (SL nhận + ngày nhận) và PO đang chờ về; chỉ giữ mã thuộc CAT theo dõi, 12 tháng gần nhất
+async function poImportFile(f) {
+  if (!f) return; const info = $('#poInfo'); info.textContent = 'Đang đọc file PO Detail...';
+  try {
+    const isCsv = /\.(csv|txt)$/i.test(f.name);
+    const wb = isCsv ? XLSX.read(await f.text(), { type: 'string', raw: true }) : XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
+    let H = null, hr = -1;
+    for (let r = 0; r < Math.min(aoa.length, 25) && !H; r++) { const h = (aoa[r] || []).map(x => norm(x).trim()); const f2 = re => h.findIndex(x => re.test(x));
+      if (f2(/^po no/) >= 0 && f2(/^barcode$/) >= 0) { hr = r; H = { po: f2(/^po no/), pd: f2(/^purchased date/), rd: f2(/^purchase record date/), eta: f2(/^estimated delivery date/), st: f2(/^status/), bc: f2(/^barcode$/), ic: f2(/^item code$/), nm: f2(/^item name$/), vc: f2(/^supplier code$/), vn: f2(/^supplier name$/), oq: f2(/^order qty$/), pq: f2(/^purchased qty$/), dq: f2(/^partial delivered qty$/), cx: f2(/^canceled datetime/) }; } }
+    if (!H) throw new Error('Không thấy cột PO No. / Barcode - cần file PODetail từ POS');
+    await ctLoad();
+    const vset = new Set(DB.SanPham.map(p => p.vendorCode)), cut = E.iso(E.today() - 365).replace(/-/g, ''), out = new Map(); let skip = 0;
+    const tracked = (bc, vc) => { if (prodOf(bc)) return true; const x = ctFind(CT.map, bc); if (x && x.cat !== undefined && x.cat !== '') return !!E.catCfg(CFG, catNorm(x.cat)); return vset.has(String(vc)); };
+    for (let r = hr + 1; r < aoa.length; r++) {
+      const row = aoa[r]; if (!row) continue; const g = i => i >= 0 ? String(row[i] == null ? '' : row[i]).trim() : '';
+      const po = g(H.po); if (!po || g(H.cx)) continue;
+      const st = norm(g(H.st)); if (/cancel/.test(st)) continue;
+      let bc = g(H.bc).replace(/^'/, '').replace(/\.0+$/, ''); if (!/^\d{6,14}$/.test(bc)) { skip++; continue; }
+      const got = Math.max(+g(H.pq) || 0, +g(H.dq) || 0), oq = +g(H.oq) || 0;
+      let status, qty, date;
+      if (got > 0) { status = 'NHAN'; qty = got; date = g(H.pd) || g(H.rd) || g(H.eta); }
+      else if (/inspection|received|partial/.test(st)) { status = 'NHAN'; qty = oq; date = g(H.pd) || g(H.rd) || g(H.eta); }
+      else if (/approved|sent/.test(st)) { status = 'CHO'; qty = oq; date = g(H.eta); }
+      else continue;
+      date = String(date).replace(/\D/g, '').slice(0, 8); if (!(qty > 0) || (status === 'NHAN' && date < cut)) continue;
+      if (!tracked(bc, g(H.vc))) continue;
+      const id = po + '_' + bc, o = out.get(id);
+      if (o) o.qty += qty; else out.set(id, { id, po, barcode: bc, itemCode: g(H.ic), name: g(H.nm), vendorCode: g(H.vc), vendorName: g(H.vn), qty, date, status });
+    }
+    const rows = [...out.values()];
+    if (!rows.length) throw new Error('Không có dòng PO nào của các CAT đang theo dõi trong 12 tháng');
+    info.textContent = `Đọc được ${rows.length.toLocaleString('vi-VN')} dòng PO - đang gửi lên hệ thống...`;
+    await srv('apiImportPO', AUTH, rows); await load(true);
+    const r = poAssign(); render();
+    showUpdateResult('Đã nạp PO Detail', `Nạp <b>${rows.length.toLocaleString('vi-VN')}</b> dòng PO (${rows.filter(x => x.status === 'NHAN').length.toLocaleString('vi-VN')} đã nhận, ${rows.filter(x => x.status === 'CHO').length.toLocaleString('vi-VN')} đang chờ về). Tự gán PO cho <b>${r.n}</b> date cũ (${r.skus} mã)${r.none ? `; ${r.none} date không tìm thấy PO nhận trong 12 tháng` : ''}.`);
+  } catch (e) { info.innerHTML = `<span class="hint bad">${esc(e.message || e)}</span>`; }
+}
+// Gán PO cho date cũ chưa có PO: date HSD xa nhất ứng với PO nhận gần nhất, trừ dần SL từng PO
+function poAssign() {
+  const rec = {};
+  DB.PO.filter(r => r.status !== 'CHO').forEach(r => (rec[r.barcode] = rec[r.barcode] || []).push({ po: r.po, date: r.date, left: +r.qty || 0 }));
+  Object.values(rec).forEach(a => a.sort((x, y) => y.date.localeCompare(x.date)));
+  const open = DB.LoDate.filter(l => l.status === 'MO' && +l.qty > 0);
+  open.filter(l => l.po).forEach(l => { const a = rec[l.barcode]; if (!a) return; let q = +l.qty || 0;
+    String(l.po).split(/[,; ]+/).forEach(p => { const r = a.find(x => x.po === p); if (r && q > 0) { const t = Math.min(r.left, q); r.left -= t; q -= t; } }); });
+  const by = {}, upd = [], skus = new Set(); let none = 0;
+  open.filter(l => !l.po).forEach(l => (by[l.barcode] = by[l.barcode] || []).push(l));
+  Object.keys(by).forEach(bc => {
+    const a = rec[bc]; if (!a) { none += by[bc].length; return; }
+    by[bc].sort((x, y) => String(y.exp).localeCompare(String(x.exp))).forEach(l => {
+      let q = +l.qty || 0; const used = [];
+      for (const r of a) { if (q <= 0) break; if (r.left <= 0) continue; const t = Math.min(r.left, q); r.left -= t; q -= t; used.push(r); }
+      if (!used.length) { none++; return; }
+      upd.push(Object.assign({}, l, { po: used.map(r => r.po).join(', '), poDate: used[0].date, poAuto: '1' })); skus.add(bc);
+    });
+  });
+  for (let i = 0; i < upd.length; i += 200) put('LoDate', upd.slice(i, i + 200));
+  return { n: upd.length, skus: skus.size, none };
+}
+// Các mã của 1 PO: từ file PO Detail đã nạp + PO đang chờ về trong CHECK TỒN + mã quét thêm
+function poLines(no) {
+  const m = new Map();
+  DB.PO.filter(r => r.po === no).forEach(r => m.set(r.barcode, { bc: r.barcode, name: r.name, qty: +r.qty || 0, date: r.date, status: r.status, vc: r.vendorCode, vn: r.vendorName }));
+  if (CT.map) for (const bc in CT.map) { const x = CT.map[bc]; if (x.po) x.po.forEach(p => { if (String(p.p) === no && !m.has(bc)) m.set(bc, { bc, name: x.name, qty: +p.q || 0, date: String(p.e || ''), status: 'CHO', vc: x.suppCode, vn: x.suppName }); }); }
+  const st = LS.get('kdate_po', null);
+  if (st && st.no === no) (st.extra || []).forEach(bc => { if (!m.has(bc)) { const p = prodOf(bc), x = ctFind(CT.map, bc); m.set(bc, { bc, name: p ? p.name : x ? x.name : bc, qty: 0, date: '', status: 'THEM', vc: p ? p.vendorCode : x ? x.suppCode : '', vn: p ? p.vendorName : x ? x.suppName : '' }); } });
+  return [...m.values()];
+}
+function poDone(no, bc) { return DB.LoDate.filter(l => l.barcode === bc && l.status !== 'HUY' && String(l.po || '').split(/[,; ]+/).includes(no)).reduce((a, l) => a + (+l.qtyStart || +l.qty || 0), 0); }
+let PODRAFT = {};
+async function openPO(focusBc) {
+  const st = LS.get('kdate_po', null);
+  modal('Nhập date theo PO', `<p class="small muted">Nhập số PO 1 lần, rồi gõ HSD cho từng mã trong PO (quét mã để nhảy tới đúng dòng). Bấm Lưu 1 lần cho cả PO. PO được giữ đến khi bấm <b>Kết thúc PO</b>.</p>
+    <div class="row"><input id="poNo" class="poin" inputmode="numeric" placeholder="Số PO" value="${esc(st ? st.no : '')}"><button class="btn" id="poOpen">${st ? 'Đổi PO' : 'Mở PO'}</button>${st ? '<button class="btn sub" onclick="poEnd()">Kết thúc PO</button>' : ''}</div>
+    <div id="poBody" style="margin-top:12px">${st ? '<p class="muted">Đang tải danh sách mã của PO...</p>' : ''}</div>`, true);
+  $('#poOpen').onclick = () => { const no = $('#poNo').value.trim(); if (!/^\d{3,12}$/.test(no)) return toast('Nhập số PO', true); if (!st || st.no !== no) { LS.set('kdate_po', { no, extra: [], at: Date.now() }); PODRAFT = {}; } openPO(); };
+  $('#poNo').onkeydown = e => { if (e.key === 'Enter') $('#poOpen').click(); };
+  if (!st) { setTimeout(() => $('#poNo').focus(), 50); return; }
+  await ctLoad(); if (!$('#poBody')) return;
+  poDraw(st.no, focusBc);
+}
+function poDraw(no, focusBc) {
+  const L = poLines(no), body = $('#poBody'); if (!body) return;
+  const first = L[0] || {}, recv = L.find(l => l.status === 'NHAN');
+  const rowsHtml = L.map((l, i) => { const done = poDone(no, l.bc), d = PODRAFT[l.bc] || {}, rest = Math.max(0, l.qty - done);
+    return `<tr data-bc="${esc(l.bc)}" ${l.bc === focusBc ? 'style="background:#fff6d6"' : ''}><td><b>${esc(l.name)}</b><div class="small muted">${esc(l.bc)}${prodOf(l.bc) ? ' · CAT ' + esc(prodOf(l.bc).cat) : ''}${l.qty ? ' · SL PO ' + l.qty : ''}</div>${done ? `<span class="tag ok">Đã nhập ${done}</span>` : '<span class="tag gray">Chưa có date</span>'}</td>
+      <td style="width:150px"><input class="poexp" data-i="${i}" inputmode="numeric" placeholder="HSD" value="${esc(d.exp || '')}" style="width:100%;font-size:16px"><div class="hint" data-h="${i}"></div>
+        <label class="small row" style="gap:6px;flex-wrap:nowrap">SL <input class="poq" type="number" min="0" inputmode="numeric" data-q="${i}" value="${esc(d.qty != null ? d.qty : rest || l.qty || '')}" style="width:80px"></label></td></tr>`; }).join('');
+  const nDone = L.filter(l => poDone(no, l.bc) > 0).length;
+  body.innerHTML = `<div class="row small"><b>PO ${esc(no)}</b>${first.vn ? ' · ' + esc(first.vn) : ''}${recv ? ' · nhận ' + ymdTxt(recv.date) : first.date ? ' · dự kiến về ' + ymdTxt(first.date) : ''} · <b>${nDone}/${L.length}</b> mã đã có date</div>
+    ${!L.length ? '<div class="action small" style="margin-top:8px">Chưa có danh sách mã của PO này (PO Detail chưa nạp hoặc PO mới). Quét lần lượt từng mã bên dưới, mã sẽ được thêm vào PO.</div>' : ''}
+    ${L.length && nDone === L.length ? '<div class="action small" style="margin-top:8px;border-left-color:var(--ok)"><b>Đã nhập đủ date cho PO này.</b> Bấm Kết thúc PO rồi nhập PO tiếp theo.</div>' : ''}
+    <div class="row" style="margin-top:8px"><input id="poScan" placeholder="Quét / gõ barcode" inputmode="numeric" style="flex:1;min-width:160px"><button class="btn sub sm" id="poCam">Quét camera</button></div>
+    <div class="tbl" style="margin-top:8px;max-height:52vh;overflow:auto"><table><thead><tr><th>Mã hàng</th><th>HSD · SL</th></tr></thead><tbody>${rowsHtml || '<tr><td colspan="2" class="muted">Quét mã để thêm vào PO.</td></tr>'}</tbody></table></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="poSave">Lưu date cho PO</button><span class="small muted" id="poCnt"></span></div>`;
+  const cnt = () => { const n = Object.values(PODRAFT).filter(d => d.iso).length; $('#poCnt').textContent = n ? n + ' mã đã gõ HSD, chưa lưu' : ''; };
+  $$('.poexp').forEach(el => { const l = L[+el.dataset.i], h = $(`[data-h="${el.dataset.i}"]`);
+    const f = () => { const v = readDate(el.value, true); (PODRAFT[l.bc] = PODRAFT[l.bc] || {}).exp = el.value; PODRAFT[l.bc].iso = v || ''; h.className = 'hint' + (el.value && !v && el.value.replace(/\D/g, '').length > 4 ? ' bad' : ''); h.textContent = el.value ? (v ? '= ' + E.fmt(v) : '') : ''; cnt(); };
+    el.oninput = () => { if (!/[^\d\/]/.test(el.value)) { const v = fmtDigits(el.value.replace(/\D/g, '')); if (v !== el.value) el.value = v; } f(); };
+    el.onkeydown = e => { if (e.key === 'Enter') { const nx = $$('.poexp')[+el.dataset.i + 1]; if (nx) nx.focus(); else $('#poScan').focus(); } };
+    if (el.value) f(); });
+  $$('.poq').forEach(el => el.oninput = () => { (PODRAFT[L[+el.dataset.q].bc] = PODRAFT[L[+el.dataset.q].bc] || {}).qty = el.value; });
+  const go = bc => { bc = String(bc || '').trim(); if (!bc) return; const tr = $(`#poBody tr[data-bc="${bc}"]`);
+    if (tr) { tr.style.background = '#fff6d6'; tr.scrollIntoView({ block: 'center' }); tr.querySelector('.poexp').focus(); $('#poScan').value = ''; return; }
+    const st = LS.get('kdate_po', null); st.extra = (st.extra || []).concat(bc); LS.set('kdate_po', st); poDraw(no, bc);
+    const t2 = $(`#poBody tr[data-bc="${bc}"]`); if (t2) { t2.scrollIntoView({ block: 'center' }); t2.querySelector('.poexp').focus(); } };
+  $('#poScan').onkeydown = e => { if (e.key === 'Enter') go($('#poScan').value); };
+  $('#poCam').onclick = () => scan(code => { openPO(code).then(() => go(code)); });
+  $('#poSave').onclick = () => poSave(no, L);
+  if (focusBc) { const tr = $(`#poBody tr[data-bc="${focusBc}"]`); if (tr) { tr.scrollIntoView({ block: 'center' }); tr.querySelector('.poexp').focus(); } }
+  cnt();
+}
+function poSave(no, L) {
+  const sd = stockDay(), now = Date.now(), lots = [], prods = []; let bad = 0;
+  L.forEach(l => { const d = PODRAFT[l.bc]; if (!d || !d.exp) return; if (!d.iso) { bad++; return; }
+    const q = d.qty != null && d.qty !== '' ? +d.qty : Math.max(0, l.qty - poDone(no, l.bc)) || l.qty; if (!(q > 0)) { bad++; return; }
+    let p = prodOf(l.bc);
+    if (!p) { const x = ctFind(CT.map, l.bc); const g = x ? guessCat(x) : { cat: CATF !== 'ALL' ? CATF : liCats()[0] };
+      p = x ? ctProd(l.bc, x, g.cat) : { id: l.bc, barcode: l.bc, itemCode: '', name: l.name || l.bc, cat: g.cat, vendorCode: String(l.vc || ''), vendorName: l.vn || '', price: '', cost: '', stock: '', slMonths: '', flag: '', flagBy: USER.name };
+      p.flag = 'THEO_DOI'; prods.push(p); DB.SanPham.push(p); }
+    const newGoods = l.status !== 'NHAN' || !l.date || E.dn(ymd2iso(l.date)) >= (sd == null ? E.today() : sd); // nhận từ ngày cập nhật tồn trở đi: tồn chưa có
+    lots.push({ id: uid(), barcode: l.bc, name: p.name, cat: p.cat, vendorCode: p.vendorCode, exp: d.iso, mfg: '', qty: String(q), qtyStart: String(q), location: '', note: '', status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: newGoods ? 'MOI' : 'TON', po: no, poDate: l.date || E.iso(E.today()).replace(/-/g, '') });
+    delete PODRAFT[l.bc]; });
+  if (!lots.length) return toast(bad ? 'Có HSD/SL chưa đúng - kiểm tra dòng báo đỏ' : 'Chưa gõ HSD cho mã nào', true);
+  if (prods.length) put('SanPham', prods);
+  put('LoDate', lots);
+  toast(`Đã lưu ${lots.length} date cho PO ${no}${bad ? ` · ${bad} dòng chưa đúng` : ''}`);
+  poDraw(no); refreshBehind();
 }
 
 // ---------------- Nhập file date đã theo dõi từ trước ----------------
@@ -1529,17 +1686,17 @@ function liPreview() {
   const upd = list.filter(x => DB.LoDate.some(l => l.barcode === x.bc && l.exp === x.exp && l.status === 'MO')).length;
   const expd = list.filter(x => E.dn(x.exp) < td).length, skus = new Set(list.map(x => x.bc)).size;
   LI.list = list; LI.newP = newP;
-  $('#liPrev').innerHTML = `<div class="row">${[['ok', `${list.length} lô hợp lệ (${skus} mã)`], upd ? ['blue', `${upd} lô cùng HSD đã có - sẽ cập nhật SL`] : 0, newP.size ? ['warn', `${newP.size} mã chưa có trong danh mục - thêm vào CAT ${esc(LI.cat)}`] : 0, expd ? ['bad', `${expd} lô đã quá HSD`] : 0, fromStock ? ['gray', `${fromStock} dòng không có SL - lấy theo tồn (date sớm nhất), date khác ghi 1`] : 0, errs.length ? ['bad', `${errs.length} dòng lỗi - bỏ qua`] : 0].filter(Boolean).map(x => `<span class="tag ${x[0]}">${x[1]}</span>`).join(' ')}</div>
-    ${list.length ? `<div class="tbl" style="margin-top:10px;max-height:300px;overflow:auto"><table><thead><tr><th>Dòng</th><th>Barcode</th><th>Tên hàng</th><th>HSD</th><th>SL</th><th class="hide-m">Vị trí</th><th class="hide-m">NSX</th></tr></thead><tbody>${list.slice(0, 200).map(x => `<tr><td>${x.line}</td><td>${esc(x.bc)}</td><td>${esc(x.p.name)}${x.isNew ? ' <span class="tag warn">mới</span>' : ''}</td><td>${E.fmt(x.exp)}</td><td>${x.qty}</td><td class="hide-m">${esc(x.location)}</td><td class="hide-m">${x.mfg ? E.fmt(x.mfg) : ''}</td></tr>`).join('')}</tbody></table></div>${list.length > 200 ? `<p class="small muted">Đang hiện 200/${list.length} lô.</p>` : ''}` : ''}
+  $('#liPrev').innerHTML = `<div class="row">${[['ok', `${list.length} date hợp lệ (${skus} mã)`], upd ? ['blue', `${upd} date cùng HSD đã có - sẽ cập nhật SL`] : 0, newP.size ? ['warn', `${newP.size} mã chưa có trong danh mục - thêm vào CAT ${esc(LI.cat)}`] : 0, expd ? ['bad', `${expd} date đã quá HSD`] : 0, fromStock ? ['gray', `${fromStock} dòng không có SL - lấy theo tồn (date sớm nhất), date khác ghi 1`] : 0, errs.length ? ['bad', `${errs.length} dòng lỗi - bỏ qua`] : 0].filter(Boolean).map(x => `<span class="tag ${x[0]}">${x[1]}</span>`).join(' ')}</div>
+    ${list.length ? `<div class="tbl" style="margin-top:10px;max-height:300px;overflow:auto"><table><thead><tr><th>Dòng</th><th>Barcode</th><th>Tên hàng</th><th>HSD</th><th>SL</th><th class="hide-m">Vị trí</th><th class="hide-m">NSX</th></tr></thead><tbody>${list.slice(0, 200).map(x => `<tr><td>${x.line}</td><td>${esc(x.bc)}</td><td>${esc(x.p.name)}${x.isNew ? ' <span class="tag warn">mới</span>' : ''}</td><td>${E.fmt(x.exp)}</td><td>${x.qty}</td><td class="hide-m">${esc(x.location)}</td><td class="hide-m">${x.mfg ? E.fmt(x.mfg) : ''}</td></tr>`).join('')}</tbody></table></div>${list.length > 200 ? `<p class="small muted">Đang hiện 200/${list.length} date.</p>` : ''}` : ''}
     ${errs.length ? `<details style="margin-top:8px"><summary class="small"><b>Xem ${errs.length} dòng lỗi</b></summary><div class="tbl" style="max-height:220px;overflow:auto"><table><thead><tr><th>Dòng</th><th>Mã</th><th>Lý do</th></tr></thead><tbody>${errs.slice(0, 300).map(e => `<tr><td>${e[0]}</td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
-    <div class="row" style="margin-top:12px"><button class="btn" id="liGo" ${list.length ? '' : 'disabled'}>Nhập ${list.length} lô vào hệ thống</button></div>`;
+    <div class="row" style="margin-top:12px"><button class="btn" id="liGo" ${list.length ? '' : 'disabled'}>Nhập ${list.length} date vào hệ thống</button></div>`;
   const go = $('#liGo'); if (go) go.onclick = liSave;
 }
 function liSave() {
   const list = LI.list || []; if (!list.length) return;
-  if (!confirm(`Nhập ${list.length} lô date vào hệ thống?`)) return;
+  if (!confirm(`Nhập ${list.length} date vào hệ thống?`)) return;
   const now = Date.now(), prods = [...LI.newP.values()];
-  // mã đã có lô date thì đưa vào theo dõi (kể cả mã "chờ phân loại" / đánh dấu không có date)
+  // mã đã có date thì đưa vào theo dõi (kể cả mã "chờ phân loại" / đánh dấu không có date)
   const seen = new Set();
   list.forEach(x => { if (x.isNew || seen.has(x.bc)) return; seen.add(x.bc); const sk = AN.skus.find(s => s.barcode === x.bc);
     if (x.p.flag === 'KHONG_DATE' || (sk && sk.state === 'PENDING')) prods.push(Object.assign({}, x.p, { flag: 'THEO_DOI', flagBy: USER.name })); });
@@ -1548,7 +1705,8 @@ function liSave() {
     if (dup) return Object.assign({}, dup, { qty: String(x.qty), mfg: x.mfg || dup.mfg, location: x.location || dup.location, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : (dup.qtySrc || 'TON') });
     return { id: uid(), barcode: x.bc, name: x.p.name, cat: x.p.cat, vendorCode: x.p.vendorCode, exp: x.exp, mfg: x.mfg, qty: String(x.qty), qtyStart: String(x.qty), location: x.location, note: x.note ? x.note + ' (nhập file)' : 'Nhập file', status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : 'TON' }; });
   for (let i = 0; i < lots.length; i += 200) put('LoDate', lots.slice(i, i + 200));
-  render(); showUpdateResult('Đã nhập file date', `Đã nhập <b>${lots.length}</b> lô date - đang gửi lên hệ thống.`);
+  const pa = DB.PO.length ? poAssign() : null;
+  render(); showUpdateResult('Đã nhập file date', `Đã nhập <b>${lots.length}</b> date - đang gửi lên hệ thống.${pa && pa.n ? ` Tự gán PO nhận hàng gần nhất cho ${pa.n} date.` : ''}`);
 }
 function liTemplate(cat) {
   const skus = AN.skus.filter(s => s.cat === cat).sort((a, b) => (a.p.vendorName || '').localeCompare(b.p.vendorName || '') || a.name.localeCompare(b.name));
