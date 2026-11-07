@@ -1347,6 +1347,7 @@
                 suppName: row[5],   // Supplier Name
                 price: row[8],      // Sales Unit Price(Tax incl.)
                 stock: row[11],     // Close Qty
+                cat: row[9],        // CAT - công cụ Theo Dõi Date đọc để tự xếp mã vào đúng CAT
                 promo: hasEmbeddedPromo ? { value: row[12], type: 'Amount' } : undefined
             };
         });
