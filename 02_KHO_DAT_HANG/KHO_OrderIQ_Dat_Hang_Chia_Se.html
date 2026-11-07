@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OrderIQ Kho Đặt hàng V2.14 · PARC MALL 1016</title>
+<title>OrderIQ Kho Đặt hàng V2.15 · PARC MALL 1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -660,7 +660,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
         <div class="up-status" id="st-sord"></div></div></div>
       <div class="step-c"><div class="step-n">3</div><div class="step-b"><b>Kiểm tra & chốt SL</b><div class="sm muted">Xem dòng 🟠 Dư · 🔴 Thiếu · ⚫ Không nên đặt · 🟣 Bỏ sót; sửa cột <b>SL chốt</b> (tool tự lưu).</div></div></div>
       <div class="step-c"><div class="step-n">4</div><div class="step-b"><b>Xuất danh sách điều chỉnh</b><div class="sm muted">Chỉ các dòng cần sửa trên hệ thống: đổi SL, xoá dòng, thêm mã bỏ sót.</div>
-        <button class="btn btn-sm btn-primary" onclick="exportAdjust()">⬇ Xuất danh sách điều chỉnh (Excel)</button></div></div>
+        <button class="btn btn-sm btn-primary" onclick="exportAdjust()">⬇ Xuất danh sách điều chỉnh (Excel)</button><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)"><b>📤 File import lên cloud</b><div class="sm muted">Đúng cấu trúc order.csv của Handy (12 cột, TAB, không tiêu đề), cột 9 = SL chốt. Gồm toàn bộ đơn sau khi chốt (kể cả dòng không đổi, mã bỏ sót đã thêm).</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px"><select id="so-keep0" title="Dòng Sale Chief chốt SL 0"><option value="drop">Dòng chốt 0: bỏ khỏi file</option><option value="keep">Dòng chốt 0: giữ, SL = 0</option></select><button class="btn btn-sm btn-primary" onclick="exportOrderCsv()">📤 Xuất order.csv (import cloud)</button></div></div></div></div>
     </div>
     <details class="card rule-box"><summary>📐 Cách tool chấm từng dòng</summary><div class="card-body sm" style="line-height:1.8;color:var(--text2)">
       • Chuẩn đối chiếu: <b>file or_plan</b> (tồn hiện tại + bán 5 tuần + bội số đặt); mã không có trong or_plan thì dùng file tồn kho tháng.<br>
@@ -1016,6 +1016,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 
 <h2>4. Tình huống ứng dụng</h2>
 <table><tr><th>Tình huống</th><th>Làm gì</th></tr>
+<tr><td>Đưa đơn đã chốt lên cloud (V2.15)</td><td>Trang ✅ Kiểm tra đơn Senior → bước 4 → <b>📤 Xuất order.csv (import cloud)</b>: đúng cấu trúc order.csv của Handy (12 cột, TAB, không tiêu đề), cột 9 = SL chốt.</td></tr>
 <tr><td>Kiểm tra đơn Handy (V2.14)</td><td>① Nạp <b>or_plan.csv</b> cùng ngày (file tải vào máy Handy) → ② nhân viên đặt xong up đơn lên cloud, tải file <b>order.csv</b> về → trang ✅ Kiểm tra đơn Senior bấm <b>📲 Tải file đơn Handy (order.csv)</b> (hoặc thả vào ô nạp bất kỳ - tool tự nhận: 12 cột, không tiêu đề, cột 9 = SL đặt) → ③ ghi tên nhân viên ở ô Senior, xem 🟠 Dư / 🔴 Thiếu / ⚫ Không nên đặt / 🟣 Bỏ sót, sửa SL chốt → ④ Xuất danh sách điều chỉnh. Mã trùng trong file được cộng SL; nạp lại cùng file thì cập nhật, giữ SL chốt đã sửa.</td></tr>
 <tr><td>Duyệt đơn Senior đặt bằng Handy</td><td>① Senior tải or_plan vào Handy → ② nhân viên ra line bấm SL → ③ up lên hệ thống → ④ Sale Chief: nạp cùng file or_plan + PO Detail mới → Lấy đơn chưa duyệt từ PO → chốt SL → Xuất danh sách điều chỉnh → sửa trên hệ thống</td></tr>
 <tr><td>Xem gợi ý trước khi Senior ra line</td><td>Nạp or_plan → 📲 Gợi ý đặt → chỉnh SL chốt → 📦 Xuất danh sách đặt theo NCC cho nhân viên bấm Handy</td></tr>
@@ -3398,7 +3399,7 @@ function ingestHandyOrder(job,rows,st){
     const sup=str(r[6]),sn=str(r[7]);if(sup&&sn&&!supName[sup]) supName[sup]=sn;
     const ex=byBc.get(bc);
     if(ex){ex.qty+=q;dup++;return;}
-    byBc.set(bc,{barcode:bc,item_code:str(r[2])!==bc?str(r[2]):'',name:str(r[3]),qty:q,pack:num(r[5]),supplier:sup,supplier_name:sn});
+    byBc.set(bc,{raw:r.slice(0,12).map(v=>str(v)),barcode:bc,item_code:str(r[2])!==bc?str(r[2]):'',name:str(r[3]),qty:q,pack:num(r[5]),supplier:sup,supplier_name:sn});
   });
   const lines=[...byBc.values()];
   if(!lines.length) throw new Error('File đơn Handy không có dòng nào có SL đặt > 0');
@@ -5095,6 +5096,35 @@ function exportCostBatch(){
   XWX.save(B,'GiaVon_PhanBo_MD');toast('Đã xuất báo cáo giá vốn & phân bổ MD');
 }
 // ---- Điều chỉnh đơn Senior
+// ==== V2.15: XUẤT FILE ORDER ĐÃ CHỐT - đúng cấu trúc order.csv của Handy để import lên cloud ====
+// UTF-8 không BOM · phân cách TAB · xuống dòng CRLF · không dòng tiêu đề · 12 cột (cột 9 = SL chốt)
+function buildOrderCsv(b,keepZero){
+  const rows=evalSupOrder(b);const hm=new Map(handyRows.map(h=>[h.barcode,h]));
+  const pad=n=>String(n).padStart(2,'0');const now=new Date();
+  const today=`${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())}`,tm=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const planD=handy&&handy.date&&handy.date.length>=8?`${handy.date.slice(0,4)}/${handy.date.slice(4,6)}/${handy.date.slice(6,8)}`:today;
+  const clean=v=>String(v??'').replace(/[\t\r\n]+/g,' ').trim();
+  const out=[];let drop=0,offLot=[];
+  rows.forEach(r=>{
+    const l=b.lines[r.li];const q=Math.max(0,Math.round(+r.chot||0));
+    if(!(q>0)&&!keepZero){drop++;return;}
+    if(q>0&&r.lot>1&&q%r.lot) offLot.push(r.name+' ('+q+' / bội số '+r.lot+')');
+    let c;
+    if(l&&l.raw&&l.raw.length>=12){c=l.raw.slice(0,12);}
+    else{const h=hm.get(r.barcode);
+      c=[planD,r.barcode,h&&h.code?h.code:r.barcode,r.name||'',h?h.unit:(l&&l.pack)||'',h?h.minq:(r.lot||''),r.supplier||'',(h&&h.supplier_name)||r.supplier_name||'','','0',today,tm];}
+    c[8]=q;out.push(c.map(clean).join('\t'));
+  });
+  return {text:out.length?out.join('\r\n')+'\r\n':'',n:out.length,drop,offLot,qty:rows.reduce((a,r)=>a+(+r.chot||0),0)};
+}
+function exportOrderCsv(){
+  const b=curBatch();if(!b){toast('Chưa có đơn để xuất','warning');return;}
+  const keepZero=V('so-keep0')==='keep';const o=buildOrderCsv(b,keepZero);
+  if(!o.n){toast('Không còn dòng nào có SL chốt > 0','warning');return;}
+  if(o.offLot.length&&!confirm(`${o.offLot.length} dòng SL chốt không đúng bội số đặt:\n- ${o.offLot.slice(0,8).join('\n- ')}${o.offLot.length>8?'\n...':''}\n\nVẫn xuất file?`)) return;
+  download(new Blob([o.text],{type:'text/csv;charset=utf-8'}),'order.csv');
+  toast(`Đã xuất order.csv: ${fmt(o.n)} dòng · tổng SL ${fmt(o.qty)}${o.drop?` · bỏ ${o.drop} dòng SL chốt 0`:''} - import file này lên cloud`);
+}
 function exportAdjust(){
   const b=curBatch();if(!b){toast('Chưa có đơn để xuất','warning');return;}
   const r=evalSupOrder(b).filter(x=>x.chot!==x.prop||x.v==='miss');
