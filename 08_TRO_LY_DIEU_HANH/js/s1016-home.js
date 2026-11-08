@@ -21,7 +21,7 @@
     ["push-sale", "Push Sale"], ["ke-hoach", "Kế hoạch & báo cáo"], ["doi-tac", "Khách hàng & đối tác"], ["tai-lieu", "Tài liệu học tập"]
   ];
   var MON_EN = { JAN: 1, FEB: 2, MAR: 3, APR: 4, MAY: 5, JUN: 6, JUL: 7, AUG: 8, SEP: 9, OCT: 10, NOV: 11, DEC: 12 };
-  var DEFAULT_PINS = [/Check_Ton_Gia_KM/i, /OrderIQ_Dat_Hang_Ton_Kho/i, /LICH_LAM_VIEC_1016/i, /SO_TAY_TEAM_ADMIN/i, /xinhangmiennam/i, /KHO_KIEM_DATE/i];
+  var DEFAULT_PINS = [/Check_Ton_Gia_KM/i, /OrderIQ_Dat_Hang_Ton_Kho/i, /LICH_LAM_VIEC_1016/i, /SO_TAY_TEAM_ADMIN/i, /xinhangmiennam/i, /kohnan-hsd/i];
   var SRC_TOOL = { LICH: /LICH_LAM_VIEC_1016/i, LICH_TASKS: /LICH_LAM_VIEC_1016/i, BUDGET: /LICH_LAM_VIEC_1016/i, TA: /SO_TAY_TEAM_ADMIN/i, KHO: /OrderIQ_Dat_Hang_Ton_Kho/i };
 
   function curYm() { return U.todayIso().slice(0, 7); }
@@ -59,7 +59,7 @@
   function saleTool() { var c = H.catalog().filter(function (t) { return t.groupId === "doanh-so" && /Dashboard_Sale|Dashboard Sale|Sale Plan/i.test(t.name + t.href) && t.month === curYm(); }); return c[0] || toolFor(/DS_Dashboard_Sale_1016_T10/i); }
   function linkBtn(t, label, cls) {
     if (!t) return "";
-    if (!/^https?:/.test(t.href || "")) return '<span class="tag grey" title="Chỉ có trên máy">Chỉ trên máy</span>';
+    if (!/^https?:/.test(t.href || "")) return '<button type="button" class="btn sm ' + (cls || "") + '" data-local-file="1">Mở trên máy</button>';
     return '<a class="btn sm ' + (cls || "") + '" target="_blank" rel="noopener" href="' + E(t.href) + '">' + E(label || "Mở") + " ↗</a>";
   }
 
@@ -297,4 +297,37 @@
     else if (el.dataset.h === "calc") runCalc();
     else if (el.dataset.h === "toolq") { H.toolQ = el.value; filterTools(); }
   });
+})();
+
+(function(){
+  var FILE_URL = "file:///Users/hoangngan/Library/CloudStorage/OneDrive-Personal/1016/6.%20N%C3%82NG%20CAO%20N%C4%82NG%20SU%E1%BA%A4T/0.LINK%20T%E1%BB%94NG%20H%E1%BB%A2P/01_VAN_HANH_TEAM/VH_Dien_CCCD_Nhan_Vien.html";
+  var FOLDER = "OneDrive > 1016 > 6. NÂNG CAO NĂNG SUẤT > 0.LINK TỔNG HỢP > 01_VAN_HANH_TEAM";
+  function show(){
+    var d = document.getElementById('localFileDlg');
+    if (!d) {
+      d = document.createElement('dialog'); d.id = 'localFileDlg';
+      d.style.cssText = 'max-width:520px;width:calc(100% - 32px);border:0;border-top:5px solid #e8082c;border-radius:14px;padding:20px;color:#16202c;background:#fff;font:14px/1.55 system-ui,sans-serif';
+      d.innerHTML = '<h3 style="margin:0 0 8px;color:#0039a6;font-size:17px">Điền CCCD chỉ mở được trên máy này</h3>' +
+        '<p style="margin:0 0 10px">File có dữ liệu CCCD nhân viên nên không đăng online. Trình duyệt cũng không cho trang online tự mở file trên máy, vì vậy cần mở bằng 1 trong 2 cách:</p>' +
+        '<ol style="margin:0 0 12px;padding-left:20px"><li><b>Nhanh nhất:</b> bấm "Sao chép đường dẫn", mở tab mới, dán vào thanh địa chỉ rồi Enter.</li><li><b>Hoặc trong Finder:</b> vào ' + FOLDER + ', mở file <b>VH_Dien_CCCD_Nhan_Vien.html</b>.</li></ol>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button type="button" data-x="close" style="padding:8px 14px;border-radius:8px;border:1px solid #c9d1dc;background:#fff;font:inherit;cursor:pointer">Đóng</button><button type="button" data-x="copy" style="padding:8px 14px;border-radius:8px;border:0;background:#0039a6;color:#fff;font:inherit;font-weight:700;cursor:pointer">Sao chép đường dẫn</button></div>';
+      d.addEventListener('click', function(e){
+        var x = e.target.getAttribute && e.target.getAttribute('data-x');
+        if (x === 'close') d.close();
+        if (x === 'copy') {
+          var b = e.target, ok = function(){ b.textContent = 'Đã chép, dán vào tab mới'; };
+          if (navigator.clipboard) navigator.clipboard.writeText(FILE_URL).then(ok, function(){ window.prompt('Sao chép đường dẫn này:', FILE_URL); });
+          else window.prompt('Sao chép đường dẫn này:', FILE_URL);
+        }
+      });
+      document.body.appendChild(d);
+    }
+    d.querySelector('[data-x=copy]').textContent = 'Sao chép đường dẫn';
+    d.showModal();
+  }
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('[data-local-file], a[href*="VH_Dien_CCCD_Nhan_Vien"]');
+    if (!a || false) return;
+    e.preventDefault(); show();
+  }, true);
 })();
