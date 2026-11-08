@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiến Lược Push Sale Tháng 11 - Sữa Tắm ON: The Body & Son Dưỡng Menturm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .custom-card {
+            background: #ffffff; border-radius: 1.25rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0; transition: all 0.3s ease;
+        }
+        .custom-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04); }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; height: 260px; }
+        .tab-btn { transition: all .2s ease; }
+        .tab-btn[aria-selected="true"].t-otb { background:#e11d48; color:#fff; border-color:#e11d48; }
+            .tab-btn[aria-selected="true"].t-son { background:#15803d; color:#fff; border-color:#15803d; }
+        .print-title { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #ffffff !important; }
+            nav { position: static !important; }
+            .custom-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+            .tab-panel { display: block !important; break-inside: avoid; margin-bottom: 1.5rem; }
+            .print-title { display: block; }
+            body[data-print] nav, body[data-print] main > *:not(.pt-area) { display: none !important; }
+            body[data-print] .pt-head { display: block !important; margin-bottom: 10px; }
+            body[data-print] .custom-card { padding: 0.75rem; border: none !important; }
+            body[data-print] .p-3\.5, body[data-print] .p-3 { padding: 6px 8px !important; }
+            body[data-print] table { font-size: 11px; }
+            body[data-print="sum"] #pt-detail { display: none !important; }
+            body[data-print="otb"] #pt-summary, body[data-print="son"] #pt-summary { display: none !important; }
+            body[data-print="otb"] .tab-panel:not(#panel-otb), body[data-print="son"] .tab-panel:not(#panel-son) { display: none !important; }
+            body[data-print="all"] #pt-detail .tab-panel { break-before: page; }
+            body[data-print] tr { break-inside: avoid; }
+            body[data-print] table { width: 100%; border-collapse: collapse; }
+            body[data-print] th, body[data-print] td { padding: 3px 5px !important; border-bottom: 1px solid #e2e8f0; font-size: 10px; line-height: 1.25; }
+            body[data-print] section { margin-bottom: 0 !important; }
+            body[data-print] #pt-detail .custom-card > div:first-child { display: none !important; }
+            body[data-print] .print-title { margin: 6px 0 4px; }
+            body[data-print] .custom-card, body[data-print] .tab-panel { break-inside: auto !important; }
+            body[data-print] .tab-panel { margin-bottom: 0 !important; }
+        }
+        .pt-head { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 py-4 px-6 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <span class="p-2 bg-rose-600 text-white rounded-xl font-black text-xl tracking-wider">POS</span>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight text-center md:text-left">TEAM ADMIN PUSH SALES DASHBOARD</h1>
+                    <p class="text-[11px] text-slate-500 font-bold text-center md:text-left uppercase tracking-wider">Kế Hoạch Push Sale Tháng 11 (07/11 - 30/11) • Sữa Tắm 99K • Son Dưỡng 39K</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <div class="text-xs font-semibold text-rose-700 bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-200 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    20/11 Nhà Giáo VN • Black Friday 27-29/11
+                </div>
+                <button onclick="window.print()" class="no-print bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md transition flex items-center gap-2">
+                    🖨️ In / Export PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="mb-8 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-extrabold uppercase tracking-wider mb-3">
+                🔥 Chiến Dịch Trọng Tâm Tháng 11 • 07/11 - 30/11/2026 (24 ngày)
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">
+                Chiến Lược Push Sale: <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-sky-600 to-green-600">Bộ Đôi Chăm Sóc Mùa Lạnh</span>
+            </h2>
+            <p class="text-base md:text-lg text-slate-600 max-w-4xl leading-relaxed">
+                Sữa tắm <strong class="text-rose-600">ON: The Body 99K</strong> tập trung <strong>2 mùi Kim Ngân & Thảo Mộc</strong> (300 chai), bán kèm <strong class="text-green-700">Son dưỡng môi Menturm 39K</strong> (100 thỏi). Tháng 11 có 5 ngày đặc biệt: <strong>11/11</strong>, <strong>20/11 Kohnan Day + Ngày Nhà Giáo</strong> và <strong>Black Friday 27-29/11</strong>, tất cả tính như cuối tuần. Lưu ý nhân sự: <strong class="text-amber-700">Phụng nghỉ từ 15/11</strong>, <strong class="text-amber-700">Uyên Nhi nghỉ từ 28/11</strong>; phần chỉ tiêu của 2 bạn trong những ngày nghỉ đã chia đều cho 9 bạn còn lại.
+            </p>
+        </header>
+
+        <!-- KPI -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div class="custom-card border-t-4 border-rose-500 bg-gradient-to-br from-white to-rose-50">
+                <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Sữa Tắm ON: The Body</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-rose-600">300</span>
+                    <span class="ml-2 text-slate-500 font-bold">Chai</span>
+                </div>
+                <p class="mt-3 text-xs text-rose-700 font-bold border-t border-rose-100 pt-2">99K <span class="line-through text-slate-400 font-semibold">198K</span> • 29.700.000đ</p>
+            </div>
+            <div class="custom-card border-t-4 border-green-600 bg-gradient-to-br from-white to-green-50">
+                <p class="text-xs font-bold text-green-700 uppercase tracking-wider">Son Dưỡng Môi Menturm</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-green-700">100</span>
+                    <span class="ml-2 text-slate-500 font-bold">Thỏi</span>
+                </div>
+                <p class="mt-3 text-xs text-green-800 font-bold border-t border-green-100 pt-2">39K • 3.900.000đ</p>
+            </div>
+            <div class="custom-card border-t-4 border-amber-500 bg-gradient-to-br from-white to-amber-50">
+                <p class="text-xs font-bold text-amber-700 uppercase tracking-wider">Lịch Kỳ 07/11 - 30/11</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-4xl font-black text-amber-600">24</span>
+                    <span class="ml-2 text-slate-500 font-bold">Ngày</span>
+                </div>
+                <p class="mt-3 text-xs text-amber-800 font-bold border-t border-amber-100 pt-2">12 ngày thường • 1 Thứ 6 • 11 ngày hệ số 2.2</p>
+            </div>
+            <div class="custom-card border-t-4 border-teal-500">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Doanh Thu Dự Kiến</p>
+                <div class="flex items-baseline mt-3">
+                    <span class="text-3xl font-black text-teal-600">33.600.000đ</span>
+                </div>
+                <p class="mt-3 text-xs text-teal-700 font-semibold border-t border-slate-100 pt-2">Tổng 2 nhóm sản phẩm tháng 11</p>
+            </div>
+        </section>
+
+        <!-- Nhịp bán toàn team -->
+        <section class="custom-card mb-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                <h3 class="text-lg font-black text-slate-900">⏱️ Nhịp Bán Toàn Team Mỗi Ngày (24 Ngày: 07/11 - 30/11)</h3>
+                <span class="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-1 rounded-md border border-amber-300">🛒 11/11 • 🔥 Kohnan Day 20/11 (Nhà Giáo VN) • 🖤 Black Friday 27-29/11</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                            <th class="p-3 text-left">Sản phẩm</th>
+                            <th class="p-3 text-center">Ngày thường (T2-T5)</th>
+                            <th class="p-3 text-center bg-orange-50 text-orange-900">Thứ 6 (13/11)</th>
+                            <th class="p-3 text-center bg-amber-50 text-amber-900">Cuối tuần / 11/11 / 20/11 / 27/11</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-semibold">
+                        <tr><td class="p-3 text-rose-700">🧴 Sữa tắm ON: The Body</td><td class="p-3 text-center">8.0 chai / ngày</td><td class="p-3 text-center text-orange-800 bg-orange-50/40">11.9 chai / ngày</td><td class="p-3 text-center text-amber-800 bg-amber-50/40">17.5 chai / ngày</td></tr>
+                        <tr><td class="p-3 text-green-700">💋 Son dưỡng môi Menturm</td><td class="p-3 text-center">2.7 thỏi / ngày</td><td class="p-3 text-center text-orange-800 bg-orange-50/40">4.0 thỏi / ngày</td><td class="p-3 text-center text-amber-800 bg-amber-50/40">5.8 thỏi / ngày</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-3">Hệ số ngày: T2-T5 = 1.0 • Thứ 6 = 1.5 • T7, CN, 11/11, 20/11, 27/11 = 2.2 (28-29/11 Black Friday trùng cuối tuần). Tổng trọng số kỳ = 37.7.</p>
+        </section>
+
+        <!-- Nhận diện sản phẩm -->
+        <section class="mb-10">
+            <h3 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2"><span>🛍️</span> BẢNG NHẬN DIỆN SẢN PHẨM PUSH SALE THÁNG 11</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="custom-card border-2 border-rose-300 bg-gradient-to-b from-rose-50/60 to-white relative overflow-hidden ring-2 ring-rose-200 md:col-span-2">
+                    <div class="absolute top-0 right-0 bg-rose-600 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">🔥 Trục Chính - 300 Chai</div>
+                    <h4 class="text-lg font-black text-slate-900 mt-3 mb-1">Sữa Tắm Nước Hoa ON: The Body (2 mùi)</h4>
+                    <p class="text-xs font-bold text-rose-600 mb-3">LG Hàn Quốc • Chai lớn • 99K (từ 198K, giảm 50%)</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <div class="bg-white rounded-xl border border-emerald-200 p-3 text-xs text-slate-700">
+                            <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></span><strong>Xanh Lá - Ly Ly Kim Ngân (Lily & Honeysuckle)</strong></div>
+                            <p>Hoa ly, kim ngân - thanh nhẹ, dịu, dùng hằng ngày, hợp làm quà tặng cô giáo 20/11.</p>
+                            <p class="mt-1 font-mono text-[11px] text-emerald-800">Barcode: 8935030229058</p>
+                        </div>
+                        <div class="bg-white rounded-xl border border-sky-200 p-3 text-xs text-slate-700">
+                            <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-sky-500 shrink-0"></span><strong>Xanh Dương - Thảo Mộc (Herbal Scent)</strong></div>
+                            <p>Thảo mộc mát, sạch thoáng, cả nhà nam nữ dùng chung.</p>
+                            <p class="mt-1 font-mono text-[11px] text-sky-800">Barcode: 8935030229065</p>
+                        </div>
+                    </div>
+                    <div class="bg-rose-100/70 p-2.5 rounded-lg border border-rose-200 text-[11px] text-rose-900 font-medium">
+                        👉 <strong>Key Push:</strong> "Sữa tắm nước hoa Hàn đang giảm 50% còn 99K chị ơi! Chị thích hương hoa kim ngân dịu nhẹ hay thảo mộc mát để em lấy đúng mùi cho chị!"
+                    </div>
+                </div>
+                <div class="custom-card border-2 border-green-300 bg-gradient-to-b from-green-50/60 to-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-700 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">💋 Bán Kèm - 100 Thỏi</div>
+                    <h4 class="text-lg font-black text-slate-900 mt-3 mb-1">Son Dưỡng Môi Menturm</h4>
+                    <p class="text-xs font-bold text-green-700 mb-3">Omi Brotherhood Nhật Bản • Medicated Stick • 39K</p>
+                    <ul class="text-xs text-slate-600 space-y-2 mb-4">
+                        <li>• <strong>Công dụng:</strong> Dưỡng ẩm sâu, môi mềm mịn, chống khô nứt mùa lạnh.</li>
+                        <li>• <strong>Điểm cộng:</strong> Nhỏ gọn bỏ túi; không màu nên cả nam và nữ đều dùng.</li>
+                        <li>• <strong>Khách mục tiêu:</strong> Mọi khách tại quầy - món mua kèm giá nhỏ, quyết định trong 5 giây.</li>
+                        <li class="font-mono text-[11px] text-green-800">• Barcode: 4987036412631</li>
+                    </ul>
+                    <div class="bg-green-100/70 p-2.5 rounded-lg border border-green-200 text-[11px] text-green-900 font-medium">
+                        👉 <strong>Key Push:</strong> "Trời trở lạnh môi khô nứt lắm, son dưỡng Nhật Menturm chỉ 39K, anh chị lấy thêm 1 thỏi nha!"
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Thanh in bảng target -->
+        <section class="no-print mb-4 pt-area">
+            <div class="flex flex-wrap items-center gap-2 bg-slate-900 text-white rounded-2xl px-4 py-3">
+                <span class="text-xs font-black uppercase tracking-wider mr-1">🖨️ In riêng bảng target:</span>
+                <button onclick="printTarget('all')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">Tất cả bảng target</button>
+                <button onclick="printTarget('sum')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">Bảng gộp 2 sản phẩm</button>
+                <button onclick="printTarget('otb')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">🧴 Sữa tắm</button>
+                <button onclick="printTarget('son')" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition">💋 Son dưỡng</button>
+            </div>
+        </section>
+
+        <div class="pt-area pt-head">
+            <h2 class="text-xl font-black text-slate-900">BẢNG TARGET PUSH SALE THÁNG 11/2026 (07/11 - 30/11) - TEAM ADMIN</h2>
+            <p class="text-xs text-slate-600 font-semibold">Kohnan Parc Mall - Store 1016 • Sữa tắm ON: The Body 300 chai (Kim Ngân + Thảo Mộc) • Son dưỡng môi 100 thỏi • 🛒 11/11 • 🔥 Kohnan Day 20/11 (Nhà Giáo VN) • 🖤 Black Friday 27-29/11</p>
+        </div>
+
+        <!-- Tổng chỉ tiêu theo người -->
+        <section class="mb-10 pt-area" id="pt-summary">
+            <div class="custom-card border-t-4 border-slate-800">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-2">
+                    <div>
+                        <span class="bg-slate-100 text-slate-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">👥 TỔNG CHỈ TIÊU THÁNG 11 THEO NHÂN VIÊN</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-2">Bảng Chỉ Tiêu Gộp 2 Sản Phẩm</h3>
+                        <p class="text-xs text-slate-500 mt-1">📌 <em>Tổng: 300 chai sữa tắm • 100 thỏi son dưỡng. Tỷ lệ chia giữ như tháng 10.</em></p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3 rounded-tl-lg">Họ Và Tên</th>
+                                <th class="p-3 text-center">Chức Danh</th>
+                                <th class="p-3 text-center bg-rose-50 text-rose-900">🧴 Sữa Tắm (Chai)</th>
+                                <th class="p-3 text-center bg-green-50 text-green-900">💋 Son Dưỡng (Thỏi)</th>
+                                <th class="p-3 text-right rounded-tr-lg">Doanh Thu Mục Tiêu</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+                            <tr><td class="p-3 font-bold">Nguyễn Lê Minh Thư</td><td class="p-3 text-center text-slate-600">CS - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">59</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">20</td><td class="p-3 text-right font-bold text-slate-900">6.621.000đ</td></tr><tr><td class="p-3 font-bold">Lê Uyên Nhi <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 28/11</span></td><td class="p-3 text-center text-slate-600">SC - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">40</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">13</td><td class="p-3 text-right font-bold text-slate-900">4.467.000đ</td></tr><tr><td class="p-3 font-bold">Võ Đặng Tú Quyên</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">40</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">11</td><td class="p-3 text-right font-bold text-slate-900">4.389.000đ</td></tr><tr><td class="p-3 font-bold">Tăng Quế Nhi</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">35</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">10</td><td class="p-3 text-right font-bold text-slate-900">3.855.000đ</td></tr><tr><td class="p-3 font-bold">Phan Thị Chúc Linh</td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">35</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">10</td><td class="p-3 text-right font-bold text-slate-900">3.855.000đ</td></tr><tr><td class="p-3 font-bold">Nguyễn Ngọc Phụng <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 15/11</span></td><td class="p-3 text-center text-slate-600">Admin - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">11</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">3</td><td class="p-3 text-right font-bold text-slate-900">1.206.000đ</td></tr><tr><td class="p-3 font-bold">Dương Xuân Hoàng Ngân</td><td class="p-3 text-center text-slate-600">Admin Chief - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">22</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">8</td><td class="p-3 text-right font-bold text-slate-900">2.490.000đ</td></tr><tr><td class="p-3 font-bold">Phan Thị Thùy Dương</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">22</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">8</td><td class="p-3 text-right font-bold text-slate-900">2.490.000đ</td></tr><tr><td class="p-3 font-bold">Trình Quách Vy</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">16</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">7</td><td class="p-3 text-right font-bold text-slate-900">1.857.000đ</td></tr><tr><td class="p-3 font-bold">Võ Thanh Thảo</td><td class="p-3 text-center text-slate-600">Cashier - <span class="text-blue-700 font-semibold">PT</span></td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">10</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">5</td><td class="p-3 text-right font-bold text-slate-900">1.185.000đ</td></tr><tr><td class="p-3 font-bold">Nguyễn Việt Hương Như</td><td class="p-3 text-center text-slate-600">Cafe Pet - FT</td><td class="p-3 text-center font-black text-rose-600 bg-rose-50/40">10</td><td class="p-3 text-center font-black text-green-700 bg-green-50/40">5</td><td class="p-3 text-right font-bold text-slate-900">1.185.000đ</td></tr><tr class="bg-slate-900 text-white font-black"><td class="p-3.5 uppercase rounded-bl-lg" colspan="2">Tổng Team Admin (11 người)</td><td class="p-3.5 text-center text-rose-300">300</td><td class="p-3.5 text-center text-green-300">100</td><td class="p-3.5 text-right text-yellow-300 rounded-br-lg">33.600.000đ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-5 bg-amber-50 border border-amber-300 rounded-xl p-4 text-xs text-amber-900 leading-relaxed">
+                    <p class="font-black uppercase tracking-wider mb-2">🧮 Cách chia target tháng 11 (Phụng & Uyên Nhi nghỉ giữa kỳ)</p>
+                    <ol class="list-decimal ml-5 space-y-1">
+                        <li><strong>Bước 1 - Chia theo tỷ lệ tháng 10:</strong> 300 chai / 100 thỏi chia cho 11 bạn đúng tỷ lệ target tháng 10 (VD Minh Thư 150/800 → 56 chai).</li>
+                        <li><strong>Bước 2 - Giữ phần ngày còn làm:</strong> Phụng làm 07-14/11 = 35% trọng số kỳ → giữ 10.6 chai, 3.2 thỏi. Uyên Nhi làm 07-27/11 = 86% trọng số kỳ → giữ 40.2 chai, 12.9 thỏi.</li>
+                        <li><strong>Bước 3 - Chia đều phần ngày nghỉ:</strong> phần dư 26.1 chai và 8.1 thỏi chia đều cho 9 bạn còn lại → mỗi bạn <strong>+2.9 chai, +0.9 thỏi</strong>. Làm tròn để tổng đúng 300 chai / 100 thỏi.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bảng chi tiết theo ca -->
+        <section class="mb-10 pt-area" id="pt-detail">
+            <div class="custom-card border-t-4 border-rose-600 bg-gradient-to-b from-rose-50/20 to-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
+                    <div>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">📊 BẢNG PHÂN BỔ CHỈ TIÊU THEO CA LÀM VIỆC</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-2">Chỉ Tiêu Chi Tiết Từng Nhân Viên</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">FT ~24 ca/tháng → ~19 ca trong kỳ 24 ngày • PT chia đều ~10 ca trong kỳ (tối đa 79h/tháng)</p>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-1 rounded-md border border-amber-300 shrink-0">🔥 Kohnan Day 20/11 (Giảm thêm 5%) • 🛒 11/11 • 🖤 Black Friday 27-29/11</span>
+                </div>
+
+                <div class="no-print flex flex-wrap gap-2 mb-5" role="tablist">
+                    <button class="tab-btn t-otb border-2 border-rose-200 text-rose-700 text-xs font-black px-4 py-2 rounded-xl" role="tab" aria-selected="true" data-tab="otb">🧴 Sữa Tắm ON: The Body (300)</button>
+                    <button class="tab-btn t-son border-2 border-green-200 text-green-700 text-xs font-black px-4 py-2 rounded-xl" role="tab" aria-selected="false" data-tab="son">💋 Son Dưỡng Môi (100)</button>
+                </div>
+
+                <div class="tab-panel" id="panel-otb">
+                    <h4 class="print-title text-base font-black text-rose-700 mb-2">🧴 Sữa Tắm ON: The Body - 300 chai (Kim Ngân + Thảo Mộc)</h4>
+                    <div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead><tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+<th class="p-3.5 rounded-tl-lg">Họ Và Tên</th>
+<th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+<th class="p-3.5 text-center bg-rose-50 text-rose-900">Target T11 (Chai)</th>
+<th class="p-3.5 text-center">Ca Ngày Thường (T2-T5)</th>
+<th class="p-3.5 text-center bg-orange-50 text-orange-900">Ca Thứ 6 (13/11)</th>
+<th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần (T7-CN)</th>
+<th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Ngày Đặc Biệt (11/11 • 20/11 • 27/11)</th>
+<th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Lê Minh Thư</td>
+<td class="p-3.5 text-center">CS Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">59</td>
+<td class="p-3.5 text-center font-bold text-slate-700">2.0 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">2.9 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">4.3 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">4.3 chai / ca</td>
+<td class="p-3.5">Mời 100% bill thanh toán tại quầy POS</td>
+</tr>
+<tr class="bg-amber-50/40">
+<td class="p-3.5 font-bold">Lê Uyên Nhi <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 28/11</span></td>
+<td class="p-3.5 text-center">SC Full-Time<br><span class="text-[10px] text-slate-500">(~17 ca: 07/11 - 27/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">40</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.5 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">2.3 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">3.4 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">3.4 chai / ca</td>
+<td class="p-3.5">Làm đến 27/11 - chốt mạnh Black Friday 27/11</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Võ Đặng Tú Quyên</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">40</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.3 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">2.0 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">2.9 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">2.9 chai / ca</td>
+<td class="p-3.5">Tập trung chốt Combo 2 chai 2 mùi</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Tăng Quế Nhi</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">35</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.2 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.7 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">2.6 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">2.6 chai / ca</td>
+<td class="p-3.5">Tận dụng giờ cao điểm (Peak hour) tại POS</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Phan Thị Chúc Linh</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">35</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.2 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.7 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">2.6 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">2.6 chai / ca</td>
+<td class="p-3.5">Hỗ trợ fill hàng & mở lời 10s tại POS</td>
+</tr>
+<tr class="bg-amber-50/40">
+<td class="p-3.5 font-bold">Nguyễn Ngọc Phụng <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 15/11</span></td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~6 ca: 07/11 - 14/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">1.0 chai / ca</td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.6 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">2.3 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">2.3 chai / ca</td>
+<td class="p-3.5">Làm đến 14/11 - dồn sức 7-8/11, 11/11 & 14/11</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Dương Xuân Hoàng Ngân</td>
+<td class="p-3.5 text-center">Admin Chief Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">22</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.7 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.1 chai / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.6 chai / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.6 chai / ca</td>
+<td class="p-3.5">Đào tạo & theo sát nhịp quầy POS</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Phan Thị Thùy Dương</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">22</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~2.2 chai / ca trực quầy</td>
+<td class="p-3.5">Tận dụng tối đa các ca trực quầy chính</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Trình Quách Vy</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">16</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~1.6 chai / ca trực quầy</td>
+<td class="p-3.5">Nhóm PT hỗ trợ tăng cường</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Võ Thanh Thảo</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">10</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~1.0 chai / ca trực quầy</td>
+<td class="p-3.5">Nhóm PT hỗ trợ tăng cường</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Việt Hương Như</td>
+<td class="p-3.5 text-center">Cafe Pet Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-rose-600 bg-rose-50/30 text-base">10</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 chai / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 chai mỗi 2 ca</span></td>
+<td class="p-3.5">Mời sữa tắm khách Cafe Pet khi thanh toán</td>
+</tr>
+<tr class="bg-rose-900 text-white font-black text-sm">
+<td class="p-4 uppercase rounded-bl-lg" colspan="2">Tổng mục tiêu tháng 11</td>
+<td class="p-4 text-center text-yellow-300 text-base">300 chai</td>
+<td class="p-4 text-center font-normal italic rounded-br-lg" colspan="5">Doanh thu dự kiến 29.700.000đ (300 x 99.000đ)</td>
+</tr>
+</tbody></table>
+</div>
+                </div>
+
+                <div class="tab-panel hidden" id="panel-son">
+                    <h4 class="print-title text-base font-black text-green-700 mb-2">💋 Son Dưỡng Môi Menturm - 100 thỏi</h4>
+                    <div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead><tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+<th class="p-3.5 rounded-tl-lg">Họ Và Tên</th>
+<th class="p-3.5 text-center">Chức Danh & Số Ca</th>
+<th class="p-3.5 text-center bg-green-50 text-green-900">Target T11 (Thỏi)</th>
+<th class="p-3.5 text-center">Ca Ngày Thường (T2-T5)</th>
+<th class="p-3.5 text-center bg-orange-50 text-orange-900">Ca Thứ 6 (13/11)</th>
+<th class="p-3.5 text-center bg-amber-50 text-amber-900">Ca Cuối Tuần (T7-CN)</th>
+<th class="p-3.5 text-center bg-red-50 text-red-900">🔥 Ca Ngày Đặc Biệt (11/11 • 20/11 • 27/11)</th>
+<th class="p-3.5 text-center rounded-tr-lg">Ghi Chú & Định Hướng</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Lê Minh Thư</td>
+<td class="p-3.5 text-center">CS Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">20</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.7 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">1.0 thỏi / ca</td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.5 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.5 thỏi / ca</td>
+<td class="p-3.5">Đặt rổ son cạnh máy POS, mời khi thối tiền</td>
+</tr>
+<tr class="bg-amber-50/40">
+<td class="p-3.5 font-bold">Lê Uyên Nhi <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 28/11</span></td>
+<td class="p-3.5 text-center">SC Full-Time<br><span class="text-[10px] text-slate-500">(~17 ca: 07/11 - 27/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">13</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.8 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">1.1 thỏi / ca</td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">1.1 thỏi / ca</td>
+<td class="p-3.5">Mời son kèm khách đổi trả/bảo hành tại SC</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Võ Đặng Tú Quyên</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">11</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.4 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.8 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.8 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Chốt kèm khi khách mua sữa tắm</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Tăng Quế Nhi</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">10</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Chốt kèm khi khách mua sữa tắm</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Phan Thị Chúc Linh</td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">10</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.5 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.7 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.7 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr>
+<tr class="bg-amber-50/40">
+<td class="p-3.5 font-bold">Nguyễn Ngọc Phụng <span class="ml-1 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">Nghỉ từ 15/11</span></td>
+<td class="p-3.5 text-center">Admin Full-Time<br><span class="text-[10px] text-slate-500">(~6 ca: 07/11 - 14/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">3</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 4 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.4 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.6 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.6 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Dương Xuân Hoàng Ngân</td>
+<td class="p-3.5 text-center">Admin Chief Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">8</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.3 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 4 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.4 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.6 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.6 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Rà tồn & fill rổ son mỗi đầu ca</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Phan Thị Thùy Dương</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">8</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.8 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Trình Quách Vy</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">7</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.7 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr>
+<tr class="bg-blue-50/20">
+<td class="p-3.5 font-bold">Võ Thanh Thảo</td>
+<td class="p-3.5 text-center"><span class="font-semibold text-blue-700">Cashier PT</span> <br><span class="text-[10px] text-slate-500 font-normal">(~10 ca trong kỳ / tối đa 79h tháng)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">5</td>
+<td colspan="4" class="p-3.5 text-center font-bold text-blue-900 bg-blue-50/60 text-sm">~0.5 thỏi / ca trực quầy<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 2 ca</span></td>
+<td class="p-3.5">Mời son kèm khi thối tiền</td>
+</tr>
+<tr>
+<td class="p-3.5 font-bold">Nguyễn Việt Hương Như</td>
+<td class="p-3.5 text-center">Cafe Pet Full-Time<br><span class="text-[10px] text-slate-500">(~19 ca trong kỳ 07-30/11)</span></td>
+<td class="p-3.5 text-center font-black text-green-700 bg-green-50/40 text-base">5</td>
+<td class="p-3.5 text-center font-bold text-slate-700">0.2 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 6 ca</span></td><td class="p-3.5 text-center font-bold text-orange-700 bg-orange-50/30">0.2 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 4 ca</span></td><td class="p-3.5 text-center font-bold text-amber-700 bg-amber-50/30">0.4 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td><td class="p-3.5 text-center font-black text-red-600 bg-red-50/40">0.4 thỏi / ca<br><span class="text-[10px] font-semibold text-slate-500">≈ 1 thỏi mỗi 3 ca</span></td>
+<td class="p-3.5">Mời son dưỡng khi khách thanh toán</td>
+</tr>
+<tr class="bg-green-900 text-white font-black text-sm">
+<td class="p-4 uppercase rounded-bl-lg" colspan="2">Tổng mục tiêu tháng 11</td>
+<td class="p-4 text-center text-yellow-300 text-base">100 thỏi</td>
+<td class="p-4 text-center font-normal italic rounded-br-lg" colspan="5">Doanh thu dự kiến 3.900.000đ (100 x 39.000đ)</td>
+</tr>
+</tbody></table>
+</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mindset + 3 bước -->
+        <section class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-rose-600 to-pink-700 rounded-[2rem] p-7 text-white shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">💡</span>
+                        <h3 class="text-2xl font-bold">Tư Duy Push Sale T11</h3>
+                    </div>
+                    <p class="text-base leading-relaxed font-light mb-4">
+                        Sữa tắm mở lời, son dưỡng chốt kèm. Giúp khách nhận ra: <strong>"Trời trở lạnh cần dưỡng da và môi, 20/11 tặng thầy cô bộ quà xinh chỉ 138K, Black Friday mua 2 chai đổi mùi càng hời!"</strong>
+                    </p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/20 text-xs">
+                    ⚡ <strong>Tối ưu tốc độ:</strong> Rổ son dưỡng đặt sát máy POS, trong tầm tay khách. Mời đúng 1 câu khi đưa bill.
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-white rounded-[2rem] border-2 border-rose-500 p-7 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">⚡</span>
+                    <h3 class="text-2xl font-bold text-rose-900 uppercase tracking-tight">KỊCH BẢN PUSH SALE 3 BƯỚC (30 GIÂY TẠI QUẦY POS)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                        <span class="inline-block bg-rose-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 1: CHUẨN BỊ</span>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            <strong>Fill hàng đầy quầy POS:</strong> Xếp đủ 2 màu sữa tắm (Xanh Lá Kim Ngân + Xanh Dương Thảo Mộc). Rổ son dưỡng đặt cạnh máy POS. Cầm sẵn 1 chai sữa tắm trên tay khi tính tiền.
+                        </p>
+                    </div>
+                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                        <span class="inline-block bg-amber-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 2: MỞ LỜI CỰC MẠNH</span>
+                        <p class="text-xs text-slate-700 leading-relaxed italic">
+                            "Dạ chị ơi, sữa tắm nước hoa <strong>ON: The Body Hàn Quốc</strong> bên em đang giảm 50% từ <strong>198K chỉ còn 99K</strong>, mùi hoa kim ngân hoặc thảo mộc, chị lấy 1 chai nha!"
+                        </p>
+                    </div>
+                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                        <span class="inline-block bg-emerald-600 text-white font-black text-xs px-2.5 py-1 rounded-md mb-2">BƯỚC 3: CHỐT KÈM SON DƯỠNG</span>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Dù khách mua hay từ chối sữa tắm: <i>"Trời lạnh môi dễ khô nứt, chị lấy thêm thỏi son dưỡng Nhật Menturm 39K bỏ túi nha chị!"</i>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cẩm nang từ chối -->
+        <section class="mb-10">
+            <div class="custom-card border-t-4 border-indigo-600 bg-gradient-to-b from-indigo-50/30 to-white">
+                <div class="flex items-center justify-between mb-6 border-b border-indigo-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🛡️</span>
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-900">CẨM NANG BÍ KÍP: BIẾN TỪ CHỐI THÀNH ĐƠN HÀNG</h3>
+                            <p class="text-xs text-indigo-700 font-bold">Bộ kịch bản phản hồi thực chiến 10 giây cho Thu ngân / Admin khi khách từ chối tại quầy</p>
+                        </div>
+                    </div>
+                    <span class="hidden md:inline-block px-3.5 py-1.5 bg-indigo-100 text-indigo-900 text-xs font-black rounded-full uppercase tracking-wider">Quy tắc vàng 3S</span>
+                </div>
+
+                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 rounded-xl mb-6 shadow-sm">
+                    <p class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2"><span>⚡</span> ÁP DỤNG QUY TẮC 3S TRONG TỪNG CÂU TRẢ LỜI:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">1. Smile (Mỉm cười):</strong> Luôn giữ thái độ thân thiện, vui vẻ dù khách đồng ý hay từ chối.</div>
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">2. Sympathize (Đồng cảm):</strong> Lắng nghe & gật đầu: <em>"Dạ em hiểu ạ...", "Dạ đúng rồi chị..."</em></div>
+                        <div class="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg border border-white/15"><strong class="text-amber-300">3. Solve & Suggest (Giải quyết & Chốt):</strong> Đưa lý do mua quá hời & chốt nhanh gọn.</div>
+                    </div>
+                </div>
+
+                <p class="text-sm font-black text-rose-700 mb-3">🧴 SỮA TẮM ON: THE BODY</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 1</span><h4 class="font-bold text-sm text-slate-900">"Nhà chị còn nhiều sữa tắm lắm, chưa dùng hết."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ em hiểu ạ, sữa tắm là đồ thiết yếu nên nhà mình hay có sẵn."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Hạn dài + Tiết kiệm):</strong><br>"Đợt này giảm đúng <strong>50% (198K còn 99K, tiết kiệm 99.000đ)</strong>, hạn dùng tận <strong>3 năm</strong>. Mua sẵn 1 chai để dành vừa hời vừa không lỡ đợt giá tốt ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Em lấy 1 chai mùi chị thích để sẵn cho chị dùng dần nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 2</span><h4 class="font-bold text-sm text-slate-900">"Giảm sâu 99K có phải hàng gần hết hạn không em?"</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Khẳng định uy tín:</strong><br>"Dạ chị yên tâm 100% ạ! Đây là chương trình tri ân của tập đoàn LG Hàn Quốc."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp chứng minh:</strong><br>"Hàng mới, date còn dài tận 3 năm. Chị kiểm tra hạn dưới đáy chai thoải mái ạ. Thơm sang như nước hoa luôn chị."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy 1 chai dùng thử là thích ngay, chỉ 99K thôi ạ!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 3</span><h4 class="font-bold text-sm text-slate-900">"Chai lớn nặng quá, chị đi xe máy mang về bất tiện."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm & Hỗ trợ:</strong><br>"Dạ chai lớn xách thì hơi đằm thật ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp:</strong><br>"Nhưng mua 1 lần dùng mấy tháng, siêu tiết kiệm. Em bỏ vào túi có quai thật gọn để chị treo xe hoặc bỏ cốp nhẹ nhàng ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Em bọc gọn vào túi cho chị mang về dễ dàng nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 4</span><h4 class="font-bold text-sm text-slate-900">"Chị quen dùng hãng khác rồi / Da chị nhạy cảm."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm chuyên nghiệp:</strong><br>"Dạ chăm sóc da thì chị em mình cẩn thận là rất đúng ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Thành phần an toàn):</strong><br>"ON: The Body là dòng cao cấp của LG Hàn Quốc, có tinh dầu Argan và thảo mộc tự nhiên dịu nhẹ, dưỡng ẩm không khô da, hương lưu lâu như nước hoa ạ."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy chai Xanh Dương thảo mộc dịu nhẹ về trải nghiệm thử là mê luôn ạ!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-400 transition md:col-span-2">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 5</span><h4 class="font-bold text-sm text-slate-900">"Để lần sau chị ghé mua / Hôm nay chị mang ít tiền."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đòn bẩy Urgency:</strong><br>"Dạ vâng ạ! Giá 99K chỉ áp dụng trong đợt tri ân này, hết đợt là về lại giá gốc 198.000đ đó chị."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp hỗ trợ thanh toán:</strong><br>"Bên em có quét QR, chuyển khoản, quẹt thẻ siêu nhanh. Nếu hôm nay chị chưa tiện lấy sữa tắm thì lấy trước thỏi son dưỡng 39K mùa này dùng liền nha chị."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Sẵn tiện ghé quầy mình chốt luôn cho hời chị nhen!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-sm font-black text-green-700 mb-3">💋 SON DƯỠNG MÔI MENTURM</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-green-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-green-100 text-green-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 6</span><h4 class="font-bold text-sm text-slate-900">"Anh là con trai, dùng son làm gì." (khách nam)</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ em hiểu ạ, nghe chữ son là anh ngại liền."</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp:</strong><br>"Đây là son dưỡng không màu, mát bạc hà, chuyên trị môi khô nứt. Nam nữ đều dùng, đi xe máy gió nhiều càng cần ạ. Hoặc anh mua kèm làm quà 20/11 tặng thầy cô cũng rất tinh tế."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"39K thôi anh, em bỏ thêm 1 thỏi vào bill nha!"</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-green-400 transition">
+                        <div class="flex items-start gap-2 mb-3"><span class="bg-green-100 text-green-700 font-black text-xs px-2.5 py-1 rounded-md shrink-0">Tình huống 7</span><h4 class="font-bold text-sm text-slate-900">"Chị có son dưỡng rồi."</h4></div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p><strong class="text-indigo-900">💬 Đồng cảm:</strong><br>"Dạ chị chăm môi kỹ quá ạ!"</p>
+                            <p><strong class="text-indigo-900">💡 Giải pháp (Thêm 1 thỏi dự phòng):</strong><br>"Son dưỡng hay để quên lắm chị, nhiều khách lấy thêm 1 thỏi để túi xách, 1 thỏi để xe hoặc bàn làm việc. Menturm Nhật nhỏ gọn, chỉ 39K."</p>
+                            <p><strong class="text-rose-600 font-bold">🎯 Chốt hạ:</strong><br>"Chị lấy thêm 1 thỏi để dự phòng nha, lúc nào cũng có sẵn!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Combo + Kohnan Day -->
+        <section class="mb-10">
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 rounded-[2rem] border-2 border-amber-400 p-8 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🎯</span>
+                        <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tight">KỊCH BẢN CHỐT COMBO</h3>
+                    </div>
+                    <div class="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl shadow-md flex items-center gap-2">🔥 BÍ KÍP NGÀY ĐẶC BIỆT (11/11 • KOHNAN DAY 20/11 -5% • BLACK FRIDAY 27-29/11)</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 rounded-2xl shadow-sm border border-amber-400">
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-yellow-100 mb-1">🛒 Ngày đôi 11/11 (Thứ 4):</p>
+                        <p class="text-xs italic leading-relaxed">
+                            "Hôm nay 11/11 ngày mua sắm lớn nhất tháng chị ơi! Sữa tắm nước hoa Hàn đang <strong>giảm 50% còn 99K</strong>, chị lấy <strong>Combo 2 chai 2 mùi chỉ 198K</strong> kèm 1 thỏi son dưỡng 39K cho đủ bộ nha!"
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-r from-red-600 to-rose-700 text-white p-4 rounded-2xl shadow-sm border border-red-500">
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-yellow-300 mb-1">🔥 Kohnan Day + Nhà Giáo VN 20/11 (Thứ 6):</p>
+                        <p class="text-xs italic leading-relaxed">
+                            "Hôm nay <strong>Kohnan Day giảm thêm 5%</strong>, lại đúng 20/11! Sữa tắm 99K còn <strong>chưa tới 95K</strong>, son dưỡng còn <strong>khoảng 37K</strong>. <strong>Bộ quà tri ân thầy cô</strong> sữa tắm Kim Ngân + son dưỡng chỉ còn <strong>khoảng 131K</strong>, em gói gọn gàng tặng liền nha!"
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-950 text-white p-4 rounded-2xl shadow-sm border border-slate-700">
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-yellow-300 mb-1">🖤 Black Friday 27-29/11 (T6-CN):</p>
+                        <p class="text-xs italic leading-relaxed">
+                            "Cuối tuần Black Friday chị ơi! Sữa tắm nước hoa Hàn 198K chỉ còn 99K, chị gom <strong>2 chai Kim Ngân + Thảo Mộc = 198K</strong> dùng tới Tết luôn, thêm thỏi son dưỡng 39K cho mùa lạnh nha!"
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-rose-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Combo 2 Chai = 198.000đ</span>
+                                <span class="text-xs font-bold text-rose-700">2 chai = giá 1 chai gốc</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Combo Sữa Tắm 2 Mùi</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Bình thường 1 chai đã 198K, hôm nay chị lấy <strong>2 chai 2 mùi</strong> (Xanh Lá kim ngân cho chị + Xanh Dương thảo mộc cho anh nhà) tổng cũng chỉ <strong>198K</strong>, tính ra mua 1 tặng 1 ạ!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Lý do mua:</strong> Đổi mùi mỗi ngày, cả nhà dùng chung.</li>
+                            <li>✔️ <strong>Cao điểm:</strong> 11/11 và Black Friday 27-29/11.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-green-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-green-700 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Bộ Đôi Mùa Lạnh = 138.000đ</span>
+                                <span class="text-xs font-bold text-green-700">Sữa tắm + Son dưỡng</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Bộ Đôi Dưỡng Ẩm Mùa Lạnh</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Trời trở lạnh da với môi khô nhanh lắm chị. Chị lấy <strong>1 chai sữa tắm nước hoa + 1 thỏi son dưỡng Nhật</strong>, tổng chỉ <strong>138K</strong>, tắm thơm, môi mềm cả mùa luôn!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Lý do mua:</strong> Son 39K giá nhỏ, quyết định nhanh khi đã lấy sữa tắm.</li>
+                            <li>✔️ <strong>Mời cho:</strong> mọi bill có sữa tắm, hóa mỹ phẩm.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-pink-300 shadow-sm flex flex-col justify-between ring-2 ring-pink-200">
+                        <div>
+                            <div class="flex justify-between items-center mb-3 gap-2 flex-wrap">
+                                <span class="bg-pink-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase">Quà 20/11 = 138.000đ</span>
+                                <span class="text-xs font-bold text-pink-700">Dưới 150K</span>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base mb-2">Bộ Quà Tri Ân Thầy Cô</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-4 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                "Anh chị đang chọn quà 20/11 cho thầy cô phải không ạ? <strong>Sữa tắm nước hoa Hàn Kim Ngân + son dưỡng Nhật</strong>, thiết thực lại sang, chỉ <strong>138K</strong> (Kohnan Day 20/11 còn khoảng 131K). Em gói đẹp liền nha!"
+                            </p>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-1 font-medium">
+                            <li>✔️ <strong>Khách mục tiêu:</strong> Phụ huynh mua quà thầy cô (quyết định nhanh).</li>
+                            <li>✔️ <strong>Cao điểm:</strong> 14-15/11, 18-20/11 (tuần trước lễ và ngày 20/11).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Charts -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="custom-card">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Cơ Cấu Doanh Thu Mục Tiêu T11 (33.600.000đ)</h3>
+                <p class="text-xs text-slate-500 mb-4">Sữa tắm là trục doanh thu, son dưỡng là món bán kèm tăng giá trị bill</p>
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+            </div>
+            <div class="custom-card">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Phân Bổ Target 2 Mùi Sữa Tắm T11 (300 Chai)</h3>
+                <p class="text-xs text-slate-500 mb-4">2 mùi Kim Ngân & Thảo Mộc - mời theo sở thích khách</p>
+                <div class="chart-container"><canvas id="variantChart"></canvas></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function printTarget(which) {
+            document.body.setAttribute('data-print', which);
+            if (!document.getElementById('pt-page')) {
+                const st = document.createElement('style');
+                st.id = 'pt-page';
+                st.textContent = '@page { size: A4 landscape; margin: 10mm; }';
+                document.head.appendChild(st);
+            }
+            setTimeout(() => window.print(), 50);
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            window.addEventListener('afterprint', () => {
+                document.body.removeAttribute('data-print');
+                const pg = document.getElementById('pt-page'); if (pg) pg.remove();
+            });
+
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.addEventListener('click', () => {
+                btns.forEach(b => b.setAttribute('aria-selected', 'false'));
+                btn.setAttribute('aria-selected', 'true');
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById('panel-' + btn.dataset.tab).classList.remove('hidden');
+            }));
+
+            if (typeof Chart === 'undefined') return;
+            if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+            const legend = { position: 'bottom', labels: { font: { family: 'Inter', size: 11, weight: 'bold' }, padding: 14 } };
+
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sữa tắm ON: The Body (29.700.000đ)', 'Son dưỡng môi (3.900.000đ)'],
+                    datasets: [{ data: [29700000, 3900000], backgroundColor: ['#e11d48', '#15803d'], hoverOffset: 6, borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend,
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => Math.round(v / ctx.dataset.data.reduce((a, b) => a + b, 0) * 100) + '%' } } }
+            });
+
+            new Chart(document.getElementById('variantChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Xanh Lá: Ly Ly Kim Ngân', 'Xanh Dương: Thảo Mộc'],
+                    datasets: [{ data: [150, 150], backgroundColor: ['#10b981', '#0284c7'], hoverOffset: 6, borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend,
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: v => v + ' chai' } } }
+            });
+        });
+    </script>
+</body>
+</html>
