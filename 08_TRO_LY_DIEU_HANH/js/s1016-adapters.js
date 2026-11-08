@@ -117,7 +117,9 @@
   var P_AVATAR = { SuaTam: { pid: "SUATAM-AVATAR", key: "SUATAM", label: "Sữa Tắm AVATAR Hộp Quà", unit: "Hộp" }, KemTay: { pid: "KEMTAY-HATOMUGI", key: "KEMTAY", label: "Kem Dưỡng Tay Hatomugi", unit: "Tuýp" }, Son: { pid: "SON-MENTURM", key: "SON", label: "Son Dưỡng Môi Menturm", unit: "Thỏi" } };
   var P_ONBODY = { SuaTam: { pid: "SUATAM-ONBODY", key: "SUATAM", label: "Sữa Tắm On: The Body", unit: "Chai" }, KemTay: P_AVATAR.KemTay, Son: P_AVATAR.Son };
   var P_T9 = { SuaTam: { pid: "SUATAM-ONBODY", key: "SUATAM", label: "Sữa Tắm On: The Body", unit: "Chai", bills: "pushBillsSuaTam" }, Remos: { pid: "XITMUOI-REMOS", key: "REMOS", label: "Xịt Muỗi Remos", unit: "Chai", bills: "pushBillsRemos" } };
+  var P_T11 = { SuaTam: { pid: "SUATAM-ONBODY", key: "SUATAM", label: "Sữa Tắm On: The Body", unit: "Chai" }, Son: P_AVATAR.Son };
   S.PUSH_SOURCES = [
+    { id: "PS_T11_ONBODY", key: "TEAM_ADMIN_POS_PUSH_SALE_NOV_2026_V1", name: "Push Sale T11 - Tracker Team (ON Body 300, bản 07/11)", month: "2026-11", priority: 40, products: P_T11, tool: "PS_T11_ONBODY_0711" },
     { id: "PS_T10_AVATAR", key: "TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_AVATAR_V2", name: "Push Sale T10 - Tracker Team (AVATAR, bản 15/10 & 18/10)", month: "2026-10", priority: 30, products: P_AVATAR, tool: "PS_T10_AVATAR_1810" },
     { id: "PS_T10_ONBODY", key: "TEAM_ADMIN_POS_PUSH_SALE_OCT_2026_V1", name: "Push Sale T10 - Tracker Team (ON Body, bản 02/10)", month: "2026-10", priority: 20, products: P_ONBODY, tool: "PS_T10_ONBODY_0210" },
     { id: "PS_T10_NV", key: "TEAM_ADMIN_PUSH_SALE_OCT_2026_NHANVIEN_AVATAR_V2", name: "Push Sale T10 - Tracker Nhân viên", month: "2026-10", priority: 10, products: P_AVATAR, tool: "PS_T10_NHANVIEN" },
