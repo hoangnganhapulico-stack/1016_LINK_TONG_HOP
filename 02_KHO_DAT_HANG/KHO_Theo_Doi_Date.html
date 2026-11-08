@@ -502,13 +502,14 @@ function srv(fn, ...args) {
   });
 }
 // Hàng đợi gửi: mất mạng vẫn lưu trên máy, có mạng tự gửi lại
-let QUEUE = LS.get('kdate_queue', []), flushing = false, ONLINE = true;
+let QUEUE = LS.get('kdate_queue', []), flushing = false, ONLINE = true, PUT_LOG = [], STALE = false;
 function put(table, rows) {
   rows = [].concat(rows);
   const list = DB[table], m = new Map(list.map((r, i) => [r.id, i]));
   rows.forEach(r => { r.updatedAt = String(Date.now()); if (m.has(r.id)) list[m.get(r.id)] = Object.assign({}, list[m.get(r.id)], r); else list.push(r); });
   QUEUE.push({ table, rows }); LS.set('kdate_queue', QUEUE);
-  recompute(); flush();
+  const t0 = Date.now(); PUT_LOG = PUT_LOG.filter(j => t0 - j.at < 300000); PUT_LOG.push({ at: t0, table, rows });
+  recompute(); flush(); dbCacheSave();
 }
 async function flush() {
   if (flushing || !QUEUE.length || !AUTH) { syncInfo(); return; }
@@ -529,24 +530,42 @@ async function flush() {
   flushing = false; syncInfo();
 }
 let LAST_LOAD = 0;
+// Đưa dữ liệu (từ máy chủ hoặc bản lưu trên máy) vào DB, giữ các thay đổi chưa gửi và vừa gửi sau mốc since
+function dbApply(d, since) {
+  TABLES.forEach(t => { if (t !== 'PO') DB[t] = d[t] || []; });
+  if (d.PO) { DB.PO = d.PO; PO_ST.inline = true; PO_ST.ready = true; } else PO_ST.inline = false; // máy chủ bản cũ vẫn gửi PO kèm
+  const mergeIn = j => { const m = new Map(DB[j.table].map((r, i) => [r.id, i])); j.rows.forEach(r => { if (m.has(r.id)) DB[j.table][m.get(r.id)] = r; else DB[j.table].push(r); }); };
+  if (since) PUT_LOG.filter(j => j.at >= since).forEach(mergeIn);
+  QUEUE.forEach(mergeIn);
+  const c = DB.CauHinh.find(r => r.id === 'config');
+  CFG = E.config(c ? JSON.parse(c.value) : null);
+}
+let DBC_T = null;
+function dbCacheSave() { clearTimeout(DBC_T); DBC_T = setTimeout(() => { const d = {}; TABLES.forEach(t => { if (t !== 'PO') d[t] = DB[t]; }); idbSet('db', { t: LAST_LOAD || Date.now(), d }); }, 800); }
 async function load(silent) {
   try {
-    const d = await srv('apiLoad');
-    TABLES.forEach(t => { if (t !== 'PO') DB[t] = d[t] || []; });
-    if (d.PO) { DB.PO = d.PO; PO_ST.inline = true; PO_ST.ready = true; } else PO_ST.inline = false; // máy chủ bản cũ vẫn gửi PO kèm
-    QUEUE.forEach(j => { const m = new Map(DB[j.table].map((r, i) => [r.id, i])); j.rows.forEach(r => { if (m.has(r.id)) DB[j.table][m.get(r.id)] = r; else DB[j.table].push(r); }); });
-    const c = DB.CauHinh.find(r => r.id === 'config');
-    CFG = E.config(c ? JSON.parse(c.value) : null);
-    LAST_LOAD = Date.now(); ONLINE = true;
+    const since = Date.now(), d = await srv('apiLoad');
+    dbApply(d, since);
+    LAST_LOAD = Date.now(); ONLINE = true; STALE = false;
     if (PO_ST.wanted) poEnsure();
-    recompute();
+    recompute(); dbCacheSave();
     if (!silent) render();
-  } catch (e) { ONLINE = false; if (!silent) toast('Không tải được dữ liệu: ' + (e.message || e), true); }
+  } catch (e) { ONLINE = false; STALE = false; if (!silent) toast('Không tải được dữ liệu: ' + (e.message || e), true); }
   syncInfo();
+}
+// Vẽ lại sau khi có dữ liệu mới mà không làm mất việc đang nhập
+function refreshView() {
+  if ($('#mbg').classList.contains('on')) return void setTimeout(refreshView, 1000);
+  if (USER && ['setup', 'recv'].includes(VIEW)) return;
+  if (!USER && $('#lgPin') && $('#lgPin').value) return;
+  const a = document.activeElement, id = a && a.id && a.matches('input,textarea') ? a.id : '', pos = id ? a.selectionStart : 0;
+  render();
+  if (id) { const b = $('#' + id); if (b) { b.focus(); try { b.setSelectionRange(pos, pos); } catch (e) {} } }
 }
 function recompute() { AN = E.analyze(DB, CFG, Date.now()); badge(); }
 function syncInfo() {
   const el = $('#sync'); if (!el) return;
+  if (STALE) { el.innerHTML = `<span class="dot off"></span>Đang lấy dữ liệu mới... · Đang xem bản lưu lúc ${LAST_LOAD ? new Date(LAST_LOAD).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-'}`; return; }
   el.innerHTML = `<span class="dot ${ONLINE && !QUEUE.length ? '' : 'off'}"></span>${QUEUE.length ? `Chờ gửi ${QUEUE.length} thay đổi${ONLINE ? '...' : ' (mất mạng - tự gửi lại)'}` : 'Đã lưu lên hệ thống'} · Cập nhật ${LAST_LOAD ? new Date(LAST_LOAD).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-'} <button class="btn sub sm" onclick="load()">Tải lại</button>${IS_GAS ? '' : ' <span class="tag warn">Chế độ chạy thử trên máy</span>'}`;
 }
 function toast(msg, bad) { const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (bad ? ' bad' : ''); clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 3200); }
@@ -556,7 +575,7 @@ function badge() { const b = $('#bHome'); if (!b || !AN) return; const n = myTas
 function staffNames() { return ['Quản lý'].concat(DB.NhanSu.filter(u => String(u.active) !== '0').map(u => u.name)); }
 function renderLogin() {
   $('#nav').style.display = 'none';
-  const saved = LS.get('kdate_user', {});
+  const saved = LS.get('kdate_user', {}) || {};
   $('#app').innerHTML = `<div class="card login"><h3>Đăng nhập</h3><p class="muted">Chọn tên của bạn và nhập mã PIN do Quản lý cấp.</p>
     <div class="form" style="grid-template-columns:1fr"><label class="f">Tên<select id="lgName">${staffNames().map(n => `<option ${n === saved.name ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
     <label class="f">Mã PIN<input id="lgPin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••"></label>
@@ -568,7 +587,7 @@ function renderLogin() {
     $('#lgBtn').disabled = true;
     try {
       const r = await srv('apiLogin', a);
-      AUTH = a; USER = r.user;
+      AUTH = a; USER = r.user; LS.set('kdate_user_i', r.user);
       if ($('#lgRemember').checked) LS.set('kdate_user', a); else LS.set('kdate_user', { name: a.name });
       afterLogin();
     } catch (e) { $('#lgMsg').textContent = e.message || String(e); $('#lgBtn').disabled = false; }
@@ -581,7 +600,7 @@ function afterLogin() {
   $('#uName').textContent = USER.name + (USER.role === 'QL' ? ' · QL' : '');
   $('#navSetup').style.display = USER.role === 'QL' ? '' : 'none';
   const uc = userCats(); CATF = uc.length === 1 ? uc[0] : 'ALL';
-  if (USER.role === 'QL' && !DB.NCC.length) seedNcc();
+  if (USER.role === 'QL' && !DB.NCC.length && !STALE) seedNcc();
   flush(); render(); setTimeout(() => ctLoad(), 1500);
 }
 function seedNcc() {
@@ -2003,15 +2022,36 @@ ${sh.merges.length?`<mergeCells count="${sh.merges.length}">${sh.merges.map(m=>`
 <script>
 // ---------------- Khởi động ----------------
 $$('#nav button[data-v]').forEach(b => b.onclick = () => setView(b.dataset.v));
-$('#btnLogout').onclick = () => { USER = null; AUTH = null; const s = LS.get('kdate_user', {}); LS.set('kdate_user', { name: s.name }); render(); };
+$('#btnLogout').onclick = () => { USER = null; AUTH = null; LS.set('kdate_user_i', null); const s = LS.get('kdate_user', {}); LS.set('kdate_user', { name: s.name }); render(); };
 (async function start() {
+  const saved = LS.get('kdate_user', {}) || {}, remembered = !!(saved.name && saved.pin), info = LS.get('kdate_user_i', null);
+  const c = await idbGet('db');
   $('#app').innerHTML = '<p class="muted" style="padding:30px 0">Đang tải dữ liệu...</p>';
-  await load(true);
-  const saved = LS.get('kdate_user', {});
-  if (saved.name && saved.pin) {
-    try { const r = await srv('apiLogin', saved); AUTH = saved; USER = r.user; afterLogin(); return; } catch (e) {}
+  if (c && c.d) { // mở ngay bằng bản lưu trên máy, dữ liệu mới về sẽ tự cập nhật
+    try {
+      dbApply(c.d); LAST_LOAD = c.t; STALE = true; recompute();
+      if (remembered && info && info.name === saved.name) { AUTH = saved; USER = info; afterLogin(); }
+      else if (!remembered) render();
+      syncInfo();
+    } catch (e) { STALE = false; }
   }
-  render();
+  const shown = !!(USER || (c && c.d && !remembered));
+  const loginP = remembered ? srv('apiLogin', saved).then(r => r.user, e => /PIN/.test(String(e && e.message)) ? null : undefined) : Promise.resolve(undefined);
+  await load(true);
+  if (shown && !ONLINE) toast('Chưa kết nối được máy chủ - đang dùng dữ liệu đã lưu trên máy', true);
+  const u = await loginP;
+  if (u === null) { // PIN đã đổi hoặc tài khoản đã khoá
+    USER = null; AUTH = null; LS.set('kdate_user_i', null); LS.set('kdate_user', { name: saved.name });
+    if (shown) toast('Mã PIN đã đổi - vui lòng đăng nhập lại', true);
+    return render();
+  }
+  if (u) {
+    const first = !USER; AUTH = saved; USER = u; LS.set('kdate_user_i', u);
+    if (first) return afterLogin();
+    $('#uName').textContent = USER.name + (USER.role === 'QL' ? ' · QL' : ''); $('#navSetup').style.display = USER.role === 'QL' ? '' : 'none';
+    if (USER.role === 'QL' && !DB.NCC.length) seedNcc();
+  }
+  if (shown) refreshView(); else render();
 })();
 setInterval(() => { if (USER && !$('#mbg').classList.contains('on') && document.visibilityState === 'visible') load(true).then(() => { if (!$('#mbg').classList.contains('on') && !['setup', 'recv'].includes(VIEW)) render(); }); }, 180000);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && USER && Date.now() - LAST_LOAD > 60000) load(true).then(() => { if (!$('#mbg').classList.contains('on') && !['setup', 'recv'].includes(VIEW)) render(); }); });
