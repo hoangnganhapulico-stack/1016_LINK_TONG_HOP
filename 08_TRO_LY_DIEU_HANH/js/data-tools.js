@@ -1,6 +1,6 @@
 window.S1016_TOOLS = {
   "extractedAt": "2026-10-29T00:00:00+07:00",
-  "count": 69,
+  "count": 67,
   "tools": [
     {
       "name": "Trợ Lý Điều Hành 1016",
@@ -134,7 +134,7 @@ window.S1016_TOOLS = {
     },
     {
       "name": "Điền CCCD Nhân Viên",
-      "desc": "Điền hình CCCD 2 mặt và ảnh chân dung ĐKNV",
+      "desc": "Điền hình CCCD 2 mặt và ảnh chân dung ĐKNV. Chỉ mở trên máy, bấm để xem cách mở",
       "group": "Vận hành Team",
       "groupId": "van-hanh",
       "href": "01_VAN_HANH_TEAM/VH_Dien_CCCD_Nhan_Vien.html",
@@ -224,7 +224,7 @@ window.S1016_TOOLS = {
     },
     {
       "name": "Kiểm Tra HSD Nhận Hàng",
-      "desc": "Tính % hạn sử dụng khi nhận hàng (VN > 65%, NK > 60%)",
+      "desc": "Kiểm date khi nhận hàng: tính % hạn sử dụng (VN > 65%, NK > 60%)",
       "group": "Kho - Đặt hàng - Trưng bày",
       "groupId": "kho",
       "href": "https://hoangnganhapulico-stack.github.io/kohnan-hsd/",
@@ -271,16 +271,6 @@ window.S1016_TOOLS = {
       "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Dashboard_Doanh_Thu_Sanh_Mau.html",
       "host": "GitHub",
       "updated": "04/11/2026"
-    },
-    {
-      "name": "Phân Tích Sale Toàn Hệ Thống",
-      "desc": "File DETAIL toàn hệ thống + tồn kho store",
-      "group": "Doanh số & Phân tích",
-      "groupId": "doanh-so",
-      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Phan_Tich_Toan_He_Thong.html",
-      "local": "",
-      "host": "GitHub",
-      "updated": "24/10/2026"
     },
     {
       "name": "So Sánh Hệ Thống Theo Store",
@@ -643,24 +633,14 @@ window.S1016_TOOLS = {
       "updated": "21/10/2026"
     },
     {
-      "name": "Phân Tích Hệ Thống 1016",
-      "desc": "Công cụ phân tích hệ thống Store 1016",
+      "name": "So Sánh Store 1016 Với Hệ Thống",
+      "desc": "DETAIL toàn hệ thống + tồn kho + PO: cơ hội bỏ lỡ, sản phẩm tương đương, học store top",
       "group": "Doanh số & Phân tích",
       "groupId": "doanh-so",
       "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Phan_Tich_He_Thong_1016.html",
       "local": "",
       "host": "GitHub",
-      "updated": "29/10/2026"
-    },
-    {
-      "name": "Kiểm Date",
-      "desc": "Công cụ kho Store 1016",
-      "group": "Kho - Đặt hàng - Trưng bày",
-      "groupId": "kho",
-      "local": "",
-      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_KIEM_DATE.html",
-      "host": "GitHub",
-      "updated": "03/11/2026"
+      "updated": "08/11/2026"
     },
     {
       "name": "Điều chỉnh tồn kho / Face",
