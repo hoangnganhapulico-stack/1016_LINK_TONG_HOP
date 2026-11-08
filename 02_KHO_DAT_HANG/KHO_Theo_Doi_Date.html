@@ -460,7 +460,8 @@ const LEVEL = { expired: ['crit', 'Hết hạn'], overdue: ['bad', 'Quá hạn x
 const LOCAL = { // Chế độ chạy thử khi mở file ngoài Apps Script: lưu trong trình duyệt
   db() { return this._d || (this._d = LS.get('kdate_demo_db', null) || (() => { const d = {}; TABLES.forEach(t => d[t] = []); return d; })()); },
   save(d) { this._d = d; LS.set('kdate_demo_db', d); },
-  apiLoad() { return JSON.stringify(Object.assign({}, this.db(), { now: Date.now() })); },
+  apiLoad() { const o = Object.assign({}, this.db(), { now: Date.now() }); delete o.PO; return JSON.stringify(o); },
+  apiLoadPO() { const d = this.db(); let c = d.CauHinh.find(r => r.id === 'poAt'); if (!c) { c = { id: 'poAt', value: String(Date.now()) }; d.CauHinh.push(c); this.save(d); } return JSON.stringify({ at: c.value, rows: d.PO || [] }); },
   auth(a) {
     const d = this.db(), pinRow = d.CauHinh.find(r => r.id === 'adminPin'), ap = pinRow ? pinRow.value : '1016';
     if (a.name === 'Quản lý' && a.pin === ap) return { name: 'Quản lý', role: 'QL', cats: '' };
@@ -480,7 +481,7 @@ const LOCAL = { // Chế độ chạy thử khi mở file ngoài Apps Script: l�
   apiStock(a) { this.auth(a); const d = this.db(), info = { at: new Date().toISOString(), n: 0, total: d.SanPham.length, pulledAt: Date.now(), demo: 1 };
     d.CauHinh = d.CauHinh.filter(r => r.id !== 'stockAt').concat([{ id: 'stockAt', value: JSON.stringify(info) }]); this.save(d); return JSON.stringify({ ok: true, info }); },
   apiImportPO(a, rows) { this.auth(a); const d = this.db(), ids = new Set(rows.map(r => r.id)), min = rows.reduce((m, r) => r.date && r.date < m ? r.date : m, '99999999');
-    d.PO = (d.PO || []).filter(r => !ids.has(r.id) && r.date < min && r.status !== 'CHO').concat(rows.map(r => { const o = {}; Object.keys(r).forEach(k => o[k] = String(r[k] == null ? '' : r[k])); return o; })); this.save(d); return JSON.stringify({ ok: true, n: rows.length }); },
+    d.PO = (d.PO || []).filter(r => !ids.has(r.id) && r.date < min && r.status !== 'CHO').concat(rows.map(r => { const o = {}; Object.keys(r).forEach(k => o[k] = String(r[k] == null ? '' : r[k])); return o; })); d.CauHinh = d.CauHinh.filter(r => r.id !== 'poAt').concat([{ id: 'poAt', value: String(Date.now()) }]); this.save(d); return JSON.stringify({ ok: true, n: rows.length }); },
   apiImportProducts(a, rows, cats) {
     this.auth(a);
     const d = this.db(), old = new Map(d.SanPham.map(p => [p.id, p]));
@@ -531,11 +532,13 @@ let LAST_LOAD = 0;
 async function load(silent) {
   try {
     const d = await srv('apiLoad');
-    TABLES.forEach(t => DB[t] = d[t] || []);
+    TABLES.forEach(t => { if (t !== 'PO') DB[t] = d[t] || []; });
+    if (d.PO) { DB.PO = d.PO; PO_ST.inline = true; PO_ST.ready = true; } else PO_ST.inline = false; // máy chủ bản cũ vẫn gửi PO kèm
     QUEUE.forEach(j => { const m = new Map(DB[j.table].map((r, i) => [r.id, i])); j.rows.forEach(r => { if (m.has(r.id)) DB[j.table][m.get(r.id)] = r; else DB[j.table].push(r); }); });
     const c = DB.CauHinh.find(r => r.id === 'config');
     CFG = E.config(c ? JSON.parse(c.value) : null);
     LAST_LOAD = Date.now(); ONLINE = true;
+    if (PO_ST.wanted) poEnsure();
     recompute();
     if (!silent) render();
   } catch (e) { ONLINE = false; if (!silent) toast('Không tải được dữ liệu: ' + (e.message || e), true); }
@@ -669,6 +672,7 @@ BIND.home = () => bindCatChips();
 // ---------------- 2. NHẬP DATE THEO CAT ----------------
 let INF = 'ALL', INQ = '', INLIMIT = 150;
 function vInput() {
+  if (!PO_ST.ready) poEnsure().then(ok => { if (ok && VIEW === 'input' && LS.get('kdate_po', null) && !$('#mbg').classList.contains('on')) render(); });
   const F = { ALL: 'Tất cả', TODO: 'Chưa kiểm / quá chu kỳ', GAP: 'Thiếu date so với tồn', NEAR: 'Có hàng cận date', PENDING: 'Chờ phân loại', OK: 'Đã kiểm' };
   return `<section>${secHead(1, 'Nhập date theo CAT', 'Chọn CAT của bạn, quét hoặc gõ mã, nhập date gần nhất đang có trên kệ + kho.')}
     ${catChips()}
@@ -790,6 +794,7 @@ function policyTxt(n, cat) {
 }
 function openSku(bc) {
   const p = prodOf(bc); if (!p) return scanHit(bc);
+  if (!PO_ST.ready) poEnsure().then(() => { const f = $('#fPo'); if (f && f.dataset.bc === bc && !f.value) f.value = poLatest(bc) || ''; });
   const n = nccOf(p.cat, p.vendorCode), sk = AN.skus.find(s => s.barcode === bc);
   const lots = AN.lots.filter(s => s.barcode === bc && s.open).sort((a, b) => a.exp - b.exp);
   const closed = AN.lots.filter(s => s.barcode === bc && !s.open).length;
@@ -807,7 +812,7 @@ function openSku(bc) {
         <div class="srcbox">Số lượng này là
           <label class="srcopt"><input type="radio" name="fSrc" value="TON" checked><span><b>Hàng đang có</b> - đã nằm trong tồn hệ thống (tồn đến hết ${stockAsOf()})</span></label>
           <label class="srcopt"><input type="radio" name="fSrc" value="MOI"><span><b>Hàng mới về</b> sau ngày tồn - tồn chưa có, lần cập nhật tồn sau sẽ cộng vào</span></label></div>
-        <label class="f">Số PO nhận hàng<input id="fPo" inputmode="numeric" value="${esc(poSticky() || poLatest(bc) || '')}" placeholder="VD 356909"></label></div>
+        <label class="f">Số PO nhận hàng<input id="fPo" data-bc="${esc(bc)}" inputmode="numeric" value="${esc(poSticky() || poLatest(bc) || '')}" placeholder="VD 356909"></label></div>
       <details class="more"><summary>Thêm chi tiết (không bắt buộc): NSX, vị trí, hạn dùng, ghi chú</summary><div class="form" style="margin-top:8px">${dateField('fMfg', 'Ngày sản xuất (NSX)', false)}
         <label class="f">Vị trí<select id="fLoc"><option>Kệ</option><option>Kho</option><option>Kệ + Kho</option><option>Mâm / Layer khuyến mãi</option></select></label>
         <label class="f">Hạn dùng (tháng)<input id="fSl" type="number" min="0" value="${esc(p.slMonths)}" placeholder="VD 18"></label>
@@ -1229,7 +1234,8 @@ function openStock() {
       <div class="row"><input type="file" id="poFile" accept=".csv,.txt,.xlsx,.xls"><button class="btn sub sm" id="poAssignBtn">Gán PO cho date cũ</button></div><div id="poInfo" class="small" style="margin-top:8px">${DB.PO.length ? `Đang có ${DB.PO.length.toLocaleString('vi-VN')} dòng PO.` : ''}</div></div>`, true);
   SB.import();
   $('#poFile').onchange = e => poImportFile(e.target.files[0]);
-  $('#poAssignBtn').onclick = () => { const r = poAssign(); showUpdateResult('Gán PO cho date cũ', `Đã gán PO cho <b>${r.n}</b> date (${r.skus} mã)${r.none ? `; ${r.none} date không tìm thấy PO nhận hàng trong 12 tháng` : ''}.`); };
+  poEnsure().then(() => { const i = $('#poInfo'); if (i && !i.textContent.trim() && DB.PO.length) i.textContent = `Đang có ${DB.PO.length.toLocaleString('vi-VN')} dòng PO.`; });
+  $('#poAssignBtn').onclick = async () => { await poEnsure(); const r = poAssign(); showUpdateResult('Gán PO cho date cũ', `Đã gán PO cho <b>${r.n}</b> date (${r.skus} mã)${r.none ? `; ${r.none} date không tìm thấy PO nhận hàng trong 12 tháng` : ''}.`); };
   $('#stGo').onclick = async () => {
     $('#stGo').disabled = true; $('#stInfo').textContent = 'Đang lấy dữ liệu CHECK TỒN (khoảng 10-30 giây)...';
     try { const r = await srv('apiStock', AUTH); await load(true); refreshBehind(); ctLoad(true);
@@ -1406,6 +1412,26 @@ const CT = { map: null, at: null, loading: null };
 function idb(mode, fn) { return new Promise((ok, no) => { try { const r = indexedDB.open('kdate', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onerror = () => no(r.error);
   r.onsuccess = () => { const tx = r.result.transaction('kv', mode), st = tx.objectStore('kv'), q = fn(st); tx.oncomplete = () => ok(q && q.result); tx.onerror = () => no(tx.error); }; } catch (e) { no(e); } }); }
 const idbGet = k => idb('readonly', st => st.get(k)).catch(() => null), idbSet = (k, v) => idb('readwrite', st => st.put(v, k)).catch(() => null);
+// Danh sách PO nặng nên không tải kèm mỗi lần mở: chỉ tải khi cần, lưu trên máy, tải lại khi có file PO mới (mốc poAt)
+const PO_ST = { at: null, ready: false, wanted: false, inline: false, loading: null };
+function poEnsure(force) {
+  PO_ST.wanted = true;
+  if (PO_ST.inline) return Promise.resolve(true);
+  if (PO_ST.loading) return PO_ST.loading;
+  const c0 = DB.CauHinh.find(r => r.id === 'poAt'), at = c0 ? String(c0.value) : '';
+  if (PO_ST.ready && !force && (!at || PO_ST.at === at)) return Promise.resolve(true);
+  PO_ST.loading = (async () => {
+    const c = await idbGet('po');
+    if (!force && c && at && c.at === at) { DB.PO = c.d; PO_ST.at = at; PO_ST.ready = true; return true; }
+    try {
+      const r = await srv('apiLoadPO');
+      DB.PO = r.rows || []; PO_ST.at = String(r.at || at); PO_ST.ready = true;
+      idbSet('po', { at: PO_ST.at, d: DB.PO });
+    } catch (e) { if (!PO_ST.ready && c) { DB.PO = c.d; PO_ST.at = c.at; PO_ST.ready = true; } }
+    return PO_ST.ready;
+  })().finally(() => { PO_ST.loading = null; });
+  return PO_ST.loading;
+}
 function ctLoad(force) {
   if (CT.map && !force) return Promise.resolve(CT.map);
   if (CT.loading) return CT.loading;
@@ -1490,7 +1516,7 @@ async function poImportFile(f) {
     const rows = [...out.values()];
     if (!rows.length) throw new Error('Không có dòng PO nào của các CAT đang theo dõi trong 12 tháng');
     info.textContent = `Đọc được ${rows.length.toLocaleString('vi-VN')} dòng PO - đang gửi lên hệ thống...`;
-    await srv('apiImportPO', AUTH, rows); await load(true);
+    await srv('apiImportPO', AUTH, rows); await load(true); await poEnsure(true);
     const r = poAssign(); render();
     showUpdateResult('Đã nạp PO Detail', `Nạp <b>${rows.length.toLocaleString('vi-VN')}</b> dòng PO (${rows.filter(x => x.status === 'NHAN').length.toLocaleString('vi-VN')} đã nhận, ${rows.filter(x => x.status === 'CHO').length.toLocaleString('vi-VN')} đang chờ về). Tự gán PO cho <b>${r.n}</b> date cũ (${r.skus} mã)${r.none ? `; ${r.none} date không tìm thấy PO nhận trong 12 tháng` : ''}.`);
   } catch (e) { info.innerHTML = `<span class="hint bad">${esc(e.message || e)}</span>`; }
@@ -1536,7 +1562,8 @@ async function openPO(focusBc) {
   $('#poOpen').onclick = () => { const no = $('#poNo').value.trim(); if (!/^\d{3,12}$/.test(no)) return toast('Nhập số PO', true); if (!st || st.no !== no) { LS.set('kdate_po', { no, extra: [], at: Date.now() }); PODRAFT = {}; } openPO(); };
   $('#poNo').onkeydown = e => { if (e.key === 'Enter') $('#poOpen').click(); };
   if (!st) { setTimeout(() => $('#poNo').focus(), 50); return; }
-  await ctLoad(); if (!$('#poBody')) return;
+  await Promise.all([ctLoad(), poEnsure()]); if (!$('#poBody')) return;
+  if (!PO_ST.ready) toast('Chưa tải được danh sách PO - thử lại khi có mạng', true);
   poDraw(st.no, focusBc);
 }
 function poDraw(no, focusBc) {
@@ -1692,7 +1719,7 @@ function liPreview() {
     <div class="row" style="margin-top:12px"><button class="btn" id="liGo" ${list.length ? '' : 'disabled'}>Nhập ${list.length} date vào hệ thống</button></div>`;
   const go = $('#liGo'); if (go) go.onclick = liSave;
 }
-function liSave() {
+async function liSave() {
   const list = LI.list || []; if (!list.length) return;
   if (!confirm(`Nhập ${list.length} date vào hệ thống?`)) return;
   const now = Date.now(), prods = [...LI.newP.values()];
@@ -1705,7 +1732,7 @@ function liSave() {
     if (dup) return Object.assign({}, dup, { qty: String(x.qty), mfg: x.mfg || dup.mfg, location: x.location || dup.location, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : (dup.qtySrc || 'TON') });
     return { id: uid(), barcode: x.bc, name: x.p.name, cat: x.p.cat, vendorCode: x.p.vendorCode, exp: x.exp, mfg: x.mfg, qty: String(x.qty), qtyStart: String(x.qty), location: x.location, note: x.note ? x.note + ' (nhập file)' : 'Nhập file', status: 'MO', closedReason: '', createdBy: USER.name, createdAt: now, checkedBy: USER.name, checkedAt: now, qtySrc: LI.src === 'MOI' ? 'MOI' : 'TON' }; });
   for (let i = 0; i < lots.length; i += 200) put('LoDate', lots.slice(i, i + 200));
-  const pa = DB.PO.length ? poAssign() : null;
+  await poEnsure(); const pa = DB.PO.length ? poAssign() : null;
   render(); showUpdateResult('Đã nhập file date', `Đã nhập <b>${lots.length}</b> date - đang gửi lên hệ thống.${pa && pa.n ? ` Tự gán PO nhận hàng gần nhất cho ${pa.n} date.` : ''}`);
 }
 function liTemplate(cat) {
