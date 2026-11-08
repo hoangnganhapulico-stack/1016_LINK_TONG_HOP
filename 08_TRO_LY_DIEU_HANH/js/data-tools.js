@@ -334,7 +334,7 @@ window.S1016_TOOLS = {
     },
     {
       "name": "T11 - Chiến Lược ON: The Body (bản 07/11)",
-      "desc": "Sữa tắm 99K 2 mùi, Son 39K - target theo ca, Phụng nghỉ 15/11, Nhi nghỉ 28/11",
+      "desc": "Sữa tắm 99K 2 mùi, Son 39K - target theo ca, Kim Ngân 200 + Thảo Mộc 100",
       "group": "Push Sale",
       "groupId": "push-sale",
       "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/04_PUSH_SALE/2026-11/PS_2026-11_Chien_Luoc_0711_ON_Body.html",
