@@ -568,8 +568,7 @@ function renderLogin() {
       AUTH = a; USER = r.user;
       if ($('#lgRemember').checked) LS.set('kdate_user', a); else LS.set('kdate_user', { name: a.name });
       afterLogin();
-    } catch (e) { $('#lgMsg').textContent = e.message || String(e); }
-    $('#lgBtn').disabled = false;
+    } catch (e) { $('#lgMsg').textContent = e.message || String(e); $('#lgBtn').disabled = false; }
   };
   $('#lgBtn').onclick = go; $('#lgPin').onkeydown = e => { if (e.key === 'Enter') go(); };
 }
