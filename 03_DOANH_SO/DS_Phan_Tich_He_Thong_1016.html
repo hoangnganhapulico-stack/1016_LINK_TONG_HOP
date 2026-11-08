@@ -204,6 +204,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--blue-soft) !important
     <button data-tab="overview" class="on">Tổng quan</button>
     <button data-tab="cat">Ngành hàng (CAT)</button>
     <button data-tab="missed">Cơ hội bỏ lỡ</button>
+    <button data-tab="equiv">Sản phẩm tương đương</button>
     <button data-tab="strength">Lợi thế riêng</button>
     <button data-tab="consign">Hàng ký gửi</button>
     <button data-tab="lookup">Tra cứu SKU</button>
@@ -253,6 +254,34 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--blue-soft) !important
         <span><button id="mExportX" class="primary">Xuất Excel Cơ hội bỏ lỡ</button> <button id="mExportH">Xuất HTML</button></span></div>
       <div class="tbl-wrap" id="missedTbl"></div>
       <div id="missedDetail" style="margin-top:12px"></div>
+    </div>
+  </section>
+  <section id="view-equiv" class="view hidden">
+    <div class="card">
+      <h2>Sản phẩm tương đương - mã bán yếu vì khách mua mã khác hay vì cả nhóm yếu?</h2>
+      <details class="guide" open>
+        <summary>Cách đọc và xử lý (trả lời câu hỏi: có nên đẩy thêm mã này không?)</summary>
+        <ol class="steps">
+          <li><b>Khách chuyển mã</b> - nhóm vẫn giữ tỷ trọng, mã khác cùng tầm giá bán vượt kỳ vọng. Không mất doanh số, <b>không đẩy thêm</b>. Xem cột Biên LN: mã khách chuyển sang có biên cao hơn thì giữ nguyên, thấp hơn mới cân nhắc đẩy lại.</li>
+          <li><b>Khách chọn bản rẻ/nhỏ</b> - bản dưới một nửa giá bán vượt kỳ vọng. Dùng bản nhỏ làm bước thử, đặt cạnh bản lớn; thêm PG cho bản lớn thường không hiệu quả.</li>
+          <li><b>Cả nhóm yếu</b> - đây mới là cơ hội thật. Xử lý vị trí, diện tích và khách của cả nhóm, học store top; đừng đẩy riêng từng mã.</li>
+          <li><b>Riêng mã yếu</b> - nhóm ổn, không mã nào bù rõ. Kiểm tra face, vị trí, giá, rồi gọi store top hỏi cách bán.</li>
+          <li><b>Xem cột Tồn (tuần)</b> trước khi đặt: trên 8 tuần thì ngưng đặt, giảm face và lên kế hoạch xả.</li>
+        </ol>
+        <p class="small muted" style="margin-top:6px">Mã tương đương = cùng Layer 4 cấp trong file tồn kho. Tầm giá: từ 50% đến 160% giá mã đang xem. Tỷ trọng nhóm = DS nhóm ÷ DS store, đạt khi từ 90% mức của nhóm so sánh. Layer là phân loại của hệ thống nên có thể lẫn vài mã khác loại - bấm vào mã để xem danh sách trước khi quyết định.</p>
+      </details>
+      <div class="row" style="margin-bottom:10px">
+        <label class="field">CAT<select id="eqCat"></select></label>
+        <label class="field">Kết luận
+          <select id="eqV"><option value="">Tất cả mã yếu</option><option value="chuyen">Khách chuyển mã</option><option value="re">Khách chọn bản rẻ/nhỏ</option><option value="yeu">Cả nhóm yếu</option><option value="rieng">Riêng mã yếu</option><option value="het">Hết hàng</option></select>
+        </label>
+        <label class="field" style="flex:1">Tìm mọi mã theo barcode / tên<input id="eqQ" placeholder="VD: 4901330748630 hoặc Hatomugi" style="width:100%"></label>
+      </div>
+      <div id="eqSummary"></div>
+      <div class="row" style="justify-content:space-between;align-items:center;margin:4px 0 8px"><p class="small muted" style="margin:0">Bấm vào 1 mã để xem toàn bộ mã cùng nhóm.</p>
+        <span><button id="eqExportX" class="primary">Xuất Excel Sản phẩm tương đương</button> <button id="eqExportH">Xuất HTML</button></span></div>
+      <div class="tbl-wrap" id="eqTbl"></div>
+      <div id="eqDetail" style="margin-top:12px"></div>
     </div>
   </section>
   <section id="view-strength" class="view hidden"></section>
@@ -570,7 +599,9 @@ var CORE = (function () {
         supplier:map.suppliercode != null ? String(row[map.suppliercode] || '') : '',
         last:map.lastsalesdateyyyymmdd != null ? String(row[map.lastsalesdateyyyymmdd] || '') : '',
         income:map.incomeqty != null ? num(row[map.incomeqty]) : 0,
-        brand:map.branddivisionname != null ? String(row[map.branddivisionname] || '') : ''
+        brand:map.branddivisionname != null ? String(row[map.branddivisionname] || '') : '',
+        layer:[map.layer1, map.layer2, map.layer3, map.layer4].every(function(c){ return c != null; }) ? [map.layer1, map.layer2, map.layer3, map.layer4].map(function(c){ return String(row[c] == null ? '' : row[c]).trim(); }).join('-') : '',
+        gp:map.gpcogs != null && num(row[map.gpcogs]) ? num(row[map.gpcogs]) : null
       };
       all.set(bc, item);
       if (!item.store || item.store === focus) { if (item.store === focus) anyFocus = true; out.set(bc, item); }
@@ -584,6 +615,51 @@ var CORE = (function () {
     if (/discontinu|ngưng|ngung/i.test(it.group)) return { code:'ngung', label:'Ngưng kinh doanh', cls:'b-muted', it:it };
     if (it.close <= 0) return { code:'het-hang', label:'Hết hàng', cls:'b-bad', it:it };
     return { code:'co-hang', label:'Có hàng - bán yếu', cls:'b-warn', it:it };
+  }
+
+  // ==== Equivalent products: same 4-level Layer at the focus store. Separates "customers moved to another SKU"
+  // (group holds its share, other SKUs sell above expectation) from "the whole group is weak".
+  function computeEquiv(res, inv){
+    if (!inv) return null;
+    var groups = new Map(), F = res.F, days = Math.max(1, F.activeDays), hasLayer = false;
+    res.skus.forEach(function(s){
+      var it = inv.get(s.bc), key = it && it.layer && !/^-*$/.test(it.layer) ? it.layer : '';
+      if (!key) return;
+      hasLayer = true;
+      var g = groups.get(key); if (!g) { g = { key:key, skus:[], fRev:0, bRev:0 }; groups.set(key, g); }
+      g.skus.push(s); g.fRev += s.fRev; g.bRev += s.bRev;
+    });
+    if (!hasLayer) return { noLayer:true, rows:[], bySku:new Map(), groups:groups };
+    var bySku = new Map();
+    groups.forEach(function(g){
+      g.fShare = F.rev > 0 ? g.fRev / F.rev : 0;
+      g.bShare = res.bench.rev > 0 ? g.bRev / res.bench.rev : 0;
+      g.idx = g.bShare > 0 ? g.fShare / g.bShare : null;
+      g.skus.forEach(function(s){
+        var it = inv.get(s.bc), price = s.sysQty > 0 ? s.sysRev / s.sysQty : 0, wk = s.fQty / days * 7;
+        bySku.set(s.bc, { s:s, it:it, g:g, price:price, close:it.close, gp:it.gp, weekly:wk, weeks:wk > 0 ? it.close / wk : null });
+      });
+    });
+    bySku.forEach(function(e){
+      var s = e.s, near = [], cheap = [], nearOver = 0, cheapOver = 0;
+      e.g.skus.forEach(function(o){
+        if (o === s || o.fRev <= o.expected) return;
+        var oe = bySku.get(o.bc), over = o.fRev - o.expected;
+        if (e.price > 0 && oe.price < e.price * 0.5) { cheap.push(oe); cheapOver += over; }
+        else if (e.price > 0 && oe.price <= e.price * 1.6) { near.push(oe); nearOver += over; }
+      });
+      var byOver = function(a, b){ return (b.s.fRev - b.s.expected) - (a.s.fRev - a.s.expected); };
+      near.sort(byOver); cheap.sort(byOver);
+      e.near = near; e.cheap = cheap; e.nearOver = nearOver; e.cheapOver = cheapOver;
+      e.expQty = e.price > 0 ? s.expected / e.price : 0;
+      e.weak = s.gap > 0 && s.idx != null && s.idx < 0.8;
+      var gapRev = Math.max(s.gap, 1), groupOk = e.g.idx != null && e.g.idx >= 0.9;
+      e.v = !e.weak ? 'dat' : e.close <= 0 ? 'het' : groupOk && nearOver >= 0.5 * gapRev ? 'chuyen' : cheapOver >= 0.5 * gapRev ? 're' : groupOk ? 'rieng' : 'yeu';
+    });
+    var rows = [];
+    bySku.forEach(function(e){ rows.push(e); });
+    rows.sort(function(a, b){ return b.s.gap - a.s.gap; });
+    return { rows:rows, bySku:bySku, groups:groups };
   }
 
   // ==== Consignment: SKUs whose Order Group contains "consign" (store cannot order; supplier manages stock)
@@ -719,7 +795,7 @@ var CORE = (function () {
     return out;
   }
 
-  return { parsePO:parsePO, isExcludedCat:isExcludedCat, parseMonthlyLayer1:parseMonthlyLayer1, monthKeyFromName:monthKeyFromName, GROUPS:GROUPS, GROUP_LABEL:GROUP_LABEL, regionOf:regionOf, topStoresOf:topStoresOf, computeConsign:computeConsign, pad2:pad2, num:num, parseDay:parseDay, isoFromExcelSerial:isoFromExcelSerial, normHeader:normHeader, splitLine:splitLine, detectDelim:detectDelim,
+  return { parsePO:parsePO, isExcludedCat:isExcludedCat, parseMonthlyLayer1:parseMonthlyLayer1, monthKeyFromName:monthKeyFromName, GROUPS:GROUPS, GROUP_LABEL:GROUP_LABEL, regionOf:regionOf, topStoresOf:topStoresOf, computeConsign:computeConsign, computeEquiv:computeEquiv, pad2:pad2, num:num, parseDay:parseDay, isoFromExcelSerial:isoFromExcelSerial, normHeader:normHeader, splitLine:splitLine, detectDelim:detectDelim,
     createAgg:createAgg, makeFeeder:makeFeeder, finalize:finalize, analyze:analyze, filterMissed:filterMissed,
     filterStrength:filterStrength, parseInventory:parseInventory, invStatus:invStatus, normBarcode:normBarcode };
 })();
@@ -889,6 +965,8 @@ function runAnalysis(){
 function renderAll(){
   STATE.cg = STATE.inv && STATE.res ? CORE.computeConsign(STATE.agg, STATE.res, STATE.inv) : null;
   computeCgNever();
+  STATE.eq = STATE.inv && STATE.res ? CORE.computeEquiv(STATE.res, STATE.inv) : null;
+  renderEquiv();
   renderOverview(); renderCat(); renderMissed(); renderStrength(); renderConsign(); renderCgNever();
   if (mrMonths().length) renderMonthly(); renderStores(); renderAction(); renderLookup();
   showTab(STATE.tab);
@@ -1011,6 +1089,8 @@ function getMissed(){
 function actionFor(st, bc){
   if (bc && STATE.po && !STATE.po.recv.has(bc)) return 'Chưa từng về hàng - đề xuất MD phân bổ / listing';
   if (!st) return 'Kiểm tra tồn và trưng bày';
+  var eqE = bc && STATE.eq && STATE.eq.bySku && STATE.eq.bySku.get(bc);
+  if (st.code === 'co-hang' && eqE && eqE.weak) return eqAction(eqE);
   return { 'chua-listing':'Đề xuất MD bổ sung listing', 'het-hang':'Đặt hàng bổ sung ngay', 'co-hang':'Kiểm tra trưng bày, facing, giá, Push Sale', 'ngung':'Xin MD mã thay thế' }[st.code];
 }
 function renderMissed(){
@@ -1049,6 +1129,106 @@ function renderMissed(){
   h += '</tbody></table>';
   if (list.length > 300) h += '<p class="small muted" style="padding:6px 8px">Hiển thị 300/' + fmt(list.length) + ' SKU. Bấm "Xuất Excel kết quả" để lấy đủ danh sách.</p>';
   $('missedTbl').innerHTML = h;
+}
+
+/* ---------- Equivalent products ---------- */
+var EQ_V = {
+  chuyen:['Khách chuyển mã', 'b-info'], re:['Khách chọn bản rẻ/nhỏ', 'b-info'], yeu:['Cả nhóm yếu', 'b-bad'],
+  rieng:['Riêng mã yếu', 'b-warn'], het:['Hết hàng', 'b-bad'], dat:['Đạt mức', 'b-good']
+};
+function eqNoStockLabel(e){ return e.weeks != null ? fmt1(e.weeks) : e.close > 0 ? 'Không bán' : '-'; }
+function eqAction(e){
+  var a = '', top = e.near[0], topGpOk = top && e.gp != null && top.gp != null && top.gp >= e.gp;
+  if (e.v === 'chuyen') a = (topGpOk || !top || e.gp == null || top.gp == null) ? 'Không đẩy thêm. Giữ tối thiểu, ưu tiên đặt mã khách đang mua.' : 'Khách chuyển sang mã biên thấp hơn: cân nhắc đẩy lại mã này.';
+  else if (e.v === 're') a = 'Dùng bản nhỏ làm bước thử, đặt cạnh bản lớn. Chưa thêm PG cho bản lớn.';
+  else if (e.v === 'yeu') a = 'Cơ hội thật: xử lý vị trí, diện tích cả nhóm và học store top.';
+  else if (e.v === 'rieng') a = 'Kiểm tra face, vị trí, giá; gọi store top hỏi cách bán.';
+  else if (e.v === 'het') a = 'Đặt hàng trước, chưa kết luận.';
+  else a = 'Giữ cách bán hiện tại.';
+  if (e.close > 0 && (e.weeks == null || e.weeks > 8) && e.v !== 'dat') a += ' Tồn nhiều: ngưng đặt, giảm face.';
+  var low = e.near.concat(e.cheap).filter(function(o){ return o.weeks != null && o.weeks < 1; })[0];
+  if (low) a += ' Mã thay thế ' + low.s.name + ' còn ' + fmt(low.close) + ', dưới 1 tuần bán: đặt ngay.';
+  return a;
+}
+function eqSubs(e){
+  var L = (e.v === 're' ? e.cheap.concat(e.near) : e.near.concat(e.cheap)).slice(0, 2);
+  return L.map(function(o){ return o.s.name + ' (+' + fmtM(o.s.fRev - o.s.expected) + ')'; }).join('; ');
+}
+function getEquiv(){
+  var q = STATE.eq;
+  if (!q || q.noLayer) return { list:[], hidden:0 };
+  var cat = $('eqCat').value, v = $('eqV').value, t = $('eqQ').value.trim().toLowerCase(), hidden = 0;
+  var list = q.rows.filter(function(e){
+    if (cat && e.s.cat !== cat) return false;
+    if (t) return e.s.bc.indexOf(t) >= 0 || String(e.s.name).toLowerCase().indexOf(t) >= 0;
+    if (!e.weak) return false;
+    if (e.expQty < 3) { hidden++; return false; }
+    return !v || e.v === v;
+  });
+  return { list:list, hidden:hidden };
+}
+function renderEquiv(){
+  if (!STATE.res) return;
+  var catSel = $('eqCat'), prev = catSel.value;
+  catSel.innerHTML = '<option value="">Tất cả CAT</option>' + STATE.res.cats.map(function(c){ return '<option value="' + c.code + '">' + esc(catLabel(c.code)) + '</option>'; }).join('');
+  catSel.value = prev;
+  renderEquivList();
+}
+function renderEquivList(){
+  var q = STATE.eq, tbl = $('eqTbl'), sumEl = $('eqSummary');
+  if (!q || q.noLayer) {
+    sumEl.innerHTML = '<div class="alert warn"><b>' + (q ? 'File tồn kho đang nạp không có cột Layer1-Layer4.' : 'Chưa có file tồn kho.') + '</b> Mục này cần file "TỒN KHO" có các cột Layer1, Layer2, Layer3, Layer4 để biết mã nào cùng nhóm.</div>';
+    tbl.innerHTML = ''; $('eqDetail').innerHTML = ''; return;
+  }
+  var R = getEquiv(), list = R.list, cnt = {}, sum = {};
+  list.forEach(function(e){ cnt[e.v] = (cnt[e.v] || 0) + 1; sum[e.v] = (sum[e.v] || 0) + Math.max(0, e.s.gap); });
+  var part = function(k){ return '<b>' + EQ_V[k][0] + '</b>: ' + (cnt[k] || 0) + ' mã · ' + fmtM(sum[k] || 0); };
+  var eqDays = STATE.res.F.activeDays;
+  sumEl.innerHTML = (eqDays < 21 ? '<div class="alert warn"><b>Kỳ dữ liệu chỉ có ' + eqDays + ' ngày.</b> Kết luận từng mã còn dao động và cột Tồn (tuần) tính theo tốc độ bán ngắn hạn. Nên nạp DETAIL đủ tháng trước khi quyết định ngưng đặt hoặc giảm face.</div>' : '') + '<div class="alert info">' + ['chuyen', 're', 'yeu', 'rieng', 'het'].map(part).join('<br>') +
+    '<br><span class="small">Số tiền là thiếu hụt so với kỳ vọng. Với "Khách chuyển mã", phần này đã được mã khác bù nên không phải doanh số mất đi.' + (R.hidden ? ' Đã ẩn ' + fmt(R.hidden) + ' mã có kỳ vọng dưới 3 sản phẩm trong kỳ (quá ít để kết luận); gõ tên vào ô tìm để xem.' : '') + '</span></div>';
+  var h = '<table><thead><tr><th>#</th><th>Barcode</th><th>Tên sản phẩm</th><th>CAT</th><th class="n">Giá TB</th><th class="n">SL store</th><th class="n">DS store</th><th class="n">DS kỳ vọng</th><th class="n">Thiếu hụt</th><th class="n">Nhóm: store</th><th class="n">Nhóm: so sánh</th><th>Mã đang bù</th><th class="n">Biên LN</th><th class="n">Tồn</th><th class="n">Tồn (tuần)</th><th>Kết luận</th><th>Nên làm</th></tr></thead><tbody>';
+  list.slice(0, 300).forEach(function(e, i){
+    var s = e.s, V = EQ_V[e.v];
+    h += '<tr class="click" data-eqbc="' + esc(s.bc) + '"><td>' + (i + 1) + '</td><td>' + esc(s.bc) + '</td><td class="name">' + esc(s.name) + '</td><td>' + s.cat + '</td><td class="n">' + fmt(e.price) + '</td><td class="n">' + fmt(s.fQty) + '</td><td class="n">' + fmt(s.fRev) + '</td><td class="n">' + fmt(s.expected) + '</td><td class="n">' + fmt(Math.max(0, s.gap)) + '</td><td class="n">' + pct(e.g.fShare, 2) + '</td><td class="n">' + pct(e.g.bShare, 2) + '</td><td class="small">' + esc(eqSubs(e)) + '</td><td class="n">' + (e.gp != null ? fmt1(e.gp) + '%' : '-') + '</td><td class="n">' + fmt(e.close) + '</td><td class="n">' + eqNoStockLabel(e) + '</td><td><span class="badge ' + V[1] + '">' + V[0] + '</span></td><td class="small">' + esc(eqAction(e)) + '</td></tr>';
+  });
+  if (!list.length) h += '<tr><td colspan="17" class="muted">Không có mã nào theo bộ lọc hiện tại.</td></tr>';
+  h += '</tbody></table>';
+  if (list.length > 300) h += '<p class="small muted" style="padding:6px 8px">Hiển thị 300/' + fmt(list.length) + ' mã. Bấm "Xuất Excel" để lấy đủ danh sách.</p>';
+  tbl.innerHTML = h;
+}
+function equivBlock(bc){
+  var q = STATE.eq, e = q && q.bySku && q.bySku.get(bc);
+  if (!e) return '';
+  var g = e.g, V = EQ_V[e.v], tot = g.skus.reduce(function(t, x){ return { f:t.f + x.fRev, b:t.b + x.bRev }; }, { f:0, b:0 });
+  var rows = g.skus.slice().sort(function(a, b){ return (b.fRev + b.bRev) - (a.fRev + a.bRev); });
+  var show = rows.slice(0, 25); if (show.indexOf(e.s) < 0) show.push(e.s);
+  var h = '<div class="learn" style="margin-top:10px"><b>Sản phẩm tương đương (nhóm ' + esc(g.key) + ')</b> <span class="badge ' + V[1] + '">' + V[0] + '</span><br>Nhóm chiếm ' + pct(g.fShare, 2) + ' DS store, so với ' + pct(g.bShare, 2) + ' của ' + esc(benchLabel()) + '. ' + esc(eqAction(e)) + '</div>';
+  h += '<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Sản phẩm</th><th>Quan hệ</th><th class="n">Giá TB</th><th class="n">SL store</th><th class="n">DS store</th><th class="n">% nhóm: store</th><th class="n">% nhóm: so sánh</th><th class="n">Biên LN</th><th class="n">Tồn</th><th class="n">Tồn (tuần)</th></tr></thead><tbody>';
+  show.forEach(function(x){
+    var o = q.bySku.get(x.bc), rel = x === e.s ? 'Mã đang xem' : e.price > 0 && o.price < e.price * 0.5 ? 'Rẻ/nhỏ hơn' : e.price > 0 && o.price > e.price * 1.6 ? 'Đắt hơn' : 'Cùng tầm giá';
+    h += '<tr class="' + (x === e.s ? 'focus' : '') + '"><td class="name">' + esc(x.name) + '<br><span class="small muted">' + esc(x.bc) + '</span></td><td class="small">' + rel + '</td><td class="n">' + fmt(o.price) + '</td><td class="n">' + fmt(x.fQty) + '</td><td class="n">' + fmt(x.fRev) + '</td><td class="n">' + pct(tot.f ? x.fRev / tot.f : 0, 1) + '</td><td class="n">' + pct(tot.b ? x.bRev / tot.b : 0, 1) + '</td><td class="n">' + (o.gp != null ? fmt1(o.gp) + '%' : '-') + '</td><td class="n">' + fmt(o.close) + '</td><td class="n">' + eqNoStockLabel(o) + '</td></tr>';
+  });
+  return h + '</tbody></table></div>';
+}
+function renderEquivDetail(bc){
+  var el = $('eqDetail'), e = STATE.eq && STATE.eq.bySku.get(bc); if (!e) return;
+  el.innerHTML = '<div class="card" style="margin:0"><h3>' + esc(bc) + ' · ' + esc(e.s.name) + '</h3>' + equivBlock(bc) + '</div>';
+  el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function addEquivSheet(B, sub){
+  var q = STATE.eq; if (!q || q.noLayer) return;
+  var L = getEquiv().list;
+  var sh = B.addSheet('Sản phẩm tương đương', { title:'SẢN PHẨM TƯƠNG ĐƯƠNG (' + L.length + ' MÃ)', subtitle:sub + ' · Bộ lọc CAT: ' + ($('eqCat').value || 'Tất cả'), cols:[6, 16, 36, 7, 14, 12, 9, 14, 14, 14, 11, 11, 40, 9, 8, 9, 20, 44] });
+  B.table(sh, [{h:'STT',t:'stt'},{h:'Barcode',t:'code'},{h:'Tên sản phẩm',t:'wrap'},{h:'CAT',t:'center'},{h:'Nhóm Layer',t:'center'},{h:'Giá TB (đ)',t:'money'},{h:'SL store',t:'int'},{h:'DS store (đ)',t:'money'},{h:'DS kỳ vọng (đ)',t:'money'},{h:'Thiếu hụt (đ)',t:'moneyB'},{h:'Nhóm: store',t:'pct'},{h:'Nhóm: so sánh',t:'pct'},{h:'Mã đang bù',t:'wrap'},{h:'Biên LN (%)',t:'dec'},{h:'Tồn',t:'int'},{h:'Tồn (tuần)',t:'dec'},{h:'Kết luận',t:'center'},{h:'Nên làm',t:'wrap'}],
+    L.map(function(e, i){ var s = e.s; return [i + 1, s.bc, s.name, s.cat, e.g.key, Math.round(e.price), s.fQty, Math.round(s.fRev), Math.round(s.expected), Math.round(Math.max(0, s.gap)), e.g.fShare, e.g.bShare, eqSubs(e), e.gp != null ? +e.gp.toFixed(1) : '', e.close, e.weeks != null ? +e.weeks.toFixed(1) : '', EQ_V[e.v][0], eqAction(e)]; }),
+    { main:true, freezeCol:3, emptyText:'Không có mã nào theo bộ lọc' });
+  B.note(sh, 'Ghi chú: Mã tương đương = cùng Layer 4 cấp trong file tồn kho. Tầm giá 50%-160%. Tỷ trọng nhóm đạt khi từ 90% mức nhóm so sánh. Giá TB và doanh số chưa VAT.');
+}
+function exportEquiv(kind){
+  if (!STATE.res || !STATE.eq || STATE.eq.noLayer) return;
+  var m = STATE.agg.meta, B = mkBook(kind);
+  addEquivSheet(B, 'So với: ' + benchLabel() + ' · Kỳ dữ liệu: ' + vnDate(m.minDay) + ' - ' + vnDate(m.maxDay) + ' · Xuất lúc ' + nowStamp());
+  B.save('Kohnan_SanPhamTuongDuong_' + STATE.focus + '_' + fileDate() + '.xlsx');
 }
 
 /* ---------- Strength ---------- */
@@ -1196,7 +1376,7 @@ function renderSkuDetail(bc, elId){
   show.forEach(function(z){
     h += '<tr class="' + (z.code === focus ? 'focus' : '') + '"><td>' + (rows.indexOf(z) + 1) + '</td><td>' + storeLbl(z.code) + (z.code === L.best ? ' <span class="badge b-good">Nên học</span>' : '') + '</td><td>' + regionOfS(z.code) + '</td><td class="n">' + fmt(z.rev) + '</td><td class="n">' + fmt(z.qty) + '</td><td class="n">' + (z.days ? fmt1(z.qty / z.days) : '-') + '</td><td class="n">' + (z.qty > 0 ? fmt(z.rev / z.qty) : '-') + '</td><td class="n">' + pct(z.storeRev ? z.rev / z.storeRev : 0, 3) + '</td><td class="n">' + z.rank + '</td></tr>';
   });
-  el.innerHTML = h + '</tbody></table></div>';
+  el.innerHTML = h + '</tbody></table>' + equivBlock(bc) + '</div>';
   el.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 function renderConsignDetail(bc){ renderSkuDetail(bc, 'cgDetail'); }
@@ -1904,6 +2084,7 @@ function exportXlsx(kind){
     { total:['TỔNG', Math.round(cats.reduce(function(t, c){ return t + c.fRev; }, 0)), 1, 1, '', Math.round(cats.reduce(function(t, c){ return t + Math.max(0, c.potential); }, 0)), '', ''] });
   B.note(sh, 'Ghi chú: Doanh số = Sales trừ Return, chưa VAT. Tỷ trọng = DS CAT ÷ tổng DS store. DS tiềm năng = DS tăng thêm nếu CAT đạt tỷ trọng của nhóm so sánh. Đã loại SERVICES, LIQUOR, CONCESSIONARY.');
   addMissedSheet(B, sub);
+  addEquivSheet(B, sub);
   // 3. Strength
   var st = CORE.filterStrength(r);
   sh = B.addSheet('Lợi thế riêng', { title:'LỢI THẾ RIÊNG (' + st.length + ' MÃ)', subtitle:sub, cols:[6, 16, 36, 7, 14, 9, 11, 10, 11, 18, 14, 18, 14, 18, 14] });
@@ -1948,6 +2129,12 @@ $('btnExport').addEventListener('click', function(){ exportXlsx('xlsx'); });
 $('btnExportHtml').addEventListener('click', function(){ exportXlsx('html'); });
 $('mExportX').addEventListener('click', function(){ exportMissed('xlsx'); });
 $('mExportH').addEventListener('click', function(){ exportMissed('html'); });
+$('eqExportX').addEventListener('click', function(){ exportEquiv('xlsx'); });
+$('eqExportH').addEventListener('click', function(){ exportEquiv('html'); });
+['eqCat', 'eqV'].forEach(function(id){ $(id).addEventListener('change', function(){ $('eqDetail').innerHTML = ''; renderEquivList(); }); });
+var eqTimer = null;
+$('eqQ').addEventListener('input', function(){ clearTimeout(eqTimer); eqTimer = setTimeout(renderEquivList, 200); });
+$('eqTbl').addEventListener('click', function(e){ var tr = e.target.closest('tr[data-eqbc]'); if (tr) renderEquivDetail(tr.getAttribute('data-eqbc')); });
 $('selBench').addEventListener('change', function(){ $('customWrap').classList.toggle('hidden', this.value !== 'custom'); });
 $('tabs').addEventListener('click', function(e){ var t = e.target.closest('button'); if (t) showTab(t.getAttribute('data-tab')); });
 ['mCat', 'mTop', 'mPen', 'mIdx', 'mInv', 'mRel', 'mPO'].forEach(function(id){ $(id).addEventListener('change', function(){ $('missedDetail').innerHTML = ''; renderMissed(); }); });
