@@ -91,7 +91,7 @@
 
 </script><!--S1016-BRIDGE-END-->
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OrderIQ Kho V2.15 · PARC MALL 1016</title>
+<title>OrderIQ Kho V2.16 · PARC MALL 1016</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -847,14 +847,14 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
     <div class="steps">
       <div class="step-c" id="stp1"><div class="step-n">1</div><div class="step-b"><b>File or_plan (chuẩn đối chiếu)</b><div class="sm muted" id="stp1-s"></div>
         <button class="btn btn-sm" onclick="document.getElementById('fi-handy2').click()">📲 Tải file or_plan</button><input type="file" id="fi-handy2" accept=".csv,.txt,.xlsx,.xls" style="display:none" onchange="queueFiles(this.files,'handy');this.value=''"></div></div>
-      <div class="step-c" id="stp2"><div class="step-n">2</div><div class="step-b"><b>Đơn Senior đã đặt</b><div class="sm muted" id="stp2-s"><b>Nhanh nhất: tải thẳng file đơn Handy (order.csv)</b> nhân viên vừa up lên cloud. Hoặc lấy từ PO Detail (dòng chưa duyệt / chưa nhận), hoặc file đơn khác (Barcode + SL).</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="loadFromPO()">🚚 Lấy đơn chưa duyệt từ PO</button><button class="btn btn-sm" onclick="document.getElementById('fi-po2').click()">📂 Tải file PO Detail mới</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📲 Tải file đơn Handy (order.csv)</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📝 File đơn khác</button></div>
+      <div class="step-c" id="stp2"><div class="step-n">2</div><div class="step-b"><b>Đơn Senior đã đặt</b><div class="sm muted" id="stp2-s"><b>Nhanh nhất: tải thẳng file đơn Handy (order.csv)</b> nhân viên vừa up lên cloud. Đơn chưa Create chỉ có trong file này, không có trong PO Detail. <b>🚚 Lấy toàn bộ đơn tuần này</b> gộp thêm các PO đang mở trong tuần (MD + cửa hàng).</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="loadFromPO()">🚚 Lấy toàn bộ đơn tuần này</button><button class="btn btn-sm" onclick="document.getElementById('fi-po2').click()">📂 Tải file PO Detail mới</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📲 Tải file đơn Handy (order.csv)</button><button class="btn btn-sm" onclick="document.getElementById('fi-sord').click()">📝 File đơn khác</button></div>
         <input type="file" id="fi-po2" accept=".csv,.xlsx,.xls" style="display:none" onchange="window._poThenLoad=true;queueFiles(this.files,'po');this.value=''">
         <input type="file" id="fi-sord" accept=".csv,.xlsx,.xls" multiple style="display:none" onchange="queueFiles(this.files,'sord');this.value=''">
         <div class="up-status" id="st-sord"></div></div></div>
       <div class="step-c"><div class="step-n">3</div><div class="step-b"><b>Kiểm tra & chốt SL</b><div class="sm muted">Xem dòng 🟠 Dư · 🔴 Thiếu · ⚫ Không nên đặt · 🟣 Bỏ sót; sửa cột <b>SL chốt</b> (tool tự lưu).</div></div></div>
-      <div class="step-c"><div class="step-n">4</div><div class="step-b"><b>Xuất danh sách điều chỉnh</b><div class="sm muted">Chỉ các dòng cần sửa trên hệ thống: đổi SL, xoá dòng, thêm mã bỏ sót.</div>
-        <button class="btn btn-sm btn-primary" onclick="exportAdjust()">⬇ Xuất danh sách điều chỉnh (Excel)</button><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)"><b>📤 File import lên cloud</b><div class="sm muted">Đúng cấu trúc order.csv của Handy (12 cột, TAB, không tiêu đề), cột 9 = SL chốt. Gồm toàn bộ đơn sau khi chốt (kể cả dòng không đổi, mã bỏ sót đã thêm).</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px"><select id="so-keep0" title="Dòng Sale Chief chốt SL 0"><option value="drop">Dòng chốt 0: bỏ khỏi file</option><option value="keep">Dòng chốt 0: giữ, SL = 0</option></select><button class="btn btn-sm btn-primary" onclick="exportOrderCsv()">📤 Xuất order.csv (import cloud)</button></div></div></div></div>
+      <div class="step-c"><div class="step-n">4</div><div class="step-b"><b>Xuất danh sách điều chỉnh</b><div class="sm muted">Excel gồm toàn bộ mã đã đặt (MD + cửa hàng, có PO + chưa Create), mã bỏ sót đề xuất thêm và tổng theo NCC.</div>
+        <button class="btn btn-sm btn-primary" onclick="exportAdjust()">⬇ Xuất Excel tổng hợp đơn tuần</button><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)"><b>📤 File import lên cloud</b><div class="sm muted">Đúng cấu trúc order.csv của Handy (12 cột, TAB, không tiêu đề), cột 9 = SL chốt. Gồm mọi dòng cửa hàng đặt chưa có PO + mã bỏ sót đã thêm, theo SL chốt. Dòng MD và dòng đã có PO không đưa vào để tránh đặt trùng (đổi ở ô chọn).</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px"><select id="so-keep0" title="Dòng Sale Chief chốt SL 0"><option value="drop">Dòng chốt 0: bỏ khỏi file</option><option value="keep">Dòng chốt 0: giữ, SL = 0</option></select><select id="so-csv-po" title="Dòng cửa hàng đã có PO"><option value="">Dòng đã có PO: không đưa vào</option><option value="with">Dòng đã có PO: đưa vào (cẩn thận đặt trùng)</option></select><button class="btn btn-sm btn-primary" onclick="exportOrderCsv()">📤 Xuất order.csv (import cloud)</button></div></div></div></div>
     </div>
     <details class="card rule-box"><summary>📐 Cách tool chấm từng dòng</summary><div class="card-body sm" style="line-height:1.8;color:var(--text2)">
       • Chuẩn đối chiếu: <b>file or_plan</b> (tồn hiện tại + bán 5 tuần + bội số đặt); mã không có trong or_plan thì dùng file tồn kho tháng.<br>
@@ -869,7 +869,12 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
       <button class="btn btn-sm btn-danger" onclick="deleteBatch()">Xoá đợt này</button>
       <div class="search"><span>🔍</span><input type="text" id="so-q" placeholder="Tìm tên, barcode..." oninput="rerender('soT')"></div>
       <select id="so-v" onchange="rerender('soT')"><option value="">Tất cả đánh giá</option><option value="ok">🟢 Hợp lý</option><option value="over">🟠 Đặt dư</option><option value="short">🔴 Đặt thiếu</option><option value="no">⚫ Không nên đặt</option><option value="new">🔵 Mã mới</option><option value="unk">❔ Không có trong tồn kho</option><option value="miss">🟣 Senior bỏ sót (đã thêm)</option></select>
+      <select id="so-kind" onchange="rerender('soT')"><option value="">MD + Cửa hàng</option><option value="store">🏪 Cửa hàng đặt</option><option value="md">🏢 MD phân bổ</option></select>
+      <select id="so-st" onchange="rerender('soT')"><option value="">Mọi trạng thái</option><option value="new">Chưa Create</option><option value="po">Đã có PO</option><option value="add">Đề xuất thêm</option></select>
+      <select id="so-sup" onchange="rerender('soT')"></select>
+      <button class="btn btn-sm btn-danger" onclick="deleteSupLines()">🗑 Xoá dòng của NCC đang lọc</button>
     </div>
+    <div class="alert a-disc" id="so-week-sum" style="display:none"></div>
     <div class="stats-grid five" id="so-stats"></div>
     <div class="card">
       <div class="card-hd"><div class="card-title">🏅 Chấm điểm Senior</div><div style="display:flex;gap:8px;align-items:center"><label class="chk">Nhóm theo <select id="sos-group" onchange="rerender('soST')"><option value="batch">Từng đợt</option><option value="seller">Senior</option><option value="sup">NCC</option></select></label><div class="exp" data-t="soST"></div></div></div>
@@ -1411,6 +1416,7 @@ select:focus,input:focus,.search:focus-within{outline:2px solid var(--navy);outl
 <tr><td>Cần đặt vs Gợi ý or_plan</td><td>Cần đặt dùng tồn kho tháng; or_plan dùng bán 5 tuần + tồn hiện tại. Trang or_plan có cột "So với Cần đặt" và nhãn lệch khi khác nhiều - kiểm tra tồn thực tế.</td></tr></table>
 <h2>0b. Bổ sung V2.1 - quy tắc nghiệp vụ Kohnan</h2>
 <table><tr><th>Nội dung</th><th>Cách dùng</th></tr>
+<tr><td>Đơn tuần (V2.16)</td><td>Một đợt <b>Đơn tuần</b> gộp: PO đang mở đặt trong tuần (MD + cửa hàng), đơn order.csv chưa Create, mã bỏ sót đã thêm. Cột mới: MD / Cửa hàng, Trạng thái PO, Người đặt; lọc theo các cột này và theo NCC. Excel tổng hợp xuất toàn bộ + tổng theo NCC. Nạp PO Detail mới: PO không còn trong file (đã xoá trên cloud) tự gỡ. Nạp order.csv mới: chọn thay đơn cũ hay cộng thêm. Dòng đã có PO mặc định giữ SL PO, không đưa vào order.csv để tránh đặt trùng.</td></tr>
 <tr><td>Xuất order.csv đã chốt (V2.15)</td><td>Trang ✅ Kiểm tra đơn Senior → bước 4 → <b>📤 Xuất order.csv (import cloud)</b>: file đúng cấu trúc order.csv của Handy (UTF-8, TAB, CRLF, không tiêu đề, 12 cột), cột 9 = SL chốt; dòng nạp từ order.csv giữ nguyên các cột khác, mã thêm mới lấy thông tin từ or_plan. Chọn dòng chốt 0 bỏ khỏi file hay giữ SL 0 tuỳ cách cloud nhận file. SL chốt sai bội số → hỏi trước khi xuất. File Excel 'danh sách điều chỉnh' vẫn giữ để xem / lưu.</td></tr>
 <tr><td>Kiểm tra đơn Handy (V2.14)</td><td>① Nạp <b>or_plan.csv</b> cùng ngày (file tải vào máy Handy) → ② nhân viên đặt xong up đơn lên cloud, tải file <b>order.csv</b> về → trang ✅ Kiểm tra đơn Senior bấm <b>📲 Tải file đơn Handy (order.csv)</b> (hoặc thả vào ô nạp bất kỳ - tool tự nhận: 12 cột, không tiêu đề, cột 9 = SL đặt) → ③ ghi tên nhân viên ở ô Senior, xem 🟠 Dư / 🔴 Thiếu / ⚫ Không nên đặt / 🟣 Bỏ sót, sửa SL chốt → ④ Xuất danh sách điều chỉnh. Mã trùng trong file được cộng SL; nạp lại cùng file thì cập nhật, giữ SL chốt đã sửa.</td></tr>
 <tr><td>PO: 1 PO nhận 1 lần</td><td>PO giao thiếu là đã KẾT THÚC - phần thiếu KHÔNG tính là hàng đang về. Chỉ PO còn hiệu lực chưa nhận mới tính (PO chưa duyệt: theo Tham số, mặc định không tính). Tool không tự tạo / chuyển PO. Trang PO đang về có bảng "Cảnh báo PO": giao thiếu, PO mới đặt lại đang chờ / quá hạn, nhiều PO cùng mã (nguy cơ trùng), cần đặt nhưng bị hạn chế, cần đặt thêm khi đang có PO chờ.</td></tr>
@@ -1958,7 +1964,7 @@ function queueFiles(files,type){[...files].forEach(f=>queue.push({file:f,type}))
 async function nextFile(){
   if(pendingMap) return;
   const job=queue.shift();
-  if(!job){working=false;busy(false);compute();renderImportInfo();if(window._afterSord){window._afterSord=false;goto('supord');}else if(window._afterPromo){window._afterPromo=false;goto('promo');}else if(window._afterMoa){window._afterMoa=false;goto('moa');}else if(window._poThenLoad){window._poThenLoad=false;window._afterHandy=false;loadFromPO();}else if(window._afterHandy){window._afterHandy=false;goto(curPage==='supord'?'supord':'handy');}else renderCurrent();return;}
+  if(!job){working=false;busy(false);compute();window._hdoRun=null;if(window._poChanged){window._poChanged=false;try{soAfterPo();}catch(e){console.error(e);}}renderImportInfo();if(window._afterSord){window._afterSord=false;goto('supord');}else if(window._afterPromo){window._afterPromo=false;goto('promo');}else if(window._afterMoa){window._afterMoa=false;goto('moa');}else if(window._poThenLoad){window._poThenLoad=false;window._afterHandy=false;loadFromPO();}else if(window._afterHandy){window._afterHandy=false;goto(curPage==='supord'?'supord':'handy');}else renderCurrent();return;}
   working=true;
   const st=document.getElementById('st-'+job.type);
   busy(true,`Đang đọc ${job.file.name}${queue.length?` (còn ${queue.length} file)`:''}...`);await tick();
@@ -1972,7 +1978,7 @@ async function nextFile(){
     if(isHandyOrderAoa(rows)&&!isHandyAoa(rows)){ingestHandyOrder(job,rows,document.getElementById('st-sord')||st);nextFile();return;}
     if(job.type==='promo') throw new Error('Không nhận ra file: cần sale_list (cột Rate/Amount) hoặc bulk_sale_list (cột Bulk Sale)');
     if(isHandyAoa(rows)){ingestHandy(job,rows,document.getElementById('st-handy')||st);nextFile();return;}
-    if(job.type==='handy') throw new Error('Không phải file Handy (or_plan): cần 26 cột, cột 12 = "this w"');
+    if(job.type==='handy') throw new Error('Không phải file Handy (or_plan): cần 26 cột, cột 12 = "this w" hoặc "1w ago"');
     const S=SPEC_IMPORT[job.type];
     const hi=findHeaderRow(rows,S.marks);
     if(hi<0) throw new Error('Không tìm thấy dòng tiêu đề có cột Barcode'+(job.type==='po'?' / PO No.':''));
@@ -2146,7 +2152,7 @@ async function ingest(job,headers,body,map,month,days,st){
     markDirty('sord');st.innerHTML=`✅ ${esc(job.file.name)}: ${fmt(lines.length)} dòng đề xuất`;
   } else {
     // V2: khoá dòng PO = PO No. + Line No. (không có Line thì Barcode). Nạp lại / file xuất mới hơn → CẬP NHẬT dòng cũ, không cộng dồn.
-    const idx=new Map(poData.map((p,i)=>[p.k,i]));let add=0,upd=0,badD=0,bad=0;
+    const idx=new Map(poData.map((p,i)=>[p.k,i]));let add=0,upd=0,badD=0,bad=0;const seenK=new Set(),seenSup=new Set();let minOd='',maxOd='';
     window._undo={kind:'po',prev:poData.slice(),fname:job.file.name};
     body.forEach((r,i)=>{
       if(!nonEmpty(r)) return;rep.read++;
@@ -2159,9 +2165,16 @@ async function ingest(job,headers,body,map,month,days,st){
         barcode:bc,item_code:idCell(job,i,map,'item_code',body),item_name:str(g(r,'item_name')),order_qty:nn(r,'order_qty',i),unit_cost:nn(r,'unit_cost',i),
         order_amt:nn(r,'order_amt',i),partial_qty:nn(r,'partial_qty',i),purchased_qty:nn(r,'purchased_qty',i),purchased_amt:nn(r,'purchased_amt',i),pack:nn(r,'pack',i),std_price:nn(r,'std_price',i),promo_rb:nn(r,'promo_rb',i),basic_rb:nn(r,'basic_rb',i),memo:str(g(r,'memo')),src:job.file.name};
       if(p.order_qty<=0||(p.pd&&p.od&&p.pd<p.od)) bad++;
-      p.k=p.po_no+'|'+(p.line_no||p.barcode);
+      p.k=p.po_no+'|'+(p.line_no||p.barcode);seenK.add(p.k);if(p.supplier) seenSup.add(p.supplier);if(p.od){if(!minOd||p.od<minOd) minOd=p.od;if(p.od>maxOd) maxOd=p.od;}
       if(idx.has(p.k)){poData[idx.get(p.k)]=p;upd++;}else{idx.set(p.k,poData.length);poData.push(p);add++;}
     });
+    // V2.16: file PO Detail KHÔNG có dòng Cancel - PO xoá trên cloud chỉ đơn giản là biến mất khỏi file. Dòng chưa nhận, nằm trong khoảng ngày của file mà file không còn → đã xoá.
+    {let gone=0;const gonePo=new Set();
+     if(seenK.size&&seenSup.size>=20&&minOd){poData=poData.filter(p=>{if(seenK.has(p.k)) return true;const st=String(p.status||'').toLowerCase();
+       if(st==='received'||st.startsWith('partial')||st.startsWith('inspection')||(+p.purchased_qty>0)) return true;
+       if(!p.od||p.od<minOd||p.od>maxOd) return true;gone++;gonePo.add(p.po_no);return false;});}
+     if(gone) rep.warn.push(`${gone} dòng của ${gonePo.size} PO không còn trong file mới (đã xoá trên cloud) → đã gỡ khỏi tool: PO ${[...gonePo].slice(0,15).join(', ')}${gonePo.size>15?'...':''}.`);
+     window._poChanged=true;}
     rep.accepted=add;rep.updated=upd;
     if(badD) rep.warn.push(`${badD} dòng PO thiếu / sai ngày đặt.`);
     if(bad) rep.warn.push(`${bad} dòng PO bất thường (SL đặt ≤ 0 hoặc ngày nhận trước ngày đặt) - xem trang Kiểm tra dữ liệu.`);
@@ -2775,8 +2788,11 @@ function evalSupOrder(b){
   const ic={};poData.forEach(p=>{if(p.item_code&&p.barcode) ic[p.item_code]=p.barcode;});
   if(handy) handy.rows.forEach(h=>{if(h.code&&h.code!==h.barcode) ic[h.code]=h.barcode;});
   const hm=new Map(handyRows.map(h=>[h.barcode,h]));
+  const poK=new Map();b.lines.forEach(l=>{if(l.po_no) poK.set(l.po_no+'|'+l.barcode,null);});
+  if(poK.size) poLines.forEach(p=>{const k=p.po_no+'|'+p.barcode;if(poK.has(k)) poK.set(k,p);});
   return b.lines.map((l,li)=>{
     const bc=l.barcode||ic[l.item_code]||'';
+    const pl=l.po_no?poK.get(l.po_no+'|'+l.barcode):null;const own=pl?(pl.outstanding||0):0; // V2.16: PO đang chấm không phải "hàng khác đang về"
     const s=bc?skuMap.get(bc):null;const hr=bc?hm.get(bc):null;
     const lot=hr?hr.lot:(l.pack>1?l.pack:(packBc[bc]||1));
     const roundP=q=>q<=0?0:Math.ceil(q/lot)*lot;
@@ -2784,9 +2800,13 @@ function evalSupOrder(b){
       abc:hr?hr.abc:s?s.abc:'',close_qty:hr?hr.stock:s?s.close_qty:null,on_order:hr?hr.on_order:s?s.on_order:0,sales_day:hr?hr.rate:s?s.sales_day:null,tod:s?s.tod:null,prop:l.qty,pack:lot,lot,s,hr,
       cost:s?unitCost(s):(hr?hr.price:0),src:hr?'Handy':'Tồn kho tháng'};
     r.supplier_name=supName[r.supplier]||(hr?hr.supplier_name:'')||l.supplier_name||'';
+    r.on_order=Math.max(0,(r.on_order||0)-own);
+    r.kind=l.kind||(pl?(pl.type==='store'?'store':'md'):'store');r.kindL=r.kind==='md'?'🏢 MD':'🏪 Cửa hàng';
+    r.who=l.who||(pl?(pl.creator||pl.approver||''):(r.kind==='store'?b.seller||'':''));
+    r.poSt=l.po_no?(pl?pl.status_l:'Không còn trên file PO'):l.missing?'Đề xuất thêm':'Chưa Create';r.stK=l.po_no?'po':l.missing?'add':'new';
     let v,why,sug,min=null,max=null;
     if(hr){ // ---- chuẩn theo file or_plan (tồn hiện tại + bán 5 tuần) ----
-      const avail=hr.stock+hr.on_order;
+      const hrOn=Math.max(0,hr.on_order-own);const avail=hr.stock+hrOn;
       if(hr.st==='no'){v='no';why=hr.note;sug=0;}
       else if(hr.rate<=0){
         if(s&&s.z_cls==='forgot'&&s.h_avg<(+cfg.slowMo||1)){min=0;max=lot;v=l.qty>lot?'over':'ok';why='🐢 Quên đặt nhưng bán chậm (TB '+fmt1(s.h_avg)+'/tháng) - chỉ giữ tối đa 1 đơn vị đặt nếu cần có mặt trên kệ';sug=v==='ok'?l.qty:lot;}
@@ -2800,7 +2820,7 @@ function evalSupOrder(b){
       } else {
         const need=roundP(Math.max(0,hr.mx-avail));
         min=roundP(Math.max(1,hr.op-avail+1));max=Math.max(min,need)+(lot>1?lot:0);
-        const after=(Math.max(0,hr.stock)+hr.on_order+l.qty)/hr.rate;r.after=after;
+        const after=(Math.max(0,hr.stock)+hrOn+l.qty)/hr.rate;r.after=after;
         const tgt=hr.lead+hr.safe+hr.cyc;
         if(l.qty>max){v='over';why=`Sau nhập đủ ~${Math.round(after)} ngày, vượt mức ${tgt} ngày (Lead ${hr.lead} + Safety ${hr.safe} + chu kỳ ${hr.cyc})`;sug=Math.max(min,need);}
         else if(l.qty<min){v='short';why=`Sau nhập chỉ đủ ~${Math.round(after)} ngày, dưới Lead + Safety ${hr.lead+hr.safe} ngày`;sug=Math.max(min,need);}
@@ -2817,10 +2837,10 @@ function evalSupOrder(b){
       if(!s.everIncome){v='new';why='Mã chưa từng nhập/bán - đơn đầu, kiểm tra listing';sug=l.qty;}
       else {v='over';why='Không có sức bán'+(s.close_qty>0?', còn tồn '+fmt(s.close_qty):'');sug=0;}
     } else {
-      min=roundP(s.rec_gross>0?s.rec_gross-s.on_order:0);
-      max=roundP(Math.max(0,Math.round((s.lead+s.safe+cfg.cycle)*s.sales_day-s.close_qty-s.on_order)));
+      const sOn=Math.max(0,s.on_order-own);min=roundP(s.rec_gross>0?s.rec_gross-s.on_order:0);
+      max=roundP(Math.max(0,Math.round((s.lead+s.safe+cfg.cycle)*s.sales_day-s.close_qty-sOn)));
       if(max<min) max=min;
-      const after=(Math.max(0,s.close_qty)+s.on_order+l.qty)/s.sales_day;
+      const after=(Math.max(0,s.close_qty)+sOn+l.qty)/s.sales_day;
       r.after=after;
       if(l.qty>max){v='over';why=`Sau nhập đủ ~${Math.round(after)} ngày, vượt mức ${s.lead+s.safe+cfg.cycle} ngày`;sug=max;}
       else if(l.qty<min){v='short';why=`Sau nhập chỉ đủ ~${Math.round(after)} ngày, dưới lead + safety ${s.lead+s.safe} ngày`;sug=min;}
@@ -2829,7 +2849,7 @@ function evalSupOrder(b){
     if(l.missing&&v!=='no'&&v!=='unk'){v='miss';why='Cần đặt nhưng Senior bỏ sót - đã thêm vào đơn';sug=Math.max(sug||0,min||0,hr?hr.q:(s?roundP(s.rec_qty):0));}
     if(r.after===undefined&&r.sales_day>0) r.after=(Math.max(0,r.close_qty||0)+(r.on_order||0)+l.qty)/r.sales_day;
     r.v=v;r.rank=SO_RANK[v];r.why=why;r.sug=sug;r.min=min;r.max=max;
-    r.chot=l.chot!==undefined&&l.chot!==null&&l.chot!==''?+l.chot:sug;
+    r.chot=l.chot!==undefined&&l.chot!==null&&l.chot!==''?+l.chot:(l.po_no?l.qty:sug); // dòng đã có PO: mặc định giữ SL PO, không tự giảm
     r.diff=r.chot-l.qty;
     return r;
   });
@@ -2848,7 +2868,7 @@ function soScope(b){
   const cnt={},cats={};b.lines.forEach(l=>{if(l.missing) return;const bc=l.barcode||ic[l.item_code];const h=bc&&hm.get(bc);const s=bc&&skuMap.get(bc);
     const k=(h&&h.supplier)||(s&&s.supplier)||l.supplier;if(k) cnt[k]=(cnt[k]||0)+1;const c=s&&s.layer1;if(c) cats[c]=(cats[c]||0)+1;});
   b._supCnt=cnt;b._catCnt=cats;
-  if(b.scope==='all') return new Set(Object.keys(cnt));
+  if(b.scope==='all'||b.scope==='every') return new Set(Object.keys(cnt));
   if(b.scope==='cat') return new Set(Object.keys(cnt)); // lọc CAT xử lý ở soMissing
   if(b.scope&&cnt[b.scope]!==undefined) return new Set([b.scope]);
   const top=Object.entries(cnt).sort((x,y)=>y[1]-x[1])[0];return new Set(top?[top[0]]:[]);
@@ -2857,13 +2877,13 @@ function soMissing(b){
   if(!b) return [];
   const {ic}=soKeyOf(b);
   const inList=new Set(b.lines.map(l=>l.barcode||ic[l.item_code]).filter(Boolean));
-  const sc=soScope(b);const catSet=b.scope==='cat'?new Set(Object.keys(b._catCnt||{})):null;
+  const sc=soScope(b);const catSet=b.scope==='cat'?new Set(Object.keys(b._catCnt||{})):null;const every=b.scope==='every';
   if(handyRows.length){
-    return handyRows.filter(h=>h.st==='order'&&h.q>0&&!inList.has(h.barcode)&&(catSet?catSet.has(h.layer1):sc.has(h.supplier))).map(h=>({
+    return handyRows.filter(h=>h.st==='order'&&h.q>0&&!inList.has(h.barcode)&&(every||(catSet?catSet.has(h.layer1):sc.has(h.supplier)))).map(h=>({
       hd:true,barcode:h.barcode,name:h.name,layer1:h.layer1,supplier:h.supplier,supplier_name:h.supplier_name,abc:h.abc,close_qty:h.stock,on_order:h.on_order,sales_day:h.rate,
       days_left:h.cover===null?999:h.cover,rec_qty:h.q,cartons:h.cartons,urg:h.urg,s:h.s,sales_amt:h.sold*h.price,status:h.urg==='oos'?'oos':'low'}));
   }
-  return skus.filter(s=>s.orderable&&s.rec_qty>0&&(catSet?catSet.has(s.layer1):sc.has(s.supplier))&&!inList.has(s.barcode));
+  return skus.filter(s=>s.orderable&&s.rec_qty>0&&(every||(catSet?catSet.has(s.layer1):sc.has(s.supplier)))&&!inList.has(s.barcode));
 }
 
 // ============================================================
@@ -3404,11 +3424,11 @@ T.csT={title:'Ma ky gui',sheet:'Ma ky gui',click:s=>showModal(s.barcode),
     C('Căn cứ',r=>r.why.join(' | '),{nosort:true,td:r=>`<div class="sigs">${r.why.map(w=>`<span class="sig">${esc(w)}</span>`).join('')}</div>`})]};
 
 // ---- Đơn NCC gửi
-function curBatch(){const id=V('so-batch')||window._curSord;return supOrders.find(b=>b.id===id)||supOrders[0]||null;}
+function curBatch(){const id=V('so-batch')||window._curSord;return supOrders.find(b=>b.id===id&&!b.arch)||supOrders.find(b=>!b.arch)||null;}
 T.soT={title:'Doi chieu don Senior',sheet:'Doi chieu Senior',click:r=>r.s&&showModal(r.barcode),
   cnt:d=>`${fmt(d.length)} dòng · Senior ${fmtM(sumVal(d,r=>(r.prop||0)*ucOf(r.barcode)))} → chốt ${fmtM(sumVal(d,r=>(r.chot||0)*ucOf(r.barcode)))}`,
-  data:()=>{const q=Q('so-q'),v=V('so-v');window._soAll=evalSupOrder(curBatch());return window._soAll.filter(r=>(!v||r.v===v)&&(!q||String(r.name).toLowerCase().includes(q)||String(r.barcode).includes(q)||String(r.item_code).includes(q))).sort((a,b)=>a.rank-b.rank);},
-  cols:[C('PO No.',r=>r.po_no,{td:r=>r.po_no?`<code>${esc(r.po_no)}</code>`:'—'}),cBc(),cName(),cCat(),cSupC(),C('Khuyến mãi',r=>promoTag(r.barcode),{td:r=>{const t=promoTag(r.barcode);return t?`<span class="badge b-accent">${esc(t)}</span>`:'—';}}),C('Nguồn chuẩn',r=>r.src,{td:r=>`<span class="sm muted">${r.src}</span>`}),cN('Bội số đặt',r=>r.lot>1?r.lot:null),C('ABC',r=>r.abc,{td:r=>r.s?abcBadge(r.abc):'—'}),C('Trạng thái',r=>r.s?stText(r.s):'',{td:r=>r.s?stBadge(r.s):'—'}),
+  data:()=>{const q=Q('so-q'),v=V('so-v'),kd=V('so-kind'),stk=V('so-st'),sp=V('so-sup');window._soAll=evalSupOrder(curBatch());return window._soAll.filter(r=>(!v||r.v===v)&&(!kd||r.kind===kd)&&(!stk||r.stK===stk)&&(!sp||r.supplier===sp)&&(!q||String(r.name).toLowerCase().includes(q)||String(r.barcode).includes(q)||String(r.item_code).includes(q))).sort((a,b)=>a.rank-b.rank);},
+  cols:[C('PO No.',r=>r.po_no,{td:r=>r.po_no?`<code>${esc(r.po_no)}</code>`:'—'}),C('MD / Cửa hàng',r=>r.kindL,{td:r=>`<span class="badge ${r.kind==='md'?'b-accent':'b-gray'}">${r.kindL}</span>`}),C('Trạng thái PO',r=>r.poSt,{td:r=>`<span class="sm">${esc(r.poSt)}</span>`}),C('Người đặt',r=>r.who,{td:r=>`<span class="sm">${esc(r.who||'—')}</span>`}),cBc(),cName(),cCat(),cSupC(),cSupN(),C('Khuyến mãi',r=>promoTag(r.barcode),{td:r=>{const t=promoTag(r.barcode);return t?`<span class="badge b-accent">${esc(t)}</span>`:'—';}}),C('Nguồn chuẩn',r=>r.src,{td:r=>`<span class="sm muted">${r.src}</span>`}),cN('Bội số đặt',r=>r.lot>1?r.lot:null),C('ABC',r=>r.abc,{td:r=>r.s?abcBadge(r.abc):'—'}),C('Trạng thái',r=>r.s?stText(r.s):'',{td:r=>r.s?stBadge(r.s):'—'}),
     cN('Tồn hiện tại',r=>r.close_qty),cN('Đang về',r=>r.on_order||null),cD('Bán TB/ngày',r=>r.sales_day),
     cN('SL Senior đề xuất',r=>r.prop,{td:r=>r.v==='miss'?'<span class="badge so-miss">Không có</span>':`<b>${fmt(r.prop)}</b>`}),
     C('Mức hợp lý',r=>r.min===null?'':`${r.min}-${r.max}`,{nosort:true,cls:'num',td:r=>r.min===null?'—':`${fmt(r.min)} - ${fmt(r.max)}`}),
@@ -3524,8 +3544,10 @@ function batchScore(b){
     n,ok:c('ok'),over:c('over'),short:c('short'),no:c('no'),miss:b.miss0,adj:own.filter(x=>x.chot!==x.prop).length,
     pq:own.reduce((a,x)=>a+x.prop,0),cq:r.reduce((a,x)=>a+x.chot,0),batches:1};
 }
+function soScoreBatches(){const out=[];supOrders.forEach(b=>{if(!b.week){out.push(b);return;}const g={};b.lines.forEach(l=>{if(l.missing||l.kind==='md') return;const w=l.who||b.seller||'(chưa ghi tên)';(g[w]=g[w]||[]).push(l);});
+  Object.entries(g).forEach(([w,ls])=>out.push({id:b.id+'|'+w,fname:b.fname,date:b.date,supplier:'',seller:w,scope:'all',lines:ls,miss0:0}));});return out;}
 function scoreRows(){
-  const by=V('sos-group')||'batch';const rows=supOrders.map(batchScore);
+  const by=V('sos-group')||'batch';const rows=soScoreBatches().map(batchScore);
   let out=rows;
   if(by!=='batch'){const g={};rows.forEach(x=>{const k=by==='seller'?x.seller:x.sup||'(Không rõ)';const a=g[k]=g[k]||{id:k,seller:by==='seller'?k:'',sup:by==='sup'?k:'',supN:by==='sup'?x.supN:'',date:'',fname:'',n:0,ok:0,over:0,short:0,no:0,miss:0,adj:0,pq:0,cq:0,batches:0};
     ['n','ok','over','short','no','miss','adj','pq','cq','batches'].forEach(f=>a[f]+=x[f]);if(by==='seller'&&!a.sup.includes(x.sup)) a.sup=(a.sup?a.sup+', ':'')+x.sup;});out=Object.values(g);}
@@ -3639,7 +3661,7 @@ function dashKpis(){
   const overdue=poOpen.filter(l=>l.late>0);
   const orderableN=skus.filter(s=>s.orderable).length;const forgot=skus.filter(s=>s.z_cls==='forgot');
   const wk=weeklyRows().filter(w=>w.tx&&w.ev!=='nopo').slice(-4);const wIn=wk.reduce((x,w)=>x+w.inAmt,0),wC=wk.reduce((x,w)=>x+w.cogs,0);
-  const ss=supOrders.slice(0,5).map(batchScore).map(x=>(x.n+x.miss)?x.ok/(x.n+x.miss)*100:null).filter(x=>x!==null);
+  const ss=soScoreBatches().slice(0,5).map(batchScore).map(x=>(x.n+x.miss)?x.ok/(x.n+x.miss)*100:null).filter(x=>x!==null);
   const hasPO=poData.length>0;
   P.push({k:'poOk',n:'Dòng PO đặt hợp lý',v:ev.length?c('ok')/ev.length*100:null,f:ev.length?fmtPct(c('ok')/ev.length*100):'—',go:"goto('poeff')",
     fix:'Xem trang Hiệu quả đặt hàng theo người duyệt / CAT để tìm nhóm hay đặt lệch; điều chỉnh Safety và chu kỳ đặt.',up:'Chia sẻ cách đặt của nhóm có tỷ lệ hợp lý cao cho cả team.'});
@@ -3869,25 +3891,38 @@ function ingestHandyOrder(job,rows,st){
   if(!lines.length) throw new Error('File đơn Handy không có dòng nào có SL đặt > 0');
   const dk=d.replace(/\//g,'');const key='hdo|'+dk+'|'+t0+'|'+t1+'|'+lines.length+'|'+lines.reduce((a,l)=>a+l.qty,0);
   const sups=[...new Set(lines.map(l=>l.supplier).filter(Boolean))];
-  const old=supOrders.find(x=>x.key===key);
-  const b={id:old?old.id:'so'+Date.now(),key,fname:`Đơn Handy ${dmyK(dk)}${t0?' '+t0.slice(0,5)+(t1&&t1!==t0?'-'+t1.slice(0,5):''):''} (${job.file.name})`,date:new Date().toLocaleString('vi-VN'),supplier:sups.length===1?sups[0]:'',seller:old?old.seller||'':'',scope:old?old.scope:(sups.length>1?'all':undefined),lines};
-  if(old){const ch={};old.lines.forEach(l=>{if(l.chot!==undefined&&l.chot!==null) ch[l.barcode]=l.chot;});b.lines.forEach(l=>{if(ch[l.barcode]!==undefined) l.chot=ch[l.barcode];});old.lines.filter(l=>l.missing).forEach(l=>b.lines.push(l));supOrders=supOrders.filter(x=>x!==old);}
-  supOrders.unshift(b);window._curSord=b.id;window._afterSord=true;markDirty('sord','meta');
+  const mon=weekKey(dk);const wb=soWeekBatch(mon);
+  const had=wb.lines.filter(l=>!l.po_no&&!l.missing);const same=had.some(l=>l.hkey===key);
+  let mode='add';
+  if(same) mode='same';
+  else if(had.length&&window._hdoRun!==mon) mode=confirm(`Đơn tuần đang có ${had.length} dòng từ file order.csv trước.\n\nOK = THAY bằng file mới (đơn đã xoá trên cloud sẽ biến mất)\nCancel = CỘNG THÊM file này vào đơn tuần`)?'replace':'add';
+  window._hdoRun=mon;
+  const ch={};
+  if(mode==='same') had.filter(l=>l.hkey===key).forEach(l=>{if(l.chot!==undefined&&l.chot!==null) ch[l.barcode]=l.chot;});
+  if(mode==='replace') had.forEach(l=>{if(l.chot!==undefined&&l.chot!==null) ch[l.barcode]=l.chot;});
+  wb.lines=wb.lines.filter(l=>l.po_no||l.missing||(mode==='same'?l.hkey!==key:mode!=='replace'));
+  const inW=new Map(wb.lines.filter(l=>!l.po_no&&!l.missing).map(l=>[l.barcode,l]));
+  lines.forEach(l=>{l.hkey=key;l.kind='store';if(ch[l.barcode]!==undefined) l.chot=ch[l.barcode];
+    wb.lines=wb.lines.filter(x=>!(x.missing&&x.barcode===l.barcode));
+    const ex=inW.get(l.barcode);if(ex){ex.qty+=l.qty;ex.chot=null;if(ex.raw) ex.raw=ex.raw.slice();}else wb.lines.push(l);});
+  syncWeekPO(wb);soArchive();
+  const old=mode==='same';
+  window._curSord=wb.id;window._afterSord=true;markDirty('sord','meta');
   const warn=!handy?' · ⚠️ Chưa nạp or_plan - tool đang so theo file tồn kho tháng, nên nạp or_plan cùng ngày':(handy.date!==dk?` · ⚠️ or_plan đang nạp là ngày ${dmyK(handy.date)}, đơn ngày ${dmyK(dk)} - nên nạp or_plan cùng ngày`:'');
-  st.innerHTML=`✅ ${esc(job.file.name)}: đơn Handy ngày ${dmyK(dk)} · ${fmt(lines.length)} mã · ${fmt(sups.length)} NCC${dup?` · gộp ${dup} dòng trùng mã (cộng SL)`:''}${zero?` · bỏ ${zero} dòng SL 0`:''}${old?' · đã nạp file này trước đó → cập nhật, giữ SL chốt':''}${warn}`;
+  st.innerHTML=`✅ ${esc(job.file.name)}: đơn Handy ngày ${dmyK(dk)} vào <b>${esc(wb.fname)}</b> · ${fmt(lines.length)} mã · ${fmt(sups.length)} NCC${dup?` · gộp ${dup} dòng trùng mã (cộng SL)`:''}${zero?` · bỏ ${zero} dòng SL 0`:''}${old?' · đã nạp file này trước đó → cập nhật, giữ SL chốt':mode==='replace'?' · đã THAY đơn order.csv cũ':''}${warn}`;
 }
-function isHandyAoa(rows){const r=rows.find(x=>x&&x.length>=26);return !!r&&String(r[11]).trim().toLowerCase()==='this w'&&/^\d{4}\/\d{2}\/\d{2}$/.test(String(r[0]).trim());}
+function isHandyAoa(rows){const r=rows.find(x=>x&&x.length>=26);return !!r&&/^(this w|\d+w ago)$/i.test(String(r[11]).trim())&&/^\d{4}\/\d{2}\/\d{2}$/.test(String(r[0]).trim());}
 function ingestHandy(job,rows,st){
-  const out=[];let date='',sched='',weeks=[];
+  const out=[];let date='',sched='',weeks=[],w0='';
   rows.forEach(r=>{
     if(!r||r.length<26) return;const bc=str(r[2]);if(!bc) return;
-    if(!date){date=str(r[0]).replace(/\//g,'');sched=str(r[1]);weeks=[16,17,18,19,20].map(i=>str(r[i]));}
+    if(!date){date=str(r[0]).replace(/\//g,'');sched=str(r[1]);w0=str(r[11]).toLowerCase();weeks=[16,17,18,19,20].map(i=>str(r[i]));}
     out.push({barcode:bc,code:str(r[3]),name:str(r[4]),unit:Math.max(1,num(r[5])),minq:num(r[6]),supplier:str(r[7]),supplier_name:str(r[8]),price:num(r[9]),stock:num(r[10]),
       w:[21,22,23,24,25].map(i=>num(r[i]))});
   });
   if(!out.length) throw new Error('File Handy không có dòng dữ liệu');
   const keep=handy&&handy.date===date?handy.chot:{};
-  handy={date,sched,fname:job.file.name,weeks,rows:out,chot:keep||{}};
+  handy={date,sched,fname:job.file.name,weeks,w0,rows:out,chot:keep||{}};
   out.forEach(r=>{if(r.supplier&&r.supplier_name&&!supMaster[r.supplier]) supName[r.supplier]=supName[r.supplier]||r.supplier_name;});
   markDirty('handy','meta');window._afterHandy=true;
   st.innerHTML=`✅ ${esc(job.file.name)}: file Handy ngày ${dmyK(date)} (${esc(sched)}) · ${fmt(out.length)} mã · ${fmt(new Set(out.map(r=>r.supplier)).size)} NCC`;
@@ -3896,7 +3931,7 @@ const HD_ST={order:'🛒 Cần đặt',check:'🔎 Cần xem',ok:'🟢 Đủ hà
 const HD_URG={oos:'🔴 Hết hàng đang bán',before:'🟠 Sẽ hết trước khi hàng về',below:'🟡 Dưới điểm đặt',min:'🧱 Bổ sung tồn trưng bày'};
 function computeHandy(){
   handyRows=[];if(!handy) return;
-  const planD=parseDate(handy.date);const dow=(planD.getDay()+6)%7;const d0=dow+1; // số ngày đã qua của tuần này (T2 = 1)
+  const planD=parseDate(handy.date);const dow=(planD.getDay()+6)%7;const d0=/ago/.test(handy.w0||'')?7:dow+1; // số ngày đã qua của tuần này (T2 = 1)
   const days=d0+28;
   // ABC theo doanh thu 5 tuần (giá bán × SL) nếu chưa có file tồn kho
   const amt=r=>r.w.reduce((a,b)=>a+b,0)*r.price;
@@ -5010,13 +5045,15 @@ function renderConsHead(){
 function renderSupOrdHead(){
   document.querySelectorAll('.v-cycle').forEach(e=>e.textContent=cfg.cycle);
   const sel=document.getElementById('so-batch');const cur=(curBatch()||{}).id;
-  sel.innerHTML=supOrders.length?supOrders.map(b=>`<option value="${b.id}">${esc(b.fname)} · ${esc(b.date)} · ${b.lines.length} dòng</option>`).join(''):'<option value="">Chưa có file</option>';
+  soArchive();const vis=supOrders.filter(b=>!b.arch);sel.innerHTML=vis.length?vis.map(b=>`<option value="${b.id}">${esc(b.fname)} · ${esc(b.date)} · ${b.lines.length} dòng</option>`).join(''):'<option value="">Chưa có file</option>';
   if(cur) sel.value=cur;
   const all=window._soAll||evalSupOrder(curBatch());
   const c=k=>all.filter(r=>r.v===k).length;
   const pq=all.reduce((a,r)=>a+r.prop,0),cq=all.reduce((a,r)=>a+r.chot,0);
   const pa=all.reduce((a,r)=>a+r.prop*r.cost,0),ca=all.reduce((a,r)=>a+r.chot*r.cost,0);
   renderSoScope();
+  {const b=curBatch();const sf=document.getElementById('so-sup');if(sf){const cv=sf.value;const ks=[...new Set(all.map(r=>r.supplier).filter(Boolean))].sort();sf.innerHTML='<option value="">Tất cả NCC</option>'+ks.map(k=>`<option value="${esc(k)}">${esc(k)} ${esc(supName[k]||'')}</option>`).join('');sf.value=ks.includes(cv)?cv:'';}
+   const el=document.getElementById('so-week-sum');if(el){const t=soTotals(b);el.style.display=b?'flex':'none';if(b) el.innerHTML=`<span>🧮</span><div><b>Tổng đơn: ${fmtM(t.chot)}</b> sau chốt = 🏢 MD ${fmtM(t.md)} + 🏪 Cửa hàng có PO ${fmtM(t.stPo)} + 🏪 Chưa Create ${fmtM(t.stNew)} · ➕ Mã bỏ sót chưa thêm ${fmt(t.missN)} mã ${fmtM(t.miss)} → <b>Nếu thêm hết: ${fmtM(t.chot+t.miss)}</b></div>`;}}
   document.getElementById('so-stats').innerHTML=!all.length?'':
     tile('accent','Senior đề xuất',fmt(all.filter(r=>r.v!=='miss').reduce((a,r)=>a+r.prop,0)),`${fmt(all.length)} dòng · ~${fmtM(pa)} giá vốn`)+
     tile('success','Sau khi chốt',fmt(cq),`~${fmtM(ca)} · ${cq>=pq?'+':''}${fmt(cq-pq)} so với Senior`)+
@@ -5026,7 +5063,7 @@ function renderSupOrdHead(){
 }
 function addMissing(bc){const b=curBatch();if(!b) return;const list=soMissing(b).filter(s=>!bc||s.barcode===bc);if(!list.length) return;list.forEach(s=>b.lines.push({barcode:s.barcode,item_code:'',name:s.name,qty:0,pack:0,supplier:s.supplier,supplier_name:s.supplier_name,missing:true}));markDirty('sord');renderT('soT');renderT('soMT');renderSupOrdHead();toast(`Đã thêm ${list.length} mã bỏ sót vào đơn`);}
 function renderSoScope(){const b=curBatch();const el=document.getElementById('so-scope');if(!b){el.innerHTML='';return;}const sc=[...soScope(b)];const cnt=b._supCnt||{};const ks=Object.keys(cnt).sort((x,y)=>cnt[y]-cnt[x]);const cats=Object.keys(b._catCnt||{});
-  el.innerHTML=`<label class="chk">Kiểm tra mã bỏ sót theo <select id="so-scope-sel" onchange="setScope(this.value)">${ks.map(k=>`<option value="${esc(k)}" ${b.scope!=='all'&&b.scope!=='cat'&&sc.length===1&&sc[0]===k?'selected':''}>NCC ${esc(k)} ${esc(supName[k]||'')} (${cnt[k]} dòng)</option>`).join('')}${ks.length>1?`<option value="all" ${b.scope==='all'?'selected':''}>Tất cả NCC có trong đơn</option>`:''}${cats.length?`<option value="cat" ${b.scope==='cat'?'selected':''}>Các CAT có trong đơn (${cats.length} CAT - khi Senior đặt theo line hàng)</option>`:''}</select></label><span style="margin-left:8px">Mã đang cần đặt theo ${handyRows.length?'file or_plan':'file tồn kho'} nhưng không có trong đơn.</span>`;}
+  el.innerHTML=`<label class="chk">Kiểm tra mã bỏ sót theo <select id="so-scope-sel" onchange="setScope(this.value)">${ks.map(k=>`<option value="${esc(k)}" ${b.scope!=='all'&&b.scope!=='cat'&&b.scope!=='every'&&sc.length===1&&sc[0]===k?'selected':''}>NCC ${esc(k)} ${esc(supName[k]||'')} (${cnt[k]} dòng)</option>`).join('')}${ks.length>1?`<option value="all" ${b.scope==='all'?'selected':''}>Tất cả NCC có trong đơn</option>`:''}${cats.length?`<option value="cat" ${b.scope==='cat'?'selected':''}>Các CAT có trong đơn (${cats.length} CAT - khi Senior đặt theo line hàng)</option>`:''}<option value="every" ${b.scope==='every'?'selected':''}>Mọi NCC đang có mã cần đặt (kể cả NCC chưa có trong đơn)</option></select></label><span style="margin-left:8px">Mã đang cần đặt theo ${handyRows.length?'file or_plan':'file tồn kho'} nhưng không có trong đơn.</span>`;}
 function renderSoSteps(){
   const s1=document.getElementById('stp1-s');if(!s1) return;
   s1.innerHTML=handy?`✅ or_plan ngày <b>${dmyK(handy.date)}</b> (${esc(handy.sched)}) · ${fmt(handy.rows.length)} mã`:'⚠️ Chưa có - tải đúng file or_plan Senior đã tải vào Handy';
@@ -5035,26 +5072,57 @@ function renderSoSteps(){
   if(b) document.getElementById('stp2-s').innerHTML=`✅ Đang xem: <b>${esc(b.fname)}</b> · ${b.lines.filter(l=>!l.missing).length} dòng${b.seller?' · Senior '+esc(b.seller):''}`;
 }
 // Lấy đơn Senior từ PO Detail: dòng chưa duyệt / chưa nhận của ngày đặt gần nhất, tách theo người tạo đơn
+// ==== V2.16: ĐƠN TUẦN = PO đang mở trong tuần (MD + cửa hàng) + đơn Handy chưa Create (order.csv) + mã bỏ sót đã thêm ====
+function soWeekRef(){let k=handy&&handy.date&&handy.date.length>=8?handy.date:'';poLines.forEach(l=>{if(!l.cancel&&l.od>k) k=l.od;});return k;}
+function soWeekBatch(mon){
+  let b=supOrders.find(x=>x.id==='week_'+mon);if(b){b.arch=false;return b;}
+  const d=parseDate(mon),e=new Date(d.getFullYear(),d.getMonth(),d.getDate()+6);
+  b={id:'week_'+mon,week:mon,fname:`Đơn tuần ${dmyK(mon)} - ${dmyK(ymd(e))}`,date:new Date().toLocaleString('vi-VN'),supplier:'',seller:'',scope:'all',lines:[]};
+  supOrders.filter(x=>!x.week&&!x.arch&&x.key&&x.key.startsWith('hdo|')&&weekKey(x.key.split('|')[1])===mon).forEach(x=>{x.arch=true;if(x.seller&&!b.seller) b.seller=x.seller;x.lines.forEach(l=>b.lines.push({...l,hkey:l.hkey||x.key,kind:l.kind||'store'}));});
+  supOrders.unshift(b);return b;
+}
+function syncWeekPO(b){
+  const d=parseDate(b.week),sun=ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()+6));
+  const po=poLines.filter(l=>!l.cancel&&!l.received&&!l.isCons&&l.type!=='supply'&&l.od>=b.week&&l.od<=sun);
+  const ch={};b.lines.forEach(l=>{if(l.po_no&&l.chot!==undefined&&l.chot!==null&&l.chot!=='') ch[l.po_no+'|'+l.barcode]=l.chot;});
+  const stQ={};po.forEach(l=>{if(l.type==='store') stQ[l.barcode]=(stQ[l.barcode]||0)+l.order_qty;});
+  let moved=0;
+  const keep=b.lines.filter(l=>{if(l.po_no) return false;if(l.missing&&stQ[l.barcode]) return false;if(!l.missing&&stQ[l.barcode]===l.qty){moved++;return false;}return true;}); // đơn Handy đã Create thành PO cùng SL → chỉ giữ dòng PO, tránh tính 2 lần
+  b.lines=[...po.map(l=>({barcode:l.barcode,item_code:l.item_code,name:l.item_name,qty:l.order_qty,pack:l.pack||0,supplier:l.supplier,supplier_name:l.supplier_name,po_no:l.po_no,chot:ch[l.po_no+'|'+l.barcode],kind:l.type==='store'?'store':'md',who:l.creator||l.approver||''})),...keep];
+  return {po:po.length,moved};
+}
+function soArchive(){ // đơn của tuần trước không còn hiện ở danh sách đợt (vẫn tính chấm điểm Senior)
+  const mon=weekKey(soWeekRef());if(!mon) return;let ch=false;
+  supOrders.forEach(b=>{if(b.arch) return;let k='';const m=/^po_(\d{8})_/.exec(b.id||'');
+    if(b.week) k=b.week;else if(b.key&&b.key.startsWith('hdo|')) k=weekKey(b.key.split('|')[1]);else if(m) k=weekKey(m[1]);
+    if((k&&k<mon)||(m&&supOrders.some(x=>x.week===k))){b.arch=true;ch=true;}});
+  if(ch) markDirty('sord');
+}
+function soAfterPo(){ // nạp PO Detail mới → đơn tuần & đợt PO cũ cập nhật theo: PO đã xoá / đã nhận biến mất
+  const live=new Set(poLines.filter(l=>!l.cancel&&!l.received).map(l=>l.po_no));
+  supOrders.forEach(b=>{if(b.arch) return;if(b.week){syncWeekPO(b);return;}if(/^po_/.test(b.id||'')) b.lines=b.lines.filter(l=>!l.po_no||live.has(l.po_no));});
+  supOrders=supOrders.filter(b=>b.week||!/^po_/.test(b.id||'')||b.lines.length);
+  soArchive();markDirty('sord');
+}
 function loadFromPO(){
-  const cand=poLines.filter(l=>!l.cancel&&!l.received&&!l.isCons);
-  if(!cand.length){toast('File PO chưa có dòng chưa duyệt / chưa nhận - tải file PO Detail mới sau khi Senior up đơn','warning');return;}
-  const lastD=cand.map(l=>l.od).sort().pop();
-  const day=cand.filter(l=>l.od===lastD);
-  const g={};day.forEach(l=>{const k=l.creator||l.approver||'(Không rõ)';(g[k]=g[k]||[]).push(l);});
-  let n=0;
-  Object.entries(g).forEach(([who,ls])=>{
-    const id='po_'+lastD+'_'+slug(who);
-    const old=supOrders.find(x=>x.id===id);const chot={};if(old) old.lines.forEach(l=>{if(l.chot!==undefined&&l.chot!==null) chot[l.po_no+'|'+l.barcode]=l.chot;});
-    const lines=ls.map(l=>({barcode:l.barcode,item_code:l.item_code,name:l.item_name,qty:l.order_qty,pack:l.pack||0,supplier:l.supplier,supplier_name:l.supplier_name,po_no:l.po_no,chot:chot[l.po_no+'|'+l.barcode]}));
-    supOrders=supOrders.filter(x=>x.id!==id);
-    supOrders.unshift({id,fname:`PO ngày ${dmyK(lastD)} - ${who}`,date:new Date().toLocaleString('vi-VN'),supplier:'',seller:who,scope:'all',lines});n++;
-  });
-  window._curSord=supOrders[0].id;markDirty('sord');
-  goto('supord');toast(`Đã lấy ${fmt(day.length)} dòng PO ngày ${dmyK(lastD)} · ${n} người tạo đơn`);
+  const k=soWeekRef();if(!k){toast('Chưa có file PO Detail / or_plan - tải file trước','warning');return;}
+  const mon=weekKey(k);const b=soWeekBatch(mon);const r=syncWeekPO(b);soArchive();
+  if(!b.lines.length){supOrders=supOrders.filter(x=>x!==b);toast('Tuần này chưa có PO đang mở, cũng chưa có đơn order.csv - tải file order.csv hoặc PO Detail mới','warning');return;}
+  window._curSord=b.id;markDirty('sord');goto('supord');
+  const h=b.lines.filter(l=>!l.po_no&&!l.missing).length;
+  toast(`${b.fname}: ${fmt(r.po)} dòng PO đang mở · ${fmt(h)} dòng chưa Create${r.moved?` · ${r.moved} dòng order.csv đã Create thành PO`:''}`);
+}
+function deleteSupLines(){
+  const b=curBatch(),sup=V('so-sup');if(!b) return;if(!sup){toast('Chọn NCC ở ô lọc NCC trước','warning');return;}
+  const n=b.lines.filter(l=>l.supplier===sup&&!l.po_no).length,p=b.lines.filter(l=>l.supplier===sup&&l.po_no).length;
+  if(!n){toast(p?`NCC ${sup} chỉ còn ${p} dòng có PO - xoá PO trên cloud rồi nạp lại PO Detail`:`NCC ${sup} không có dòng nào`,'warning');return;}
+  if(!confirm(`Xoá ${n} dòng chưa có PO của NCC ${sup} khỏi đơn này?`)) return;
+  b.lines=b.lines.filter(l=>!(l.supplier===sup&&!l.po_no));markDirty('sord');document.getElementById('so-sup').value='';rerender('soT');rerender('soMT');renderSupOrdHead();
+  toast(`Đã xoá ${n} dòng của NCC ${sup}${p?` · còn ${p} dòng có PO`:''}`);
 }
 function setScope(v){const b=curBatch();if(!b) return;b.scope=v;markDirty('sord');renderT('soMT');renderSupOrdHead();}
 function setChot(bid,li,v){const b=supOrders.find(x=>x.id===bid);if(!b) return;b.lines[li].chot=v===''?null:Math.max(0,+v);markDirty('sord');renderT('soT');renderSupOrdHead();}
-function applySug(){const b=curBatch();if(!b) return;if(!confirm('Đặt SL chốt = SL tool đề xuất cho toàn bộ đợt này?')) return;b.lines.forEach(l=>{l.chot=null;});markDirty('sord');renderT('soT');renderSupOrdHead();}
+function applySug(){const b=curBatch();if(!b) return;if(!confirm('Đặt SL chốt = SL tool đề xuất cho các dòng chưa có PO của đợt này?')) return;b.lines.forEach(l=>{if(!l.po_no) l.chot=null;});markDirty('sord');renderT('soT');renderSupOrdHead();}
 function deleteBatch(){const b=curBatch();if(!b||!confirm('Xoá đợt '+b.fname+'?')) return;supOrders=supOrders.filter(x=>x!==b);window._curSord=null;markDirty('sord');renderT('soT');renderT('soMT');renderSupOrdHead();}
 function renderSupMap(){
   const codes=[...new Set([...skus.map(s=>s.supplier),...poLines.map(l=>l.supplier)].filter(Boolean))].sort();
@@ -5561,15 +5629,17 @@ function exportCostBatch(){
 // ---- Điều chỉnh đơn Senior
 // ==== V2.15: XUẤT FILE ORDER ĐÃ CHỐT - đúng cấu trúc order.csv của Handy để import lên cloud ====
 // UTF-8 không BOM · phân cách TAB · xuống dòng CRLF · không dòng tiêu đề · 12 cột (cột 9 = SL chốt)
-function buildOrderCsv(b,keepZero){
+function buildOrderCsv(b,keepZero,withPo){
   const rows=evalSupOrder(b);const hm=new Map(handyRows.map(h=>[h.barcode,h]));
   const pad=n=>String(n).padStart(2,'0');const now=new Date();
   const today=`${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())}`,tm=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   const planD=handy&&handy.date&&handy.date.length>=8?`${handy.date.slice(0,4)}/${handy.date.slice(4,6)}/${handy.date.slice(6,8)}`:today;
   const clean=v=>String(v??'').replace(/[\t\r\n]+/g,' ').trim();
-  const out=[];let drop=0,offLot=[];
+  const out=[];let drop=0,offLot=[],skipPo=0,poChanged=0,skipMd=0;
   rows.forEach(r=>{
     const l=b.lines[r.li];const q=Math.max(0,Math.round(+r.chot||0));
+    if(r.kind==='md'){skipMd++;return;}
+    if(l&&l.po_no&&!withPo){skipPo++;if(q!==l.qty) poChanged++;return;}
     if(!(q>0)&&!keepZero){drop++;return;}
     if(q>0&&r.lot>1&&q%r.lot) offLot.push(r.name+' ('+q+' / bội số '+r.lot+')');
     let c;
@@ -5578,30 +5648,47 @@ function buildOrderCsv(b,keepZero){
       c=[planD,r.barcode,h&&h.code?h.code:r.barcode,r.name||'',h?h.unit:(l&&l.pack)||'',h?h.minq:(r.lot||''),r.supplier||'',(h&&h.supplier_name)||r.supplier_name||'','','0',today,tm];}
     c[8]=q;out.push(c.map(clean).join('\t'));
   });
-  return {text:out.length?out.join('\r\n')+'\r\n':'',n:out.length,drop,offLot,qty:rows.reduce((a,r)=>a+(+r.chot||0),0)};
+  return {text:out.length?out.join('\r\n')+'\r\n':'',n:out.length,drop,offLot,skipPo,poChanged,skipMd,qty:out.reduce((a,x)=>a+(+x.split('\t')[8]||0),0)};
 }
 function exportOrderCsv(){
   const b=curBatch();if(!b){toast('Chưa có đơn để xuất','warning');return;}
-  const keepZero=V('so-keep0')==='keep';const o=buildOrderCsv(b,keepZero);
-  if(!o.n){toast('Không còn dòng nào có SL chốt > 0','warning');return;}
+  const m=soMissing(b);
+  if(m.length&&confirm(`Còn ${m.length} mã bỏ sót CHƯA thêm vào đơn (~${fmtM(m.reduce((x,i)=>x+i.rec_qty*ucOf(i.barcode),0))}).\n\nOK = THÊM HẾT với SL tool đề xuất rồi xuất\nCancel = xuất KHÔNG có các mã này`)) addMissing();
+  const keepZero=V('so-keep0')==='keep';const o=buildOrderCsv(b,keepZero,V('so-csv-po')==='with');
+  if(!o.n){toast(`Không có dòng nào để xuất${o.skipPo?` (${o.skipPo} dòng đã có PO, ${o.skipMd} dòng MD không đưa vào file)`:''}`,'warning');return;}
   if(o.offLot.length&&!confirm(`${o.offLot.length} dòng SL chốt không đúng bội số đặt:\n- ${o.offLot.slice(0,8).join('\n- ')}${o.offLot.length>8?'\n...':''}\n\nVẫn xuất file?`)) return;
   download(new Blob([o.text],{type:'text/csv;charset=utf-8'}),'order.csv');
-  toast(`Đã xuất order.csv: ${fmt(o.n)} dòng · tổng SL ${fmt(o.qty)}${o.drop?` · bỏ ${o.drop} dòng SL chốt 0`:''} - import file này lên cloud`);
+  toast(`Đã xuất order.csv: ${fmt(o.n)} dòng · tổng SL ${fmt(o.qty)}${o.drop?` · bỏ ${o.drop} dòng SL chốt 0`:''}${o.skipPo?` · ${o.skipPo} dòng đã có PO không đưa vào (tránh đặt trùng)`:''}${o.poChanged?` · ⚠️ ${o.poChanged} dòng PO đổi SL: sửa trên cloud`:''}`);
+}
+function soTotals(b){
+  const t={md:0,stPo:0,stNew:0,chot:0,miss:0,missN:0,prop:0};if(!b) return t;
+  evalSupOrder(b).forEach(r=>{const u=ucOf(r.barcode),v=(r.chot||0)*u;t.chot+=v;t.prop+=(r.prop||0)*u;if(r.kind==='md') t.md+=v;else if(r.po_no) t.stPo+=v;else t.stNew+=v;});
+  soMissing(b).forEach(m=>{t.miss+=m.rec_qty*ucOf(m.barcode);t.missN++;});return t;
+}
+// V2.16: Excel tổng hợp - TOÀN BỘ dòng đơn (không chỉ dòng phải sửa) + mã bỏ sót + tổng theo NCC
+function buildWeekAoa(b){
+  const rows=evalSupOrder(b),miss=soMissing(b);
+  const act=x=>{const p=x.po_no?'SỬA PO: ':'';return x.v==='miss'?'THÊM MÃ (đã thêm)':x.chot===x.prop?'GIỮ NGUYÊN':x.chot===0?p+'XOÁ DÒNG':x.chot>x.prop?p+'TĂNG SL':p+'GIẢM SL';};
+  const head=['Việc cần làm','MD / Cửa hàng','Trạng thái PO','PO No.','Người đặt','Barcode','Mã hàng','Tên sản phẩm','Mã NCC','Tên NCC','CAT','Tồn','PO khác đang về','Bán TB/tuần','SL Senior đặt','SL tool đề xuất','SL chốt','SL đề xuất thêm','Chênh lệch','Bội số đặt','Giá vốn/đv','Giá trị Senior (đ)','Giá trị chốt (đ)','Giá trị đề xuất thêm (đ)','Đánh giá','Lý do'];
+  const det=rows.map(x=>{const u=ucOf(x.barcode);return [act(x),x.kindL,x.poSt,x.po_no,x.who||'',x.barcode,x.item_code||(typeof codeOf==='function'?codeOf(x.barcode):'')||'',x.name,x.supplier,x.supplier_name,x.layer1?(catName[x.layer1]||x.layer1):'',x.close_qty??'',x.on_order||0,x.sales_day?Math.round(x.sales_day*70)/10:0,x.prop,x.sug,x.chot,'',x.chot-x.prop,x.lot,u,x.prop*u,x.chot*u,'',SO_LABEL[x.v].slice(2).trim(),x.why];});
+  const dm=miss.map(m=>{const u=ucOf(m.barcode);return ['ĐỀ XUẤT THÊM (chưa thêm)','🏪 Cửa hàng','Đề xuất thêm','','',m.barcode,(typeof codeOf==='function'?codeOf(m.barcode):'')||'',m.name,m.supplier,supName[m.supplier]||m.supplier_name||'',m.layer1?(catName[m.layer1]||m.layer1):'',m.close_qty??'',m.on_order||0,m.sales_day?Math.round(m.sales_day*70)/10:0,0,m.rec_qty,'',m.rec_qty,'','',u,0,'',m.rec_qty*u,'Senior bỏ sót','Cần đặt nhưng không có trong đơn'];});
+  const order=[...det,...dm].sort((x,y)=>String(x[8]).localeCompare(String(y[8]))||String(x[7]).localeCompare(String(y[7])));
+  const g={};const sup=k=>g[k]=g[k]||{k,n:0,md:0,stPo:0,stNew:0,chot:0,mN:0,m:0};
+  rows.forEach(x=>{const o=sup(x.supplier||'(Không rõ)'),v=(x.chot||0)*ucOf(x.barcode);o.n++;o.chot+=v;if(x.kind==='md') o.md+=v;else if(x.po_no) o.stPo+=v;else o.stNew+=v;});
+  miss.forEach(m=>{const o=sup(m.supplier||'(Không rõ)');o.mN++;o.m+=m.rec_qty*ucOf(m.barcode);});
+  const sumA=[['Mã NCC','Tên NCC','MOA','Số dòng trong đơn','Giá trị MD (đ)','Giá trị Cửa hàng có PO (đ)','Giá trị chưa Create (đ)','Giá trị chốt (đ)','Số mã đề xuất thêm','Giá trị đề xuất thêm (đ)','Giá trị nếu thêm hết (đ)','So với MOA'],
+    ...Object.values(g).sort((a,b)=>(b.chot+b.m)-(a.chot+a.m)).map(o=>{const moa=(cfg.moa||{})[o.k]||0,tt=o.chot+o.m;return [o.k,supName[o.k]||'',moa||'',o.n,o.md,o.stPo,o.stNew,o.chot,o.mN,o.m,tt,!moa?'Không có MOA':o.chot>=moa?'Đạt MOA':tt>=moa?'Đạt nếu thêm mã':'Dưới MOA'];})];
+  return {head,order,sumA,t:soTotals(b),nDet:det.length,nMiss:dm.length};
 }
 function exportAdjust(){
   const b=curBatch();if(!b){toast('Chưa có đơn để xuất','warning');return;}
-  const r=evalSupOrder(b).filter(x=>x.chot!==x.prop||x.v==='miss');
-  if(!r.length){toast('Không có dòng nào cần điều chỉnh');return;}
-  const act=x=>x.v==='miss'?'THÊM MÃ':x.chot===0?'XOÁ DÒNG':x.chot>x.prop?'TĂNG SL':'GIẢM SL';
-  const aoa=[['Việc cần làm','PO No.','Barcode','Mã hàng','Tên sản phẩm','Mã NCC','Tên NCC','Tồn hiện tại','Đang về','Bán TB/tuần','SL Senior đặt','SL Sale Chief chốt','Chênh lệch','Bội số đặt','Đánh giá','Lý do'],
-    ...r.sort((x,y)=>act(x).localeCompare(act(y))||String(x.supplier).localeCompare(String(y.supplier))).map(x=>[act(x),x.po_no,x.barcode,x.item_code||'',x.name,x.supplier,x.supplier_name,x.close_qty??'',x.on_order||0,x.sales_day?Math.round(x.sales_day*70)/10:0,x.prop,x.chot,x.chot-x.prop,x.lot,SO_LABEL[x.v].slice(2).trim(),x.why])];
-  const cnt=k=>r.filter(x=>act(x)===k).length;
-  const B=XW.Book();
-  XWX.listSheet(B,new Set(),aoa,{name:'Điều chỉnh đơn Senior',title:'Danh sách điều chỉnh đơn Senior',types:['textB','code','code','code','wrap','code','text','int','int','dec','int','int','int','int','center','wrap'],
-    sub:'Đơn '+b.fname,kv:[['Senior',b.seller||'—','textB'],['Chuẩn đối chiếu',handy?'or_plan '+dmyK(handy.date):'Tồn kho tháng '+fmtMonth(latestMonth),'textB'],['Thêm mã / Tăng SL',cnt('THÊM MÃ')+' / '+cnt('TĂNG SL'),'textB'],['Giảm SL / Xoá dòng',cnt('GIẢM SL')+' / '+cnt('XOÁ DÒNG'),'textB']],kvPairs:2,noTotal:true,
-    note:'Ghi chú: SL Sale Chief chốt đã làm tròn theo bội số đặt. Chênh lệch = SL chốt - SL Senior đặt.'});
-  XWX.save(B,'DieuChinh_DonSenior');
-  toast(`Đã xuất ${fmt(r.length)} dòng cần điều chỉnh`);
+  const A=buildWeekAoa(b);if(!A.order.length){toast('Đợt này chưa có dòng nào','warning');return;}
+  const B=XW.Book(),used=new Set(),t=A.t;
+  const kv=[['Đơn',b.fname,'textB'],['Chuẩn đối chiếu',handy?'or_plan '+dmyK(handy.date):'Tồn kho tháng '+fmtMonth(latestMonth),'textB'],['Giá trị MD',Math.round(t.md),'moneyB'],['Giá trị Cửa hàng có PO',Math.round(t.stPo),'moneyB'],['Giá trị chưa Create',Math.round(t.stNew),'moneyB'],['TỔNG sau chốt',Math.round(t.chot),'moneyB'],['Đề xuất thêm ('+t.missN+' mã)',Math.round(t.miss),'moneyB'],['TỔNG nếu thêm hết',Math.round(t.chot+t.miss),'moneyB']];
+  XWX.listSheet(B,used,A.sumA,{name:'Tổng theo NCC',title:'Tổng đơn theo NCC',types:['code','text','money','int','money','money','money','moneyB','int','money','moneyB','center'],sub:'Đơn '+b.fname,kv,kvPairs:2,unit:'NCC',note:'Giá trị tính theo giá vốn đơn vị (M.A.C / giá PO gần nhất). Mã đề xuất thêm chưa nằm trong đơn: bấm Thêm trên tool nếu quyết định đặt.'});
+  XWX.listSheet(B,used,[A.head,...A.order],{name:'Toàn bộ đơn',title:'Toàn bộ mã đặt + mã đề xuất thêm',types:['textB','center','text','code','text','code','code','wrap','code','text','text','text','text','dec','int','int','int','int','int','text','money','money','moneyB','money','center','wrap'],sub:'Đơn '+b.fname,note:'Sắp theo NCC. "SỬA PO" = dòng đã có PO, phải sửa trực tiếp trên cloud; order.csv chỉ chứa dòng chưa có PO.'});
+  XWX.save(B,'DonTuan_TongHop');
+  toast(`Đã xuất Excel tổng hợp: ${fmt(A.nDet)} dòng đơn + ${fmt(A.nMiss)} mã đề xuất thêm`);
 }
 
 
