@@ -683,7 +683,19 @@ const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth
 const todayNum=()=>Number(todayKey().replace(/-/g,''));
 const isDay5=()=>{const d=new Date().getDate();return d===5||d===20;};
 const fmtTime=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())+' '+pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();};
-const cellCode=v=>{let s=String(v??'').trim();if(/^\d+(\.\d+)?e\+?\d+$/i.test(s))s=Number(s).toFixed(0);return s.replace(/\.0+$/,'');};
+const cellCode=v=>String(v??'').trim().replace(/\.0+$/,''); // ô số giữ đủ 13 chữ số; dạng 8,9E+12 đã mất số nên không đoán
+function parseQty(v){
+  if(typeof v==='number')return Number.isInteger(v)&&v>0?v:NaN;
+  let s=String(v??'').trim();
+  if(/^\d{1,3}([.,]\d{3})+$/.test(s))s=s.replace(/[.,]/g,''); // 1.000 hoặc 1,000
+  s=s.replace(/[.,]0+$/,'');
+  if(!/^\d+$/.test(s))return NaN;
+  const n=Number(s);return n>0?n:NaN;
+}
+function decodeBytes(buf){
+  try{return new TextDecoder('utf-8',{fatal:true}).decode(buf);}
+  catch(e){try{return new TextDecoder('windows-1258').decode(buf);}catch(e2){return new TextDecoder('latin1').decode(buf);}}
+}
 const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
 async function dbSet(k,v){try{await db.setItem(k,v);}catch(e){toast('Không lưu được vào bộ nhớ trình duyệt (tab ẩn danh?). Dữ liệu sẽ mất khi tải lại.',true);}}
 async function dbGet(k){try{return await db.getItem(k);}catch(e){return null;}}
@@ -717,11 +729,22 @@ function approve({title,text,reasons,needPin,confirmLabel}){
 // ===== DỮ LIỆU =====
 function readFile(file,{header}){
   return new Promise((res,rej)=>{
-    if(/\.(xlsx|xls)$/i.test(file.name)){
-      const fr=new FileReader();
-      fr.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];res(header?XLSX.utils.sheet_to_json(ws,{raw:false,defval:''}):XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''}));}catch(err){rej(err);}};
-      fr.onerror=()=>rej(new Error('Không đọc được file'));fr.readAsArrayBuffer(file);
-    }else Papa.parse(file,{header:!!header,skipEmptyLines:true,complete:r=>res(r.data),error:rej});
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error('Không đọc được file'));
+    fr.onload=e=>{
+      try{
+        if(/\.(xlsx|xls)$/i.test(file.name)){
+          // raw:true để lấy đúng giá trị ô; raw:false làm tròn barcode 13 số thành 8.93E+12
+          const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          res(header?XLSX.utils.sheet_to_json(ws,{raw:true,defval:''}):XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}));
+        }else{
+          const text=decodeBytes(e.target.result); // nhận cả CSV UTF-8 và CSV ANSI do Excel lưu
+          res(Papa.parse(text,{header:!!header,skipEmptyLines:true}).data);
+        }
+      }catch(err){rej(err);}
+    };
+    fr.readAsArrayBuffer(file);
   });
 }
 function parseItems(rows){
@@ -975,40 +998,106 @@ function downloadTemplate(){
   X.table(sh,[{h:'Barcode',t:'code'},{h:'Số lượng',t:'int'}],[['8935350808636',2]],{main:true});
   X.save('Kohnan_TinhTienBill_FileMau.xlsx');
 }
+const BC_HEAD=/^(barcode|bar code|ma vach|ma sp|ma san pham|ma hang|ma|item code|itemcode|jan|ean|sku|plu)$/;
+const QTY_HEAD=/(so luong|soluong|^s. ?l..?.?ng|\bsl\b|^s\.l|qty|quantity|can tinh|can ban)/;
+const QTY_NOT=/(close|open|ton|stock|income)/;
+function detectCols(rows){
+  const cols=Math.max(0,...rows.slice(0,50).map(r=>r.length));
+  for(let i=0;i<Math.min(rows.length,8);i++){
+    const h=rows[i].map(c=>norm(c).replace(/\s+/g,' ').trim());
+    let b=h.findIndex(c=>c==='barcode');
+    if(b<0)b=h.findIndex(c=>BC_HEAD.test(c));
+    if(b>=0){
+      const q=h.findIndex(c=>QTY_HEAD.test(c)&&!QTY_NOT.test(c));
+      return {bc:b,qty:q,start:i+1,head:rows[i],cols};
+    }
+  }
+  // Không có tiêu đề: cột mã là cột nhận ra nhiều mã nhất
+  let best=-1,score=0;
+  for(let c=0;c<cols;c++){const n=rows.slice(0,40).filter(r=>barcodeFromInput(cellCode(r[c]))).length;if(n>score){score=n;best=c;}}
+  return {bc:best,qty:-1,start:0,head:null,cols};
+}
 async function importList(file){
   let rows;
   try{rows=await readFile(file,{header:false});}catch(e){toast('Không đọc được file',true);return;}
-  rows=rows.map(r=>Array.isArray(r)?r:Object.values(r));
-  let bcCol=0,qCol=1,start=0;
-  for(let i=0;i<Math.min(rows.length,8);i++){
-    const h=rows[i].map(c=>norm(c).trim());
-    const b=h.findIndex(c=>/^(barcode|ma vach|item code|ma hang|jan)/.test(c));
-    if(b>=0){bcCol=b;const q=h.findIndex(c=>/^(so luong|sl\b|qty|quantity|sales qty)/.test(c));qCol=q>=0?q:b+1;start=i+1;break;}
-  }
-  const want={},bad=[];
-  rows.slice(start).forEach(r=>{
-    const raw=cellCode(r[bcCol]);if(!raw)return;
-    const q=Math.floor(num(r[qCol]))||1;
+  rows=rows.map(r=>Array.isArray(r)?r:Object.values(r)).filter(r=>r.some(c=>String(c??'').trim()!==''));
+  if(!rows.length){toast('File không có dữ liệu',true);return;}
+  const d=detectCols(rows);
+  const label=c=>{const h=d.head&&String(d.head[c]??'').trim();return 'Cột '+(c+1)+(h?': '+h:'');};
+  const colOpts=sel=>Array.from({length:d.cols},(_,c)=>`<option value="${c}" ${c===sel?'selected':''}>${esc(label(c))}</option>`).join('');
+  const hasLines=B().lines.length>0;
+  openModal(`<h3>Kiểm tra cột trước khi nhập</h3><p class="note">${esc(file.name)}</p>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px">
+      <div><label class="f">Cột mã (Barcode / Item Code)</label><select id="imB"><option value="-1">Chọn cột</option>${colOpts(d.bc)}</select></div>
+      <div><label class="f">Cột số lượng</label><select id="imQ"><option value="-1">Chọn cột</option>${colOpts(d.qty)}<option value="-2">Không có cột - mỗi dòng 1 SP</option></select></div>
+    </div>
+    <div id="imSum" style="margin-top:10px"></div>
+    <div class="tbl" style="margin-top:8px"><table><thead><tr><th>Mã</th><th>Sản phẩm</th><th class="r">SL file</th><th class="r">Tồn</th></tr></thead><tbody id="imPrev"></tbody></table></div>
+    <div class="foot"><button class="btn sub" id="imNo">Hủy</button>${hasLines?'<button class="btn sub" id="imAdd">Cộng thêm vào bill</button>':''}<button class="btn" id="imGo">${hasLines?'Thay toàn bộ bill':'Nhập vào bill'}</button></div>`,true);
+  const start=d.start;
+  const draw=()=>{
+    const b=+$('imB').value,q=+$('imQ').value,ok=b>=0&&q!==-1;
+    $('imGo').disabled=!ok;if($('imAdd'))$('imAdd').disabled=!ok;
+    if(!ok){$('imSum').innerHTML='<div class="alert warn" style="margin:0">Chọn đủ cột mã và cột số lượng để tiếp tục.</div>';$('imPrev').innerHTML='';return;}
+    const r=parseRows(rows.slice(start),b,q);
+    $('imSum').innerHTML=`<div class="alert info" style="margin:0"><b>${fm(r.rowCount)}</b> dòng · tổng <b>${fm(r.fileTotal)}</b> SP · nhận ra <b>${fm(Object.keys(r.want).length)}</b> mã${r.notFound.length?` · <span style="color:var(--bad)">${fm(r.notFound.length)} mã không có</span>`:''}${r.badQty.length?` · <span style="color:var(--bad)">${fm(r.badQty.length)} dòng sai SL</span>`:''}</div>`;
+    $('imPrev').innerHTML=rows.slice(start,start+6).map(x=>{const raw=cellCode(x[b]),bc=barcodeFromInput(raw),p=P[bc];const qv=q===-2?1:parseQty(x[q]);return `<tr><td class="codes">${esc(raw)}</td><td>${p?esc(p.name):'<span class="tag bad">Không có trong dữ liệu</span>'}</td><td class="r"><b>${isNaN(qv)?'<span class="tag bad">'+esc(x[q])+'</span>':fm(qv)}</b></td><td class="r">${p?fm(p.stock):'-'}</td></tr>`;}).join('');
+  };
+  $('imB').onchange=draw;$('imQ').onchange=draw;draw();
+  $('imNo').onclick=closeModal;
+  const go=replace=>{const r=parseRows(rows.slice(start),+$('imB').value,+$('imQ').value);applyImport(r,replace);};
+  $('imGo').onclick=()=>go(hasLines);
+  if($('imAdd'))$('imAdd').onclick=()=>go(false);
+}
+function parseRows(rows,b,q){
+  const want={},notFound=[],badQty=[];let fileTotal=0,rowCount=0;
+  rows.forEach(r=>{
+    const raw=cellCode(r[b]);if(!raw)return;
+    rowCount++;
+    const n=q===-2?1:parseQty(r[q]);
+    if(isNaN(n)){badQty.push({raw,val:r[q]});return;}
+    fileTotal+=n;
     const bc=barcodeFromInput(raw);
-    if(!bc){if(/\d/.test(raw))bad.push(raw);return;}
-    want[bc]=(want[bc]||0)+q;
+    if(!bc){notFound.push({raw,qty:n});return;}
+    want[bc]=(want[bc]||0)+n;
   });
-  const bill=B(),short=[];let added=0;
-  Object.entries(want).forEach(([bc,q])=>{
+  return {want,notFound,badQty,fileTotal,rowCount};
+}
+function applyImport(r,replace){
+  const bill=B();
+  if(replace){bill.lines=[];bill.short=[];}
+  bill.short=bill.short||[];
+  let added=0,sumIn=0;
+  Object.entries(r.want).forEach(([bc,q])=>{
     let line=bill.lines.find(l=>l.bc===bc);
     const need=(line?line.qty:0)+q,av=availOf(bc,bill);
-    const allow=(line&&line.over)?Math.max(need,0):Math.min(need,Math.max(av,0));
-    if(allow<need)short.push({bc,need,got:allow});
+    const allow=line&&line.over&&need<=line.over.qty?need:Math.min(need,Math.max(av,0));
+    bill.short=bill.short.filter(s=>s.bc!==bc);
+    if(allow<need)bill.short.push({bc,need});
     if(allow>0){if(line)line.qty=allow;else bill.lines.push({bc,qty:allow});added++;}
+    sumIn+=Math.max(0,allow-(need-q));
   });
   render();saveBills();
-  const shortRows=short.map(s=>`<tr><td>${esc((P[s.bc]||{}).name||s.bc)}<div class="codes">${s.bc}</div></td><td class="r">${fm(s.need)}</td><td class="r"><b style="color:var(--bad)">${fm(s.got)}</b></td></tr>`).join('');
+  const short=shortList(bill),shortQty=short.reduce((s,x)=>s+x.miss,0),nfQty=r.notFound.reduce((s,x)=>s+x.qty,0);
+  const row=(l,v,c)=>`<tr><td>${l}</td><td class="r"><b ${c?'style="color:var(--bad)"':''}>${fm(v)}</b></td></tr>`;
   openModal(`<h3>Kết quả nhập file</h3>
-    <div class="alert ok">Đã thêm ${fm(added)} mã vào bill.</div>
-    ${short.length?`<div class="alert bad">${fm(short.length)} mã thiếu tồn: chỉ tính đúng số tồn. Sửa ô SL trên bill để mở vượt tồn bằng PIN.</div><div class="tbl"><table><thead><tr><th>Sản phẩm</th><th class="r">Cần</th><th class="r">Đã tính</th></tr></thead><tbody>${shortRows}</tbody></table></div>`:''}
-    ${bad.length?`<div class="alert warn" style="margin-top:8px">${fm(bad.length)} mã không có trong dữ liệu: ${esc(bad.slice(0,20).join(', '))}${bad.length>20?'...':''}</div>`:''}
-    <div class="foot"><button class="btn sub" id="mTpl">Tải file mẫu</button><button class="btn" id="mClose">Đóng</button></div>`,true);
-  $('mClose').onclick=closeModal;$('mTpl').onclick=downloadTemplate;
+    <div class="tbl"><table><tbody>${row('Tổng SP trong file (dòng đọc được)',r.fileTotal)}${row('Đã vào bill ('+fm(added)+' mã)',sumIn)}${shortQty?row('Thiếu tồn, chưa tính',shortQty,1):''}${nfQty?row('Mã không có trong dữ liệu',nfQty,1):''}</tbody></table></div>
+    ${short.length?`<div class="alert bad" style="margin-top:8px">${fm(short.length)} mã thiếu tồn: danh sách giữ ngay trên bill, mở vượt tồn bằng PIN nếu hàng thực tế có đủ.</div>`:''}
+    ${r.notFound.length?`<div class="alert warn" style="margin-top:8px">Mã không có: ${esc(r.notFound.slice(0,30).map(x=>x.raw).join(', '))}${r.notFound.length>30?'...':''}${r.notFound.some(x=>/e\+/i.test(x.raw))?'<br>Mã dạng 8,9E+12 đã mất chữ số trong file: định dạng lại cột Barcode rồi lưu file.':''}</div>`:''}
+    ${r.badQty.length?`<div class="alert warn" style="margin-top:8px">Dòng sai số lượng, chưa nhập: ${esc(r.badQty.slice(0,20).map(x=>x.raw+' ('+(x.val===''?'trống':x.val)+')').join(', '))}</div>`:''}
+    <div class="foot"><button class="btn" id="mClose">Đóng</button></div>`,true);
+  $('mClose').onclick=()=>{closeModal();$('scanInput').focus();};
+}
+function shortList(bill){
+  return (bill.short||[]).map(s=>{const l=bill.lines.find(x=>x.bc===s.bc),got=l?l.qty:0;return {bc:s.bc,need:s.need,got,miss:s.need-got};}).filter(x=>x.miss>0);
+}
+async function unlockShort(bcs){
+  const bill=B(),list=shortList(bill).filter(x=>bcs.includes(x.bc));if(!list.length)return;
+  const ok=await approve({title:'Mở vượt tồn '+list.length+' mã',text:'Kiểm tra hàng thực tế trước khi mở. Tổng thiếu '+fm(list.reduce((s,x)=>s+x.miss,0))+' SP.',reasons:OVER_REASONS,needPin:true,confirmLabel:'Mở vượt tồn'});
+  if(!ok)return;
+  list.forEach(x=>{let l=bill.lines.find(y=>y.bc===x.bc);if(!l){l={bc:x.bc,qty:0};bill.lines.push(l);}l.qty=x.need;l.over={qty:x.need,reason:ok.reason};});
+  bill.short=bill.short.filter(s=>!bcs.includes(s.bc));
+  render();saveBills();
 }
 
 // ===== TÌM =====
@@ -1130,7 +1219,7 @@ function renderLines(bill,c){
   box.querySelectorAll('[data-qty]').forEach(el=>el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();$('scanInput').focus();}});
   box.querySelectorAll('[data-inc]').forEach(el=>el.onclick=()=>{const i=+el.dataset.inc;setQty(i,bill.lines[i].qty+1);});
   box.querySelectorAll('[data-dec]').forEach(el=>el.onclick=()=>{const i=+el.dataset.dec;setQty(i,bill.lines[i].qty-1);});
-  box.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>{bill.lines.splice(+el.dataset.del,1);render();saveBills();});
+  box.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>{const [x]=bill.lines.splice(+el.dataset.del,1);if(x&&bill.short)bill.short=bill.short.filter(s=>s.bc!==x.bc);render();saveBills();});
   box.querySelectorAll('[data-man]').forEach(el=>el.onclick=()=>lineDiscModal(+el.dataset.man));
   flashBc='';
 }
@@ -1146,7 +1235,13 @@ function renderSuggest(bill,c){
     const lastBc=c.lines[g.restUnits[g.restUnits.length-1].i].bc;
     h+=`<div class="sug"><span>Mua thêm <b>${addN}</b> SP${g.idx.length>1||(P[lastBc]&&P[lastBc].bulk&&P[lastBc].bulk.siblings.length)?' cùng nhóm':''} để được combo <b>${g.deal.qty} SP giá ${fm(g.deal.price)}đ</b>, tiết kiệm <b>${fm(saved)}đ</b>.</span><button class="btn sm" data-addc="${lastBc}" data-n="${addN}">Thêm ${addN}</button></div>`;
   });
+  const sh=shortList(bill);
+  if(sh.length){
+    h=`<div class="alert bad" style="margin:8px 0 0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><b>Thiếu tồn so với file: ${fm(sh.length)} mã, thiếu ${fm(sh.reduce((s,x)=>s+x.miss,0))} SP</b><button class="btn sm red" data-unl="${sh.map(x=>x.bc).join(',')}">Mở vượt tồn tất cả</button></div>`+
+      sh.map(x=>`<div style="display:flex;justify-content:space-between;gap:8px;border-top:1px solid #f3c4cc;padding:4px 0;margin-top:4px;font-size:13px;align-items:center"><span>${esc((P[x.bc]||{}).name||x.bc)}<div class="codes">Cần ${fm(x.need)} · đã tính ${fm(x.got)} · tồn ${fm((P[x.bc]||{}).stock)}</div></span><button class="btn sm sub" data-unl="${x.bc}">Mở</button></div>`).join('')+`</div>`+h;
+  }
   $('suggest').innerHTML=h;
+  $('suggest').querySelectorAll('[data-unl]').forEach(el=>el.onclick=()=>unlockShort(el.dataset.unl.split(',')));
   $('suggest').querySelectorAll('[data-deal]').forEach(el=>el.onclick=()=>dealModal(el.dataset.deal));
   $('suggest').querySelectorAll('[data-addc]').forEach(el=>el.onclick=()=>addProduct(el.dataset.addc,+el.dataset.n));
 }
@@ -1402,7 +1497,7 @@ function wire(){
   wireScan();wireUploads();
   $('btnCam').onclick=openCam;
   $('btnImport').onclick=()=>{
-    openModal(`<h3>Nhập danh sách từ Excel</h3><p class="note">File có cột <b>Barcode</b> (hoặc Item Code) và <b>Số lượng</b>. Máy tự nhận tiêu đề; không có tiêu đề thì cột 1 là mã, cột 2 là số lượng. Mã đã có trong bill sẽ được cộng dồn.</p><div class="foot"><button class="btn sub" id="tplB">Tải file mẫu</button><button class="btn sub" id="imNo">Hủy</button><button class="btn" id="imGo">Chọn file</button></div>`);
+    openModal(`<h3>Nhập danh sách từ Excel</h3><p class="note">File có cột <b>Barcode</b> (hoặc Item Code) và <b>Số lượng</b>. Sau khi chọn file, máy hiện cột đã nhận ra và tổng số lượng để chị kiểm tra trước khi nhập.</p><div class="foot"><button class="btn sub" id="tplB">Tải file mẫu</button><button class="btn sub" id="imNo">Hủy</button><button class="btn" id="imGo">Chọn file</button></div>`);
     $('tplB').onclick=downloadTemplate;$('imNo').onclick=closeModal;$('imGo').onclick=()=>{closeModal();$('importFile').click();};
   };
   $('importFile').onchange=e=>{const f=e.target.files[0];if(f)importList(f);e.target.value='';};
@@ -1416,7 +1511,7 @@ function wire(){
   $('btnK80').onclick=pr('k80');$('btnA4').onclick=pr('a4');
   $('btnBc').onclick=()=>printBarcodes(barcodeList(B()),'Bill '+(active+1));
   $('btnBcScreen').onclick=()=>screenScan(barcodeList(B()));
-  $('btnClear').onclick=()=>{if(!B().lines.length)return;openModal(`<h3>Xóa hết dòng trong bill này?</h3><div class="foot"><button class="btn sub" id="xNo">Không</button><button class="btn red" id="xYes">Xóa hết</button></div>`);$('xNo').onclick=closeModal;$('xYes').onclick=()=>{const b=B();b.lines=[];b.tender={};b.billDisc={type:'',value:0};closeModal();render();saveBills();};};
+  $('btnClear').onclick=()=>{if(!B().lines.length)return;openModal(`<h3>Xóa hết dòng trong bill này?</h3><div class="foot"><button class="btn sub" id="xNo">Không</button><button class="btn red" id="xYes">Xóa hết</button></div>`);$('xNo').onclick=closeModal;$('xYes').onclick=()=>{const b=B();b.lines=[];b.short=[];b.tender={};b.billDisc={type:'',value:0};closeModal();render();saveBills();};};
   $('btnDelBill').onclick=()=>{openModal(`<h3>Bỏ bill ${active+1}?</h3><p class="note">Bill chưa lưu sẽ mất.</p><div class="foot"><button class="btn sub" id="xNo">Không</button><button class="btn red" id="xYes">Bỏ bill</button></div>`);$('xNo').onclick=closeModal;$('xYes').onclick=()=>{bills.splice(active,1);if(!bills.length)bills.push(newBill());active=Math.min(active,bills.length-1);closeModal();render();saveBills();};};
   $('btnPull').onclick=()=>pullCloud(true);
   $('btnPin').onclick=async()=>{if($('setPinOld').value!==String(cfg.pin)){toast('PIN hiện tại không đúng',true);return;}const n=$('setPinNew').value.trim();if(n.length<4){toast('PIN mới cần ít nhất 4 ký tự',true);return;}cfg.pin=n;await dbSet('cfg',cfg);$('setPinOld').value=$('setPinNew').value='';toast('Đã đổi PIN trên máy này');};
