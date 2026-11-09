@@ -237,7 +237,7 @@ tr.over td{background:#fdeef0}
     <li><span class="n">3</span><span>Gõ <b>3*mã</b> để thêm 3 sản phẩm một lần. Quét lại cùng mã sẽ cộng thêm 1.</span></li>
     <li><span class="n">4</span><span>Bấm vào cột <b>Giảm tay</b> để giảm từng sản phẩm, hoặc chọn giảm toàn bill bên phải.</span></li>
     <li><span class="n">5</span><span>Nhập số tiền vào từng hình thức thanh toán, bấm <b>Đủ</b> để điền phần còn lại.</span></li>
-    <li><span class="n">6</span><span><b>In mã vạch</b> hoặc <b>Quét trên màn hình</b> để quét vào POS không cần gõ; phiếu K80/A4 có Item Code và mã vạch từng dòng.</span></li>
+    <li><span class="n">6</span><span><b>In mã vạch</b> hoặc <b>Quét trên màn hình</b> để quét vào POS không cần gõ; phiếu K80/A4 theo mẫu bill Kohnan để gửi khách, có Item Code, Barcode và tổng số lượng; không hiện vượt tồn và lý do giảm tay.</span></li>
     <li><span class="n">7</span><span>Bấm <b>Lưu bill</b> để vào lịch sử. Hóa đơn chính thức vẫn xuất trên POS.</span></li>
   </ul></div>
   <div class="sec-head"><span class="num">2</span><h2>Thứ tự tính tiền theo POS</h2></div>
@@ -1276,7 +1276,7 @@ function renderTotals(bill,c){
   $('billDiscMore').innerHTML=more;
   if($('svSerial'))$('svSerial').onchange=e=>{bill.billDisc.serial=e.target.value.trim();saveBills();};
   $('totals').innerHTML=
-    row('Tiền hàng theo giá gốc',c.gross)+row('Khuyến mãi',c.promoSum,'minus')+row('Mix / Bundle',c.comboSum,'minus')+row('Giảm 5% ngày 5/20',c.d5Sum,'minus')+row('Giảm tay từng dòng',c.manSum,'minus')+row('Giảm toàn bill',c.billAmt,'minus')+row('Làm tròn tiền mặt',c.rounding,'minus')+
+    row('Tổng số lượng sản phẩm',bill.lines.reduce((s,l)=>s+l.qty,0))+row('Tiền hàng theo giá gốc',c.gross)+row('Khuyến mãi',c.promoSum,'minus')+row('Mix / Bundle',c.comboSum,'minus')+row('Giảm 5% ngày 5/20',c.d5Sum,'minus')+row('Giảm tay từng dòng',c.manSum,'minus')+row('Giảm toàn bill',c.billAmt,'minus')+row('Làm tròn tiền mặt',c.rounding,'minus')+
     `<div class="grand"><span>PHẢI TRẢ</span><b>${fm(c.due)}đ</b></div>`;
 }
 function renderPay(bill,c){
@@ -1324,34 +1324,73 @@ function billSnapshot(bill){
     sums:{gross:c.gross,promo:c.promoSum,combo:c.comboSum,d5:c.d5Sum,man:c.manSum,bill:c.billAmt,rounding:c.rounding,due:c.due,change:c.change,missing:c.missing},
     lines:bill.lines.map((l,i)=>{const r=c.lines[i],p=P[l.bc]||{};return {bc:l.bc,code:itemCodeOf(l.bc),name:p.name||l.bc,qty:l.qty,list:r.list,sale:r.sale,combo:r.comboDisc,d5:r.d5,man:r.manual,manReason:l.manual&&r.manual?l.manual.reason:'',net:r.net,over:l.over&&l.qty>num(p.stock)?l.over.reason:'',deal:p.bulk?p.bulk.bulkName:''};})};
 }
-function discLabel(bd){return {sv20:'Staff Voucher 20K',sv50:'Staff Voucher 50K',v5:'Voucher 5%',pct:'Giảm tay %',amt:'Giảm tay'}[bd&&bd.type]||'Giảm toàn bill';}
-function tenderRows(s){return TENDERS.filter(([k])=>+s.tender[k]>0).map(([k,l])=>`<tr><td>${l}</td><td class="r">${fm(s.tender[k])}</td></tr>`).join('');}
+function discLabel(bd){return {sv20:'Staff Voucher 20K',sv50:'Staff Voucher 50K',v5:'Voucher 5%',pct:'Discount',amt:'Discount'}[bd&&bd.type]||'Discount';}
+// Phiếu gửi khách theo mẫu bill Kohnan: KHÔNG hiện vượt tồn, lý do giảm tay. Chưa qua POS nên không có Mã CQT / mã tra cứu.
+const fmE=n=>Math.round(Number(n)||0).toLocaleString('en-US');
+const STORE_INFO=['No.1016:PARC MALL','Lô L2-01 Tầng 2 Trung Tâm Thương Mại Parc Mall 547-549 Tạ Quang Bửu Phường Chánh Hưng Thành Phố Hồ Chí Minh Việt Nam','TEL:028 3535 5477','Business hours:09:00 - 22:00'];
+const TENDER_POS={cash:'Cash',card:'Credit',momo:'MOMO',vnpay:'VNpay',bank:'Bank',recv:'Receivable'};
+function receiptDate(t){const d=new Date(t);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' ('+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+') '+pad(d.getHours())+':'+pad(d.getMinutes());}
+// Các dòng giảm của 1 sản phẩm, đúng kiểu "Discount P  -70,000 x1  -70,000"
+function discLines(l){
+  const out=[];
+  const fromSale=(l.list-l.sale)*l.qty+(l.combo||0);
+  const add=(label,amt)=>{if(!amt)return;const unit=amt/l.qty;out.push(Number.isInteger(unit)?{label,unit:-unit,q:l.qty,amt:-amt}:{label,unit:-amt,q:1,amt:-amt});};
+  add('Discount P',fromSale);add('Discount 5%',l.d5);add('Discount',l.man);
+  return out;
+}
 function printBill(s,mode){
   const k80=mode==='k80';
-  const sumRows=[['Tiền hàng',s.sums.gross],['Khuyến mãi',-s.sums.promo],['Mix / Bundle',-s.sums.combo],['Giảm 5% ngày 5/20',-s.sums.d5],['Giảm tay dòng',-s.sums.man],[discLabel(s.billDisc),-s.sums.bill],['Làm tròn tiền mặt',-s.sums.rounding]].filter(x=>x[1]).map(x=>`<tr><td>${x[0]}</td><td class="r">${fm(x[1])}</td></tr>`).join('');
-  const linesHtml=k80?s.lines.map((l,i)=>`<div class="ln"><div class="nm">${i+1}. ${esc(l.name)}${l.over?' <b>[VƯỢT TỒN]</b>':''}</div><div class="ic">Item: <b>${esc(l.code||'-')}</b> &nbsp; SL: <b>${l.qty}</b></div><div class="bc">${barcodeSVG(l.bc,{x:2,h:34})}</div><div class="rw"><span>${l.qty} x ${fm(l.sale)}</span><b>${fm(l.net)}</b></div>${l.combo||l.d5||l.man?`<div class="ds">${l.combo?'Combo -'+fm(l.combo)+' ':''}${l.d5?'5% -'+fm(l.d5)+' ':''}${l.man?'Tay -'+fm(l.man):''}</div>`:''}</div>`).join(''):
-    `<table class="t"><thead><tr><th>#</th><th>Sản phẩm</th><th>Item Code</th><th>Mã vạch</th><th class="r">SL</th><th class="r">Giá bán</th><th class="r">Giảm</th><th class="r">Thành tiền</th></tr></thead><tbody>${s.lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}${l.over?' <b>[VƯỢT TỒN: '+esc(l.over)+']</b>':''}${l.manReason?'<div class="sm">Giảm tay: '+esc(l.manReason)+'</div>':''}</td><td><b>${esc(l.code||'-')}</b></td><td>${barcodeSVG(l.bc,{x:1,h:30})}</td><td class="r"><b>${l.qty}</b></td><td class="r">${fm(l.sale)}</td><td class="r">${fm(l.combo+l.d5+l.man)}</td><td class="r"><b>${fm(l.net)}</b></td></tr>`).join('')}</tbody></table>`;
+  const totalQty=s.lines.reduce((a,l)=>a+l.qty,0);
+  const sub=s.lines.reduce((a,l)=>a+l.net,0);
+  const paid=TENDERS.filter(([k])=>+s.tender[k]>0);
+  const received=paid.reduce((a,[k])=>a+(+s.tender[k]),0);
+  const row=(a,b,c)=>`<tr class="${c||''}"><td>${a}</td><td class="r">${b}</td></tr>`;
+  const sumHtml=`<table class="sum">
+    ${row('Sub / '+totalQty+'Items',fmE(sub),'sb')}
+    ${s.sums.bill?row(discLabel(s.billDisc),fmE(-s.sums.bill)):''}
+    ${s.sums.rounding?row('Rounding',fmE(-s.sums.rounding)):''}
+    ${row('Total',fmE(s.sums.due),'gd')}
+    ${paid.map(([k])=>row(TENDER_POS[k],fmE(s.tender[k]))).join('')}
+    ${paid.length?row('Received',fmE(received),'big')+row('Change',fmE(s.sums.change),'big'):''}
+    ${paid.length&&s.sums.missing?row('Balance',fmE(s.sums.missing),'big'):''}
+  </table>`;
+  const linesHtml=k80?s.lines.map(l=>`<div class="ln"><div>${esc(l.code||'')}${l.code?'&nbsp;&nbsp;&nbsp;':''}${esc(l.bc)}</div><div>${esc(l.name)}</div><div class="pr"><span>${fmE(l.list)}</span><span class="x">x${l.qty}</span><span class="a">${fmE(l.list*l.qty)}</span></div>${discLines(l).map(d=>`<div>${d.label}</div><div class="pr"><span>${fmE(d.unit)}</span><span class="x">x${d.q}</span><span class="a">${fmE(d.amt)}</span></div>`).join('')}</div>`).join(''):
+    `<table class="t"><thead><tr><th>#</th><th>Item Code</th><th>Barcode</th><th>Sản phẩm</th><th class="r">Đơn giá</th><th class="r">SL</th><th class="r">Giảm</th><th class="r">Thành tiền</th></tr></thead><tbody>${s.lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.code||'')}</td><td>${esc(l.bc)}</td><td>${esc(l.name)}</td><td class="r">${fmE(l.list)}</td><td class="r"><b>${l.qty}</b></td><td class="r">${fmE((l.list-l.sale)*l.qty+(l.combo||0)+(l.d5||0)+(l.man||0))}</td><td class="r"><b>${fmE(l.net)}</b></td></tr>`).join('')}</tbody><tfoot><tr><td colspan="5"><b>Tổng số lượng sản phẩm</b></td><td class="r"><b>${totalQty}</b></td><td></td><td class="r"><b>${fmE(sub)}</b></td></tr></tfoot></table>`;
   const html=`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Phiếu tạm tính ${esc(s.no)}</title><style>
   @page{${k80?'size:80mm auto;margin:2mm':'size:A4;margin:10mm'}}
-  body{font-family:Arial,sans-serif;margin:0;color:#000;font-size:${k80?'12px':'13px'};${k80?'width:74mm;':''}}
-  .tb{position:sticky;top:0;background:#0039a6;color:#fff;padding:8px;display:flex;gap:8px;align-items:center}
+  html,body{overflow-x:hidden}
+  body{font-family:'Courier New',Courier,monospace;margin:0 auto;color:#000;font-size:${k80?'12.5px':'13px'};line-height:1.25;${k80?'width:74mm;':'max-width:190mm;'}}
+  .tb{position:sticky;top:0;background:#0039a6;color:#fff;padding:8px;display:flex;gap:8px;align-items:center;font-family:Arial,sans-serif}
   .tb button{font-weight:700;padding:4px 12px}
-  .hd{text-align:center;border-bottom:1px dashed #000;padding:6px 0;margin-bottom:6px}.hd img{height:${k80?'26px':'36px'}}
-  .ti{font-weight:700;font-size:${k80?'14px':'18px'};margin-top:4px}
-  .ln{border-bottom:1px dashed #999;padding:4px 0;break-inside:avoid}.nm{font-weight:700}.ic{font-size:12px}.bc svg{display:block;margin:2px auto;max-width:100%;height:auto}
-  .rw{display:flex;justify-content:space-between}.ds{font-size:11px}
+  .lg{text-align:center;padding:8px 0 6px}.lg img{height:${k80?'38px':'44px'}}
+  .dash{border-top:1px dashed #000;margin:8px 0}
+  .ctr{text-align:center;margin:8px 0}
+  .ti{text-align:center;font-weight:700;font-size:15px;margin:8px 0 6px}
+  .ln{margin-top:10px;break-inside:avoid}
+  .pr{display:flex;justify-content:flex-end;gap:4px}.pr span:first-child{flex:1;text-align:right}.pr .x{width:34px;text-align:right}.pr .a{width:92px;text-align:right}
   table{width:100%;border-collapse:collapse}.r{text-align:right}
-  html,body{overflow-x:hidden}${k80?'':'body{max-width:190mm;margin:0 auto}'}
-  .t{table-layout:auto}.t th,.t td{border:1px solid #999;padding:4px;vertical-align:middle}.t th{background:#0039a6;color:#fff;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.t svg{display:block;width:150px;max-width:150px;height:auto}.t tr{break-inside:avoid}.sm{font-size:11px}
-  .sum{margin-top:6px}.sum td{padding:1px 0}.gd td{border-top:2px solid #000;font-size:${k80?'15px':'18px'};font-weight:800;padding-top:4px}
-  .ft{text-align:center;font-size:11px;margin-top:8px;border-top:1px dashed #000;padding-top:4px}
-  ${k80?'':'.sumw{width:340px;margin-left:auto}'}
+  .t{margin-top:8px}.t th,.t td{border:1px solid #777;padding:4px;vertical-align:top;font-size:12px}.t th{background:#eee}.t tr{break-inside:avoid}
+  .sum{${k80?'':'width:360px;margin-left:auto;'}}.sum td{padding:1px 0}
+  .sb td{border-top:1px dashed #000;padding-top:5px}
+  .gd td,.big td{font-size:${k80?'16px':'17px'};font-weight:700}.gd td{padding-top:8px}
+  .bcw{text-align:center;margin-top:8px}.bcw svg{max-width:100%;height:auto}
+  .ft{margin-top:8px;font-size:12px}
   @media print{.tb{display:none}}</style></head><body>
-  <div class="tb"><button onclick="print()">In</button><span>${k80?'K80':'A4'} · ${s.lines.length} mã</span></div>
-  <div class="hd"><img src="${logoSrc()}" alt=""><div>Store 1016 - Parc Mall</div><div class="ti">PHIẾU TẠM TÍNH</div><div>${esc(s.no||'(chưa lưu)')} · ${esc(fmtTime(s.at))}</div><div>Người tính: <b>${esc(s.cashier||'-')}</b>${s.note?' · '+esc(s.note):''}</div></div>
+  <div class="tb"><button onclick="print()">In / Lưu PDF</button><span>${k80?'K80':'A4'} · ${s.lines.length} mã · ${totalQty} SP</span></div>
+  <div class="lg"><img src="${logoSrc()}" alt="KOHNAN"></div>
+  ${STORE_INFO.map(x=>`<div>${esc(x)}</div>`).join('')}
+  <div class="dash"></div>
+  <div>* Hàng hóa được đổi trả trong vòng 7 ngày kể từ sau ngày mua hàng.</div>
+  <div>* Vui lòng tham khảo điều kiện đổi trả hàng hóa trước khi thanh toán</div>
+  <div class="ti">&lt;PHIẾU TẠM TÍNH&gt;</div>
+  <div>${esc(receiptDate(s.at))}</div>
+  <div>Thu ngân:${esc(s.cashier||'-')}</div>
+  ${s.note?`<div>Khách hàng:${esc(s.note)}</div>`:''}
   ${linesHtml}
-  <div class="sumw"><table class="sum">${sumRows}<tr class="gd"><td>PHẢI TRẢ</td><td class="r">${fm(s.sums.due)}</td></tr>${tenderRows(s)}${s.sums.change?`<tr><td>Tiền thừa</td><td class="r">${fm(s.sums.change)}</td></tr>`:''}${s.sums.missing?`<tr><td><b>Còn thiếu</b></td><td class="r"><b>${fm(s.sums.missing)}</b></td></tr>`:''}</table></div>
-  <div class="ft">Giá đã gồm VAT. Phiếu tạm tính, không phải hóa đơn. Hóa đơn chính thức xuất trên POS.</div>
+  <div style="margin-top:10px"></div>
+  ${sumHtml}
+  <div class="ft">Giá đã gồm VAT.<br>Số phiếu tạm tính:${esc(s.no||'(chưa lưu)')}<br>Phiếu tạm tính, không phải hóa đơn. Hóa đơn chính thức xuất trên POS khi thanh toán.</div>
+  ${s.no?`<div class="bcw">${barcodeSVG(s.no,{x:1,h:40,text:false})}</div>`:''}
   </body></html>`;
   const w=window.open('','_blank');
   if(!w){toast('Trình duyệt chặn cửa sổ mới: cho phép popup rồi bấm lại',true);return;}
