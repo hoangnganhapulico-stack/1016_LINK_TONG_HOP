@@ -183,6 +183,16 @@ window.S1016_TOOLS = {
       "updated": "25/10/2026"
     },
     {
+      "name": "Tính Tiền Bill",
+      "desc": "Tính trước khi nhập POS: KM, Mix/Bundle, 5% ngày 5-20, check tồn, nhiều hình thức thanh toán, in mã vạch",
+      "group": "Kho - Đặt hàng - Trưng bày",
+      "groupId": "kho",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/02_KHO_DAT_HANG/KHO_Tinh_Tien_Bill.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "09/11/2026"
+    },
+    {
       "name": "So Sánh Tồn Nhiều Sản Phẩm",
       "desc": "Store x sản phẩm (Tồn, Giá, Bán, GP%), xuất Excel ô riêng",
       "group": "Kho - Đặt hàng - Trưng bày",
