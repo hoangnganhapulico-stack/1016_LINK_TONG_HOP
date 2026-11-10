@@ -82,6 +82,16 @@
   .side{display:flex;flex-direction:column;gap:12px}
   .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .field{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .field.span2{grid-column:1/-1}
+  .quick{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .quick:empty{display:none}
+  .quick button{font:inherit;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer}
+  .quick button:hover{border-color:var(--accent);color:var(--accent)}
+  .group-msg{border:2px solid var(--accent);border-radius:12px;padding:12px;background:var(--accent-soft);display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .group-msg pre{margin:0;white-space:pre-wrap;font-family:inherit;font-size:13px;background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border);max-height:420px;overflow:auto}
+  .group-msg .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+  .group-msg .row label{font-size:12px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+  .group-msg input[type=text]{width:150px}
   .field label{font-size:11.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.03em}
   select,input[type=text],input[type=number]{font:inherit;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%}
   select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -176,8 +186,10 @@
       </div>
       <div class="side">
         <div class="fields">
-          <div class="field"><label for="monthSelect">Tháng kiểm tra</label><select id="monthSelect" disabled><option>Chưa có dữ liệu</option></select></div>
-          <div class="field"><label for="dateSelect">Ngày xem "chưa định ca"</label><select id="dateSelect" disabled><option>—</option></select></div>
+          <div class="field span2"><label for="monthSelect">Tháng kiểm tra</label><select id="monthSelect" disabled><option>Chưa có dữ liệu</option></select></div>
+          <div class="field"><label for="fromSelect">Check từ ngày</label><select id="fromSelect" disabled><option>—</option></select></div>
+          <div class="field"><label for="toSelect">Đến ngày</label><select id="toSelect" disabled><option>—</option></select></div>
+          <div class="field span2 quick" id="quickRange"></div>
           <div class="field"><label for="offStd">OFF chuẩn / tháng (FT)</label><input type="number" id="offStd" min="0" max="15" placeholder="Tự tính"></div>
           <div class="field"><label for="gayStd">Ca gãy chuẩn / tháng (FT)</label><input type="number" id="gayStd" min="0" max="15" placeholder="Tự tính"></div>
           <div class="field"><label for="ptHours">PT tối đa giờ / tháng</label><input type="number" id="ptHours" min="1" value="79"></div>
@@ -572,7 +584,7 @@ function parseRoster(rows, sheetName){
     if (!n) continue;
     people.push({ code: normCode(r[cCode]), name, pos, days, sheet: sheetName });
   }
-  return { people, from: dateCols[0].iso, to: dateCols[dateCols.length-1].iso };
+  return { people, from: dateCols[0].iso, to: dateCols[dateCols.length-1].iso, sheet: sheetName };
 }
 
 function ingestWorkbook(name, sheetsMap){
@@ -586,7 +598,11 @@ function ingestWorkbook(name, sheetsMap){
   let range = '';
   const isos = [].concat(found.bcc.map(x=>x.iso), found.work.map(x=>x.from), found.leave.map(x=>x.from)).sort();
   if (isos.length) range = isoShort(isos[0])+' - '+isoShort(isos[isos.length-1]);
-  if (found.roster.length) range = found.roster.map(r => isoShort(r.from)+' - '+isoShort(r.to)).join(', ');
+  if (found.roster.length){
+    const rs = found.roster.map(r => r.sheet).filter(Boolean);
+    range = found.roster.length > 2 ? '' : found.roster.map(r => isoShort(r.from)+' - '+isoShort(r.to)).join(', ');
+    if (found.roster.length > 2){ for (let i=det.length-1;i>=0;i--) if (/^Lịch làm việc/.test(det[i])) det.splice(i,1); det.push('Lịch làm việc · '+found.roster.length+' sheet tháng ('+rs[0]+' … '+rs[rs.length-1]+')'); }
+  }
   const ok = det.length>0;
   return { name, ok, data: found, detail: ok ? [...new Set(det)].join(', ') + (range ? ' · '+range : '') : 'Không nhận diện được',
     kind: found.bcc.length ? 'bcc' : found.work.length ? 'work' : found.leave.length ? 'leave' : found.roster.length ? 'roster' : '',
@@ -616,7 +632,7 @@ $('resetBtn').addEventListener('click', () => { files = []; rebuild(); });
 
 /* ---------- gộp dữ liệu ---------- */
 function rebuild(){
-  const m = { emps:{}, bcc:{}, work:{}, leave:{}, roster:{}, rosterByName:{}, rosterRange:null, shiftMap: Object.assign({}, DEFAULT_SHIFT_MAP), bccMax:'', months:{} };
+  const m = { emps:{}, bcc:{}, work:{}, leave:{}, roster:{}, rosterByName:{}, rosterRange:null, shiftMap: Object.assign({}, DEFAULT_SHIFT_MAP), bccMax:'', months:{}, workMax:'', workCodes:{} };
   const addEmp = (code, name, extra) => {
     if (!code) return; const e = m.emps[code] || (m.emps[code] = { code, name:'', pos:'', dept:'' });
     if (name && (!e.name || /[ÀÁẢÃẠĂÂĐÈÉÊÌÍÒÓÔƠÙÚƯỲÝàáảãạăâđèéêìíòóôơùúưỳý]/.test(name))) e.name = titleCase(name);
@@ -635,7 +651,7 @@ function rebuild(){
   files.forEach(f => {
     f.data.work.forEach(w => {
       const key = 'w|'+w.code+'|'+w.from+'|'+w.to+'|'+w.shift+'|'+w.st; if (seen[key]) return; seen[key]=1;
-      addEmp(w.code, w.name);
+      addEmp(w.code, w.name); m.workCodes[w.code] = 1; if (w.to > m.workMax) m.workMax = w.to;
       for (let d=w.from; d<=w.to; d=nextIso(d)){ (m.work[w.code+'|'+d] = m.work[w.code+'|'+d] || []).push(w); m.months[d.slice(0,7)]=1; }
     });
     f.data.leave.forEach(l => {
@@ -692,21 +708,39 @@ function buildMonthOptions(){
   const keep = sel.value;
   sel.innerHTML = months.length ? months.map(ym => '<option value="'+ym+'">Tháng '+ym.slice(5)+'/'+ym.slice(0,4)+'</option>').join('') : '<option>Chưa có dữ liệu</option>';
   sel.disabled = !months.length;
-  if (months.length){ sel.value = months.includes(keep) ? keep : (M.bccMax ? M.bccMax.slice(0,7) : months[months.length-1]); }
-  buildDateOptions();
+  const sameMonth = months.length && months.includes(keep);
+  if (months.length){ sel.value = sameMonth ? keep : (M.bccMax ? M.bccMax.slice(0,7) : months[months.length-1]); }
+  buildDateOptions(false);
 }
-function buildDateOptions(){
-  const sel = $('dateSelect'), ym = $('monthSelect').value;
-  if (!/^\d{4}-\d{2}$/.test(ym)){ sel.innerHTML = '<option>—</option>'; sel.disabled = true; return; }
-  const keep = sel.value;
-  sel.innerHTML = '<option value="all">Cả tháng</option>' + monthDays(ym).map(d => '<option value="'+d+'">'+THU[dow(d)]+' '+isoToVi(d)+'</option>').join('');
-  sel.disabled = false;
-  const today = new Date(); const tIso = today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
-  if (keep && (keep==='all' || keep.slice(0,7)===ym)) sel.value = keep;
-  else sel.value = (M.bccMax && M.bccMax.slice(0,7)===ym) ? M.bccMax : (tIso.slice(0,7)===ym ? tIso : 'all');
+/* Ngày cuối có đủ dữ liệu: ngày nhỏ hơn giữa BCC và file đơn định ca */
+function dataEnd(ym){
+  const days = monthDays(ym), last = days[days.length-1];
+  const cap = v => !v ? '' : v.slice(0,7)===ym ? v : (v > last ? last : '');
+  const b = cap(M.bccMax), w = cap(M.workMax);
+  if (b && w) return b < w ? b : w;
+  if (b || w) return b || w;
+  const today = new Date(); const y = new Date(today.getTime()-86400000);
+  const yIso = y.getFullYear()+'-'+pad(y.getMonth()+1)+'-'+pad(y.getDate());
+  return yIso.slice(0,7)===ym ? yIso : last;
 }
-$('monthSelect').addEventListener('change', () => { buildDateOptions(); recompute(); });
-$('dateSelect').addEventListener('change', recompute);
+function buildDateOptions(keepRange){
+  const fs = $('fromSelect'), ts = $('toSelect'), ym = $('monthSelect').value;
+  if (!/^\d{4}-\d{2}$/.test(ym)){ fs.innerHTML = ts.innerHTML = '<option>—</option>'; fs.disabled = ts.disabled = true; $('quickRange').innerHTML = ''; return; }
+  const kf = fs.value, kt = ts.value;
+  const opts = monthDays(ym).map(d => '<option value="'+d+'">'+THU[dow(d)]+' '+isoToVi(d)+'</option>').join('');
+  fs.innerHTML = opts; ts.innerHTML = opts; fs.disabled = ts.disabled = false;
+  const days = monthDays(ym), end = dataEnd(ym);
+  if (keepRange && kf && kf.slice(0,7)===ym && kt && kt.slice(0,7)===ym){ fs.value = kf; ts.value = kt; }
+  else { fs.value = days[0]; ts.value = end; }
+  const q = [['Đến ngày có đủ dữ liệu', days[0], end], ['Cả tháng', days[0], days[days.length-1]]];
+  if (M.bccMax && M.bccMax.slice(0,7)===ym && M.bccMax !== end) q.splice(1, 0, ['Đến ngày BCC '+isoShort(M.bccMax), days[0], M.bccMax]);
+  if (end > days[0]) q.push(['Chỉ ngày '+isoShort(end), end, end]);
+  $('quickRange').innerHTML = q.map(x => '<button type="button" data-f="'+x[1]+'" data-t="'+x[2]+'">'+esc(x[0])+'</button>').join('');
+  $('quickRange').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fs.value = b.dataset.f; ts.value = b.dataset.t; recompute(); }));
+}
+$('monthSelect').addEventListener('change', () => { buildDateOptions(false); recompute(); });
+$('fromSelect').addEventListener('change', () => { if ($('toSelect').value < $('fromSelect').value) $('toSelect').value = $('fromSelect').value; recompute(); });
+$('toSelect').addEventListener('change', () => { if ($('fromSelect').value > $('toSelect').value) $('fromSelect').value = $('toSelect').value; recompute(); });
 
 /* ---------- trạng thái từng người, từng ngày ---------- */
 function shiftOfBcc(m, r, w){ if (w){ const p = parseShift(w.shift); if (p) return p; } const t = m.shiftMap[r.ca]; if (t) return parseShift(t); if (/NWD4/i.test(r.ca)) return {dur:4, text:r.ca}; return null; }
@@ -732,6 +766,7 @@ function dayState(m, code, iso){
   st.isGay = st.kind==='work' && st.shift && st.shift.dur <= 4.5;
   st.actualH = b ? hoursOf(b.tg) : 0;
   st.punchIn = b ? b.vao : ''; st.punchOut = b ? b.ra : '';
+  st.noReq = st.kind==='none' && !!m.workMax && iso > m.workMax; // file đơn định ca chưa có tới ngày này
   return st;
 }
 function planText(st){
@@ -762,6 +797,7 @@ function classify(st){
   const noCa = /không có ca|không ca/i.test(ly);
 
   if (noCa || (!b.ca && anyPunch && !st.off && !ly)){
+    if (st.noReq) return R('Chưa kiểm tra được - file đơn định ca chỉ tới '+isoShort(M.workMax), 'muted', 'Xuất lại WorkingApplicationReport có ngày này', anyPunch ? 'Đã chấm '+punches : '');
     if (st.kind==='work' && st.shiftSt==='S') return R('Đã đăng ký ca - chờ QL duyệt', 'pend', 'Quản lý duyệt đơn định ca '+st.shift.text, anyPunch ? 'Đã chấm '+punches : '');
     if (st.kind==='work' && st.lag) return R('Ca đã duyệt - BCC chưa cập nhật', 'muted', 'Xuất lại BCC để hết lỗi', st.shift.text);
     if (st.kind==='off'){ if (anyPunch) return R('Có OFF nhưng vẫn chấm công', 'warn', 'Đổi OFF thành ca làm (rút đơn OFF, làm đơn định ca)', 'Đã chấm '+punches); return st.off.st==='S' ? R('Đơn OFF chờ duyệt', 'pend', 'Quản lý duyệt đơn OFF') : null; }
@@ -826,7 +862,8 @@ function recompute(){
       if (st.half) s.half++;
       if (st.b && st.actualH>0){ s.hoursActual += st.actualH; s.daysActual++; }
       // chưa định ca / chờ duyệt
-      if (st.kind==='none'){ s.none++; if (past) s.nonePast++; missing.push({ e, d, st, type: past || st.b ? 'none' : 'future', label: st.b && (st.b.vao||st.b.ra) ? 'Có chấm công nhưng chưa định ca' : (past ? 'Chưa định ca / chưa làm đơn OFF' : 'Chưa định ca (sắp tới)'), level: past ? 'critical' : 'warn' }); }
+      if (st.kind==='none' && st.noReq){ s.none++; missing.push({ e, d, st, type:'nofile', label:'Chưa kiểm tra được - file đơn định ca chỉ tới '+isoShort(M.workMax), level:'muted', roster: ro ? (ro.days[d]||'') : '' }); }
+      else if (st.kind==='none'){ s.none++; if (past) s.nonePast++; missing.push({ e, d, st, type: past || st.b ? 'none' : 'future', label: st.b && (st.b.vao||st.b.ra) ? 'Có chấm công nhưng chưa định ca' : (past ? 'Chưa định ca / chưa làm đơn OFF' : 'Chưa định ca (sắp tới)'), level: past ? 'critical' : 'warn', roster: ro ? (ro.days[d]||'') : '' }); }
       else if (st.pending){ s.pend++; missing.push({ e, d, st, type:'pend', label: 'Chờ duyệt: '+planText(st).replace(' · chờ duyệt',''), level:'pend' }); }
       // lỗi công
       if (st.b){ const c = classify(st); if (c){ errors.push({ e, d, st, c }); if (c.level==='critical'||c.level==='warn') s.errs++; } }
@@ -838,9 +875,15 @@ function recompute(){
     s.ptDaysPlan = s.work; s.ptOverH = s.hoursPlan > ptH + 1e-9; s.ptOverD = s.work > ptD;
     summary.push(s);
   });
-  const sel = $('dateSelect').value;
-  R = { ym, days, N, sundays, offStd, gayStd, ptH, ptD, lastData, emps, grid, errors, missing, summary, mismatch, daily, hasRoster, sel,
+  let from = $('fromSelect').value, to = $('toSelect').value;
+  if (!from || from.slice(0,7)!==ym) from = days[0]; if (!to || to.slice(0,7)!==ym) to = days[N-1];
+  const inR = x => x.d >= from && x.d <= to;
+  // nhân viên có ngày thiếu ca nhưng không có đơn nào trong file đơn định ca
+  const noWorkInFile = Object.keys(M.workCodes).length ? [...new Set(missing.filter(x => x.type==='none' && inR(x) && !M.workCodes[x.e.code]).map(x => x.e))] : [];
+  R = { ym, days, N, sundays, offStd, gayStd, ptH, ptD, lastData, emps, grid, summary, hasRoster, from, to, inR, noWorkInFile,
+        errors: errors.filter(inR), missing: missing.filter(inR), mismatch: mismatch.filter(inR), daily: daily.filter(inR),
         rosterOnly: hasRoster ? rosterNotInSystem(emps) : [] };
+  R.rangeTxt = from===to ? isoToVi(from) : isoShort(from)+' - '+isoToVi(to);
   render();
 }
 function rosterNotInSystem(emps){
@@ -902,15 +945,40 @@ function dayCell(d){ return '<td class="nowrap">'+THU[dow(d)]+' '+isoShort(d)+'<
 function matchQ(e, q){ if (!q) return true; q = nameKey(q); return nameKey(e.name).includes(q) || e.code.includes(q); }
 
 function viewDinhCa(){
-  const sel = R.sel; let list = R.missing.filter(x => sel==='all' || x.d===sel);
-  const f = ui.f.dinhca || 'all';
-  const cnt = { all:list.length, none:list.filter(x=>x.type==='none').length, pend:list.filter(x=>x.type==='pend').length, future:list.filter(x=>x.type==='future').length };
+  let list = R.missing.slice();
+  const f = ui.f.dinhca || 'none';
+  const cnt = { all:list.length, none:list.filter(x=>x.type==='none').length, pend:list.filter(x=>x.type==='pend').length, future:list.filter(x=>x.type==='future').length, nofile:list.filter(x=>x.type==='nofile').length };
   list = list.filter(x => f==='all' || x.type===f).filter(x => matchQ(x.e, ui.q.dinhca));
-  return { chips:[['all','Tất cả',cnt.all],['none','Chưa định ca (đã qua)',cnt.none],['pend','Chờ quản lý duyệt',cnt.pend],['future','Ngày tới chưa đăng ký',cnt.future]],
-    head:['Nhân viên','Ngày','Tình trạng','Đã chấm công','Việc cần làm'],
-    rows: list.map(x => '<tr>'+empCell(x.e)+dayCell(x.d)+'<td>'+badge(x.level, x.label)+'</td><td class="tabular nowrap">'+esc([x.st.punchIn,x.st.punchOut].filter(Boolean).join(' - ') || '—')+'</td><td class="act">'+(x.type==='pend' ? 'Quản lý vào duyệt đơn' : x.type==='none' ? 'Làm đơn định ca hoặc đơn OFF' : 'Đăng ký ca/OFF trước ngày làm')+'</td></tr>'),
-    empty: sel==='all' ? 'Cả tháng không còn ngày nào thiếu ca hay chờ duyệt.' : 'Ngày '+isoToVi(sel)+' mọi người đã có ca / OFF / nghỉ được duyệt.',
-    legend: '"Chờ quản lý duyệt" = nhân viên đã nộp đơn nhưng chưa được duyệt, không tính là lỗi chưa định ca.' };
+  const chips = [['none','Chưa định ca',cnt.none],['pend','Đã định ca - chờ QL duyệt',cnt.pend],['future','Ngày tới chưa đăng ký',cnt.future]];
+  if (cnt.nofile) chips.push(['nofile','Ngoài khoảng file đơn',cnt.nofile]);
+  chips.push(['all','Tất cả',cnt.all]);
+  return { chips,
+    head:['Nhân viên','Ngày','Tình trạng','Lịch làm việc','Đã chấm công','Việc cần làm'],
+    rows: list.map(x => '<tr>'+empCell(x.e)+dayCell(x.d)+'<td>'+badge(x.level, x.label)+'</td><td class="nowrap">'+esc(x.roster || (R.grid[x.e.code+'|'+x.d] && rosterCellOf(x.e, x.d)) || '—')+'</td><td class="tabular nowrap">'+esc([x.st.punchIn,x.st.punchOut].filter(Boolean).join(' - ') || '—')+'</td><td class="act">'+esc(todoOf(x))+'</td></tr>'),
+    empty: f==='none' ? 'Từ '+R.rangeTxt+' không còn ai chưa định ca.' : 'Không có dòng nào trong nhóm này.',
+    legend: 'Đang xem '+R.rangeTxt+'. "Đã định ca - chờ QL duyệt" = đơn đang ở trạng thái Submitted, không tính là chưa định ca.'
+      + (cnt.nofile ? ' "Ngoài khoảng file đơn" = file WorkingApplicationReport chỉ có đơn tới '+isoToVi(M.workMax)+', nên các ngày sau chưa kết luận được.' : '')
+      + (R.noWorkInFile.length ? ' Lưu ý: file đơn định ca không có đơn nào của '+R.noWorkInFile.map(e=>e.name).join(', ')+'. Nếu các bạn đã đăng ký, kiểm tra file xuất đã chọn đủ nhân viên chưa.' : '') };
+}
+function rosterCellOf(e, d){ if (!R.hasRoster) return ''; const ro = rosterOf(M, e.code, e.name); return ro ? (ro.days[d]||'') : ''; }
+function rosterKind(cell){
+  const c = norm(cell).toUpperCase(); if (!c) return '';
+  if (/^(OFF|WO)$/.test(c)) return 'off';
+  if (/^AL-?1\/2$/.test(c)) return 'half';
+  if (parseShift(c)) return 'work';
+  if (/^(AL|SL|UP|PH|BT|OST|MR|HAC|MATERNITY)/.test(c)) return 'leave';
+  return '';
+}
+function todoOf(x){
+  if (x.type==='pend') return 'Quản lý vào duyệt đơn';
+  if (x.type==='nofile') return 'Xuất lại WorkingApplicationReport có ngày này rồi tải lên';
+  const rc = x.roster || rosterCellOf(x.e, x.d), k = rosterKind(rc);
+  if (k==='off') return 'Làm đơn OFF (lịch: OFF)';
+  if (k==='leave') return 'Làm đơn nghỉ '+norm(rc).toUpperCase()+' (theo lịch)';
+  if (k==='half') return 'Làm đơn định ca 4 tiếng + đơn AL nửa ngày';
+  if (k==='work') return 'Làm đơn định ca '+parseShift(norm(rc).toUpperCase()).text+' (theo lịch)';
+  if (x.st.b && (x.st.b.vao || x.st.b.ra)) return 'Làm đơn định ca (đã đi làm)';
+  return x.type==='future' ? 'Đăng ký ca/OFF trước ngày làm' : 'Làm đơn định ca hoặc đơn OFF';
 }
 function viewLoi(){
   let list = R.errors.slice();
@@ -971,7 +1039,7 @@ function viewLich(){
 function messagesFor(){
   const by = {};
   const add = (e, line) => { (by[e.code] = by[e.code] || { e, lines:[] }).lines.push(line); };
-  R.missing.filter(x => x.type==='none').forEach(x => add(x.e, '• '+isoShort(x.d)+': '+x.label));
+  R.missing.filter(x => x.type==='none').forEach(x => add(x.e, '• '+isoShort(x.d)+': '+x.label+' → '+todoOf(x)));
   R.errors.filter(x => x.c.level==='critical' || x.c.level==='warn').forEach(x => add(x.e, '• '+isoShort(x.d)+': '+x.c.label+(x.c.detail?' ('+x.c.detail+')':'')+(x.c.act?' → '+x.c.act:'')));
   R.mismatch.filter(x => x.level==='critical').forEach(x => add(x.e, '• '+isoShort(x.d)+': '+x.type+' → '+x.act));
   R.summary.forEach(s => {
@@ -982,7 +1050,67 @@ function messagesFor(){
       if (s.gayDiff!==0 && !s.none) add(s.e, '• Tháng '+R.ym.slice(5)+': có '+s.gay+' ca gãy, chuẩn '+R.gayStd+' → '+(s.gayDiff<0?'thiếu '+(-s.gayDiff):'thừa '+s.gayDiff));
     }
   });
-  return Object.values(by).sort((a,b) => a.e.name.localeCompare(b.e.name,'vi')).map(x => ({ e:x.e, text: x.e.name+' ơi, chấm công tháng '+R.ym.slice(5)+' cần xử lý:\n'+[...new Set(x.lines)].join('\n')+'\nBạn xử lý giúp trước ngày '+deadline()+' nhé. Cảm ơn!' }));
+  return Object.values(by).sort((a,b) => a.e.name.localeCompare(b.e.name,'vi')).map(x => ({ e:x.e, text: x.e.name+' ơi, chấm công '+R.rangeTxt+' cần xử lý:\n'+[...new Set(x.lines)].join('\n')+'\nBạn xử lý giúp trước ngày '+deadline()+' nhé. Cảm ơn!' }));
+}
+function fmtDays(list){ // ['2026-11-01','2026-11-03'] -> "01, 03/11"
+  const by = {}; [...new Set(list)].sort().forEach(d => { (by[d.slice(5,7)] = by[d.slice(5,7)] || []).push(d.slice(8)); });
+  return Object.keys(by).map(mo => by[mo].join(', ')+'/'+mo).join('; ');
+}
+function groupMessage(dl){
+  const sec = {}; const order = [];
+  const S = (key, title) => { if (!sec[key]){ sec[key] = { title, people:{} }; order.push(key); } return sec[key]; };
+  const put = (key, title, e, d, note) => { const g = S(key, title); const p = g.people[e.code] = g.people[e.code] || { e, items:[] }; p.items.push({ d, note: note||'' }); };
+  const T = {
+    ca:   'CHƯA ĐỊNH CA → làm đơn định ca (Working Application)',
+    caoff:'CHƯA ĐỊNH CA / CHƯA LÀM ĐƠN OFF → ngày làm thì làm đơn định ca, ngày nghỉ thì làm đơn OFF',
+    off:  'CHƯA LÀM ĐƠN OFF (theo Lịch làm việc) → làm đơn OFF',
+    al:   'CHƯA LÀM ĐƠN NGHỈ PHÉP (theo Lịch làm việc) → làm đơn AL / nghỉ',
+    half: 'NGÀY AL-1/2 CHƯA CÓ ĐƠN → đơn định ca 4 tiếng + đơn AL nửa ngày',
+    inout:'THIẾU GIỜ CHẤM CÔNG → làm đơn điều chỉnh giờ (Adjust Working Time)',
+    nopunch:'CÓ CA NHƯNG KHÔNG CHẤM CÔNG CẢ NGÀY → quên chấm thì làm đơn điều chỉnh giờ, nghỉ thì làm đơn OFF/AL',
+    offwork:'ĐÃ ĐĂNG KÝ OFF / NGHỈ NHƯNG VẪN ĐI LÀM → rút đơn OFF/nghỉ, làm đơn định ca',
+    lech: 'ĐỊNH CA KHÁC LỊCH LÀM VIỆC → sửa đơn cho đúng lịch (hoặc báo QL nếu đổi ca)',
+    khac: 'CẦN KIỂM TRA THÊM'
+  };
+  R.missing.filter(x => x.type==='none' || x.type==='future').forEach(x => {
+    const k = rosterKind(x.roster || rosterCellOf(x.e, x.d));
+    const punched = x.st.b && (x.st.b.vao || x.st.b.ra);
+    if (k==='off' && !punched) put('off', T.off, x.e, x.d);
+    else if (k==='leave' && !punched) put('al', T.al, x.e, x.d, norm(x.roster || rosterCellOf(x.e, x.d)).toUpperCase());
+    else if (k==='half') put('half', T.half, x.e, x.d);
+    else if (k==='work' || punched || R.hasRoster) put('ca', T.ca, x.e, x.d);
+    else put('caoff', T.caoff, x.e, x.d);
+  });
+  const inMiss = new Set(R.missing.filter(x => x.type==='none' || x.type==='future').map(x => x.e.code+'|'+x.d));
+  R.errors.forEach(x => {
+    const c = x.c; if (c.level!=='critical' && c.level!=='warn') return;
+    if (inMiss.has(x.e.code+'|'+x.d)) return; // đã nằm ở mục chưa định ca
+    if (/Thiếu giờ (VÀO|RA)|Thiếu 1 lần chấm|Thiếu giờ vào\/ra/i.test(c.label)) put('inout', T.inout, x.e, x.d, (/VÀO/.test(c.label)?'thiếu VÀO':/RA/.test(c.label)?'thiếu RA':'thiếu 1 lần chấm'));
+    else if (/không chấm công cả ngày/i.test(c.label)) put('nopunch', T.nopunch, x.e, x.d);
+    else if (/OFF nhưng vẫn chấm|vào ngày OFF|đơn nghỉ.*vẫn chấm/i.test(c.label)) put('offwork', T.offwork, x.e, x.d);
+    else put('khac', T.khac, x.e, x.d, c.label);
+  });
+  R.mismatch.filter(x => x.level==='warn').forEach(x => put('lech', T.lech, x.e, x.d, 'lịch '+x.roster+', hệ thống '+x.sys));
+  const want = ['ca','caoff','off','al','half','inout','nopunch','offwork','lech','khac'].filter(k => sec[k]);
+  const pend = R.missing.filter(x => x.type==='pend').length;
+  const nofile = R.missing.filter(x => x.type==='nofile').length;
+  let t = '📢 NHẮC CHẤM CÔNG TỪ '+(R.from===R.to ? 'NGÀY '+isoToVi(R.from) : isoShort(R.from)+' ĐẾN '+isoToVi(R.to))+'\n';
+  if (!want.length){
+    t += '\nCả nhà đã định ca, OFF, chấm công đầy đủ trong khoảng ngày này. Cảm ơn cả nhà! 👏';
+  } else {
+    t += 'Các bạn có tên dưới đây kiểm tra và làm đơn trên hệ thống'+(dl ? ' trước '+dl : '')+' nhé:\n';
+    want.forEach((k, i) => {
+      t += '\n'+(i+1)+'. '+sec[k].title+'\n';
+      Object.values(sec[k].people).sort((a,b) => a.e.name.localeCompare(b.e.name,'vi')).forEach(p => {
+        const notes = p.items.some(it => it.note);
+        t += '- '+p.e.name+': '+(notes ? p.items.sort((a,b)=>a.d<b.d?-1:1).map(it => isoShort(it.d)+(it.note?' ('+it.note+')':'')).join(', ') : fmtDays(p.items.map(it=>it.d)))+'\n';
+      });
+    });
+  }
+  if (pend) t += '\nĐơn đã nộp đang chờ quản lý duyệt: '+pend+' ngày (không cần làm lại).';
+  if (nofile) t += '\n(Chưa kiểm tra '+nofile+' ngày sau '+isoShort(M.workMax)+' vì file đơn định ca chưa có.)';
+  if (want.length) t += '\nLàm xong các bạn thả ❤️ vào tin nhắn này giúp mình. Cảm ơn cả nhà!';
+  return { text: t, count: want.reduce((n,k) => n + Object.keys(sec[k].people).length, 0) };
 }
 function deadline(){ const d = new Date(); d.setDate(d.getDate()+1); return pad(d.getDate())+'/'+pad(d.getMonth()+1); }
 
@@ -990,14 +1118,14 @@ function render(){
   // thẻ số liệu
   const st = $('stats');
   if (!R){ st.innerHTML = ''; $('tabs').innerHTML = ''; $('panel').innerHTML = '<div class="empty"><div class="big">Chưa có dữ liệu</div>Tải file BCC (và các file đơn định ca, đơn nghỉ, Lịch làm việc nếu có) để bắt đầu.</div>'; $('exportAllBtn').disabled = true; return; }
-  const sel = R.sel, mis = R.missing.filter(x => sel==='all' || x.d===sel);
+  const mis = R.missing;
   const nNone = mis.filter(x=>x.type==='none').length, nPend = mis.filter(x=>x.type==='pend').length;
   const nErr = R.errors.filter(x => x.c.level==='critical' || x.c.level==='warn').length;
   const nPT = R.summary.filter(s => s.e.isPT && (s.ptOverH || s.ptOverD)).length;
   const nFT = R.summary.filter(s => !s.e.isPT && (s.offDiff>0 || s.gayDiff>0 || (!s.none && (s.offDiff<0 || s.gayDiff<0)))).length;
   const cards = [
-    ['dinhca', nNone, 'Chưa định ca '+(sel==='all'?'(cả tháng)':isoShort(sel)), 'var(--critical)'],
-    ['dinhca', nPend, 'Chờ quản lý duyệt', 'var(--pend)'],
+    ['dinhca', nNone, 'Chưa định ca '+R.rangeTxt, 'var(--critical)'],
+    ['dinhca', nPend, 'Đã định ca - chờ QL duyệt', 'var(--pend)'],
     ['loi', nErr, 'Lỗi công cần xử lý', 'var(--warn)'],
     ['thang', nFT, 'FT lệch OFF / ca gãy', 'var(--info)'],
     ['thang', nPT, 'PT lố '+R.ptH+'h / '+R.ptD+' ngày', '#E8082C']
@@ -1010,7 +1138,7 @@ function render(){
 function renderPanel(){
   if (!R) return;
   lsSet('cc_tab', ui.tab);
-  const counts = { dinhca: R.missing.filter(x => R.sel==='all' || x.d===R.sel).length, loi: R.errors.filter(x=>x.c.level==='critical'||x.c.level==='warn').length,
+  const counts = { dinhca: R.missing.filter(x => x.type==='none').length, loi: R.errors.filter(x=>x.c.level==='critical'||x.c.level==='warn').length,
     thang: R.summary.length, lich: R.mismatch.length, nhan: messagesFor().length, chitiet: R.daily.length };
   $('tabs').innerHTML = TABS.map(t => '<button class="tab" role="tab" aria-selected="'+(t.id===ui.tab)+'" data-id="'+t.id+'">'+esc(t.name)+' <span class="cnt">'+counts[t.id]+'</span></button>').join('');
   $('tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { ui.tab = b.dataset.id; renderPanel(); }));
@@ -1028,17 +1156,18 @@ function renderPanel(){
   $('expTab').addEventListener('click', () => exportBook([ui.tab]));
 }
 function viewChiTiet(){
-  const f = ui.f.chitiet || 'past';
+  const f = ui.f.chitiet || 'all';
   let list = R.daily.filter(x => matchQ(x.e, ui.q.chitiet));
-  if (f==='past') list = list.filter(x => R.lastData && x.d <= R.lastData);
-  if (f==='day' && R.sel!=='all') list = list.filter(x => x.d===R.sel);
-  return { chips:[['past','Đến ngày có BCC',R.lastData ? R.daily.filter(x=>x.d<=R.lastData).length : 0],['day','Ngày đang chọn',R.sel==='all'?R.daily.length:R.daily.filter(x=>x.d===R.sel).length],['all','Cả tháng',R.daily.length]],
+  const bad = x => { const r = dailyResult(x.st); return r.level==='critical' || r.level==='warn'; };
+  if (f==='bad') list = list.filter(bad);
+  return { chips:[['all',R.rangeTxt,R.daily.length],['bad','Chỉ dòng có lỗi',R.daily.filter(bad).length]],
     head:['Nhân viên','Ngày','Lịch làm việc','Hệ thống','Vào','Ra','Giờ công','Kết quả'],
     rows: list.map(x => { const r = dailyResult(x.st); return '<tr>'+empCell(x.e)+dayCell(x.d)+'<td class="nowrap">'+esc(x.roster||'—')+'</td><td class="nowrap muted">'+esc(planText(x.st)||'—')+'</td><td class="tabular">'+esc(x.st.punchIn||'—')+'</td><td class="tabular">'+esc(x.st.punchOut||'—')+'</td><td class="num">'+(x.st.actualH?fmtH(x.st.actualH):'—')+'</td><td>'+badge(r.level, r.label)+'</td></tr>'; }),
     empty:'Không có dòng nào.', legend:'' };
 }
 function dailyResult(st){
   const c = st.b ? classify(st) : null; if (c) return c;
+  if (st.kind==='none' && st.noReq) return { label:'Ngoài khoảng file đơn định ca', level:'muted' };
   if (st.kind==='none') return { label: st.b ? 'Chưa định ca' : 'Chưa có ca/OFF', level: st.b ? 'critical' : 'warn' };
   if (st.pending) return { label:'Chờ duyệt', level:'pend' };
   if (st.kind==='off') return { label:'OFF', level:'muted' };
@@ -1049,11 +1178,16 @@ function dailyResult(st){
 }
 function renderMessages(p){
   let list = messagesFor().filter(x => matchQ(x.e, ui.q.nhan));
-  p.innerHTML = '<div class="toolbar"><input type="text" class="search" id="q" placeholder="Tìm tên hoặc mã NV…" value="'+esc(ui.q.nhan||'')+'"><span class="spacer"></span><button class="btn btn-ghost btn-sm" id="copyAll">Sao chép tất cả</button></div>'
+  const dlv = ui.dl !== undefined ? ui.dl : 'ngày '+deadline();
+  const gm = groupMessage(dlv);
+  p.innerHTML = '<div class="group-msg"><div class="row"><b>Tin nhắn tổng gửi group · '+esc(R.rangeTxt)+'</b><label>Hạn xử lý <input type="text" id="dlInput" value="'+esc(dlv)+'"></label><button class="btn btn-primary btn-sm" id="copyGroup">Sao chép tin nhắn tổng</button></div><pre id="groupPre">'+esc(gm.text)+'</pre></div>'
+    + '<div class="toolbar"><input type="text" class="search" id="q" placeholder="Tìm tên hoặc mã NV…" value="'+esc(ui.q.nhan||'')+'"><span class="spacer"></span><button class="btn btn-ghost btn-sm" id="copyAll">Sao chép tất cả</button></div>'
     + (list.length ? '<div class="msg-grid">'+list.map((x,i) => '<div class="msg"><div class="msg-head"><b>'+esc(x.e.name)+(x.e.isPT?'<span class="pt-tag">PT</span>':'')+'</b><button class="btn btn-primary btn-sm" data-i="'+i+'">Sao chép</button></div><pre>'+esc(x.text)+'</pre></div>').join('')+'</div>' : '<div class="empty"><div class="big">Không ai cần nhắc.</div></div>')
-    + '<div class="legend">Tin nhắn soạn sẵn cho từng nhân viên, dán vào Zalo. Đơn "chờ duyệt" không đưa vào tin nhắn vì đó là việc của quản lý.</div>';
+    + '<div class="legend">Tin nhắn tổng gom theo việc cần làm, dán lên group nhắc chung. Bên dưới là tin nhắn riêng từng người. Đơn "chờ duyệt" (Submitted) không bị nhắc vì đó là việc của quản lý.</div>';
   const copy = t => { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Đã sao chép'), () => { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Đã sao chép'); } catch(e){} ta.remove(); }); };
   p.querySelectorAll('.msg button').forEach(b => b.addEventListener('click', () => copy(list[+b.dataset.i].text)));
+  $('copyGroup').addEventListener('click', () => copy(groupMessage(ui.dl !== undefined ? ui.dl : dlv).text));
+  $('dlInput').addEventListener('input', () => { ui.dl = $('dlInput').value; $('groupPre').textContent = groupMessage(ui.dl).text; });
   $('copyAll').addEventListener('click', () => copy(list.map(x=>x.text).join('\n\n')));
   const q = $('q'); q.addEventListener('input', () => { ui.q.nhan = q.value; const pos = q.selectionStart; renderPanel(); const q2 = $('q'); q2.focus(); q2.setSelectionRange(pos,pos); });
 }
@@ -1063,7 +1197,7 @@ function exportBook(tabs){
   if (!R) return;
   const B = XW.Book();
   const now = new Date(); const stamp = pad(now.getHours())+':'+pad(now.getMinutes())+' '+pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear();
-  const ky = 'Kỳ dữ liệu: 01/'+R.ym.slice(5)+'/'+R.ym.slice(0,4)+' - '+(R.lastData ? isoToVi(R.lastData) : isoToVi(R.days[R.N-1]));
+  const ky = 'Kỳ dữ liệu: '+isoToVi(R.from)+' - '+isoToVi(R.to);
   const sub = 'Check Ca & Chấm Công · ' + ky + ' · Xuất lúc ' + stamp;
   const lvTxt = l => ({critical:'Lỗi', warn:'Cần kiểm tra', pend:'Chờ duyệt', info:'Nhắc nhở', muted:'Thông tin', ok:'OK'}[l] || '');
   const want = t => tabs.includes(t) || tabs.includes('all');
@@ -1071,7 +1205,7 @@ function exportBook(tabs){
     const sh = B.addSheet('Tổng quan', { title:'TỔNG QUAN CHẤM CÔNG THÁNG '+R.ym.slice(5)+'/'+R.ym.slice(0,4), subtitle: sub, cols:[30,16,30,16], landscape:false });
     B.section(sh, '1. CHỈ SỐ CHÍNH');
     B.kv(sh, [['Nhân viên', R.emps.length, 'int'], ['Part-time', R.summary.filter(s=>s.e.isPT).length, 'int'],
-      ['Ngày chưa định ca (đã qua)', R.missing.filter(x=>x.type==='none' && x.d<=R.lastData).length, 'int'], ['Đơn chờ duyệt', R.missing.filter(x=>x.type==='pend').length, 'int'],
+      ['Ngày chưa định ca', R.missing.filter(x=>x.type==='none').length, 'int'], ['Đơn chờ duyệt', R.missing.filter(x=>x.type==='pend').length, 'int'],
       ['Lỗi công cần xử lý', R.errors.filter(x=>x.c.level==='critical'||x.c.level==='warn').length, 'int'], ['Thiếu giờ VÀO / RA', R.errors.filter(x=>/Thiếu giờ/.test(x.c.label)).length, 'int'],
       ['FT lệch OFF / ca gãy', R.summary.filter(s=>!s.e.isPT && (s.offDiff||s.gayDiff)).length, 'int'], ['PT lố giờ / ngày', R.summary.filter(s=>s.e.isPT && (s.ptOverH||s.ptOverD)).length, 'int'],
       ['OFF chuẩn (FT)', R.offStd, 'int'], ['Ca gãy chuẩn (FT)', R.gayStd, 'int'], ['PT tối đa giờ', R.ptH, 'int'], ['PT tối đa ngày công', R.ptD, 'int']], { pairs:2 });
@@ -1081,7 +1215,7 @@ function exportBook(tabs){
     const list = R.missing;
     const sh = B.addSheet('Chưa định ca - chờ duyệt', { title:'CHƯA ĐỊNH CA & CHỜ DUYỆT ('+list.length+' NGÀY)', subtitle: sub, cols:[6,10,26,14,12,40,18,34] });
     B.table(sh, [{h:'STT',t:'stt'},{h:'Mã NV',t:'code'},{h:'Họ tên',t:'textB'},{h:'Vị trí',t:'text'},{h:'Ngày',t:'center'},{h:'Tình trạng',t:'wrap'},{h:'Đã chấm công',t:'center'},{h:'Việc cần làm',t:'wrap'}],
-      list.map((x,i) => [i+1, x.e.code, x.e.name, x.e.pos, THU[dow(x.d)]+' '+isoToVi(x.d), x.label, [x.st.punchIn,x.st.punchOut].filter(Boolean).join(' - '), x.type==='pend'?'Quản lý duyệt đơn':'Làm đơn định ca hoặc đơn OFF']),
+      list.map((x,i) => [i+1, x.e.code, x.e.name, x.e.pos, THU[dow(x.d)]+' '+isoToVi(x.d), x.label, [x.st.punchIn,x.st.punchOut].filter(Boolean).join(' - '), todoOf(x)]),
       { main:true, freezeCol:3, emptyText:'Không có ngày nào thiếu ca' });
   }
   if (want('loi')){
@@ -1113,6 +1247,9 @@ function exportBook(tabs){
   if (want('nhan')){
     const list = messagesFor();
     const sh = B.addSheet('Tin nhắn nhắc', { title:'TIN NHẮN NHẮC NHÂN VIÊN ('+list.length+' NGƯỜI)', subtitle: sub, cols:[6,10,24,90] });
+    B.section(sh, '1. TIN NHẮN TỔNG GỬI GROUP');
+    B.table(sh, [{h:'',t:'stt'},{h:'',t:'code'},{h:'Gửi',t:'textB'},{h:'Tin nhắn',t:'wrap'}], [['', '', 'Group nhắc chung', groupMessage(ui.dl !== undefined ? ui.dl : 'ngày '+deadline()).text]], { zebra:false });
+    B.section(sh, '2. TIN NHẮN RIÊNG TỪNG NGƯỜI');
     B.table(sh, [{h:'STT',t:'stt'},{h:'Mã NV',t:'code'},{h:'Họ tên',t:'textB'},{h:'Tin nhắn',t:'wrap'}], list.map((x,i) => [i+1, x.e.code, x.e.name, x.text]), { main:true, emptyText:'Không ai cần nhắc' });
   }
   if (want('chitiet')){
@@ -1122,7 +1259,7 @@ function exportBook(tabs){
       list.map((x,i) => [i+1, x.e.code, x.e.name, THU[dow(x.d)]+' '+isoToVi(x.d), x.roster, planText(x.st), x.st.punchIn, x.st.punchOut, x.st.actualH ? Math.round(x.st.actualH*100)/100 : '', dailyResult(x.st).label]), { main:true, freezeCol:3 });
   }
   const tag = { all:'BaoCaoDayDu', dinhca:'ChuaDinhCa', loi:'LoiCong', thang:'TongKetThang', lich:'DoiChieuLich', nhan:'TinNhan', chitiet:'ChiTiet' }[tabs[0]] || 'BaoCao';
-  B.save('Kohnan_CheckCaChamCong_'+tag+'_T'+R.ym.slice(5)+'-'+R.ym.slice(0,4)+'_'+pad(now.getDate())+'-'+pad(now.getMonth()+1)+'-'+now.getFullYear()+'.xlsx');
+  B.save('Kohnan_CheckCaChamCong_'+tag+'_Ngay'+R.from.slice(8)+'-'+R.to.slice(8)+'_T'+R.ym.slice(5)+'-'+R.ym.slice(0,4)+'_'+pad(now.getDate())+'-'+pad(now.getMonth()+1)+'-'+now.getFullYear()+'.xlsx');
 }
 $('exportAllBtn').addEventListener('click', () => exportBook(['all','dinhca','loi','thang','lich','nhan','chitiet']));
 
