@@ -243,6 +243,16 @@ window.S1016_TOOLS = {
       "updated": "05/04/2026"
     },
     {
+      "name": "11.11 SALE 111K - Toàn hệ thống T11",
+      "desc": "Xếp hạng 19 cửa hàng chạy đồng giá 111K ngày 11/11, 1016 so với chuỗi, voucher NV và giới hạn số lượng",
+      "group": "Doanh số & Phân tích",
+      "groupId": "doanh-so",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_2026-11_111K_Toan_He_Thong.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "12/11/2026"
+    },
+    {
       "name": "Sale Plan & Dashboard - Tháng 11",
       "desc": "Kế hoạch bán hàng T11, Budget 4.480 tr, Pelican, Topaz Elite, Sảnh",
       "group": "Doanh số & Phân tích",
