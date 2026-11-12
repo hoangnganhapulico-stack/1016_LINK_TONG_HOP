@@ -114,7 +114,33 @@
   S.sourceById = function (id) { for (var i = 0; i < S.sources.length; i++) if (S.sources[i].id === id) return S.sources[i]; return null; };
 
   function saveSync() { S.writeJ(K.SYNC, S.sync); }
-  function saveCache() { if (!S.writeJ(K.CACHE, S.cache)) { /* quá dung lượng: bỏ bớt bản ghi lớn nhất */ } }
+  /* Bộ nhớ đệm chỉ là BẢN SAO dữ liệu nguồn (để so thay đổi & dùng tạm khi nguồn lỗi).
+     localStorage ~5MB dùng CHUNG cho mọi công cụ trên cùng địa chỉ github.io, nên không được
+     để bản sao chiếm chỗ của công cụ gốc: chỉ giữ dữ liệu của nguồn nhỏ, tổng tối đa ~1MB;
+     nguồn lớn chỉ giữ dấu (hash/thời điểm). Ghi lỗi thì thu gọn dần, không báo lỗi đỏ. */
+  var CACHE_MAX = 1000000, CACHE_ITEM_MAX = 250000;
+  function slimEntry(c) { return c ? { at: c.at, hash: c.hash, sourceAt: c.sourceAt || null, origin: c.origin || null, slim: true } : c; }
+  function trySet(o) { try { S.raw.set(K.CACHE, JSON.stringify(o)); return true; } catch (e) { return false; } }
+  function saveCache() {
+    var out = {}, total = 0;
+    Object.keys(S.cache).map(function (id) { var c = S.cache[id]; return { id: id, c: c, n: c && c.data != null ? JSON.stringify(c.data).length : 0 }; })
+      .sort(function (a, b) { return a.n - b.n; })
+      .forEach(function (x) {
+        if (x.n && x.n <= CACHE_ITEM_MAX && total + x.n <= CACHE_MAX) { out[x.id] = x.c; total += x.n; }
+        else out[x.id] = slimEntry(x.c);
+      });
+    if (trySet(out)) return;
+    var slim = {}; Object.keys(S.cache).forEach(function (id) { slim[id] = slimEntry(S.cache[id]); });
+    if (trySet(slim)) return;
+    S.raw.del(K.CACHE);
+    if (window.console) console.warn("[S1016] Bộ nhớ trình duyệt đã đầy - bỏ qua lưu bộ nhớ đệm của Trợ lý.");
+  }
+  S.storageUsage = function () {
+    var by = [], total = 0;
+    S.raw.keys().forEach(function (k) { var n = (k.length + ((S.raw.get(k) || "").length)) * 2; total += n; by.push({ key: k, bytes: n }); });
+    by.sort(function (a, b) { return b.bytes - a.bytes; });
+    return { total: total, top: by.slice(0, 15) };
+  };
 
   /* So sánh bản ghi cũ/mới -> các dòng lịch sử. records: {id: obj} */
   S.diffRecords = function (sourceId, entity, oldRecs, newRecs, fields, origin) {
@@ -147,7 +173,10 @@
       if (res.error) throw new Error(res.error);
       var hashNow = U.hash(U.stable(res.data));
       var prev = S.cache[id];
-      if (src.diff && (!prev || prev.hash !== hashNow)) {
+      if (src.diff && prev && prev.hash !== hashNow && prev.data == null) {
+        // bản đệm chỉ còn dấu (nguồn lớn): biết là có thay đổi nhưng không so được từng dòng
+        S.addLog([{ origin: opts.origin || "Đồng bộ", source: id, entity: "nguồn", id: id, field: "(có cập nhật)", old: null, new: (res.count || 0) + " bản ghi" }]);
+      } else if (src.diff && (!prev || prev.hash !== hashNow)) {
         var logs = src.diff(prev ? prev.data : null, res.data, opts.origin || (res.origin === "import" ? "Nhập gói" : "Đồng bộ"));
         if (prev) S.addLog(logs); // lần đầu không ghi hàng loạt "(mới)"
         else S.addLog([{ origin: "Đồng bộ", source: id, entity: "nguồn", id: id, field: "(lần đầu)", old: null, new: (res.count || 0) + " bản ghi" }]);
