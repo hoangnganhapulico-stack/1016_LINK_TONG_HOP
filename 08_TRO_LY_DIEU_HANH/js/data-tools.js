@@ -273,14 +273,14 @@ window.S1016_TOOLS = {
       "updated": "24/10/2026"
     },
     {
-      "name": "Dashboard Doanh Thu Sảnh (Mẫu)",
-      "desc": "Theo dõi nhiều sảnh cùng lúc - nạp DETAIL, so sánh sảnh với quầy",
+      "name": "Theo Dõi Sảnh Riêng",
+      "desc": "Bản theo dõi riêng: doanh thu sảnh, kế hoạch & thay đổi mặt hàng (Mall / bán chậm), hình ảnh, kinh nghiệm - gửi số sảnh theo ngày sang Trợ lý",
       "group": "Doanh số & Phân tích",
       "groupId": "doanh-so",
-      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Dashboard_Doanh_Thu_Sanh_Mau.html",
-      "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Dashboard_Doanh_Thu_Sanh_Mau.html",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Theo_Doi_Sanh_Rieng.html",
+      "local": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_Theo_Doi_Sanh_Rieng.html",
       "host": "GitHub",
-      "updated": "04/11/2026"
+      "updated": "12/11/2026"
     },
     {
       "name": "So Sánh Hệ Thống Theo Store",
