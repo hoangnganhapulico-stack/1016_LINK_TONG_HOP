@@ -120,6 +120,39 @@ code,kbd{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:#e
 .hide{display:none!important}
 details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 .foot-note{font-size:12px;color:var(--ink2)}
+.gwrap{--lw:230px;overflow:auto;border:1px solid var(--card-line);border-radius:12px;background:#fff;max-height:640px}
+.gin{position:relative}
+.grow{display:flex;min-height:42px;border-top:1px solid var(--line);position:relative;z-index:1;cursor:pointer}
+.glab{position:sticky;left:0;z-index:3;flex:none;width:var(--lw);background:#fff;padding:5px 8px;border-right:1px solid var(--card-line);font-size:12px;line-height:1.3}
+.gtrack{position:relative;flex:none}
+.ghead{position:sticky;top:0;z-index:4;background:#fff;min-height:48px;cursor:default}.ghead .glab{z-index:5}
+.gday{position:absolute;bottom:3px;width:22px;text-align:center;font-size:10px;color:var(--ink2)}
+.gwk{position:absolute;top:3px;font-size:10px;font-weight:700;color:var(--navy);white-space:nowrap}
+.gms{position:absolute;top:16px;font-size:9px;font-weight:800;color:#fff;background:var(--kred);border-radius:4px;padding:0 4px;white-space:nowrap}
+.ggrp{background:var(--blue-soft);min-height:30px;cursor:default}.ggrp .glab{background:var(--blue-soft);color:var(--navy);font-weight:800;font-size:13px}
+.gbg{position:absolute;top:0;bottom:0;left:var(--lw);z-index:0;pointer-events:none}
+.gbg .we{position:absolute;top:0;bottom:0;width:22px;background:#f1f4f9}
+.gbg .ml{position:absolute;top:0;bottom:0;width:2px;background:rgba(232,8,44,.3)}
+.gbg .td{position:absolute;top:0;bottom:0;width:3px;background:var(--kred)}
+.gbar{position:absolute;top:11px;height:20px;border-radius:6px;background:#dfe7f5;border:1px solid #b9c8e6}
+.gbar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--navy)}
+.gbar.ok{background:#cfead9;border-color:#8fcca6}.gbar.ok i{background:var(--ok)}
+.gbar.bad{border:2px solid var(--bad);background:#fde7eb}.gbar.bad i{background:var(--bad)}
+.gbar.fut i{background:#7d9bd6}
+.gbar span{position:absolute;left:calc(100% + 5px);top:1px;font-size:11px;font-weight:700;white-space:nowrap}
+.grow:not(.ghead):not(.ggrp):hover .glab{background:#f6f9ff}
+.dep{display:inline-block;font-size:10px;padding:0 6px;margin-top:2px}
+.calw{overflow-x:auto}.cal{display:grid;grid-template-columns:repeat(7,minmax(96px,1fr));gap:4px;min-width:720px}
+.cal .h{font-size:12px;font-weight:700;color:var(--navy);text-align:center}
+.cal .d{background:#fff;border:1px solid var(--card-line);border-radius:8px;padding:4px 5px;min-height:84px;font-size:11px;line-height:1.3}
+.cal .d.we{background:#f8f9fc}.cal .d.past{opacity:.5}.cal .d.tdy{outline:2px solid var(--kred)}
+.cal .d b.dd{display:block;font-size:12px;color:var(--ink2)}
+.cal .ev{display:block;margin-top:2px;padding-left:9px;position:relative}
+.cal .ev::before{content:"";position:absolute;left:0;top:4px;width:6px;height:6px;border-radius:50%;background:var(--dot,#0039a6)}
+.cal .ev.m{color:#fff;background:var(--kred);border-radius:4px;padding:0 4px;font-weight:700}.cal .ev.m::before{display:none}
+#pctPop{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,92vw);background:#fff;border-radius:14px;box-shadow:0 10px 40px rgba(0,30,90,.3);padding:16px;display:none}
+#pctPop.on{display:block}#pctPop .pp{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0}
+@media(max-width:640px){.gwrap{--lw:150px}}
 @media(max-width:640px){.hero .wrap{flex-direction:column;align-items:flex-start;gap:0}.mascot-hero{width:120px;align-self:flex-end;margin-top:-10px}.brand img{height:36px}h2{font-size:21px}.kpi .v{font-size:24px}.big4{font-size:36px}th,td{padding:8px 9px}.tl-bar div{font-size:9px}}
 @media print{.nav,.noprint{display:none!important}body{background:#fff}}
 </style>
@@ -139,7 +172,7 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 
 <nav class="nav"><div class="wrap">
   <span class="logo-box"><img src="../08_TRO_LY_DIEU_HANH/kohnan_logo.png" alt="Kohnan"></span>
-  <a href="#tq">Tổng quan</a><a href="#kh">Kế hoạch</a><a href="#ns">Nhân sự</a><a href="#hd">Hướng dẫn</a><a href="#ipl">Input list kho</a><a href="#lo">Kiểm tra layout</a><a href="#sl">Số liệu</a><a href="#ha">Hình ảnh</a><a href="#bh">Bài học</a>
+  <a href="#tq">Tổng quan</a><a href="#tl">Timeline</a><a href="#kh">Kế hoạch</a><a href="#ns">Nhân sự</a><a href="#hd">Hướng dẫn</a><a href="#ipl">Input list kho</a><a href="#lo">Kiểm tra layout</a><a href="#sl">Số liệu</a><a href="#ha">Hình ảnh</a><a href="#bh">Bài học</a>
 </div></nav>
 
 <main class="wrap">
@@ -173,7 +206,14 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 <!-- 2. KẾ HOẠCH -->
 <section id="kh">
   <div class="sec-head"><span class="num">2</span><h2>Kế hoạch &amp; timeline từng việc</h2></div>
-  <p class="lead">Mỗi việc có ngày, vai trò, người phụ trách (gõ tên hoặc bấm tên gợi ý từ mục Nhân sự), tick khi xong. Bấm "Cách làm" để xem hướng dẫn.</p>
+  <p class="lead">Biểu đồ cho biết từng team đang làm tới đâu (%), việc nào chờ team kia làm xong mới làm được (VD Admin check packing list chờ Sale), và lịch từng ngày để xếp ca.</p>
+  <h3 id="tl" style="scroll-margin-top:60px">Biểu đồ timeline theo team</h3>
+  <div class="tabs noprint" id="gTabs"></div>
+  <div class="legend"><span><i style="background:#0039a6"></i>đang làm (phần đậm = % đã xong)</span><span><i style="background:#1f8a4c"></i>xong</span><span><i style="background:#d63b2f"></i>trễ hạn</span><span><i style="background:#7d9bd6"></i>chưa tới ngày</span><span><i style="background:#e8082c;width:3px"></i>hôm nay</span><span>Bấm vào dòng để cập nhật %</span></div>
+  <div class="gwrap" id="gantt"></div>
+  <h3 style="margin-top:22px">Lịch từng ngày - xếp ca</h3>
+  <div id="cal"></div>
+  <h3 style="margin-top:22px">Danh sách việc</h3>
   <div class="row noprint" style="margin-bottom:12px">
     <select id="fRole"><option value="">Tất cả vai trò</option></select>
     <select id="fStat"><option value="">Tất cả trạng thái</option><option value="todo">Chưa xong</option><option value="late">Trễ hạn</option><option value="week">Trong 7 ngày tới</option><option value="done">Đã xong</option></select>
@@ -287,6 +327,7 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 </section>
 </main>
 
+<div id="pctPop"></div>
 <div class="lb" id="lb" onclick="this.classList.remove('on')"><span class="x">×</span><img id="lbImg" alt=""></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -436,14 +477,54 @@ function renderTasks(){
     html+=`<tr class="${s.done?'done':''} ${late?'late':''}" data-id="${t[0]}">
       <td class="c"><input type="checkbox" class="chk" ${s.done?'checked':''} onchange="setTask('${t[0]}','done',this.checked)"></td>
       <td style="white-space:nowrap"><b>${t[2]}</b>${t[2]!==t[3]?' → '+t[3]:''}<div class="xs muted">${late?'<span class="tag bad">Trễ</span>':(a<=td&&td<=b&&!s.done?'<span class="tag warn">Đang làm</span>':'D'+(dayDiff(a,D0)>=0?'+':'')+dayDiff(a,D0))}</div></td>
-      <td><div class="tt">${t[5]}</div><a href="#hd" class="xs" onclick="openGuide('${t[6]}')">Cách làm →</a>${s.doneAt?`<div class="xs muted">Xong lúc ${esc(s.doneAt)}</div>`:''}</td>
+      <td><div class="tt">${t[5]}</div>${pctCtl(t)}<a href="#hd" class="xs" onclick="openGuide('${t[6]}')">Cách làm →</a>${s.doneAt?`<div class="xs muted">Xong lúc ${esc(s.doneAt)}</div>`:''}</td>
       <td class="sm">${t[4].split(',').map(r=>RN[r]).join('<br>')}</td>
       <td><input type="text" class="who" value="${esc(s.who||'')}" placeholder="Tên người phụ trách" onchange="setTask('${t[0]}','who',this.value)">${names.length?`<div class="pick">${names.map(n=>`<button type="button" onclick="addWho('${t[0]}','${esc(n).replace(/'/g,"\\'")}')">${esc(n)}</button>`).join('')}</div>`:''}</td>
       <td><input type="text" class="who" value="${esc(s.note||'')}" placeholder="Ghi chú" onchange="setTask('${t[0]}','note',this.value)"></td></tr>`;
   });
   $('taskBody').innerHTML=html||'<tr><td colspan="6" class="muted">Không có việc phù hợp bộ lọc.</td></tr>';
 }
-function setTask(id,f,v){const s={...(G('task:'+id,{})||{})};s[f]=v;if(f==='done')s.doneAt=v?nowStr():'';S('task:'+id,s);renderTasks();renderOverview();}
+function setTask(id,f,v){const s={...(G('task:'+id,{})||{})};s[f]=v;if(f==='done'){s.doneAt=v?nowStr():'';if(!v&&s.pct>=100)s.pct=null;}S('task:'+id,s);renderTasks();renderOverview();renderTL();}
+// ===== TIMELINE THEO TEAM =====
+const SHORT={a1:'Lên kế hoạch, phân công',a2:'Vẽ layout, đánh số location',a3:'Họp phổ biến + test',a4:'Gỡ tag / số cũ',a5:'Đặt văn phòng phẩm',a6:'Dọn hàng thời vụ, hàng lỗi',a7:'Dọn kho giá trị cao, damage',a8:'NCC đồng kiểm, đổi trả',a9:'Kiểm chứng từ trả / moving',b1:'Sắp xếp kho ≤ 1,5m',b2:'Làm packing list',b3:'1 face = 1 SKU',b4:'PC card đúng SKU',b5:'Sub label hàng No barcode',b6:'Dán nhãn Pcs/Set, Demo...',b7:'Đánh số gondola đợt 1',b8:'Vệ sinh gầm kệ',b9:'Gửi layout + họp Ajis',c1:'Xong slip trả NCC',c2:'Đặt hàng đủ bán tới 22/12',c3:'Kiểm Cloud stock âm, MAC',c4:'Xong Discard/Theft/Move',c5:'Báo Mall + bảo vệ',c6:'QUÉT GẦM lần 1',c7:'Admin check chéo packing list',c8:'Chọn gondola sampling',d1:'Nhận hàng cuối, chứng từ',d2:'Lên Input list kho (chưa số)',d3:'In & dán Input list kho',d4:'Input list sàn 4 bước',d5:'Nhập số Input list kho',d6:'Double check IPL kho 30/30/30',d7:'Input list location 9000',d8:'QUÉT GẦM lần 2, bổ sung số gon',d9:'Caution display, kiểm chéo',d10:'Hàng đã thanh toán, ký gửi',d11:'Biểu mẫu đêm KK',d12:'Đăng ký Mall F12/F10/F04',d13:'Đồ ăn uống, số gon cuối',e1:'Kiểm Input list lần cuối',e2:'Rút hàng phức tạp, chụp ảnh',e3:'Trừ số hàng xuất kho',e4:'Trả hàng về line, giao IPL',e5:'Mở tủ / kho, tháo POP',e6:'Đón Ajis, họp',e7:'Sampling trong đêm',e8:'Nhận file Ajis, ký Handover',f1:'Đổ số lên Cloud',f2:'Next Morning Check',f3:'Final Q\'ty, POST check',f4:'Email STOCKTAKE + báo cáo',f5:'Đánh giá Ajis QR',f6:'Nhận hàng lại, gỡ tem',f7:'Hoàn tất trước 29/12',f8:'Report Night + rút kinh nghiệm'};
+const TEAMS=[['sale','Team Sale','#0039a6',['SALE','SENIOR','SC_CHIEF','KHO']],['admin','Team Admin','#e8082c',['ADMIN','AD_CHIEF','SC']],['ql','Quản lý (SM)','#465364',['SM']]];
+const DEP={c7:['b2'],d3:['d2'],d5:['d3'],d6:['d5'],d9:['b4','b6'],e3:['d6'],f1:['e8'],f2:['f1'],f3:['f2']};
+const MSS={'02/12':'Ngưng trả','10/12':'Ngưng nhận','16/12':'KIỂM KÊ','22/12':'Nhận lại','29/12':'Đóng Cloud','07/01':'Đóng kho'};
+const GS=P('06/11'),GE=P('07/01'),DW=22,ND=dayDiff(GE,GS)+1;let gTab='team',gScrolled=false;
+function strip(h){return String(h).replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>');}
+function teamOf(r){return (TEAMS.find(t=>t[3].includes(r))||TEAMS[0])[0];}
+function tTeams(t){return [...new Set(t[4].split(',').map(teamOf))];}
+function tColor(t){return TEAMS.find(x=>x[0]===teamOf(t[4].split(',')[0]))[2];}
+function autoPct(t){const s=(t[0]==='d5'||t[0]==='d6')?iplStats():null;if(!s)return null;if(t[0]==='d5')return s.rows?s.pctQty:null;return s.need?Math.round(s.chk/s.need*100):null;}
+function tPct(t){const s=tState(t);if(s.done)return 100;if(s.pct!==undefined&&s.pct!==null&&s.pct!=='')return +s.pct;return autoPct(t)??0;}
+function tStat(t){const [a,b]=tDates(t),td=today0();if(tPct(t)>=100)return 'ok';if(b<td)return 'bad';if(a<=td)return 'run';return 'fut';}
+function depHtml(t){const d=DEP[t[0]];if(!d||tPct(t)>=100)return '';const nd=d.map(id=>TASKS.find(x=>x[0]===id)).filter(x=>tPct(x)<100);
+  return nd.length?`<div><span class="dep tag warn">Chờ ${nd.map(x=>x[0].toUpperCase()+' '+esc(SHORT[x[0]])+' '+tPct(x)+'%').join(', ')}</span></div>`:`<div><span class="dep tag ok">${d.map(x=>x.toUpperCase()).join(', ')} đã xong - làm được</span></div>`;}
+function pctCtl(t){const p=tPct(t),s=tState(t),auto=autoPct(t)!=null&&(s.pct===undefined||s.pct===null)&&!s.done;
+  return `<div class="row" style="gap:6px;margin:4px 0 2px"><div class="pbar" style="width:90px"><div style="width:${p}%;background:${tStat(t)==='bad'?'var(--bad)':'var(--ok)'}"></div></div><select style="font-size:12px;padding:3px 6px" onchange="setPct('${t[0]}',this.value)">${[0,10,20,30,40,50,60,70,80,90,100].map(v=>`<option value="${v}" ${Math.round(p/10)*10===v?'selected':''}>${v}%</option>`).join('')}</select>${auto?'<span class="xs muted">tự tính</span>':''}</div>${depHtml(t)}`;}
+function setPct(id,v){const s={...(G('task:'+id,{})||{})};v=+v;s.pct=v;if(v>=100){if(!s.done){s.done=true;s.doneAt=nowStr();}}else if(s.done){s.done=false;s.doneAt='';}S('task:'+id,s);renderTasks();renderOverview();renderTL();}
+function openPct(id){const t=TASKS.find(x=>x[0]===id),s=tState(t),p=tPct(t);
+  $('pctPop').innerHTML=`<div class="row"><b>${id.toUpperCase()} · ${esc(SHORT[id])}</b><span class="sp"></span><button class="btn sub sm" onclick="$('pctPop').classList.remove('on')">Đóng</button></div><div class="sm muted" style="margin-top:6px">${t[5]}</div><div class="sm" style="margin-top:6px"><b>${t[2]} → ${t[3]}</b> · ${t[4].split(',').map(r=>RN[r]).join(', ')}</div>${depHtml(t)}
+  <div class="sm" style="margin-top:10px"><b>Đang làm tới: ${p}%</b>${autoPct(t)!=null&&(s.pct==null)?' (tự tính từ Input list kho)':''}</div><div class="pp">${[0,10,20,30,40,50,60,70,80,90,100].map(v=>`<button class="btn ${v===p?'':'sub'} sm" onclick="setPct('${id}',${v});openPct('${id}')">${v===100?'Xong':v+'%'}</button>`).join('')}</div>
+  <input type="text" class="who" placeholder="Người phụ trách" value="${esc(s.who||'')}" onchange="setTask('${id}','who',this.value)"><input type="text" class="who" style="margin-top:6px" placeholder="Ghi chú (VD: xong khu 1001-2050, còn 3xxx)" value="${esc(s.note||'')}" onchange="setTask('${id}','note',this.value)">`;$('pctPop').classList.add('on');}
+function gGroups(){if(gTab==='team')return TEAMS.map(tm=>[tm[1],TASKS.filter(t=>teamOf(t[4].split(',')[0])===tm[0]),tm[2]]);if(gTab==='phase')return Object.keys(PH).map(k=>[PH[k],TASKS.filter(t=>t[1]===k)]);const tm=TEAMS.find(x=>x[0]===gTab);return [[tm[1]+' (gồm việc phối hợp)',TASKS.filter(t=>tTeams(t).includes(gTab)),tm[2]]];}
+function renderGantt(){const td=today0(),W=ND*DW;let bg='',hd='',rows='';
+  $('gTabs').innerHTML=[['team','Theo team'],['sale','Team Sale'],['admin','Team Admin'],['ql','Quản lý (SM)'],['phase','Theo giai đoạn']].map(x=>`<button class="tab ${gTab===x[0]?'on':''}" onclick="gTab='${x[0]}';renderTL()">${x[1]}</button>`).join('');
+  for(let i=0;i<ND;i++){const d=new Date(GS.getFullYear(),GS.getMonth(),GS.getDate()+i),dw=d.getDay(),k=dmy(d);if(dw===0||dw===6)bg+=`<div class="we" style="left:${i*DW}px"></div>`;if(dw===1)hd+=`<div class="gwk" style="left:${i*DW+2}px">T2 ${k}</div>`;hd+=`<div class="gday" style="left:${i*DW}px;${dw===0?'color:var(--bad)':''}">${d.getDate()}</div>`;if(MSS[k]){bg+=`<div class="ml" style="left:${i*DW+10}px"></div>`;hd+=`<div class="gms" style="left:${i*DW}px">${MSS[k]}</div>`;}}
+  const ti=dayDiff(td,GS);if(ti>=0&&ti<ND)bg+=`<div class="td" style="left:${ti*DW+9}px"></div>`;
+  gGroups().forEach(([name,list,col])=>{const dn=list.filter(t=>tStat(t)==='ok').length,lt=list.filter(t=>tStat(t)==='bad').length;rows+=`<div class="grow ggrp"><div class="glab" ${col?`style="border-left:4px solid ${col}"`:''}>${esc(name)} · ${dn}/${list.length} xong${lt?` · <span style="color:var(--bad)">${lt} trễ</span>`:''}</div><div class="gtrack" style="width:${W}px"></div></div>`;
+    list.forEach(t=>{const [a,b]=tDates(t),s=tState(t),p=tPct(t),st=tStat(t);const l=Math.max(0,dayDiff(a,GS)),w=(Math.min(ND-1,dayDiff(b,GS))-l+1)*DW;
+      rows+=`<div class="grow" onclick="openPct('${t[0]}')" title="${esc(strip(t[5]))}"><div class="glab"><b>${t[0].toUpperCase()}</b> ${esc(SHORT[t[0]])}<div class="xs muted">${t[2]}${t[2]!==t[3]?' - '+t[3]:''} · ${s.who?esc(s.who):t[4].split(',').map(r=>RN[r]).join(', ')}</div>${depHtml(t)}</div><div class="gtrack" style="width:${W}px"><div class="gbar ${st}" style="left:${l*DW+2}px;width:${w-4}px"><i style="width:${p}%"></i><span>${st==='ok'?'✓ Xong':p+'%'}${st==='bad'?' · TRỄ':''}</span></div></div></div>`;});});
+  const g=$('gantt');g.innerHTML=`<div class="gin" style="width:calc(var(--lw) + ${W}px)"><div class="gbg" style="width:${W}px">${bg}</div><div class="grow ghead"><div class="glab"><b>Việc</b><div class="xs muted">Bấm dòng để cập nhật %</div></div><div class="gtrack" style="width:${W}px">${hd}</div></div>${rows}</div>`;
+  if(!gScrolled){gScrolled=true;g.scrollLeft=Math.max(0,(ti-6)*DW);}}
+function renderCal(){const td=today0();const st=new Date(td.getFullYear(),td.getMonth(),td.getDate()-((td.getDay()+6)%7));const end=P('10/01');
+  const list=TASKS.filter(t=>gTab==='team'||gTab==='phase'||tTeams(t).includes(gTab));let h=['T2','T3','T4','T5','T6','T7','CN'].map(x=>`<div class="h">${x}</div>`).join('');
+  for(let d=new Date(st);d<=end;d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)){const k=dmy(d);let ev='';MS.forEach(m=>{if(m[0]===k)ev+=`<span class="ev m">${esc(m[1])}</span>`;});
+    list.forEach(t=>{const [a,b]=tDates(t),span=dayDiff(b,a),ok=tStat(t)==='ok';let x='';if(span<=3&&d>=a&&d<=b)x=SHORT[t[0]];else if(+d===+a)x='Bắt đầu: '+SHORT[t[0]];else if(+d===+b)x='Hạn: '+SHORT[t[0]];
+      if(x)ev+=`<span class="ev" style="--dot:${tColor(t)};${ok?'text-decoration:line-through;opacity:.6':''}" title="${esc(strip(t[5]))}">${esc(x)}</span>`;});
+    const dw=d.getDay();h+=`<div class="d ${dw===0||dw===6?'we':''} ${d<td?'past':''} ${+d===+td?'tdy':''}"><b class="dd">${k}</b>${ev}</div>`;}
+  $('cal').innerHTML=`<div class="calw"><div class="cal">${h}</div></div><div class="legend">${TEAMS.map(t=>`<span><i style="background:${t[2]};border-radius:50%"></i>${t[1]}</span>`).join('')}<span>Gạch ngang = đã xong · việc ≤ 4 ngày hiện mỗi ngày, việc dài hiện ngày bắt đầu và hạn · nút team phía trên lọc cả lịch</span></div>`;}
+function renderTL(){renderGantt();renderCal();}
 function addWho(id,n){const s=G('task:'+id,{})||{};const cur=String(s.who||'').split(',').map(x=>x.trim()).filter(Boolean);if(cur.includes(n))return;cur.push(n);setTask(id,'who',cur.join(', '));}
 function exportPlan(){
   const B=XW.Book(),td=today0();
@@ -925,7 +1006,7 @@ function renderLessons(){$('lessonBody').innerHTML=LESSONS.map((l,i)=>`<tr><td c
   const ta=$('lessonNote');if(document.activeElement!==ta)ta.value=G('note','')||'';}
 
 // ================== KHỞI ĐỘNG ==================
-function renderAll(fromSync){renderOverview();renderTasks();if(!fromSync||!document.activeElement||!document.activeElement.closest('#ns'))renderRoster();
+function renderAll(fromSync){renderOverview();renderTasks();renderTL();if(!fromSync||!document.activeElement||!document.activeElement.closest('#ns'))renderRoster();
   if(!fromSync||!document.activeElement||!document.activeElement.closest('#ipl'))renderIPL();if(!fromSync||!document.activeElement||!document.activeElement.closest('#sl'))renderNumbers();renderLessons();}
 (function init(){
   $('fRole').innerHTML+=ROLES.map(r=>`<option value="${r[0]}">${r[1]}</option>`).join('');
