@@ -22,7 +22,7 @@
   ];
   var MON_EN = { JAN: 1, FEB: 2, MAR: 3, APR: 4, MAY: 5, JUN: 6, JUL: 7, AUG: 8, SEP: 9, OCT: 10, NOV: 11, DEC: 12 };
   var DEFAULT_PINS = [/Check_Ton_Gia_KM/i, /OrderIQ_Dat_Hang_Ton_Kho/i, /LICH_LAM_VIEC_1016/i, /SO_TAY_TEAM_ADMIN/i, /xinhangmiennam/i, /kohnan-hsd/i];
-  var SRC_TOOL = { LICH: /LICH_LAM_VIEC_1016/i, LICH_TASKS: /LICH_LAM_VIEC_1016/i, BUDGET: /LICH_LAM_VIEC_1016/i, TA: /SO_TAY_TEAM_ADMIN/i, KHO: /OrderIQ_Dat_Hang_Ton_Kho/i, BRAND: /DS_Brand_Contribution/i };
+  var SRC_TOOL = { LICH: /LICH_LAM_VIEC_1016/i, LICH_TASKS: /LICH_LAM_VIEC_1016/i, BUDGET: /LICH_LAM_VIEC_1016/i, TA: /SO_TAY_TEAM_ADMIN/i, KHO: /OrderIQ_Dat_Hang_Ton_Kho/i, BRAND: /DS_Brand_Contribution/i, SANH: /DS_Theo_Doi_Sanh_Rieng/i };
 
   function curYm() { return U.todayIso().slice(0, 7); }
   function ymOf(y, m) { return y + "-" + U.pad(m); }
@@ -184,9 +184,12 @@
     // --- biểu đồ tháng + 7 ngày tới ---
     var nx = []; for (var i = 0; i < 7; i++) nx.push(U.addDays(iso, i));
     var rows = nx.map(function (x) { var dx = U.dateOf(x), hm = H.month(x), b = hm.bud[x], sh = M.shiftsOn(x), onN = sh ? sh.filter(function (s) { return s.kind === "shift"; }).length : null, nt = M.dayNote(x), we = [0, 6].indexOf(dx.getDay()) >= 0, mavg = hm.avg;
-      return "<tr" + (x === iso ? ' class="cur"' : "") + "><td><b>" + U.dm(x) + "</b></td><td" + (we ? ' class="we"' : "") + ">" + U.WDF[dx.getDay()] + '</td><td class="n">' + (b != null ? U.fmtM(b) : "-") + '</td><td class="n">' + (b && mavg ? '<span class="' + (b >= mavg ? "up" : "dn") + '">' + (b >= mavg ? "+" : "") + U.fmt1((b / mavg - 1) * 100) + "%</span>" : "-") + '</td><td class="n">' + (onN != null ? onN : "-") + "</td><td>" + (nt ? E(nt) : "") + "</td></tr>"; }).join("");
+      return "<tr" + (x === iso ? ' class="cur"' : "") + "><td><b>" + U.dm(x) + "</b></td><td" + (we ? ' class="we"' : "") + ">" + U.WDF[dx.getDay()] + '</td><td class="n">' + (b != null ? U.fmtM(b) : "-") + '</td><td class="n">' + (b && mavg ? '<span class="' + (b >= mavg ? "up" : "dn") + '">' + (b >= mavg ? "+" : "") + U.fmt1((b / mavg - 1) * 100) + "%</span>" : "-") + '</td><td class="n">' + (onN != null ? onN : "-") + "</td><td>" + (nt ? E(nt) : "") + sanhTag(x) + "</td></tr>"; }).join("");
     out.push('<div class="g2c wide"><div class="card">' + sec("Budget & doanh số tháng " + (+mo.ym.slice(5)) + "/" + mo.ym.slice(0, 4), '<span class="small muted">Budget tháng <b>' + money(mo.bMonth) + "</b>" + (mo.hasSale ? " · thực đạt " + money(mo.mtdA) : "") + "</span>") + chartSvg(mo, iso) + src(mo.hasSale ? "SALE" : "BUDGET") + "</div>" +
       '<div class="card">' + sec("7 ngày tới") + '<div class="tbl"><table class="t7"><thead><tr><th>Ngày</th><th>Thứ</th><th class="n">Target</th><th class="n">So TB</th><th class="n">Đi làm</th><th>Ghi chú</th></tr></thead><tbody>' + rows + "</tbody></table></div></div></div>");
+
+    // --- Sảnh đang chạy (từ trang Theo Dõi Sảnh Riêng) ---
+    try { var snh = sanhHtml(iso); if (snh) out.push(snh); } catch (e) {}
 
     // --- Brand mix PB+SB (từ trang Brand Contribution) ---
     try { var bh = brandHtml(); if (bh) out.push(bh); } catch (e) {}
@@ -224,6 +227,32 @@
       '<div class="al ' + v[0] + '"><b>' + v[1] + "</b> · PB+SB " + P(L.share) + " (cùng kỳ " + P(L.shareLY) + ", TB hệ thống " + P(L.sys) + ") · hạng #" + L.rank + "/" + L.n + " · " + E(L.cm || "") + "</div>" +
       (tl ? '<div class="al info">Layer ưu tiên đẩy PB/SB: ' + tl + "</div>" : "") +
       '<div class="tbl"><table><thead><tr><th>Tháng</th><th class="n">PB+SB</th><th class="n">Δ cùng kỳ</th><th class="n">TB HT</th><th class="n">Δ HT</th><th class="n">Hạng</th><th>Kết quả</th></tr></thead><tbody>' + rows + "</tbody></table></div>" + src("BRAND") + "</div>";
+  }
+  function sanhRun(iso) { var d = S.data.SANH; if (!d || !d.sanhs) return []; return d.sanhs.filter(function (x) { return x.from && x.to && x.from <= iso && iso <= x.to; }); }
+  function sanhTag(iso) { var l = sanhRun(iso); return l.length ? ' <span class="tag warn" title="Cửa hàng có chạy sảnh">Sảnh ' + l.map(function (x) { return E(x.name); }).join(", ") + "</span>" : ""; }
+  H.sanhRun = sanhRun;
+  function sanhHtml(iso) {
+    var d = S.data.SANH; if (!d || !d.sanhs || !d.sanhs.length) return "";
+    var run = sanhRun(iso), up = d.sanhs.filter(function (x) { return x.from && x.from > iso && x.from <= U.addDays(iso, 7); });
+    if (!run.length && !up.length) return "";
+    var tool = toolFor(SRC_TOOL.SANH), today = U.todayIso();
+    var rows = run.map(function (x) {
+      var days = x.days || [], day = days.filter(function (r) { return r.d === iso; })[0], cum = 0, nd = 0;
+      days.forEach(function (r) { if (r.d <= iso) { cum += r.net; nd++; } });
+      var tgDay = x.perDay || 0, pc = day && tgDay ? day.net / tgDay * 100 : null, tgCum = x.target ? cum / x.target * 100 : null;
+      var left = Math.max(0, Math.round((U.dateOf(x.to) - U.dateOf(iso)) / 864e5));
+      var dayCell = day ? U.fmtInt(day.net) : (iso < today ? '<span class="dn">chưa nạp DETAIL</span>' : '<span class="muted">chưa có</span>');
+      return "<tr><td><b>" + E(x.name) + '</b><div class="small muted">POS ' + E(x.pos || "") + " · " + U.dm(x.from) + " - " + U.dm(x.to) + (x.status === "ended" ? " · đã kết thúc" : "") + '</div></td><td class="n">' + dayCell +
+        '</td><td class="n">' + (tgDay ? U.fmtInt(tgDay) : "-") + '</td><td class="n">' + (pc != null ? '<span class="' + (pc >= 100 ? "up" : "dn") + '">' + U.fmt1(pc) + "%</span>" : "-") +
+        '</td><td class="n">' + (day ? U.fmtInt(day.cust) + (day.cust ? '<div class="small muted">AOV ' + U.fmtInt(day.net / day.cust) + "</div>" : "") : "-") +
+        '</td><td class="n">' + U.fmtInt(cum) + (tgCum != null ? '<div class="small muted">' + U.fmt1(tgCum) + "% target</div>" : "") + '</td><td class="n">' + (x.status === "ended" ? "-" : left) + "</td></tr>";
+    }).join("");
+    var tot = 0, totC = 0; run.forEach(function (x) { (x.days || []).forEach(function (r) { if (r.d === iso) { tot += r.net; totC += r.cust; } }); });
+    var need = run.filter(function (x) { return x.need && x.status !== "ended"; }).map(function (x) { return "<b>" + E(x.name) + "</b> cần " + U.fmtM(x.need) + "/ngày trong " + x.remain + " ngày còn lại"; });
+    return '<div class="card">' + sec("Sảnh " + U.dm(iso) + (run.length ? " · " + run.length + " sảnh đang chạy" : ""), tool ? linkBtn(tool, "Mở Theo dõi Sảnh") : "") +
+      (run.length ? '<div class="tbl"><table><thead><tr><th>Sảnh</th><th class="n">DT ngày</th><th class="n">Target ngày</th><th class="n">% ngày</th><th class="n">Khách</th><th class="n">Lũy kế đợt</th><th class="n">Còn (ngày)</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+        (tot ? '<p class="small muted">Tổng sảnh ngày ' + U.dm(iso) + ": <b>" + U.fmtInt(tot) + "đ</b> · " + U.fmtInt(totC) + " khách</p>" : "") + (need.length ? '<div class="al warn">' + need.join("<br>") + "</div>" : "") : "") +
+      (up.length ? '<div class="al info">Sắp chạy: ' + up.map(function (x) { return "<b>" + E(x.name) + "</b> (POS " + E(x.pos || "") + ", từ " + U.dm(x.from) + (x.target ? ", target " + U.fmtM(x.target) : "") + ")"; }).join("; ") + "</div>" : "") + src("SANH") + "</div>";
   }
   function groupName(id) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][0] === id) return GROUPS[i][1]; return "Khác"; }
 
