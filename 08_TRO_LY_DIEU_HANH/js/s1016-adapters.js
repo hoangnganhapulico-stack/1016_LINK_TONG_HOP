@@ -210,6 +210,20 @@
     diff: function (a, b, origin) { return S.diffRecords("BRAND", "Tháng Brand", a && a.recs, b.recs, ["share", "sys", "rank", "verdict"], origin); }
   });
 
+  /* ================= 4c. SẢNH (ảnh chụp từ trang Theo Dõi Sảnh Riêng) ================= */
+  S.registerSource({
+    id: "SANH", name: "Theo dõi Sảnh (doanh thu sảnh theo ngày)", group: "Doanh số", tool: "SANH", entity: "Doanh thu, khách, target từng sảnh theo ngày",
+    keys: ["S1016_SNAP_SANH"], how: "Mở trang Theo Dõi Sảnh Riêng và nạp file DETAIL - trang tự gửi số sảnh theo ngày.",
+    read: function () {
+      var sn = readSnap("SANH"); if (!sn) return { missing: true, message: "Chưa có số liệu: mở trang Theo Dõi Sảnh Riêng trong trình duyệt này." };
+      var p = sn.snap.payload; if (!p || !Array.isArray(p.sanhs)) throw new Error("Ảnh chụp SANH thiếu danh sách sảnh.");
+      var byDate = {}, recs = {};
+      p.sanhs.forEach(function (x) { (x.days || []).forEach(function (d) { (byDate[d.d] = byDate[d.d] || []).push({ id: x.id, name: x.name, pos: x.pos, net: d.net, cust: d.cust, store: d.store }); recs["SN:" + x.id + ":" + d.d] = { net: d.net, cust: d.cust }; }); });
+      return { data: { sanhs: p.sanhs, byDate: byDate, recs: recs }, count: p.sanhs.length, origin: sn.origin, sourceAt: sn.at };
+    },
+    diff: function (a, b, origin) { return S.diffRecords("SANH", "Doanh thu sảnh/ngày", a && a.recs, b.recs, ["net", "cust"], origin); }
+  });
+
   /* ================= 5. KHO & ĐẶT HÀNG (ảnh chụp từ OrderIQ) ================= */
   S.registerSource({
     id: "KHO", name: "OrderIQ - tồn kho & đặt hàng", group: "Kho - Đặt hàng", tool: "ORDERIQ", entity: "Mã cần xử lý, SKU quên đặt, lý do, người phụ trách",
