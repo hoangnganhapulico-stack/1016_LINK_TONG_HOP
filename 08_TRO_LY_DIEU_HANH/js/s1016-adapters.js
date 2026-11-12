@@ -197,6 +197,19 @@
     diff: function (a, b, origin) { return S.diffRecords("SALE", "Doanh số ngày", a && a.days, b.days, ["revenue", "bills"], origin); }
   });
 
+  /* ================= 4b. BRAND MIX PB+SB (ảnh chụp từ trang Brand Contribution) ================= */
+  S.registerSource({
+    id: "BRAND", name: "Brand Contribution (tỷ trọng PB+SB)", group: "Doanh số", tool: "BRAND", entity: "Tỷ trọng PB+SB theo tháng, xếp hạng, Layer ưu tiên",
+    keys: ["S1016_SNAP_BRAND"], how: "Mở trang Brand Contribution (nhập file Brand Sales Contribution công ty gửi) - trang tự gửi tóm tắt.",
+    read: function () {
+      var sn = readSnap("BRAND"); if (!sn) return { missing: true, message: "Chưa có số liệu: mở trang Brand Contribution trong trình duyệt này." };
+      var p = sn.snap.payload; if (!p.latest || !Array.isArray(p.months)) throw new Error("Ảnh chụp BRAND thiếu latest/months.");
+      var recs = {}; p.months.forEach(function (m) { recs["BR:" + m.k] = { share: m.share, sys: m.sys, rank: m.rank, verdict: m.verdict }; });
+      return { data: { latest: p.latest, until: p.until, months: p.months, topLayers: p.topLayers || [], recs: recs }, count: p.months.length, origin: sn.origin, sourceAt: sn.at };
+    },
+    diff: function (a, b, origin) { return S.diffRecords("BRAND", "Tháng Brand", a && a.recs, b.recs, ["share", "sys", "rank", "verdict"], origin); }
+  });
+
   /* ================= 5. KHO & ĐẶT HÀNG (ảnh chụp từ OrderIQ) ================= */
   S.registerSource({
     id: "KHO", name: "OrderIQ - tồn kho & đặt hàng", group: "Kho - Đặt hàng", tool: "ORDERIQ", entity: "Mã cần xử lý, SKU quên đặt, lý do, người phụ trách",
