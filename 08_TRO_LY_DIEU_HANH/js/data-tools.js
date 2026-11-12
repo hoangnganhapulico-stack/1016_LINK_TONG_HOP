@@ -563,6 +563,16 @@ window.S1016_TOOLS = {
       "updated": "24/08/2026"
     },
     {
+      "name": "Kiểm Kê 12/2026 - Kế Hoạch & Tiến Trình",
+      "desc": "Timeline, phân công, hướng dẫn, Input list kho tự kiểm, kiểm tra layout - KK 16/12/2026",
+      "group": "Kế hoạch & Báo cáo",
+      "groupId": "ke-hoach",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/05_KE_HOACH_BAO_CAO/KK_Kiem_Ke_Thang12_2026.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "12/11/2026"
+    },
+    {
       "name": "T10 - Kế Hoạch Team Admin",
       "desc": "Đạt Budget T10 + bù phần thiếu T9",
       "group": "Kế hoạch & Báo cáo",
