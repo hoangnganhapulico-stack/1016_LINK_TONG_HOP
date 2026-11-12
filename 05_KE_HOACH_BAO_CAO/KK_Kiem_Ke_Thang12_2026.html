@@ -172,7 +172,7 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 
 <nav class="nav"><div class="wrap">
   <span class="logo-box"><img src="../08_TRO_LY_DIEU_HANH/kohnan_logo.png" alt="Kohnan"></span>
-  <a href="#tq">Tổng quan</a><a href="#tl">Timeline</a><a href="#kh">Kế hoạch</a><a href="#ns">Nhân sự</a><a href="#hd">Hướng dẫn</a><a href="#ipl">Input list kho</a><a href="#lo">Kiểm tra layout</a><a href="#sl">Số liệu</a><a href="#ha">Hình ảnh</a><a href="#bh">Bài học</a>
+  <a href="#tq">Tổng quan</a><a href="#tl">Timeline</a><a href="#khu">Tiến độ khu</a><a href="#kh">Kế hoạch</a><a href="#ns">Nhân sự</a><a href="#hd">Hướng dẫn</a><a href="#ipl">Input list kho</a><a href="#lo">Kiểm tra layout</a><a href="#sl">Số liệu</a><a href="#ha">Hình ảnh</a><a href="#bh">Bài học</a>
 </div></nav>
 
 <main class="wrap">
@@ -211,6 +211,8 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
   <div class="tabs noprint" id="gTabs"></div>
   <div class="legend"><span><i style="background:#0039a6"></i>đang làm (phần đậm = % đã xong)</span><span><i style="background:#1f8a4c"></i>xong</span><span><i style="background:#d63b2f"></i>trễ hạn</span><span><i style="background:#7d9bd6"></i>chưa tới ngày</span><span><i style="background:#e8082c;width:3px"></i>hôm nay</span><span>Bấm vào dòng để cập nhật %</span></div>
   <div class="gwrap" id="gantt"></div>
+  <h3 id="khu" style="margin-top:22px;scroll-margin-top:60px">Tiến độ theo khu - Sale xong → Admin vào check</h3>
+  <div id="zoneProg"></div>
   <h3 style="margin-top:22px">Lịch từng ngày - xếp ca</h3>
   <div id="cal"></div>
   <h3 style="margin-top:22px">Danh sách việc</h3>
@@ -524,7 +526,7 @@ function renderCal(){const td=today0();const st=new Date(td.getFullYear(),td.get
       if(x)ev+=`<span class="ev" style="--dot:${tColor(t)};${ok?'text-decoration:line-through;opacity:.6':''}" title="${esc(strip(t[5]))}">${esc(x)}</span>`;});
     const dw=d.getDay();h+=`<div class="d ${dw===0||dw===6?'we':''} ${d<td?'past':''} ${+d===+td?'tdy':''}"><b class="dd">${k}</b>${ev}</div>`;}
   $('cal').innerHTML=`<div class="calw"><div class="cal">${h}</div></div><div class="legend">${TEAMS.map(t=>`<span><i style="background:${t[2]};border-radius:50%"></i>${t[1]}</span>`).join('')}<span>Gạch ngang = đã xong · việc ≤ 4 ngày hiện mỗi ngày, việc dài hiện ngày bắt đầu và hạn · nút team phía trên lọc cả lịch</span></div>`;}
-function renderTL(){renderGantt();renderCal();}
+function renderTL(){renderGantt();renderZoneProg();renderCal();}
 function addWho(id,n){const s=G('task:'+id,{})||{};const cur=String(s.who||'').split(',').map(x=>x.trim()).filter(Boolean);if(cur.includes(n))return;cur.push(n);setTask(id,'who',cur.join(', '));}
 function exportPlan(){
   const B=XW.Book(),td=today0();
@@ -554,9 +556,27 @@ function renderRoster(){
 function setRoster(k,v){const R={...G('roster',{})};R[k]=v;S('roster',R);renderTasks();}
 function setAjis(k,v){const A={...G('ajis',{})};A[k]=v;S('ajis',A);}
 function zones(){return G('zones',[])||[];}
-function setZone(i,k,v){const Z=zones().map(z=>({...z}));Z[i][k]=v;S('zones',Z);}
-function addZone(){const Z=zones().slice();Z.push({});S('zones',Z);renderRoster();}
-function delZone(i){if(!confirm('Xóa khu này?'))return;const Z=zones().slice();Z.splice(i,1);S('zones',Z);renderRoster();}
+function setZone(i,k,v){const Z=zones().map(z=>({...z}));Z[i][k]=v;S('zones',Z);renderZoneProg();}
+function addZone(){const Z=zones().slice();Z.push({});S('zones',Z);renderRoster();renderZoneProg();}
+function delZone(i){if(!confirm('Xóa khu này?'))return;const Z=zones().slice();Z.splice(i,1);S('zones',Z);renderRoster();renderZoneProg();}
+// ===== TIẾN ĐỘ THEO KHU =====
+const ZST=[['pk','Packing list',['','Đang làm','Xong']],['pc','1 face - PC card',['','Đang làm','Xong']],['il','Input list',['','Không cần','Đang làm','Xong']],['ck','Admin double check',['','Đang check','OK','Có lỗi - Sale sửa']]];
+function zCls(v){return /Xong|OK|Không cần/.test(v)?'#e3f4ea':/lỗi/.test(v)?'#fde7eb':v?'#fff5d6':'#fff';}
+function zState(z){if(z.ck==='OK')return ['ok','Hoàn tất'];if(/lỗi/.test(z.ck||''))return ['bad','Sale sửa lỗi rồi báo Admin'];
+  const done=[z.pk==='Xong',z.pc==='Xong',z.il==='Xong'||z.il==='Không cần'];if(done.every(Boolean))return ['warn',z.ck==='Đang check'?'Admin đang check':'Sẵn sàng - Admin vào check'];
+  return ['info','Sale đang làm '+done.filter(Boolean).length+'/3'];}
+const ZQ=[['1001-1082','Gondola sàn'],['2001-2108','Gondola sàn'],['3001-3103','Gondola sàn'],['4001-4136','Gondola sàn'],['5001-5032','Gondola sàn'],['6001-6040','Gondola'],['7001-7010','VMD'],['8001-8060','Wagon + pallet'],['8101-8345','Gondola wallside'],['8501-8508','Counter'],['9000-9303','Kho']];
+function quickZones(){if(zones().length&&!confirm('Đã có khu - thêm các dải này vào cuối?'))return;S('zones',zones().concat(ZQ.map(x=>({loc:x[0],desc:x[1]}))));renderRoster();renderZoneProg();}
+let zFilter='';
+function renderZoneProg(){const el=$('zoneProg');if(!el)return;const Z=zones();
+  if(!Z.length){el.innerHTML=`<div class="card"><p class="muted" style="margin-top:0">Chưa có khu. Thêm khu ở mục 3 (Nhân sự), hoặc tạo nhanh theo dải số layout T6/2026 rồi sửa lại theo layout kỳ này (có thể chia nhỏ theo CAT, VD 2001-2050).</p><button class="btn sub sm" onclick="quickZones()">+ Tạo nhanh 11 khu theo layout T6/2026</button></div>`;return;}
+  const ok=k=>Z.filter(z=>/Xong|OK|Không cần/.test(z[k]||'')).length;const ready=Z.filter(z=>zState(z)[1].startsWith('Sẵn sàng')).length,err=Z.filter(z=>zState(z)[0]==='bad').length;
+  const F=[['','Tất cả'],['info','Sale đang làm'],['warn','Chờ / đang check'],['bad','Có lỗi'],['ok','Hoàn tất']];
+  el.innerHTML=`<div class="grid g4">${[[ok('pk')+'/'+Z.length,'khu xong packing list'],[ok('pc')+'/'+Z.length,'khu xong 1 face - PC card'],[ok('il')+'/'+Z.length,'khu xong Input list'],[ready,'khu sẵn sàng - Admin vào check'],[ok('ck')+'/'+Z.length,'khu Admin check OK'+(err?' · '+err+' khu có lỗi':'')]].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="d">${k[1]}</div></div>`).join('')}</div>
+  <div class="tabs" style="margin-top:12px">${F.map(f=>`<button class="tab ${zFilter===f[0]?'on':''}" onclick="zFilter='${f[0]}';renderZoneProg()">${f[1]}</button>`).join('')}</div>
+  <div class="tbl"><table><thead><tr><th>Khu / Location</th>${ZST.map(c=>`<th>${c[1]}</th>`).join('')}<th>Chuyển giao</th><th>Người làm / check</th></tr></thead><tbody>${Z.map((z,i)=>({z,i,st:zState(z)})).filter(x=>!zFilter||x.st[0]===zFilter).map(({z,i,st})=>`<tr><td><b>${esc(z.loc||'?')}</b><div class="xs muted">${esc(z.desc||'')}</div></td>${ZST.map(c=>`<td><select style="font-size:12px;padding:4px 6px;background:${zCls(z[c[0]]||'')}" onchange="setZoneP(${i},'${c[0]}',this.value)">${c[2].map(o=>`<option value="${o}" ${o===(z[c[0]]||'')?'selected':''}>${o||'-'}</option>`).join('')}</select></td>`).join('')}<td><span class="tag ${st[0]}">${st[1]}</span>${z.at?`<div class="xs muted">${esc(z.at)}</div>`:''}</td><td class="xs">${esc(z.a||'')}${z.c?'<br>Check: '+esc(z.c):''}</td></tr>`).join('')||'<tr><td colspan="7" class="muted">Không có khu ở trạng thái này.</td></tr>'}</tbody></table></div>
+  <p class="foot-note">Sale chọn "Xong" khi làm xong khu → khu đủ 3 cột Sale hiện "Sẵn sàng - Admin vào check". Admin check xong chọn OK hoặc "Có lỗi - Sale sửa". Tên người lấy từ bảng phân khu ở mục 3.</p>`;}
+function setZoneP(i,k,v){const Z=zones().map(z=>({...z}));Z[i][k]=v;Z[i].at=nowStr();S('zones',Z);renderZoneProg();}
 
 // ================== HƯỚNG DẪN ==================
 const IMG='KK_Kiem_Ke_img/';
