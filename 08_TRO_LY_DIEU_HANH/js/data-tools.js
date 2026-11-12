@@ -243,6 +243,16 @@ window.S1016_TOOLS = {
       "updated": "05/04/2026"
     },
     {
+      "name": "Giải trình doanh số 11/11 - T11",
+      "desc": "Giải trình chi tiết ngày 11/11: theo CAT, giờ, sự kiện 111K, nhận xét báo cáo SM, kế hoạch hành động, xuất Excel có biểu đồ và hình ảnh",
+      "group": "Doanh số & Phân tích",
+      "groupId": "doanh-so",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/03_DOANH_SO/DS_2026-11_Giai_Trinh_1111.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "12/11/2026"
+    },
+    {
       "name": "11.11 SALE 111K - Toàn hệ thống T11",
       "desc": "Xếp hạng 19 cửa hàng chạy đồng giá 111K ngày 11/11, 1016 so với chuỗi, voucher NV và giới hạn số lượng",
       "group": "Doanh số & Phân tích",
