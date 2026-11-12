@@ -22,7 +22,7 @@
   ];
   var MON_EN = { JAN: 1, FEB: 2, MAR: 3, APR: 4, MAY: 5, JUN: 6, JUL: 7, AUG: 8, SEP: 9, OCT: 10, NOV: 11, DEC: 12 };
   var DEFAULT_PINS = [/Check_Ton_Gia_KM/i, /OrderIQ_Dat_Hang_Ton_Kho/i, /LICH_LAM_VIEC_1016/i, /SO_TAY_TEAM_ADMIN/i, /xinhangmiennam/i, /kohnan-hsd/i];
-  var SRC_TOOL = { LICH: /LICH_LAM_VIEC_1016/i, LICH_TASKS: /LICH_LAM_VIEC_1016/i, BUDGET: /LICH_LAM_VIEC_1016/i, TA: /SO_TAY_TEAM_ADMIN/i, KHO: /OrderIQ_Dat_Hang_Ton_Kho/i };
+  var SRC_TOOL = { LICH: /LICH_LAM_VIEC_1016/i, LICH_TASKS: /LICH_LAM_VIEC_1016/i, BUDGET: /LICH_LAM_VIEC_1016/i, TA: /SO_TAY_TEAM_ADMIN/i, KHO: /OrderIQ_Dat_Hang_Ton_Kho/i, BRAND: /DS_Brand_Contribution/i };
 
   function curYm() { return U.todayIso().slice(0, 7); }
   function ymOf(y, m) { return y + "-" + U.pad(m); }
@@ -188,6 +188,9 @@
     out.push('<div class="g2c wide"><div class="card">' + sec("Budget & doanh số tháng " + (+mo.ym.slice(5)) + "/" + mo.ym.slice(0, 4), '<span class="small muted">Budget tháng <b>' + money(mo.bMonth) + "</b>" + (mo.hasSale ? " · thực đạt " + money(mo.mtdA) : "") + "</span>") + chartSvg(mo, iso) + src(mo.hasSale ? "SALE" : "BUDGET") + "</div>" +
       '<div class="card">' + sec("7 ngày tới") + '<div class="tbl"><table class="t7"><thead><tr><th>Ngày</th><th>Thứ</th><th class="n">Target</th><th class="n">So TB</th><th class="n">Đi làm</th><th>Ghi chú</th></tr></thead><tbody>' + rows + "</tbody></table></div></div></div>");
 
+    // --- Brand mix PB+SB (từ trang Brand Contribution) ---
+    try { var bh = brandHtml(); if (bh) out.push(bh); } catch (e) {}
+
     // --- checklist + ghi chú + tiện ích ---
     var cs = chkState(iso), tp = tpl(), nd = Object.keys(cs).filter(function (k) { return +k < tp.length; }).length;
     var chk = tp.map(function (t, i) { var v = !!cs[i]; return '<label class="ck' + (v ? " on" : "") + '"><input type="checkbox" data-h="chk" data-i="' + i + '"' + (v ? " checked" : "") + "> " + E(t) + "</label>"; }).join("");
@@ -208,6 +211,20 @@
     if (wf) out.push(det("wf", "Quy trình điều hành 5 bước & giao việc chi tiết (bấm để mở)", wf));
     return out.join("");
   };
+  function brandHtml() {
+    var d = S.data.BRAND; if (!d || !d.months || !d.months.length) return "";
+    var P = function (v) { return v == null || !isFinite(v) ? "-" : new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v * 100) + "%"; };
+    var D = function (v) { return v == null || !isFinite(v) ? "-" : '<span class="' + (v >= 0 ? "up" : "dn") + '">' + (v >= 0 ? "+" : "") + new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v * 100) + " đ</span>"; };
+    var VT = { ok: ["ok", "Đạt"], warn: ["warn", "Đạt 1/2"], bad: ["bad", "Chưa đạt"] };
+    var L = d.months[d.months.length - 1], v = VT[L.verdict] || VT.warn, ml = function (k) { return "T" + (+k.slice(5)) + "/" + k.slice(0, 4); };
+    var rows = d.months.slice(-6).reverse().map(function (m) { var t = VT[m.verdict] || VT.warn; return "<tr><td><b>" + ml(m.k) + '</b></td><td class="n">' + P(m.share) + '</td><td class="n">' + D(m.dY) + '</td><td class="n">' + P(m.sys) + '</td><td class="n">' + D(m.dS) + '</td><td class="n">#' + m.rank + "/" + m.n + '</td><td><span class="tag ' + t[0] + '">' + t[1] + "</span></td></tr>"; }).join("");
+    var tl = (d.topLayers || []).map(function (x) { return "<b>L" + x.ly + " " + E(x.name) + "</b> (" + P(x.sh) + " / CH khác " + P(x.shs) + ")"; }).join(", ");
+    var tool = toolFor(SRC_TOOL.BRAND);
+    return '<div class="card">' + sec("Brand mix PB+SB · " + ml(L.k), linkBtn(tool, "Mở phân tích Brand")) +
+      '<div class="al ' + v[0] + '"><b>' + v[1] + "</b> · PB+SB " + P(L.share) + " (cùng kỳ " + P(L.shareLY) + ", TB hệ thống " + P(L.sys) + ") · hạng #" + L.rank + "/" + L.n + " · " + E(L.cm || "") + "</div>" +
+      (tl ? '<div class="al info">Layer ưu tiên đẩy PB/SB: ' + tl + "</div>" : "") +
+      '<div class="tbl"><table><thead><tr><th>Tháng</th><th class="n">PB+SB</th><th class="n">Δ cùng kỳ</th><th class="n">TB HT</th><th class="n">Δ HT</th><th class="n">Hạng</th><th>Kết quả</th></tr></thead><tbody>' + rows + "</tbody></table></div>" + src("BRAND") + "</div>";
+  }
   function groupName(id) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][0] === id) return GROUPS[i][1]; return "Khác"; }
 
   function dataRows() {
