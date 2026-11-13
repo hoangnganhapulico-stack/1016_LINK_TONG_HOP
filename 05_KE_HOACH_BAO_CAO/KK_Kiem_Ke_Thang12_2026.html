@@ -256,14 +256,14 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
 <section id="ipl">
   <div class="sec-head"><span class="num">5</span><h2>Công cụ Input list kho (tự kiểm 100%)</h2></div>
   <img class="mascot-sec" src="../08_TRO_LY_DIEU_HANH/kohnan_mascot.png" alt="">
-  <p class="lead">Quét barcode lên danh sách từng location kho → in phiếu dán gondola → nhập số lượng → kiểm 30% / 30% / 30% → trừ hàng xuất kho ngày KK → xuất file Warehouse dán vào gendat Ajis.</p>
+  <p class="lead">Quét barcode + gõ số lượng ngay (chống quét lặp) theo từng location → in phiếu Count specification đúng mẫu → kiểm 30% / 30% / 30% → trừ hàng xuất kho ngày KK → xuất file Warehouse dán vào gendat Ajis.</p>
   <div class="card" style="clear:both">
     <div class="row">
       <div><b>Dữ liệu hàng hóa:</b> <span id="pmStat" class="muted sm">chưa tải</span></div><span class="sp"></span>
       <button class="btn sub sm" onclick="loadPMCloud(true)">Tải từ CHECK TỒN</button>
-      <label class="btn sub sm" style="display:inline-block">Tải Item Master (Excel/CSV)<input type="file" accept=".xlsx,.xls,.csv" class="hide" onchange="loadItemMaster(this.files[0]);this.value=''"></label>
+      <label class="btn sub sm" style="display:inline-block">Tải Item Master / file INPUTLIST (.xlsm)<input type="file" accept=".xlsx,.xlsm,.xls,.csv" class="hide" onchange="loadItemMaster(this.files[0]);this.value=''"></label>
     </div>
-    <p class="foot-note" style="margin:6px 0 0">Tên + CAT lấy từ dữ liệu CHECK TỒN dùng chung. Giá Cost (cột H) lấy từ Item Master mới nhất Y san gửi - tải lên trước khi xuất file Warehouse.</p>
+    <p class="foot-note" style="margin:6px 0 0">Tên + CAT lấy từ dữ liệu CHECK TỒN dùng chung, hoặc tải file INPUTLIST .xlsm (sheet MAST / 1016_Item) để dùng đúng master của file Input list. Giá Cost (cột H) lấy từ Item Master mới nhất Y san gửi - tải lên trước khi xuất file Warehouse.</p>
   </div>
   <div class="grid g4" id="iplKpi" style="margin-top:14px"></div>
   <div class="tabs" style="margin-top:16px" id="iplTabs"></div>
@@ -649,9 +649,9 @@ const GUIDES=[
 <div class="grid g2"><div class="card"><h3>Quy trình (cập nhật T6/2026)</h3>${im('hd_06.jpg','Sắp xếp kho → lên list (không số) → nhập số → check Senior-Chief-SM → trừ xuất kho (Chief-SM) → file CSV (SM)')}
 <ol class="steps">
 <li><b>Sắp xếp hàng trong kho</b> gọn trên gondola; SP cùng barcode để chung 1 khu.</li>
-<li><b>10/12 (sau nhận hàng cuối 09/12 một ngày): lên Input list</b> ở mục 5 - quét theo thứ tự trên gondola, chọn shelf (tầng). <b>Không nhập số lượng.</b> 2 NV: 1 quét, 1 nhìn màn hình xác nhận 4 số cuối.</li>
-<li><b>In phiếu</b> (mục 5 → In phiếu) dán đúng vị trí gondola kho. Dán layout kho + phiếu "HÀNG ĐÃ LẤY DƯỚI KHO" ở cửa kho.</li>
-<li><b>13-14/12 nhập số lượng</b>: 1 NV đọc 4 số cuối barcode + số lượng trên thùng/packing list, 1 NV đọc lại 4 số cuối và nhập.</li>
+<li><b>10/12 (sau nhận hàng cuối 09/12 một ngày): lên Input list</b> ở mục 5 → tab 2 "Quét + số lượng": chọn location + shelf, quét mã → gõ số lượng → Enter. Máy quét bắn lặp tự bỏ qua; mã đã có trong location sẽ hỏi cộng vào dòng cũ hay thêm dòng mới. Chưa đếm được thì Enter để trống, nhập số sau ở tab 4 (quét mã để nhảy tới dòng). 2 NV: 1 quét, 1 đọc lại 4 số cuối + số lượng trên màn hình.</li>
+<li><b>In phiếu Count specification</b> (mục 5 → tab 3) đúng mẫu: NO, Remarks, Shelf, Category, Product name, Duplicate, Code, Count, Balance; dán đúng gondola kho. Dán layout kho + phiếu "HÀNG ĐÃ LẤY DƯỚI KHO" ở cửa kho. Cần file Excel mẫu INPUTLIST thì bấm "Xuất Excel mẫu INPUTLIST".</li>
+<li><b>13-14/12 chốt số lượng</b>: dòng nào chưa có số thì nhập ở tab 4 (quét mã để nhảy tới dòng). Cột Duplicate ≥ 2 = cùng mã xuất hiện nhiều dòng trong location, xem lại có quét trùng không.</li>
 <li><b>Double check</b> lần lượt: Sale Senior/Admin 30% → Sale Chief/Admin Chief 30% → SM 30% (mục 5 tự chia dòng cho từng lượt, không trùng nhau).</li>
 <li>Xong check: thu toàn bộ input list về văn phòng. Từ đây ai lấy hàng khỏi kho phải ghi phiếu: <b>Ngày - Barcode - Tên SP - Số lượng - Location</b> trước khi mang ra.</li>
 <li><b>Ngày 16/12</b>: Sale Chief / SM nhập phiếu xuất kho vào mục 5 → Xuất kho, công cụ tự trừ số lượng theo location + barcode.</li>
@@ -767,11 +767,11 @@ function iplStats(){let rows=0,withQty=0,chk=0,need=0;const L=locs();L.forEach(l
 function renderIPL(){
   const st=iplStats(),X=removals();
   $('iplKpi').innerHTML=[[st.locs,'location kho đã tạo'],[st.rows,'dòng hàng đã lên list'],[st.pctQty+'%',st.withQty+'/'+st.rows+' dòng đã nhập số lượng'],[st.need?Math.round(st.chk/st.need*100)+'%':'-',st.chk+'/'+st.need+' dòng đã double check'],[X.length,'phiếu xuất kho (trừ ngày KK)']].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="d">${k[1]}</div></div>`).join('');
-  const T=[['list','1. Location'],['scan','2. Lên list (quét)'],['print','3. In phiếu'],['qty','4. Nhập số lượng'],['check','5. Kiểm 30%'],['out','6. Xuất kho'],['exp','7. Xuất file']];
+  const T=[['list','1. Location'],['scan','2. Quét + số lượng'],['print','3. In phiếu'],['qty','4. Sửa / bổ sung SL'],['check','5. Kiểm 30%'],['out','6. Xuất kho'],['exp','7. Xuất file']];
   $('iplTabs').innerHTML=T.map(t=>`<button class="tab ${iplTab===t[0]?'on':''}" onclick="iplGo('${t[0]}')">${t[1]}</button>`).join('')+(curLoc?`<span class="tag info" style="align-self:center">Đang mở: ${esc(curLoc)}</span>`:'');
   const f={list:iplList,scan:iplScan,print:iplPrint,qty:iplQty,check:iplCheck,out:iplOut,exp:iplExp}[iplTab];
-  if(document.activeElement&&document.activeElement.id==='scanIn'&&iplTab==='scan'){iplScanRefresh();return;}
-  $('iplBody').innerHTML=f();if(iplTab==='scan')setTimeout(()=>{const e=$('scanIn');if(e)e.focus();},50);
+  if(document.activeElement&&['scanIn','qtyIn'].includes(document.activeElement.id)&&iplTab==='scan'){iplScanRefresh();return;}
+  $('iplBody').innerHTML=f();if(iplTab==='scan')setTimeout(()=>{renderPend();pend?focusQty():focusScan();},50);
 }
 function iplGo(t){if(t!=='list'&&t!=='out'&&t!=='exp'&&!curLoc){alert('Chọn location trước (tab 1).');t='list';}iplTab=t;stopCam();renderIPL();}
 function iplList(){const L=locs(),M=locMeta();
@@ -789,56 +789,97 @@ function openLoc(l){curLoc=l;iplTab=rowsOf(l).length?'qty':'scan';renderIPL();do
 function locSelect(){return `<select onchange="curLoc=this.value;renderIPL()">${locs().map(l=>`<option ${l===curLoc?'selected':''}>${esc(l)}</option>`).join('')}</select>`;}
 function rowName(b){const p=pmGet(b);return p?p.n:'';}
 function rowCat(b){const p=pmGet(b);return p?p.c:'';}
-// ---- quét
+// ---- quét + số lượng (chống quét lặp)
+let scanMode='qty',pend=null,lastHit={b:'',t:0},lastIdx=-1;const DUP_MS=2500;
+function cleanCode(v){return String(v||'').trim().replace(/\s/g,'');}
+function toast(m,k){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=m;t.style.cssText='position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:70;padding:10px 16px;border-radius:10px;font-weight:700;color:#fff;max-width:92vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25);background:'+({bad:'#d63b2f',warn:'#b88a00',ok:'#1f8a4c'}[k]||'#0039a6');clearTimeout(t._h);t._h=setTimeout(()=>{t.remove();},2800);}
+function focusScan(){const e=$('scanIn');if(e)e.focus();}
+function focusQty(){const e=$('qtyIn');if(e){e.focus();e.select();}}
+function dupCount(R){const c={};R.forEach(r=>{const b=normBC(r[0]);c[b]=(c[b]||0)+1;});return c;}
 function iplScan(){const R=rowsOf(curLoc);
-  return `<div class="grid g2"><div class="card"><div class="row"><b>Location</b>${locSelect()}<b>Shelf (tầng)</b><select id="shelfSel" onchange="curShelf=+this.value">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${n===curShelf?'selected':''}>${n}</option>`).join('')}</select></div>
-  <div class="scanbox" style="margin-top:12px"><input type="text" id="scanIn" inputmode="numeric" autocomplete="off" placeholder="Quét / gõ barcode rồi Enter" onkeydown="if(event.key==='Enter'){addScan(this.value);this.value='';}"><button class="btn" onclick="const e=$('scanIn');addScan(e.value);e.value='';e.focus()">Thêm</button><button class="btn sub" onclick="startCam()">📷 Camera</button></div>
-  <div id="cam"></div>
-  <p class="foot-note">Quét theo thứ tự trên gondola: trên xuống dưới · trái qua phải · trước vào trong. Đổi shelf khi sang tầng mới. Chỉ lên danh sách, <b>chưa nhập số lượng</b>. Máy quét cầm tay / Bluetooth: bấm vào ô rồi quét.</p></div>
+  return `<div class="grid g2"><div class="card"><div class="row"><b>Location</b>${locSelect()}<b>Shelf (tầng)</b><select id="shelfSel" onchange="curShelf=+this.value;pend?focusQty():focusScan()">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${n===curShelf?'selected':''}>${n}</option>`).join('')}</select></div>
+  <div class="tabs" style="margin:12px 0 8px"><button class="tab ${scanMode==='qty'?'on':''}" onclick="scanMode='qty';pend=null;renderIPL()">Quét + gõ số lượng</button><button class="tab ${scanMode==='one'?'on':''}" onclick="scanMode='one';pend=null;renderIPL()">Quét từng cái (+1 / lần)</button></div>
+  <div class="xs muted"><b>1. Quét mã vạch</b> (máy quét / gõ tay rồi Enter)</div>
+  <div class="scanbox"><input type="text" id="scanIn" inputmode="numeric" autocomplete="off" placeholder="Quét barcode" onkeydown="if(event.key==='Enter'){event.preventDefault();onScan(this.value);this.value='';}"><button class="btn sub" onclick="startCam()">📷 Camera</button></div>
+  <div id="pendBox"></div><div id="cam"></div>
+  <p class="foot-note">${scanMode==='qty'?'Quét → ô số lượng tự mở → gõ số → Enter là lưu, con trỏ tự về ô quét. Enter để trống = lên list chưa có số (nhập sau ở tab 4).':'Mỗi lần quét = +1 cái vào dòng cùng mã, cùng shelf. Dùng cho hàng lẻ ít.'} Máy quét bắn 2-3 lần cùng 1 mã sẽ <b>tự bỏ qua</b>; mã đã có trong location sẽ hỏi cộng vào dòng cũ hay thêm dòng mới. Thứ tự quét: trên xuống dưới · trái qua phải · trước vào trong.</p></div>
   <div class="card" id="lastBox">${lastBoxHtml(R)}</div></div>
   <div class="tbl" style="margin-top:12px" id="scanTbl">${scanTable(R)}</div>`;}
-function lastBoxHtml(R){const r=R[R.length-1];if(!r)return '<p class="muted">Chưa quét mã nào ở location này.</p>';const p=pmGet(r[0]);
-  return `<div class="xs muted">Dòng ${R.length} · shelf ${r[1]} - NV thứ 2 đọc lại 4 số cuối:</div><div class="big4">${esc(String(r[0]).slice(-4))}</div><div style="font-weight:700">${p?esc(p.n):'<span class="tag bad">Không có trong dữ liệu - kiểm lại mã / No barcode</span>'}</div><div class="xs muted">${esc(r[0])}${p&&p.c?' · CAT '+esc(p.c):''}</div>`;}
-function scanTable(R){return `<table><thead><tr><th class="c">#</th><th class="c">Shelf</th><th>Barcode</th><th class="c">4 số cuối</th><th>Tên hàng</th><th class="c">CAT</th><th></th></tr></thead><tbody>${R.map((r,i)=>({r,i})).reverse().slice(0,300).map(({r,i})=>`<tr><td class="c">${i+1}</td><td class="c">${r[1]}</td><td>${esc(r[0])}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td>${esc(rowName(r[0]))||'<span class="tag bad">?</span>'}</td><td class="c">${esc(rowCat(r[0]))}</td><td><button class="btn sub sm" onclick="delRow(${i})">Xóa</button></td></tr>`).join('')||'<tr><td colspan="7" class="muted">-</td></tr>'}</tbody></table>`;}
+function lastBoxHtml(R){const i=lastIdx>=0&&lastIdx<R.length?lastIdx:R.length-1;const r=R[i];if(!r)return '<p class="muted">Chưa có dòng nào ở location này.</p>';const p=pmGet(r[0]);
+  return `<div class="xs muted">VỪA LƯU · dòng ${i+1} · shelf ${r[1]} - NV thứ 2 đọc lại 4 số cuối + số lượng:</div><div class="row" style="align-items:flex-end;gap:18px"><div class="big4">${esc(String(r[0]).slice(-4))}</div><div><div class="xs muted">Số lượng</div><div class="big4" style="color:var(--kred)">${r[2]??'-'}</div></div></div><div style="font-weight:700">${p?esc(p.n):'<span class="tag bad">Không có trong dữ liệu - kiểm lại mã / No barcode</span>'}</div><div class="xs muted">${esc(r[0])}${p&&p.c?' · CAT '+esc(p.c):''}</div><div class="row" style="margin-top:8px"><button class="btn sub sm" onclick="undoLast()">↶ Hoàn tác dòng vừa lưu</button></div>`;}
+function scanTable(R){const dc=dupCount(R),seen={};
+  return `<table><thead><tr><th class="c">NO</th><th class="c">Shelf</th><th class="c">CAT</th><th>Product name</th><th class="c">Duplicate</th><th>Barcode</th><th class="c">4 số cuối</th><th class="c">Count</th><th></th></tr></thead><tbody>${R.map((r,i)=>{const b=normBC(r[0]);seen[b]=(seen[b]||0)+1;return {r,i,d:seen[b],n:dc[b]};}).reverse().slice(0,300).map(({r,i,d,n})=>`<tr style="${n>1?'background:#fff6d6':''}${i===lastIdx?';outline:2px solid var(--ok)':''}"><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c">${esc(rowCat(r[0]))}</td><td>${esc(rowName(r[0]))||'<span class="tag bad">?</span>'}</td><td class="c">${n>1?`<span class="tag warn">${d}/${n}</span>`:'1'}</td><td class="xs">${esc(r[0])}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td class="c"><b>${r[2]??'<span class="tag warn">chưa</span>'}</b></td><td><button class="btn sub sm" onclick="delRow(${i})">Xóa</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">-</td></tr>'}</tbody></table>`;}
 function iplScanRefresh(){const R=rowsOf(curLoc);if($('lastBox'))$('lastBox').innerHTML=lastBoxHtml(R);if($('scanTbl'))$('scanTbl').innerHTML=scanTable(R);}
 function beep(ok){try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator();o.frequency.value=ok?1200:300;o.connect(a.destination);o.start();o.stop(a.currentTime+(ok?.08:.3));}catch(e){}}
-function addScan(v){v=String(v||'').trim().replace(/\s/g,'');if(!v)return;if(!/^[0-9A-Za-z\-]{4,20}$/.test(v)){beep(0);return alert('Mã không hợp lệ: '+v);}
-  const R=rowsOf(curLoc);const known=!!pmGet(v);R.push([v,curShelf,null,'']);saveRows(curLoc,R);beep(known);iplScanRefresh();renderIPLKpiOnly();}
-function delRow(i){const R=rowsOf(curLoc);if(!confirm('Xóa dòng '+(i+1)+' ('+R[i][0]+')?'))return;R.splice(i,1);saveRows(curLoc,R);renderIPL();}
-function renderIPLKpiOnly(){const st=iplStats();const k=$('iplKpi').children;if(k[1]){k[1].querySelector('.v').textContent=st.rows;}}
+function onScan(v){v=cleanCode(v);if(!v)return;if(pend&&/^\d{1,5}$/.test(v)){onQty(v);return;}if(!/^[0-9A-Za-z\-]{4,20}$/.test(v)){beep(0);toast('Mã không hợp lệ: '+v,'bad');return;}
+  const t=Date.now(),nb=normBC(v);
+  if(nb===lastHit.b&&t-lastHit.t<(scanMode==='one'?700:DUP_MS)){lastHit.t=t;toast('Đã bỏ qua quét lặp ...'+nb.slice(-4),'warn');return;}
+  if(pend&&nb===pend.b){lastHit={b:nb,t};toast('Mã này đang chờ số lượng - bỏ qua quét lặp','warn');focusQty();return;}
+  if(pend){beep(0);toast('Chưa nhập số lượng cho mã ...'+pend.b.slice(-4)+'. Nhập số rồi Enter, hoặc bấm Bỏ','bad');focusQty();return;}
+  lastHit={b:nb,t};beep(!!pmGet(nb));
+  const R=rowsOf(curLoc);const ex=R.map((r,i)=>({r,i})).filter(x=>normBC(x.r[0])===nb);const same=ex.filter(x=>x.r[1]===curShelf).pop();
+  if(scanMode==='one'){if(same){R[same.i][2]=(+R[same.i][2]||0)+1;lastIdx=same.i;}else{R.push([nb,curShelf,1,'']);lastIdx=R.length-1;}saveRows(curLoc,R);iplScanRefresh();renderIPLKpi();return;}
+  pend={b:nb,ex,mode:same?'add':'new',idx:same?same.i:-1};renderPend();focusQty();}
+function addScan(v){onScan(v);}
+function renderPend(){const el=$('pendBox');if(!el)return;if(!pend){el.innerHTML='';return;}const p=pmGet(pend.b);
+  const exH=pend.ex.length?`<div class="alert sm" style="margin:8px 0"><b>Mã này ĐÃ CÓ ở location ${esc(curLoc)}:</b> ${pend.ex.map(x=>`dòng ${x.i+1} (shelf ${x.r[1]}, SL ${x.r[2]??'-'})`).join('; ')}<div class="row" style="margin-top:6px">${pend.ex.map(x=>`<button class="btn sm ${pend.mode==='add'&&pend.idx===x.i?'':'sub'}" onclick="pendMode('add',${x.i})">Cộng vào dòng ${x.i+1}</button>`).join('')}<button class="btn sm ${pend.mode==='new'?'':'sub'}" onclick="pendMode('new',-1)">Thêm dòng mới</button></div></div>`:'';
+  el.innerHTML=`<div style="border:2px solid var(--navy);border-radius:12px;padding:10px;margin-top:10px;background:#f7faff"><div class="row"><div class="big4">${esc(pend.b.slice(-4))}</div><div style="flex:1;min-width:0"><b>${p?esc(p.n):'<span class="tag bad">Không có trong dữ liệu</span>'}</b><div class="xs muted">${esc(pend.b)}${p&&p.c?' · CAT '+esc(p.c):''} · shelf ${curShelf}</div></div></div>${exH}
+  <div class="xs muted" style="margin-top:6px"><b>2. Số lượng</b> ${pend.mode==='add'?'<b style="color:var(--kred)">→ CỘNG THÊM vào dòng '+(pend.idx+1)+'</b>':'→ dòng mới'}</div>
+  <div class="scanbox"><input id="qtyIn" type="text" inputmode="numeric" autocomplete="off" placeholder="Số lượng" style="font-size:26px" onkeydown="if(event.key==='Enter'){event.preventDefault();onQty(this.value);}else if(event.key==='Escape'){cancelPend();}"><button class="btn" onclick="onQty($('qtyIn').value)">Lưu</button><button class="btn sub" onclick="cancelPend()">Bỏ</button></div></div>`;}
+function cancelPend(){pend=null;renderPend();focusScan();}
+function pendMode(m,i){const v=$('qtyIn')?$('qtyIn').value:'';pend.mode=m;pend.idx=i;renderPend();$('qtyIn').value=v;focusQty();}
+function onQty(v){if(!pend)return;v=cleanCode(v);
+  if(/^\d{6,}$/.test(v)){const nb=normBC(v);$('qtyIn').value='';if(nb===pend.b){toast('Quét lặp vào ô số lượng - đã bỏ qua. Gõ số lượng','warn');}else{beep(0);toast('Ô số lượng nhận 1 mã vạch khác (...'+v.slice(-4)+'). Nhập số lượng cho mã ...'+pend.b.slice(-4)+' trước','bad');}focusQty();return;}
+  if(v!==''&&!/^\d{1,5}$/.test(v)){toast('Số lượng không hợp lệ','bad');focusQty();return;}
+  const q=v===''?null:+v;if(q!==null&&q>=500&&!confirm('Số lượng '+q.toLocaleString('vi-VN')+' - đúng không?')){focusQty();return;}
+  const R=rowsOf(curLoc);
+  if(pend.mode==='add'&&pend.idx>=0){if(q===null){toast('Nhập số lượng để cộng vào dòng cũ','bad');focusQty();return;}R[pend.idx][2]=(+R[pend.idx][2]||0)+q;lastIdx=pend.idx;toast('Đã cộng '+q+' vào dòng '+(pend.idx+1)+' → '+R[pend.idx][2],'ok');}
+  else{R.push([pend.b,curShelf,q,'']);lastIdx=R.length-1;}
+  saveRows(curLoc,R);lastHit={b:pend.b,t:Date.now()};pend=null;renderPend();iplScanRefresh();renderIPLKpi();focusScan();}
+let undoStack=[];
+function undoLast(){const R=rowsOf(curLoc);if(lastIdx<0||lastIdx>=R.length)return;const r=R[lastIdx];if(!confirm('Xóa dòng '+(lastIdx+1)+' ('+r[0]+', SL '+(r[2]??'-')+')?'))return;R.splice(lastIdx,1);saveRows(curLoc,R);lastIdx=-1;iplScanRefresh();renderIPLKpi();focusScan();}
+function delRow(i){const R=rowsOf(curLoc);if(!confirm('Xóa dòng '+(i+1)+' ('+R[i][0]+')?'))return;R.splice(i,1);saveRows(curLoc,R);lastIdx=-1;renderIPL();}
+function renderIPLKpiOnly(){renderIPLKpi();}
 let camObj=null;
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
 async function startCam(){try{if(typeof Html5Qrcode==='undefined')await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js');
   if(camObj){await stopCam();return;}camObj=new Html5Qrcode('cam',{formatsToSupport:[Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.CODE_128],verbose:false});
-  await camObj.start({facingMode:'environment'},{fps:10,qrbox:{width:280,height:120}},txt=>{const t=Date.now();if(txt===lastScan.b&&t-lastScan.t<1800)return;lastScan={b:txt,t};addScan(txt);});}
+  await camObj.start({facingMode:'environment'},{fps:10,qrbox:{width:280,height:120}},txt=>onScan(txt));}
   catch(e){camObj=null;alert('Không mở được camera: '+e);}}
 async function stopCam(){if(camObj){try{await camObj.stop();}catch(e){}camObj=null;}}
-// ---- in phiếu
-function iplPrint(){return `<div class="card"><div class="row"><b>Location</b>${locSelect()}<button class="btn" onclick="printCount(curLoc,false)">In phiếu Count specification</button><button class="btn sub" onclick="printCount(curLoc,true)">In phiếu có số lượng (để kiểm)</button><button class="btn sub" onclick="printAll()">In tất cả location</button><button class="btn sub" onclick="printOutForm()">In phiếu "Hàng đã lấy dưới kho"</button></div>
-  <p class="foot-note">Phiếu có mã vạch từng dòng (Ajis / NV quét được), cột Count để trống. Dán tại đúng gondola kho. Phiếu xuất kho dán ở cửa kho cùng layout kho.</p></div>`;}
-function countPage(loc,withQty){const R=rowsOf(loc),M=locMeta()[loc]||{};const per=16;let pages='';
-  for(let p=0;p<Math.max(1,Math.ceil(R.length/per));p++){const part=R.slice(p*per,(p+1)*per);
-    pages+=`<div class="pg"><div class="hd"><div class="ln">Location NO <b>${esc(loc)}</b></div><div class="tt">Count specification</div><div class="dt">Store 1016 · ${esc(M.z||'')}<br>In: ${nowStr()} · Trang ${p+1}/${Math.max(1,Math.ceil(R.length/per))}</div></div>
-    <table><thead><tr><th style="width:30px">NO</th><th style="width:70px">Remarks</th><th style="width:34px">Shelf</th><th style="width:36px">Cate gory</th><th>Product name</th><th style="width:190px">Code</th><th style="width:58px">Count</th><th style="width:46px">Balance</th><th style="width:46px">Balance</th></tr></thead><tbody>
-    ${part.map((r,i)=>`<tr><td class="c">${p*per+i+1}</td><td></td><td class="c">${r[1]}</td><td class="c">${esc(rowCat(r[0]))}</td><td class="nm">${esc(rowName(r[0]))}</td><td class="c">${barcodeSVG(r[0],{x:1.3,h:30})}</td><td class="c q">${withQty&&r[2]!=null?r[2]:''}</td><td></td><td></td></tr>`).join('')}</tbody></table>
-    <div class="sg"><span>NV lên list: ............</span><span>NV đếm (bút xanh): ............</span><span>NV kiểm (bút đỏ): ............</span></div></div>`;}
+// ---- in phiếu (đúng mẫu Count specification)
+function iplPrint(){return `<div class="card"><div class="row"><b>Location</b>${locSelect()}<button class="btn" onclick="printCount(curLoc,true)">In Count specification</button><button class="btn sub" onclick="printCount(curLoc,false)">In bản cột Count trống</button><button class="btn sub" onclick="printAll(true)">In tất cả location</button><button class="btn sub" onclick="exportInputList()">Xuất Excel mẫu INPUTLIST</button><button class="btn sub" onclick="printOutForm()">In phiếu "Hàng đã lấy dưới kho"</button></div>
+  <p class="foot-note">Phiếu theo mẫu Count specification: NO · Remarks · Shelf · Category · Product name · Duplicate · Code (mã vạch quét được) · Count · Balance x5. Cột Duplicate ghi lần xuất hiện thứ mấy của cùng 1 mã trong location (2, 3... = trùng, cần xem lại). "In tất cả" có trang tổng hợp Table of Counting List.</p></div>`;}
+function countPage(loc,withQty){const R=rowsOf(loc),M=locMeta()[loc]||{};const per=14,np=Math.max(1,Math.ceil(R.length/per));let pages='';const seen={},dup=[];
+  R.forEach(r=>{const b=normBC(r[0]);seen[b]=(seen[b]||0)+1;dup.push(seen[b]);});
+  for(let p=0;p<np;p++){const part=R.slice(p*per,(p+1)*per);
+    pages+=`<div class="pg"><div class="hd"><div class="ln">Location&nbsp;NO <b>${esc(loc)}</b></div><div class="tt">Count specification</div><div class="dt">Date/Time of Printing: ${nowStr()}<br>Store 1016 ${esc(M.z?'· '+M.z:'')} · Sheet ${p+1}/${np}</div></div>
+    <table><thead><tr><th style="width:30px">NO</th><th style="width:60px">Remarks</th><th style="width:32px">Shelf</th><th style="width:36px">Cate<br>gory</th><th>Product name</th><th style="width:40px">Dupli<br>cate</th><th style="width:200px">Code</th><th style="width:56px">Count</th>${'<th style="width:44px">Balance</th>'.repeat(5)}</tr></thead><tbody>
+    ${part.map((r,i)=>{const k=p*per+i;return `<tr><td class="c">${k+1}</td><td></td><td class="c">${r[1]}</td><td class="c">${esc(rowCat(r[0]))}</td><td class="nm">${esc(rowName(r[0]))}</td><td class="c" style="${dup[k]>1?'font-weight:700;color:#d00':''}">${dup[k]}</td><td class="c">${barcodeSVG(normBC(r[0]),{x:1.4,h:30})}</td><td class="c q">${withQty&&r[2]!=null?r[2]:''}</td>${'<td></td>'.repeat(5)}</tr>`;}).join('')}</tbody></table>
+    <div class="sg"><span>NV quét: ............</span><span>NV nhập số: ............</span><span>NV kiểm (bút đỏ): ............</span></div></div>`;}
   return pages;}
+function sumPage(L){return `<div class="pg"><div class="tt" style="margin-bottom:8px">Table of Counting List</div><table style="width:auto"><thead><tr><th style="width:90px">Location</th><th style="width:70px">Lines</th><th style="width:70px">Sheets</th><th style="width:90px">Tổng SL</th><th style="width:170px">Date/Time of Printing</th></tr></thead><tbody>${L.map(l=>{const R=rowsOf(l);return `<tr><td class="c">${esc(l)}</td><td class="c">${R.length}</td><td class="c">${Math.max(1,Math.ceil(R.length/14))}</td><td class="c">${R.reduce((s,r)=>s+(+r[2]||0),0).toLocaleString('vi-VN')}</td><td class="c">${nowStr()}</td></tr>`;}).join('')}</tbody></table></div>`;}
 function printWin(title,body){const w=window.open('','_blank');if(!w)return alert('Trình duyệt chặn cửa sổ mới - cho phép popup rồi bấm lại');
   w.document.write(`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${esc(title)}</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;margin:0;color:#000}.bar{position:sticky;top:0;background:#0039a6;color:#fff;padding:8px 12px}.bar button{font-size:14px;padding:4px 14px}
-  .pg{page-break-after:always;padding:4mm}.hd{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}.ln{border:2px solid #000;padding:3px 12px;font-size:16px}.tt{font-size:20px;text-decoration:underline}.dt{font-size:11px;text-align:right}
-  table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;font-size:11px;padding:2px 4px;height:40px}th{height:auto;background:#eee}.c{text-align:center}.nm{font-size:11px}.q{font-size:16px;font-weight:700}td svg{max-width:180px;height:auto}.sg{display:flex;justify-content:space-between;margin-top:8px;font-size:12px}@media print{.bar{display:none}}</style></head>
+  .pg{page-break-after:always;padding:4mm}.hd{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}.ln{border:2px solid #000;padding:3px 12px;font-size:18px}.tt{font-size:22px;text-decoration:underline}.dt{font-size:11px;text-align:right}
+  table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;font-size:11px;padding:2px 4px;height:44px}th{height:auto;background:#eee}.c{text-align:center}.nm{font-size:12px}.q{font-size:18px;font-weight:700}td svg{max-width:190px;height:auto}.sg{display:flex;justify-content:space-between;margin-top:8px;font-size:12px}@media print{.bar{display:none}}</style></head>
   <body><div class="bar"><b>${esc(title)}</b> <button onclick="print()">In / Lưu PDF</button></div>${body}</body></html>`);w.document.close();}
-function printCount(loc,q){if(!rowsOf(loc).length)return alert('Location '+loc+' chưa có dòng nào.');printWin('Input list kho '+loc,countPage(loc,q));}
-function printAll(){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có location nào có dòng hàng.');printWin('Input list kho - '+L.length+' location',L.map(l=>countPage(l,false)).join(''));}
+function printCount(loc,q){if(!rowsOf(loc).length)return alert('Location '+loc+' chưa có dòng nào.');printWin('Input list '+loc,countPage(loc,q));}
+function printAll(q){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có location nào có dòng hàng.');printWin('Input list - '+L.length+' location',sumPage(L)+L.map(l=>countPage(l,q)).join(''));}
+function exportInputList(){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có dòng hàng.');const rows=[];L.forEach(l=>rowsOf(l).forEach(r=>{const c=rowCat(r[0]);rows.push([rows.length+1,c!==''&&!isNaN(+c)?String(c).padStart(2,'0'):c,rowName(r[0]),normBC(r[0]),r[2]??'',r[1],+l]);}));
+  const B=XW.Book();const sh=B.addSheet('INPUTLIST',{title:`INPUT LIST 1016 (${L.length} LOCATION · ${rows.length} DÒNG)`,subtitle:'Kiểm kê 16/12/2026 · Mẫu INPUTLIST: NO - Category - Product name - BarCode - Count - Shelf - Location · Xuất lúc '+nowStr(),cols:[7,10,44,17,9,8,10]});
+  B.table(sh,[{h:'NO',t:'stt'},{h:'Category',t:'code'},{h:'Product name',t:'wrap'},{h:'BarCode',t:'code'},{h:'Count',t:'int'},{h:'Shelf',t:'int'},{h:'Location',t:'int',x:{fmt:'0'}}],rows,{main:true});
+  B.save('Kohnan_KiemKe1016_INPUTLIST_'+fileDate()+'.xlsx');}
 function printOutForm(){let rows='';for(let i=1;i<=22;i++)rows+=`<tr><td class="c">${i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
   printWin('Phiếu hàng đã lấy dưới kho',`<div class="pg"><h2 style="text-align:center;color:#d00;margin:4px 0 8px">HÀNG ĐÃ LẤY DƯỚI KHO</h2><p style="font-size:12px;margin:0 0 6px">Store 1016 · Kiểm kê 16/12/2026 · Ghi TRƯỚC khi mang hàng ra khỏi kho. Ngày KK Sale Chief / SM trừ số này trong Input list kho.</p>
   <table><thead><tr><th style="width:34px">No.</th><th style="width:80px">NGÀY</th><th style="width:56px">GIỜ</th><th style="width:150px">BARCODE</th><th>ITEM NAME</th><th style="width:70px">SỐ LƯỢNG LẤY</th><th style="width:70px">LOCATION</th><th style="width:90px">NGƯỜI LẤY</th></tr></thead><tbody><tr style="color:#d00"><td class="c">VD</td><td>15/12/2026</td><td>10:00</td><td>8935273488656</td><td>Bát Cơm Trung Kiên Trắng</td><td class="c">20</td><td class="c">9011</td><td></td></tr>${rows}</tbody></table></div>`);}
 // ---- nhập số lượng
 function iplQty(){const R=rowsOf(curLoc);const q=R.filter(r=>r[2]!==null&&r[2]!==''&&r[2]!==undefined).length;
-  return `<div class="card"><div class="row"><b>Location</b>${locSelect()}<span class="tag ${q===R.length&&R.length?'ok':'warn'}">${q}/${R.length} dòng có số lượng</span><span class="sp"></span><input type="text" id="qtyWho" placeholder="Tên 2 NV nhập" value="${esc((G('QW:'+curLoc,'')||''))}" onchange="S('QW:'+curLoc,this.value)"></div>
+  return `<div class="card"><div class="row"><b>Location</b>${locSelect()}<span class="tag ${q===R.length&&R.length?'ok':'warn'}">${q}/${R.length} dòng có số lượng</span><input type="text" id="findIn" inputmode="numeric" autocomplete="off" placeholder="Quét mã để tới dòng" style="width:200px" onkeydown="if(event.key==='Enter'){event.preventDefault();findRow(this.value);this.value='';}"><span class="sp"></span><input type="text" id="qtyWho" placeholder="Tên 2 NV nhập" value="${esc((G('QW:'+curLoc,'')||''))}" onchange="S('QW:'+curLoc,this.value)"></div>
   <p class="foot-note">NV 1 đọc 4 số cuối + số lượng trên thùng / packing list, NV 2 đọc lại 4 số cuối rồi nhập. Enter để xuống dòng kế. Số lượng 0 = có list nhưng hết hàng.</p></div>
   <div class="tbl" style="margin-top:12px"><table><thead><tr><th class="c">#</th><th class="c">Shelf</th><th class="c">4 số cuối</th><th>Tên hàng</th><th>Barcode</th><th class="c">Số lượng</th></tr></thead><tbody>
-  ${R.map((r,i)=>`<tr><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td>${esc(rowName(r[0]))}</td><td class="xs">${esc(r[0])}</td><td class="c"><input type="number" min="0" step="1" inputmode="numeric" class="qty" id="q${i}" value="${r[2]??''}" onchange="setQty(${i},this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();const n=$('q${i+1}');if(n){n.focus();n.select();}}"></td></tr>`).join('')||'<tr><td colspan="6" class="muted">Location chưa có dòng - qua tab "Lên list".</td></tr>'}</tbody></table></div>`;}
+  ${R.map((r,i)=>`<tr><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td>${esc(rowName(r[0]))}</td><td class="xs">${esc(r[0])}</td><td class="c"><input type="number" min="0" step="1" inputmode="numeric" class="qty" id="q${i}" value="${r[2]??''}" onchange="setQty(${i},this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();const n=$('q${i+1}');if(n){n.focus();n.select();}}"></td></tr>`).join('')||'<tr><td colspan="6" class="muted">Location chưa có dòng - qua tab 2 "Quét + số lượng".</td></tr>'}</tbody></table></div>`;}
+function findRow(v){const nb=normBC(cleanCode(v));const R=rowsOf(curLoc);const ids=R.map((r,i)=>i).filter(i=>normBC(R[i][0])===nb);if(!ids.length){beep(0);return toast('Mã ...'+nb.slice(-4)+' không có trong location '+curLoc,'bad');}const i=ids.find(i=>R[i][2]==null)??ids[0];beep(1);const e=$('q'+i);e.scrollIntoView({block:'center'});e.focus();e.select();if(ids.length>1)toast('Mã này có '+ids.length+' dòng: '+ids.map(x=>x+1).join(', '),'warn');}
 function setQty(i,v){const R=rowsOf(curLoc);R[i][2]=v===''?null:Math.max(0,Math.round(+v));saveRows(curLoc,R);renderIPLKpi();}
 function renderIPLKpi(){const st=iplStats();const k=$('iplKpi').children;if(k[2])k[2].querySelector('.v').textContent=st.pctQty+'%',k[2].querySelector('.d').textContent=st.withQty+'/'+st.rows+' dòng đã nhập số lượng';if(k[3])k[3].querySelector('.v').textContent=st.need?Math.round(st.chk/st.need*100)+'%':'-',k[3].querySelector('.d').textContent=st.chk+'/'+st.need+' dòng đã double check';}
 // ---- kiểm 30%
