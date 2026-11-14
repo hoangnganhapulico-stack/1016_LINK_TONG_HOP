@@ -5742,9 +5742,9 @@
       ['Đóng góp Budget T11', '+' + pc(sales/DSI.budget), 'Ghi nhận ngày 16/11']
     ].map(function(x){ return '<div class="tile t11-tile"><div class="label">' + x[0] + '</div><div class="value">' + x[1] + '</div><div class="sub">' + x[2] + '</div></div>'; }).join('');
     var rows = [['Doanh số có VAT', salesVat], ['VAT đầu ra 8%', salesVat - sales], ['Doanh số chưa VAT', sales], ['Giá vốn (43.900,5đ/chai)', cogs], ['Lợi nhuận gộp', gp], ['Phí ship ' + shipLbl.toLowerCase() + ' (chưa VAT)', ship], ['Lợi nhuận sau ship', net]];
-    document.getElementById('dsiPL').innerHTML = '<div class="table-scroll"><table class="data-table"><thead><tr><th>Chỉ tiêu</th><th' + R() + '>Số tiền (đ)</th><th' + R() + '>% DS chưa VAT</th></tr></thead><tbody>' +
+    document.getElementById('dsiPL').innerHTML = '<div class="table-scroll"><table class="data-table" style="min-width:0"><thead><tr><th>Chỉ tiêu</th><th' + R() + '>Số tiền (đ)</th><th' + R() + '>% DS chưa VAT</th></tr></thead><tbody>' +
       rows.map(function(r, i){ var b = (i === 2 || i === 4 || i === 6); return '<tr' + (i === 6 ? ' style="background:#fff6d6;font-weight:800"' : '') + '><td>' + (b ? '<b>' + r[0] + '</b>' : r[0]) + '</td><td' + R() + '>' + nf(r[1]) + '</td><td' + R() + '>' + pc(r[1]/sales) + '</td></tr>'; }).join('') + '</tbody></table></div>';
-    document.getElementById('dsiShip').innerHTML = '<div class="table-scroll"><table class="data-table"><thead><tr><th>PA</th><th>Phương án</th><th' + R() + '>Phí (đ)</th><th' + R() + '>LN sau ship</th></tr></thead><tbody>' +
+    document.getElementById('dsiShip').innerHTML = '<div class="table-scroll"><table class="data-table" style="min-width:420px"><thead><tr><th>PA</th><th>Phương án</th><th' + R() + '>Phí (đ)</th><th' + R() + '>LN sau ship</th></tr></thead><tbody>' +
       DSI.alt.map(function(a){ var on = act == null && a[0] === 'B'; return '<tr' + (on ? ' style="background:#e3f4ea"' : '') + '><td><b>' + a[0] + '</b></td><td>' + a[1] + (on ? ' <span class="pill good">Đang tạm tính</span>' : '') + '</td><td' + R() + '>' + nf(a[2]) + '</td><td' + R() + '>' + nf(gp - a[2]) + ' (' + pc((gp - a[2])/sales) + ')</td></tr>'; }).join('') +
       (act != null ? '<tr style="background:#e3f4ea"><td><b>TT</b></td><td>Phí thực tế đã nhập <span class="pill good">Đang dùng</span></td><td' + R() + '>' + nf(act) + '</td><td' + R() + '>' + nf(gp - act) + ' (' + pc((gp - act)/sales) + ')</td></tr>' : '') +
       '</tbody></table></div><p class="meta" style="margin-bottom:0">' + DSI.shipPlanNote + '. Hàng ~1.500 kg (24 chai/thùng gồm chai tặng, ~12,5 kg/thùng - ước tính) nên xe 1,5 tấn sát tải; Sagawa không nhận thì đi PA A.</p>';
@@ -5774,7 +5774,7 @@
       Object.keys(bySlip).forEach(function(key){ var B = bySlip[key]; if (Math.abs(B.q) >= 100) { q += B.q; rev += B.r; slips[key] = B; } else retailQ += B.q; });
       var n = Object.keys(slips).length;
       var tag = n === 0 ? '<span class="pill warning">Chưa có bill sỉ</span>' : (q >= DSI.qty ? '<span class="pill good">Đã ghi nhận đủ</span>' : '<span class="pill warning">Ghi nhận ' + pc(q / DSI.qty) + '</span>');
-      pos.innerHTML = '<p style="margin:0 0 8px">' + tag + '</p><div class="table-scroll"><table class="data-table"><tbody>' +
+      pos.innerHTML = '<p style="margin:0 0 8px">' + tag + '</p><div class="table-scroll"><table class="data-table" style="min-width:0"><tbody>' +
         '<tr><td>Bill sỉ (≥100 chai/bill)</td><td' + R() + '><b>' + n + '</b></td></tr>' +
         '<tr><td>Số chai trên bill sỉ</td><td' + R() + '><b>' + nf(q) + '</b> / ' + nf(DSI.qty) + '</td></tr>' +
         '<tr><td>DS chưa VAT đã vào POS</td><td' + R() + '><b>' + nf(rev) + '</b> / ' + nf(sales) + '</td></tr>' +
