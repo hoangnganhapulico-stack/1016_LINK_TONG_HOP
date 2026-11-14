@@ -261,9 +261,9 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
     <div class="row">
       <div><b>Dữ liệu hàng hóa:</b> <span id="pmStat" class="muted sm">chưa tải</span></div><span class="sp"></span>
       <button class="btn sub sm" onclick="loadPMCloud(true)">Tải từ CHECK TỒN</button>
-      <label class="btn sub sm" style="display:inline-block">Tải Item Master / file INPUTLIST (.xlsm)<input type="file" accept=".xlsx,.xlsm,.xls,.csv" class="hide" onchange="loadItemMaster(this.files[0]);this.value=''"></label>
+      <label class="btn sub sm" style="display:inline-block">Tải Item Master (.xlsx / .csv) hoặc INPUTLIST (.xlsm)<input type="file" accept=".xlsx,.xlsm,.xls,.csv,text/csv" class="hide" onchange="loadItemMaster(this.files[0]);this.value=''"></label>
     </div>
-    <p class="foot-note" style="margin:6px 0 0">Tên + CAT lấy từ dữ liệu CHECK TỒN dùng chung, hoặc tải file INPUTLIST .xlsm (sheet MAST / 1016_Item) để dùng đúng master của file Input list. Giá Cost (cột H) lấy từ Item Master mới nhất Y san gửi - tải lên trước khi xuất file Warehouse.</p>
+    <p class="foot-note" style="margin:6px 0 0">Tên + CAT lấy từ dữ liệu CHECK TỒN dùng chung, hoặc tải file INPUTLIST .xlsm (sheet MAST / 1016_Item) để dùng đúng master của file Input list. Giá Cost (cột H) = cột <b>Purchase Price</b> trong Item Master mới nhất Y san gửi (file .xlsx hoặc .csv) - tải lên trước khi xuất file Warehouse. <b>Hàng ký gửi (Order Category 83)</b> lấy từ cùng file: quét vào sẽ bị chặn, không vào Input list. Tải 1 lần trên 1 máy là mọi máy cùng nhận danh sách ký gửi.</p>
   </div>
   <div class="grid g4" id="iplKpi" style="margin-top:14px"></div>
   <div class="tabs" style="margin-top:16px" id="iplTabs"></div>
@@ -733,23 +733,45 @@ async function loadPMCloud(manual){
   pmStatus();renderIPL();
 }
 function PM_extra(){const o={};for(const k in PMC){}return o;}
-function pmStatus(){const nc=Object.keys(PMC).length;$('pmStat').innerHTML=(pmInfo?esc(pmInfo):'chưa có tên hàng')+' · '+(nc?'<span class="tag ok">Cost: '+nc.toLocaleString('vi-VN')+' mã</span>':'<span class="tag warn">chưa có Cost (Item Master)</span>');}
+function pmStatus(){const nc=Object.keys(PMC).length;$('pmStat').innerHTML=(pmInfo?esc(pmInfo):'chưa có tên hàng')+' · '+(nc?'<span class="tag ok">Cost: '+nc.toLocaleString('vi-VN')+' mã</span>':'<span class="tag warn">chưa có Cost (Item Master)</span>')+' · '+(kgSet().size?'<span class="tag bad">Ký gửi (Order Cat 83): '+kgSet().size.toLocaleString('vi-VN')+' mã - chặn nhập</span>':'<span class="tag warn">chưa có danh sách ký gửi</span>');}
+// Item Master: .xlsx/.xlsm/.xls/.csv · Cost = Purchase Price (hoặc cột Cost) · CAT = Layer1 Code · Order Category 83 = hàng ký gửi
+function mfFind(h,regs){for(const re of regs){const i=h.findIndex(x=>re.test(x)&&!/to be changed/.test(x));if(i>=0)return i;}return -1;}
 function loadItemMaster(f){if(!f)return;if(typeof XLSX==='undefined')return alert('Chưa tải được thư viện đọc Excel, kiểm tra mạng.');
-  const rd=new FileReader();rd.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});let got=0,named=0;
+  const isCsv=/\.(csv|txt)$/i.test(f.name);$('pmStat').textContent='Đang đọc '+f.name+' ...';
+  const rd=new FileReader();rd.onload=e=>{setTimeout(()=>{try{
+    let wb;if(isCsv){let t=e.target.result;if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);wb=XLSX.read(t,{type:'string',raw:true});}
+    else wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    let got=0,named=0,kg=new Set(),hasOC=false,hasCostCol=false;
     wb.SheetNames.forEach(sn=>{const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
-      let hi=-1,cb=-1,cn=-1,cc=-1,ccost=-1;
-      for(let i=0;i<Math.min(rows.length,15);i++){const h=rows[i].map(x=>String(x).toLowerCase());
-        const fb=h.findIndex(x=>/barcode|jan|^sku$|mã vạch/.test(x));if(fb<0)continue;hi=i;cb=fb;
-        cn=h.findIndex(x=>/item name|product name|tên|name/.test(x));cc=h.findIndex(x=>/layer ?1|category|dept|department|cat\b|部門/.test(x));ccost=h.findIndex(x=>/cost|giá vốn|原価/.test(x));break;}
-      if(hi<0)return;
+      let hi=-1,cb=-1,cn=-1,cc=-1,ccost=-1,coc=-1;
+      for(let i=0;i<Math.min(rows.length,15);i++){const h=rows[i].map(x=>String(x).toLowerCase().trim());
+        const fb=mfFind(h,[/^barcode$/,/barcode|^jan|^sku$|mã vạch/]);if(fb<0)continue;hi=i;cb=fb;
+        cn=mfFind(h,[/^item name$/,/item name\(vn\)/,/product name/,/^tên/,/item name|name/]);
+        cc=mfFind(h,[/^layer ?1( code)?$/,/layer ?1/,/^category$/,/^cat$/,/部門/,/dept|department/]);
+        ccost=mfFind(h,[/^cost$/,/^purchase price$/,/purchase price/,/giá vốn|原価/,/cost/]);
+        coc=mfFind(h,[/^order category$/,/order category|order cat/]);break;}
+      if(hi<0)return;if(ccost>=0)hasCostCol=true;if(coc>=0)hasOC=true;
       for(let i=hi+1;i<rows.length;i++){const r=rows[i];const b=normBC(r[cb]);if(!/^\d{6,14}$/.test(b))continue;
-        if(ccost>=0&&r[ccost]!==''&&!isNaN(+r[ccost])){PMC[b]=+r[ccost];got++;}
-        if(cn>=0&&r[cn]){const cur=PM[b]||{};PM[b]={n:cur.n||String(r[cn]),c:cur.c||(cc>=0?String(r[cc]):'')};named++;}}});
-    if(!got&&!named)return alert('Không thấy cột Barcode / Cost trong file.');
+        if(coc>=0&&String(r[coc]).trim().replace(/\.0+$/,'')==='83')kg.add(b);
+        if(ccost>=0){const cv=String(r[ccost]).replace(/,/g,'').trim();if(cv!==''&&!isNaN(+cv)){PMC[b]=+cv;got++;}}
+        if(cn>=0&&r[cn]){const cur=PM[b]||{};const cat=cc>=0?String(r[cc]).trim().replace(/\.0+$/,''):'';PM[b]={n:cur.n||String(r[cn]),c:cat||cur.c||''};named++;}}});
+    if(!got&&!named)return alert('Không thấy cột Barcode trong file. File cần có dòng tiêu đề với cột Barcode, Item Name, Purchase Price (Cost), Layer1 Code, Order Category.'),pmStatus();
     try{localStorage.setItem('kk1016_pmc',JSON.stringify(PMC));localStorage.setItem('kk1016_pm',JSON.stringify({pm:PM,info:pmInfo||'Item Master'}));}catch(e){}
-    if(!pmInfo)pmInfo='Item Master';pmStatus();renderIPL();alert('Đã đọc Item Master: '+got.toLocaleString('vi-VN')+' mã có Cost, '+named.toLocaleString('vi-VN')+' mã có tên.');
-  }catch(err){alert('Không đọc được file: '+err);}};rd.readAsArrayBuffer(f);}
-
+    if(hasOC)kgSave(kg);
+    if(!pmInfo)pmInfo='Item Master';pmStatus();renderIPL();
+    alert('Đã đọc Item Master ('+f.name+'):\n- '+got.toLocaleString('vi-VN')+' mã có Cost'+(hasCostCol?'':' (không thấy cột Purchase Price / Cost)')+'\n- '+named.toLocaleString('vi-VN')+' mã có tên\n- '+(hasOC?kg.size.toLocaleString('vi-VN')+' mã hàng ký gửi (Order Category 83) - không cho nhập Input list':'không có cột Order Category'));
+  }catch(err){alert('Không đọc được file: '+err);pmStatus();}},30);};
+  if(isCsv)rd.readAsText(f,'utf-8');else rd.readAsArrayBuffer(f);}
+// ---- hàng ký gửi (Order Category 83): lưu chung để máy nào quét cũng chặn được
+const KG_CH=580;let KGSET=null,KGSIG='';
+function kgSave(set){const arr=[...set].sort();try{localStorage.setItem('kk1016_kg',JSON.stringify(arr));}catch(e){}
+  const old=(G('KGN',{})||{}).n||0;const n=Math.ceil(arr.length/KG_CH);for(let k=0;k<n;k++)S('KG:'+k,arr.slice(k*KG_CH,(k+1)*KG_CH).join(','));for(let k=n;k<old;k++)S('KG:'+k,null);
+  S('KGN',{n,count:arr.length,at:Date.now()});KGSET=null;}
+function kgSet(){const meta=G('KGN',null);const sig=meta?meta.at+'|'+meta.n:'local';if(KGSET&&sig===KGSIG)return KGSET;const st=new Set();
+  if(meta&&meta.n){for(let k=0;k<meta.n;k++){const v=G('KG:'+k,'');if(v)v.split(',').forEach(b=>b&&st.add(b));}}
+  if(!st.size){try{JSON.parse(localStorage.getItem('kk1016_kg')||'[]').forEach(b=>st.add(b));}catch(e){}}
+  KGSET=st;KGSIG=sig;return st;}
+function isKG(b){const n=normBC(b);const st=kgSet();return st.has(n)||st.has(n.replace(/^0+/,''));}
 // ================== INPUT LIST KHO ==================
 // Dữ liệu: 'IL' = {loc:{z:mô tả, at}} ; 'R:<loc>:<n>' = mảng dòng [barcode, shelf, qty|null, chk] (150 dòng/khóa) ; 'X:<id>' = phiếu xuất kho
 const CH=150;
@@ -808,11 +830,12 @@ function iplScan(){const R=rowsOf(curLoc);
 function lastBoxHtml(R){const i=lastIdx>=0&&lastIdx<R.length?lastIdx:R.length-1;const r=R[i];if(!r)return '<p class="muted">Chưa có dòng nào ở location này.</p>';const p=pmGet(r[0]);
   return `<div class="xs muted">VỪA LƯU · dòng ${i+1} · shelf ${r[1]} - NV thứ 2 đọc lại 4 số cuối + số lượng:</div><div class="row" style="align-items:flex-end;gap:18px"><div class="big4">${esc(String(r[0]).slice(-4))}</div><div><div class="xs muted">Số lượng</div><div class="big4" style="color:var(--kred)">${r[2]??'-'}</div></div></div><div style="font-weight:700">${p?esc(p.n):'<span class="tag bad">Không có trong dữ liệu - kiểm lại mã / No barcode</span>'}</div><div class="xs muted">${esc(r[0])}${p&&p.c?' · CAT '+esc(p.c):''}</div><div class="row" style="margin-top:8px"><button class="btn sub sm" onclick="undoLast()">↶ Hoàn tác dòng vừa lưu</button></div>`;}
 function scanTable(R){const dc=dupCount(R),seen={};
-  return `<table><thead><tr><th class="c">NO</th><th class="c">Shelf</th><th class="c">CAT</th><th>Product name</th><th class="c">Duplicate</th><th>Barcode</th><th class="c">4 số cuối</th><th class="c">Count</th><th></th></tr></thead><tbody>${R.map((r,i)=>{const b=normBC(r[0]);seen[b]=(seen[b]||0)+1;return {r,i,d:seen[b],n:dc[b]};}).reverse().slice(0,300).map(({r,i,d,n})=>`<tr style="${n>1?'background:#fff6d6':''}${i===lastIdx?';outline:2px solid var(--ok)':''}"><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c">${esc(rowCat(r[0]))}</td><td>${esc(rowName(r[0]))||'<span class="tag bad">?</span>'}</td><td class="c">${n>1?`<span class="tag warn">${d}/${n}</span>`:'1'}</td><td class="xs">${esc(r[0])}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td class="c"><b>${r[2]??'<span class="tag warn">chưa</span>'}</b></td><td><button class="btn sub sm" onclick="delRow(${i})">Xóa</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">-</td></tr>'}</tbody></table>`;}
+  return `<table><thead><tr><th class="c">NO</th><th class="c">Shelf</th><th class="c">CAT</th><th>Product name</th><th class="c">Duplicate</th><th>Barcode</th><th class="c">4 số cuối</th><th class="c">Count</th><th></th></tr></thead><tbody>${R.map((r,i)=>{const b=normBC(r[0]);seen[b]=(seen[b]||0)+1;return {r,i,d:seen[b],n:dc[b]};}).reverse().slice(0,300).map(({r,i,d,n})=>`<tr style="${n>1?'background:#fff6d6':''}${i===lastIdx?';outline:2px solid var(--ok)':''}"><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c">${esc(rowCat(r[0]))}</td><td>${isKG(r[0])?'<span class="tag bad">KÝ GỬI - xóa dòng</span> ':''}${esc(rowName(r[0]))||'<span class="tag bad">?</span>'}</td><td class="c">${n>1?`<span class="tag warn">${d}/${n}</span>`:'1'}</td><td class="xs">${esc(r[0])}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td class="c"><b>${r[2]??'<span class="tag warn">chưa</span>'}</b></td><td><button class="btn sub sm" onclick="delRow(${i})">Xóa</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">-</td></tr>'}</tbody></table>`;}
 function iplScanRefresh(){const R=rowsOf(curLoc);if($('lastBox'))$('lastBox').innerHTML=lastBoxHtml(R);if($('scanTbl'))$('scanTbl').innerHTML=scanTable(R);}
 function beep(ok){try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator();o.frequency.value=ok?1200:300;o.connect(a.destination);o.start();o.stop(a.currentTime+(ok?.08:.3));}catch(e){}}
 function onScan(v){v=cleanCode(v);if(!v)return;if(pend&&/^\d{1,5}$/.test(v)){onQty(v);return;}if(!/^[0-9A-Za-z\-]{4,20}$/.test(v)){beep(0);toast('Mã không hợp lệ: '+v,'bad');return;}
   const t=Date.now(),nb=normBC(v);
+  if(isKG(nb)){if(pend&&nb!==pend.b){focusQty();}lastHit={b:nb,t};beep(0);const p=pmGet(nb);toast('HÀNG KÝ GỬI (Order Category 83) - KHÔNG nhập Input list: ...'+nb.slice(-4)+(p?' '+p.n:''),'bad');return;}
   if(nb===lastHit.b&&t-lastHit.t<(scanMode==='one'?700:DUP_MS)){lastHit.t=t;toast('Đã bỏ qua quét lặp ...'+nb.slice(-4),'warn');return;}
   if(pend&&nb===pend.b){lastHit={b:nb,t};toast('Mã này đang chờ số lượng - bỏ qua quét lặp','warn');focusQty();return;}
   if(pend){beep(0);toast('Chưa nhập số lượng cho mã ...'+pend.b.slice(-4)+'. Nhập số rồi Enter, hoặc bấm Bỏ','bad');focusQty();return;}
@@ -832,6 +855,7 @@ function onQty(v){if(!pend)return;v=cleanCode(v);
   if(/^\d{6,}$/.test(v)){const nb=normBC(v);$('qtyIn').value='';if(nb===pend.b){toast('Quét lặp vào ô số lượng - đã bỏ qua. Gõ số lượng','warn');}else{beep(0);toast('Ô số lượng nhận 1 mã vạch khác (...'+v.slice(-4)+'). Nhập số lượng cho mã ...'+pend.b.slice(-4)+' trước','bad');}focusQty();return;}
   if(v!==''&&!/^\d{1,5}$/.test(v)){toast('Số lượng không hợp lệ','bad');focusQty();return;}
   const q=v===''?null:+v;if(q!==null&&q>=500&&!confirm('Số lượng '+q.toLocaleString('vi-VN')+' - đúng không?')){focusQty();return;}
+  if(isKG(pend.b)){toast('Hàng ký gửi (Order Category 83) - không nhập','bad');pend=null;renderPend();focusScan();return;}
   const R=rowsOf(curLoc);
   if(pend.mode==='add'&&pend.idx>=0){if(q===null){toast('Nhập số lượng để cộng vào dòng cũ','bad');focusQty();return;}R[pend.idx][2]=(+R[pend.idx][2]||0)+q;lastIdx=pend.idx;toast('Đã cộng '+q+' vào dòng '+(pend.idx+1)+' → '+R[pend.idx][2],'ok');}
   else{R.push([pend.b,curShelf,q,'']);lastIdx=R.length-1;}
@@ -866,7 +890,7 @@ function printWin(title,body){const w=window.open('','_blank');if(!w)return aler
   <body><div class="bar"><b>${esc(title)}</b> <button onclick="print()">In / Lưu PDF</button></div>${body}</body></html>`);w.document.close();}
 function printCount(loc,q){if(!rowsOf(loc).length)return alert('Location '+loc+' chưa có dòng nào.');printWin('Input list '+loc,countPage(loc,q));}
 function printAll(q){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có location nào có dòng hàng.');printWin('Input list - '+L.length+' location',sumPage(L)+L.map(l=>countPage(l,q)).join(''));}
-function exportInputList(){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có dòng hàng.');const rows=[];L.forEach(l=>rowsOf(l).forEach(r=>{const c=rowCat(r[0]);rows.push([rows.length+1,c!==''&&!isNaN(+c)?String(c).padStart(2,'0'):c,rowName(r[0]),normBC(r[0]),r[2]??'',r[1],+l]);}));
+function exportInputList(){const L=locs().filter(l=>rowsOf(l).length);if(!L.length)return alert('Chưa có dòng hàng.');const rows=[];L.forEach(l=>rowsOf(l).forEach(r=>{if(isKG(r[0]))return;const c=rowCat(r[0]);rows.push([rows.length+1,c!==''&&!isNaN(+c)?String(c).padStart(2,'0'):c,rowName(r[0]),normBC(r[0]),r[2]??'',r[1],+l]);}));
   const B=XW.Book();const sh=B.addSheet('INPUTLIST',{title:`INPUT LIST 1016 (${L.length} LOCATION · ${rows.length} DÒNG)`,subtitle:'Kiểm kê 16/12/2026 · Mẫu INPUTLIST: NO - Category - Product name - BarCode - Count - Shelf - Location · Xuất lúc '+nowStr(),cols:[7,10,44,17,9,8,10]});
   B.table(sh,[{h:'NO',t:'stt'},{h:'Category',t:'code'},{h:'Product name',t:'wrap'},{h:'BarCode',t:'code'},{h:'Count',t:'int'},{h:'Shelf',t:'int'},{h:'Location',t:'int',x:{fmt:'0'}}],rows,{main:true});
   B.save('Kohnan_KiemKe1016_INPUTLIST_'+fileDate()+'.xlsx');}
@@ -906,13 +930,14 @@ function delOut(id){if(!confirm('Xóa phiếu xuất kho này?'))return;S('X:'+i
 // ---- xuất file
 function finalRows(){const X=removals(),warn=[],out=[];const L=locs();const left={};
   X.forEach(x=>{const k=x.loc+'|'+normBC(x.b);left[k]=(left[k]||0)+(+x.q||0);});
-  L.forEach(l=>{rowsOf(l).forEach(r=>{let q=r[2];const k=l+'|'+normBC(r[0]);let ded=0;if(q!=null&&left[k]>0){ded=Math.min(q,left[k]);left[k]-=ded;q-=ded;}out.push({loc:l,shelf:r[1],b:normBC(r[0]),q0:r[2],ded,q});});});
+  L.forEach(l=>{rowsOf(l).forEach(r=>{if(isKG(r[0]))return;let q=r[2];const k=l+'|'+normBC(r[0]);let ded=0;if(q!=null&&left[k]>0){ded=Math.min(q,left[k]);left[k]-=ded;q-=ded;}out.push({loc:l,shelf:r[1],b:normBC(r[0]),q0:r[2],ded,q});});});
   for(const k in left)if(left[k]>0)warn.push(k.replace('|',' · ')+' còn '+left[k]+' chưa trừ được');return {out,warn};}
 function iplExp(){const {out,warn}=finalRows();const miss=out.filter(r=>r.q0==null).length,noCost=out.filter(r=>costGet(r.b)===undefined).length,noName=out.filter(r=>!pmGet(r.b)).length;const ct=G('CT',{d:'2026-12-15',t:'23:00'});
   return `<div class="card"><h3>Kiểm tra trước khi xuất</h3><ul class="rules">
   <li><b class="n" style="background:${miss?'var(--bad)':'var(--ok)'}">${miss?'!':'✓'}</b><div>${miss?miss+' dòng chưa nhập số lượng (không được xuất)':'Tất cả dòng đã có số lượng'}</div></li>
   <li><b class="n" style="background:${noCost?'var(--warn)':'var(--ok)'}">${noCost?'!':'✓'}</b><div>${noCost?noCost+' dòng chưa có Cost - tải Item Master mới nhất ở trên, hoặc SM VLOOKUP cột H':'Đủ Cost cho mọi dòng'}</div></li>
   <li><b class="n" style="background:${noName?'var(--warn)':'var(--ok)'}">${noName?'!':'✓'}</b><div>${noName?noName+' dòng barcode không có trong dữ liệu hàng (kiểm lại mã, có thể Unmatch)':'Mọi barcode đều có trong dữ liệu'}</div></li>
+  ${(()=>{const kg=[];locs().forEach(l=>rowsOf(l).forEach(r=>{if(isKG(r[0]))kg.push(l+' · '+normBC(r[0]));}));const has=kgSet().size;return `<li><b class="n" style="background:${kg.length||!has?'var(--warn)':'var(--ok)'}">${kg.length||!has?'!':'✓'}</b><div>${!has?'Chưa có danh sách hàng ký gửi - tải Item Master (có cột Order Category) ở trên':kg.length?kg.length+' dòng hàng ký gửi (Order Category 83) đã tự loại khỏi file xuất: '+kg.slice(0,8).map(esc).join('; ')+(kg.length>8?' ...':''):'Không có hàng ký gửi (Order Category 83) trong Input list'}</div></li>`;})()}
   <li><b class="n" style="background:${warn.length?'var(--bad)':'var(--ok)'}">${warn.length?'!':'✓'}</b><div>${warn.length?'Phiếu xuất kho không trừ hết: '+warn.map(esc).join('; '):'Phiếu xuất kho đã trừ đủ ('+out.reduce((s,r)=>s+r.ded,0)+' cái)'}</div></li></ul>
   <div class="row" style="margin-top:10px"><b>Cột M - Count Time</b><input type="date" value="${ct.d}" onchange="S('CT',{...G('CT',{d:'2026-12-15',t:'23:00'}),d:this.value})"><input type="time" value="${ct.t}" onchange="S('CT',{...G('CT',{d:'2026-12-15',t:'23:00'}),t:this.value})"><span class="muted sm">= ngày kiểm kê lùi 1 ngày</span></div>
   <div class="row" style="margin-top:14px"><button class="btn" onclick="exportWarehouse()">Xuất file Warehouse (A-M) dán gendat</button><button class="btn sub" onclick="exportPuradCSV()">Xuất CSV mẫu Purad</button><button class="btn sub" onclick="exportIplReport()">Báo cáo Excel Input list kho</button><button class="btn sub" onclick="backupJSON()">Sao lưu dữ liệu (.json)</button></div>
