@@ -593,6 +593,16 @@ window.S1016_TOOLS = {
       "updated": "12/11/2026"
     },
     {
+      "name": "Input List Kho - Kiểm Kê 12/2026",
+      "desc": "Quét + số lượng, in Count specification, check 30% x3, xuất file Warehouse, nhập lại từ Excel - gửi team",
+      "group": "Kế hoạch & Báo cáo",
+      "groupId": "ke-hoach",
+      "href": "https://hoangnganhapulico-stack.github.io/1016_LINK_TONG_HOP/05_KE_HOACH_BAO_CAO/KK_Input_List_Kho_T12_2026.html",
+      "local": "",
+      "host": "GitHub",
+      "updated": "14/11/2026"
+    },
+    {
       "name": "T10 - Kế Hoạch Team Admin",
       "desc": "Đạt Budget T10 + bù phần thiếu T9",
       "group": "Kế hoạch & Báo cáo",
