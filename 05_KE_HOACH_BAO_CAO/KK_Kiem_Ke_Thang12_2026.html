@@ -257,7 +257,7 @@ details.card summary{cursor:pointer;font-weight:700;color:var(--navy)}
   <div class="sec-head"><span class="num">5</span><h2>Input list kho (tự kiểm 100%)</h2></div>
   <img class="mascot-sec" src="../08_TRO_LY_DIEU_HANH/kohnan_mascot.png" alt="">
   <p class="lead">Tool Input list kho đã tách thành trang riêng để chia sẻ cho team: quét + số lượng, in phiếu Count specification, kiểm 30% x 3 lượt, trừ xuất kho, xuất file Warehouse, nhập lại từ Excel. Dữ liệu dùng chung với trang này - tiến độ bên dưới tự cập nhật.</p>
-  <div class="action" style="clear:both"><div class="row"><b>Link gửi team:</b> <a href="KK_Input_List_Kho_T12_2026.html" target="_blank">KK_Input_List_Kho_T12_2026.html</a><span class="sp"></span><a class="btn" href="KK_Input_List_Kho_T12_2026.html" target="_blank">Mở Tool Input List Kho</a><button class="btn sub" onclick="copyIplLink()">Sao chép link</button></div></div>
+  <div class="action" style="clear:both"><div class="row"><b>Link gửi team:</b> <a href="https://1016inputlistkho.netlify.app/" target="_blank">1016inputlistkho.netlify.app</a><span class="sp"></span><a class="btn" href="https://1016inputlistkho.netlify.app/" target="_blank">Mở Tool Input List Kho</a><button class="btn sub" onclick="copyIplLink()">Sao chép link</button></div></div>
   <div class="grid g4" id="iplKpi" style="margin-top:14px"></div>
 </section>
 
@@ -899,7 +899,7 @@ function iplQty(){const R=rowsOf(curLoc);const q=R.filter(r=>r[2]!==null&&r[2]!=
   ${R.map((r,i)=>`<tr><td class="c">${i+1}</td><td class="c">${r[1]}</td><td class="c l4">${esc(String(r[0]).slice(-4))}</td><td>${esc(rowName(r[0]))}</td><td class="xs">${esc(r[0])}</td><td class="c"><input type="number" min="0" step="1" inputmode="numeric" class="qty" id="q${i}" value="${r[2]??''}" onchange="setQty(${i},this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();const n=$('q${i+1}');if(n){n.focus();n.select();}}"></td></tr>`).join('')||'<tr><td colspan="6" class="muted">Location chưa có dòng - qua tab 2 "Quét + số lượng".</td></tr>'}</tbody></table></div>`;}
 function findRow(v){const nb=normBC(cleanCode(v));const R=rowsOf(curLoc);const ids=R.map((r,i)=>i).filter(i=>normBC(R[i][0])===nb);if(!ids.length){beep(0);return toast('Mã ...'+nb.slice(-4)+' không có trong location '+curLoc,'bad');}const i=ids.find(i=>R[i][2]==null)??ids[0];beep(1);const e=$('q'+i);e.scrollIntoView({block:'center'});e.focus();e.select();if(ids.length>1)toast('Mã này có '+ids.length+' dòng: '+ids.map(x=>x+1).join(', '),'warn');}
 function setQty(i,v){const R=rowsOf(curLoc);R[i][2]=v===''?null:Math.max(0,Math.round(+v));saveRows(curLoc,R);renderIPLKpi();}
-function copyIplLink(){const u=new URL('KK_Input_List_Kho_T12_2026.html',location.href).href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert('Đã sao chép link:\n'+u),()=>prompt('Sao chép link:',u));}
+function copyIplLink(){const u='https://1016inputlistkho.netlify.app/';(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert('Đã sao chép link:\n'+u),()=>prompt('Sao chép link:',u));}
 function renderIPLKpi(){const st=iplStats();const k=$('iplKpi').children;if(k[2])k[2].querySelector('.v').textContent=st.pctQty+'%',k[2].querySelector('.d').textContent=st.withQty+'/'+st.rows+' dòng đã nhập số lượng';if(k[3])k[3].querySelector('.v').textContent=st.need?Math.round(st.chk/st.need*100)+'%':'-',k[3].querySelector('.d').textContent=st.chk+'/'+st.need+' dòng đã double check';}
 // ---- kiểm 30%
 let chkRound=1;
