@@ -1,0 +1,1 @@
+(function(){function C(){this.data={datasets:[]};this.options={};}C.prototype.destroy=function(){};C.prototype.update=function(){};C.register=function(){};C.defaults={font:{},plugins:{legend:{},tooltip:{}}};window.Chart=C;window.ChartDataLabels={};})();
